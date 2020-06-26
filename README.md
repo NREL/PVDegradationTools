@@ -1,10 +1,8 @@
-﻿<img src="docs/images_wiki/CE-MFC.png" width="400">
-
 <table>
 <tr>
   <td>License</td>
   <td>
-    <a href="https://github.com/holsappled/Relative-Humidity-for-Solar-Modules/LICENSE">
+    <a href="https://github.com/NREL/PVDegradationTools/blob/master/LICENSE.md">
     <img src="https://img.shields.io/pypi/l/pvlib.svg" alt="license" />
     </a>
 </td>
@@ -12,9 +10,10 @@
 </table>
 
 
-# Relative Humidity and Acceleration Factors for Solar Modules 
+# PV Degradation Tools
 
-This open-source tool will help quantify the relative humidity inside of Solar PV Modules, as well as Arrhenius Degradation Acceleration Factor. 
+This repository contains functions for calculating degradation of photovoltaic modules. For example, functions to calculate front and rear relative Humidity, as well as Acceleration Factors. A degradation calculation function is also being developed, considering humidity and spectral irradiances models.
+
 
 
 Documentation
@@ -30,7 +29,7 @@ Relative Humidity and Acceleration Factors for Solar Modules releases may be ins
 
 Install with:
 
-    pip install RelativeHumidityforSolarModules
+    pip install PVDegradationTools
 
 For developer installation, download the repository, navigate to the folder location and install as:
 
@@ -48,7 +47,7 @@ Getting support
 
 If you suspect that you may have discovered a bug or if you'd like to
 change something about CF-MFA, then please make an issue on our
-[GitHub issues page](hhttps://github.com/holsappled/Relative-Humidity-for-Solar-Modules/issues).
+[GitHub issues page](hhttps://github.com/NREL/PVDegradationTools/issues).
 
 
 Citing
