@@ -42,6 +42,12 @@ License
 BSD 3-clause
 
 
+Contributing
+=======
+
+We welcome contributiosn to this software, but please read the copyright license agreement (cla-1.0.md), with instructions on signing it in sign-CLA.md. For questions, email us.
+
+
 Getting support
 ===============
 
@@ -55,5 +61,7 @@ Citing
 
 If you use this functions in a published work, please cite:
 
-	Holsapple, Derek. "Relative Humidity for Solar Modules", Github 2020. 
+	Holsapple, Derek, Ayala Pelaez, Silvana, Kempe, Michael. "PV Degradation Tools", NREL Github 2020, Software Record SWR-20-71.
+	
+Zenodo reference and OSTI software record information forthcoming. 
 
