@@ -1,0 +1,18 @@
+.. _api:
+
+API
+===
+Modules, methods, classes and attributes are explained here.
+
+.. automodule:: Relative_Humidity_for_Solar_Modules
+
+.. automodule:: Relative_Humidity_for_Solar_Modules.main
+
+RH Functions 
+-------------------
+.. autofunction:: RHfront
+
+Soldering Degradation Functions
+-------------------------------
+Some other function here
+

@@ -1,0 +1,18 @@
+.. _whatsnew_0100:
+
+v0.1 (08 / 05 / 2020)
+=====================
+
+First official release. Although functions work, some of the support functions for automatic setup are still being installed.
+
+* Re-structured folders to include Documentation, Versioning and Setup.
+* main.py populated with functions developed
+* Development journals and examples moved to tutorials folder
+* Added Sphinx Documentation
+* Added Versioneer
+
+
+Contributors
+~~~~~~~~~~~~
+* Derek Holsapple (:ghuser:`holsappled`)
+* Silvana Ayala (:ghuser:`shirubana`)

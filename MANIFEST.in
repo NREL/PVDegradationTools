@@ -1,0 +1,2 @@
+include versioneer.py
+include Relative_Humidity_for_Solar_Modules/_version.py
