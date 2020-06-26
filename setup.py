@@ -23,7 +23,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='Relative_Humidity_for_Solar_Modules',
+    name='PVDegradationTools',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -33,16 +33,16 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
 
 
-    description='Calculator to evaluate relative humidity in PV modules.',
+    description='Calculator to evaluate PV Degradation in PV modules.',
     long_description=long_description,
     long_description_content_type='text/markdown',
 
     # The project's main homepage.
-    url='https://github.com/holsappled/Relative-Humidity-for-Solar-Modules',
+    url='https://github.com/NREL/PVDegradationTools',
 
     # Author details
     author='Derek Holsapple',
-    author_email='derek.holsapple@nrel.gov',
+    author_email='derekhols31@gmail.com',
 
     # Choose your license
     license='BSD',
@@ -75,10 +75,10 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     #packages=find_packages(exclude=['contrib', 'docs', 'tests']) + ['data'],
-    packages = ['Relative_Humidity_for_Solar_Modules'],
+    packages = ['PVDegradationTools'],
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
-    #py_modules=["Relative_Humidity_for_Solar_Modules"],
+    #py_modules=["PVDegradationTools"],
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
@@ -104,7 +104,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        'Relative_Humidity_for_Solar_Modules': ['data/722024TYA.pickle'],
+        'PVDegradationTools': ['data/722024TYA.pickle'],
     },
 
     include_package_data=True,

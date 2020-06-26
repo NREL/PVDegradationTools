@@ -42,8 +42,8 @@ def get_config():
     cfg.VCS = "git"
     cfg.style = "pep440"
     cfg.tag_prefix = ""
-    cfg.parentdir_prefix = "Relative_Humidity_for_Solar_Modules"
-    cfg.versionfile_source = "Relative_Humidity_for_Solar_Modules/_version.py"
+    cfg.parentdir_prefix = "PVDegradationTools"
+    cfg.versionfile_source = "PVDegradationTools/_version.py"
     cfg.verbose = False
     return cfg
 

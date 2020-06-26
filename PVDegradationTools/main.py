@@ -1,7 +1,7 @@
 """
 Contains energy algorithms for processing.
 
-@author: Derek Holsapple
+@author: Derek Holsapple NREL 2020
 """
 
 import numpy as np
