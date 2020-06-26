@@ -3,13 +3,13 @@
 Installation
 ============
 
-Relative_Humidity_for_Solar_Modules releases may be installed using the pip and conda tools.
+PVDegradationTools releases may be installed using the pip and conda tools.
 
 Install with:
 
 .. code::
 
-        pip install Relative_Humidity_for_Solar_Modules
+        pip install PVDegradationTools
 
 For developer installation, download the repository, navigate to the folder location and install as:
 

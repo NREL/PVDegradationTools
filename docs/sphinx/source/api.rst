@@ -4,9 +4,9 @@ API
 ===
 Modules, methods, classes and attributes are explained here.
 
-.. automodule:: Relative_Humidity_for_Solar_Modules
+.. automodule:: PVDegradationTools
 
-.. automodule:: Relative_Humidity_for_Solar_Modules.main
+.. automodule:: PVDegradationTools.main
 
 RH Functions 
 -------------------

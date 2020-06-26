@@ -4,31 +4,15 @@ API
 ===
 Modules, methods, classes and attributes are explained here.
 
-.. automodule:: CEMFC
+.. automodule:: Relative_Humidity_for_Solar_Modules
 
-.. automodule:: CEMFC.main
+.. automodule:: Relative_Humidity_for_Solar_Modules.main
 
-Flow Mass Functions
+RH Functions 
 -------------------
-.. autofunction:: calculateMassFlow
+.. autofunction:: RHfront
 
-Reliability and Failure Functions
----------------------------------
-.. autofunction:: weibull_params
-.. autofunction:: weibull_cdf
+Soldering Degradation Functions
+-------------------------------
+Some other function here
 
-Modifying Baseline Functions
-----------------------------
-.. autofunction:: sens_lifetime
-.. autofunction:: sens_PanelEff
-.. autofunction:: sens_ManufacturingYield
-.. autofunction:: sens_ManufacturingRecycling
-.. autofunction:: sens_ManufacturingRecyclingEff
-.. autofunction:: sens_ManufacturingHQRecycling
-.. autofunction:: sens_ManufacturingHQRecyclingEff
-.. autofunction:: sens_EOLCollection
-.. autofunction:: sens_EOLRecycling
-.. autofunction:: sens_EOLRecyclingYield
-.. autofunction:: sens_EOLHQRecycling
-.. autofunction:: sens_EOLHQRecyclingYield
-.. autofunction:: sens_ReUse

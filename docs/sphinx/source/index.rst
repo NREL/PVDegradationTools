@@ -1,12 +1,12 @@
 
 
-Welcome to Relative_Humidity_for_Solar_Modules!
+Welcome to PVDegradationTools!
 ==============================================================
 
 This tool will help calculate degradation in PV modules.
 
-The source code for CE-MFC is hosted on `github
-<https://github.com/holsappled/Relative-Humidity-for-Solar-Modules>`_.
+The source code for PVDegradationTools is hosted on `github
+<https://github.com/NREL/PVDegradationTools>`_.
 
 Please see the :ref:`installation` page for installation help.
 
