@@ -1271,4 +1271,114 @@ class relativeHumidity:
 
         return RHbacksheet_series
 
+class BOLIDLeTID:
+    """
+    Class for Field extrapolation of BOLID and LeTID
+    """
     
+        ###########
+        # field Degradation Profile       
+        ###########
+        
+
+    def fieldDegradationProfile(T, x0 = [1E16,0,0], t = np.linspace(0,1000,10000), 
+                                     v_AB = 4E3, v_BA = 1E13, v_BC = 1.25E10,
+                                     v_CB = 1E9, Ea_AB = 0.475, Ea_BA = 1.32, 
+                                     Ea_BC = 0.98, Ea_CB = 1.25):
+        '''
+        This function calculates and plots the % of Defects on each state (A, B,C)
+        as a function of time and temperature, using the kinetic parameters 
+        (activation energies adn attempt fequencies). 
+        Values from Repins, Solar Energy 2020
+        Equations from Hallam, Energy Proc 2016
+        
+        Parameters
+        ----------
+        T : float
+            Temperature in Kelvin Degrees
+        x0 : array
+            1D array with the 3 initial values for number of defects in each state,
+            in the format [N_A, N_B, N_C]
+        t : array
+            1D array of the times to be simulated. Can be defined as a 
+            numpy linspace between inital time and end time and number of sample points,
+            for example t = np.linspace(0,1000,10000)
+        v_AB : float
+            Attempt frequency, in Hz for states A-->B
+        v_BA : float
+            Attempt frequency, in Hz for states B-->A
+        v_BC : float
+            Attempt frequency, in Hz for states B-->C
+        v_CB : float
+            Attempt frequency, in Hz for states C-->B
+        Ea_AB : float
+            Activation energy between states A-->B, in eV.
+        Ea_BA : float
+            Activation energy between states B-->A, in eV.
+        Ea_BC : float
+            Activation energy between states B-->C, in eV.
+        Ea_CB : float
+            Activation energy between states C-->B, in eV.
+        
+        Returns
+        --------        
+        '''
+        from scipy.integrate import odeint
+        import matplotlib.pyplot as plt
+    
+        # PARAMETERS
+        kb = 8.617333262145E-5 # eV * K-1 Boltmanzz Constnat
+               
+        # Arrhenius Equation
+        # k = reaction rate for the transition from state i to state j
+        # where i,j = A,B,C, but i != j. Also, no direct transition between
+        # state A and C (k_AC = k_CA = 0)
+        # k_ij = v_ij * np.exp(-Ea_ij/(kb*T))        
+        k_AB = v_AB * np.exp(-Ea_AB/(kb*T))
+        k_AC = 0
+        k_CA = 0
+        k_BA = v_BA * np.exp(-Ea_BA/(kb*T))
+        k_BC = v_BC * np.exp(-Ea_BC/(kb*T))
+        k_CB = v_CB * np.exp(-Ea_CB/(kb*T))
+        
+        # function that returns dN_A/dt, dN_B, and dN_C
+        def model(x, t, k_AB, k_BA, k_BC, k_CB):
+            N_A = x[0]
+            N_B = x[1]
+            N_C = x[2]
+            dN_Adt = k_BA * N_B - k_AB * N_A
+            dN_Bdt = k_AB * N_A + k_CB * N_C - (k_BA + k_BC) * N_B
+            dN_Cdt = k_BC * N_B - k_CB * N_C
+            return [dN_Adt, dN_Bdt, dN_Cdt]
+        
+        
+        # Calling the Derivate model with odeint    
+        x = odeint(model, x0, t, args=(k_AB, k_BA, k_BC, k_CB))     # args pebble.)
+        
+        N_A = x[:,0]
+        N_B = x[:,1]
+        N_C = x[:,2]
+        
+        # CAlculating Percentage of Defects in Each State
+        T_def = x.sum(axis=1)  # total of defects
+        P_A = N_A*100/T_def
+        P_B = N_B*100/T_def
+        P_C = N_C*100/T_def
+        
+        # Plotting # of Defects 
+        plt.semilogy(t, N_A, label='A')
+        plt.semilogy(t, N_B, label='B')
+        plt.semilogy(t, N_C, label='C')
+        plt.legend()
+        plt.xlabel('Exposure length (t)')
+        plt.ylabel('Number of Defects in Each State')
+        plt.show()
+        
+        # Plotting % of Defects 
+        plt.plot(t, P_A, label='A')
+        plt.plot(t, P_B, label='B')
+        plt.plot(t, P_C, label='C')
+        plt.legend()
+        plt.xlabel('Exposure length (t)')
+        plt.ylabel('% Defects in Each State')
+        plt.show()
