@@ -1271,6 +1271,65 @@ class relativeHumidity:
 
         return RHbacksheet_series
 
+class Degradation:
+    
+    def Degradation(waves, data, Ea=40.0, N=1.0):
+        '''
+        Compute degredation as double integral of Arrhenius (Activation
+        Energy, RH, Temperature) and Spectral (wavelength, irradiance)
+        functions over wavelength and time.
+
+        Parameters
+        ----------
+        waves : int-array
+            integer array (or list) of wavelengths tested w/ uniform delta
+        data : pd.DataFrame
+            DataFrame containing timestamps, temperature, relative humidity,
+            and irradiance(spectral)
+            Expected Columns:
+                ['Temperature'] : int
+                ['RH'] : float
+                ['Spectra'] : float-array
+        Ea : float, optional
+            Arrhenius activation energy. The default is 40. [kJ/mol]
+        N : float, optional
+            Fit paramter for RH sensitivity. The default is 1.
+
+        Returns
+        -------
+        D : float
+            Total degredation factor over time and wavelength.
+
+        '''
+        
+        # constants
+        R = 0.008314
+        C2 = 0.07
+        X = 0.64
+        wav_bin = (waves[1]-waves[0])/2
+        
+        # computation
+        irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        irr.columns = waves
+        
+        C3 = np.exp(-C2*waves)
+        irr = irr*C3
+        
+        irr = irr*wav_bin
+        
+        irr = irr**X
+        
+        data['G_integral'] = irr.sum(axis=1)
+        
+        C4 = np.exp(-Ea/(R*data['Temperature']))
+        
+        RHn = data['RH']**N
+        data['Arr_integrand'] = C4*RHn
+        
+        data['dD'] = data['G_integral']*data['Arr_integrand']
+        return data['dD'].sum(axis=0)
+
+
 class BOLIDLeTID:
     """
     Class for Field extrapolation of BOLID and LeTID
