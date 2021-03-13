@@ -1273,7 +1273,7 @@ class relativeHumidity:
 
 class Degradation:
     
-    def Degradation(data, wavelengths, Ea=40.0, n=1.0, x = 0.64, C=0.07):
+    def Degradation(data, wavelengths, Ea=40.0, n=1.0, x = 0.64, C2=0.07, C=1.0):
         '''
         Compute degredation as double integral of Arrhenius (Activation
         Energy, RH, Temperature) and Spectral (wavelength, irradiance)
@@ -1298,8 +1298,10 @@ class Degradation:
         x : float
             Fit parameter for irradiance sensitivity. Typically
             0.6 +- 0.22
-        C : float
-            Fit parameter for Degradation equation
+        C2 : float
+            Fit parameter for sensitivity to wavelength exponential
+        C: float
+            Fit parameter for the Degradation equaiton
             
         Returns
         -------
@@ -1318,7 +1320,7 @@ class Degradation:
         irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
         irr.columns = wavelengths
         
-        sensitivitywavelengths = np.exp(-C*wavelengths)
+        sensitivitywavelengths = np.exp(-C2*wavelengths)
         irr = irr*sensitivitywavelengths
         irr *= np.array(wav_bin)
         irr = irr**x
@@ -1332,7 +1334,7 @@ class Degradation:
         
         data['dD'] = data['G_integral']*data['Arr_integrand']
         
-        degradation = data['dD'].sum(axis=0)
+        degradation = C*data['dD'].sum(axis=0)
         
         return degradation
 
