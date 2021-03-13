@@ -1273,61 +1273,68 @@ class relativeHumidity:
 
 class Degradation:
     
-    def Degradation(waves, data, Ea=40.0, N=1.0):
+    def Degradation(data, wavelengths, Ea=40.0, n=1.0, x = 0.64, C=0.07):
         '''
         Compute degredation as double integral of Arrhenius (Activation
         Energy, RH, Temperature) and Spectral (wavelength, irradiance)
         functions over wavelength and time.
-
+    
         Parameters
         ----------
-        waves : int-array
+        wavelengths : int-array
             integer array (or list) of wavelengths tested w/ uniform delta
+            in nanometers [nm]
         data : pd.DataFrame
-            DataFrame containing timestamps, temperature, relative humidity,
+            DataFrame containing temperature, relative humidity,
             and irradiance(spectral)
             Expected Columns:
-                ['Temperature'] : int
-                ['RH'] : float
-                ['Spectra'] : float-array
-        Ea : float, optional
+                ['Temperature'] : Celsius, float
+                ['RH'] : 0-1, float
+                ['Spectra'] : [W/m2-nm], float-array
+        Ea : float
             Arrhenius activation energy. The default is 40. [kJ/mol]
-        N : float, optional
+        n : float
             Fit paramter for RH sensitivity. The default is 1.
-
+        x : float
+            Fit parameter for irradiance sensitivity. Typically
+            0.6 +- 0.22
+        C : float
+            Fit parameter for Degradation equation
+            
         Returns
         -------
-        D : float
+        degradation : float
             Total degredation factor over time and wavelength.
-
+    
         '''
         
-        # constants
-        R = 0.008314
-        C2 = 0.07
-        X = 0.64
-        wav_bin = (waves[1]-waves[0])/2
+        # Constants
+        R = 0.008314  # Gas Constant in 
+    
+        wav_bin = list(np.diff(wavelengths))
+        wav_bin.append(wav_bin[-1])  # Adding a bin for the last wavelength
         
-        # computation
+        # Integral over Wavelength
         irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
-        irr.columns = waves
+        irr.columns = wavelengths
         
-        C3 = np.exp(-C2*waves)
-        irr = irr*C3
-        
-        irr = irr*wav_bin
-        
-        irr = irr**X
-        
+        sensitivitywavelengths = np.exp(-C*wavelengths)
+        irr = irr*sensitivitywavelengths
+        irr *= np.array(wav_bin)
+        irr = irr**x
         data['G_integral'] = irr.sum(axis=1)
         
-        C4 = np.exp(-Ea/(R*data['Temperature']))
+        EApR=-Ea/R
+        C4 = np.exp(EApR/data['Temperature'])
         
-        RHn = data['RH']**N
+        RHn = data['RH']**n
         data['Arr_integrand'] = C4*RHn
         
         data['dD'] = data['G_integral']*data['Arr_integrand']
-        return data['dD'].sum(axis=0)
+        
+        degradation = data['dD'].sum(axis=0)
+        
+        return degradation
 
 
 class BOLIDLeTID:
