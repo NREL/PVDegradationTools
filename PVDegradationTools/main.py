@@ -1311,7 +1311,7 @@ class Degradation:
         '''
         
         # Constants
-        R = 0.008314  # Gas Constant in 
+        R = 0.0083145  # Gas Constant in [kJ/mol*K]
     
         wav_bin = list(np.diff(wavelengths))
         wav_bin.append(wav_bin[-1])  # Adding a bin for the last wavelength
