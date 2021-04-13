@@ -1288,8 +1288,8 @@ class Degradation:
             DataFrame containing temperature, relative humidity,
             and irradiance(spectral)
             Expected Columns:
-                ['Temperature'] : Celsius, float
-                ['RH'] : 0-1, float
+                ['Module_Temperature'] : Celsius, float
+                ['Module_RH'] : 0-1, float
                 ['Spectra'] : [W/m2-nm], float-array
         Ea : float
             Arrhenius activation energy. The default is 40. [kJ/mol]
@@ -1327,9 +1327,9 @@ class Degradation:
         data['G_integral'] = irr.sum(axis=1)
         
         EApR=-Ea/R
-        C4 = np.exp(EApR/data['Temperature'])
+        C4 = np.exp(EApR/data['Module_Temperature'])
         
-        RHn = data['RH']**n
+        RHn = data['Module_RH']**n
         data['Arr_integrand'] = C4*RHn
         
         data['dD'] = data['G_integral']*data['Arr_integrand']
