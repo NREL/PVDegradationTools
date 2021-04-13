@@ -1273,7 +1273,8 @@ class relativeHumidity:
 
 class Degradation:
     
-    def Degradation(data, wavelengths, Ea=40.0, n=1.0, x = 0.64, C2=0.07, C=1.0):
+    def Degradation(Spectra, Module_RH, Module_Temperature, wavelengths,
+                    Ea=40.0, n=1.0, x = 0.64, C2=0.07, C=1.0):
         '''
         Compute degredation as double integral of Arrhenius (Activation
         Energy, RH, Temperature) and Spectral (wavelength, irradiance)
@@ -1281,16 +1282,15 @@ class Degradation:
     
         Parameters
         ----------
+        Spectra : pd.Series type=Float
+            front or rear irradiance at each wavelength in "wavelengths"
+        Module_RH : pd.Series type=Float
+            module RH, time indexed
+        Module_Temperature : pd.Series type=Float
+            module temperature, time indexed
         wavelengths : int-array
             integer array (or list) of wavelengths tested w/ uniform delta
             in nanometers [nm]
-        data : pd.DataFrame
-            DataFrame containing temperature, relative humidity,
-            and irradiance(spectral)
-            Expected Columns:
-                ['Module_Temperature'] : Celsius, float
-                ['Module_RH'] : 0-1, float
-                ['Spectra'] : [W/m2-nm], float-array
         Ea : float
             Arrhenius activation energy. The default is 40. [kJ/mol]
         n : float
@@ -1300,7 +1300,7 @@ class Degradation:
             0.6 +- 0.22
         C2 : float
             Fit parameter for sensitivity to wavelength exponential
-        C: float
+        C : float
             Fit parameter for the Degradation equaiton
             
         Returns
@@ -1318,11 +1318,12 @@ class Degradation:
         
         # Integral over Wavelength
         try:
-            irr = pd.DataFrame(data.Spectra.tolist(), index= data.index)
+            irr = pd.DataFrame(Spectra.tolist(), index= Spectra.index)
         except:
             # TODO: Fix this except it works on some cases, veto it by cases
             print("USING THE EXCEPT in PVDegradations Degradation function")
-            irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+            #irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+            irr = Spectra.str.strip('[]').str.split(',', expand=True).astype(float)
         
         irr.columns = wavelengths
         
@@ -1330,12 +1331,13 @@ class Degradation:
         irr = irr*sensitivitywavelengths
         irr *= np.array(wav_bin)
         irr = irr**x
+        data = pd.DataFrame(index=Spectra.index)
         data['G_integral'] = irr.sum(axis=1)
         
         EApR=-Ea/R
-        C4 = np.exp(EApR/data['Module_Temperature'])
+        C4 = np.exp(EApR/Module_Temperature)
         
-        RHn = data['Module_RH']**n
+        RHn = Module_RH**n
         data['Arr_integrand'] = C4*RHn
         
         data['dD'] = data['G_integral']*data['Arr_integrand']
