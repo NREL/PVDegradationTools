@@ -1317,7 +1317,13 @@ class Degradation:
         wav_bin.append(wav_bin[-1])  # Adding a bin for the last wavelength
         
         # Integral over Wavelength
-        irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        try:
+            irr = pd.DataFrame(data.Spectra.tolist(), index= data.index)
+        except:
+            # TODO: Fix this except it works on some cases, veto it by cases
+            print("USING THE EXCEPT in PVDegradations Degradation function")
+            irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        
         irr.columns = wavelengths
         
         sensitivitywavelengths = np.exp(-C2*wavelengths)
