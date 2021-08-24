@@ -1009,7 +1009,7 @@ class relativeHumidity:
 
         """
         
-        numerator = relativeHumidity._SDwNumerator( rH_ambient, ambient_temp, surface_temp, So ,  Eas , Ead)
+        numerator = relativeHumidity.SDwNumerator( rH_ambient, ambient_temp, surface_temp, So ,  Eas , Ead)
         #get the summation of the numerator
         numerator = numerator.sum(axis = 0, skipna = True)
 
@@ -1058,7 +1058,7 @@ class relativeHumidity:
         # Back Encapsulant Relative Humidity       
         ###########
 
-    def Csat(surface_temp, So = 1.81390702, Eas = 16.729):
+    def _Csat(surface_temp, So = 1.81390702, Eas = 16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns saturation of Water Concentration (g/cm³)
@@ -1083,12 +1083,12 @@ class relativeHumidity:
         """
         
         #Saturation of water concentration
-        Csat = So * np.exp( - ( Eas / 0.00831446261815324 / (273.15 + surface_temp ) ) )
+        Csat = So * np.exp( - ( Eas / (0.00831446261815324 * (273.15 + surface_temp )) ) )
         
         return Csat
 
 
-    def Ceq( Csat , rH_SurfaceOutside ):
+    def _Ceq( Csat , rH_SurfaceOutside ):
         """       
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns Equilibration water concentration (g/cm³)
@@ -1129,7 +1129,7 @@ class relativeHumidity:
         start : float
             Initial value of the Concentration of water in the encapsulant
             currently takes the first value produced from
-            the Ceq(Saturation of Water Concentration) as a point
+            the _Ceq(Saturation of Water Concentration) as a point
             of acceptable equilibrium
         surface_temp : pandas series (float)
             The surface temperature in Celsius of the solar panel module
@@ -1223,22 +1223,31 @@ class relativeHumidity:
                         
         """
         
-        RH_surface = relativeHumidity.RHsurfaceOutside(rH_ambient, ambient_temp, surface_temp )
+        RH_surface = relativeHumidity.RHsurfaceOutside(rH_ambient=rH_ambient,
+                                                       ambient_temp=ambient_temp,
+                                                       surface_temp=surface_temp)
         
         
-        Csat = relativeHumidity.Csat( So , Eas, surface_temp )
-        Ceq = relativeHumidity.Ceq( Csat , RH_surface )
+        Csat = relativeHumidity._Csat(surface_temp=surface_temp, So=So , Eas=Eas)
+        Ceq = relativeHumidity._Ceq( Csat=Csat , rH_SurfaceOutside=RH_surface )
 
         start = Ceq[0]
         
         #Need to convert these series to numpy arrays for numba function
         surface_temp_numba = surface_temp.to_numpy()
         RH_surface_numba = RH_surface.to_numpy()
+        Ce_nparray = relativeHumidity.Ce_numba(start=start,
+                                               surface_temp=surface_temp_numba,
+                                               RH_surface=RH_surface_numba,
+                                               WVTRo=WVTRo,
+                                               EaWVTR=EaWVTR,
+                                               So=So,
+                                               l=l,
+                                               Eas=Eas)
         
-        Ce_nparray = relativeHumidity.Ce_numba(start, surface_temp_numba, RH_surface_numba, WVTRo , EaWVTR, So, l, Eas)
-        
-        RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) / (0.00831446261815324 * (surface_temp + 273.15))  )) ))
-        
+        #RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) / (0.00831446261815324 * (surface_temp + 273.15))  )) ))
+        RHback_series = 100 * (Ce_nparray / Csat)
+
         return RHback_series
 
 
@@ -1309,6 +1318,12 @@ class Degradation:
             Total degredation factor over time and wavelength.
     
         '''
+        # --- TO DO ---
+        # unpack input-dataframe
+        # Spectra = df['Spectra']
+        # Module_Temperature = df['Module_Temperature']
+        # Module_RH = df['Module_RH']
+        
         
         # Constants
         R = 0.0083145  # Gas Constant in [kJ/mol*K]
