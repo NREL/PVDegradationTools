@@ -502,7 +502,7 @@ class energyCalcs:
         rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative 
             humiditys can be calculated from these functions: RHbacksheet(),
-            RHbackEncap(); RHfront();  RHsurfaceOutside()
+            RHbackEncap(); RHfrontEncap();  RHsurfaceOutside()
         n : float
             Fit parameter for relative humidity 
         Toutdoor : pandas series
@@ -577,7 +577,7 @@ class energyCalcs:
         rh_outdoor : pandas series 
             Relative Humidity of material of interest 
             Acceptable relative humiditys can be calculated 
-            from these functions: RHbacksheet(), RHbackEncap(), RHfront(),
+            from these functions: RHbacksheet(), RHbackEncap(), RHfrontEncap(),
             RHsurfaceOutside()
         globalPOA : pandas series
             Global Plane of Array Irradiance W/m^2
@@ -658,7 +658,7 @@ class energyCalcs:
         rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative 
             humiditys can be calculated from the below functions:
-            RHbacksheet(), RHbackEncap(), RHfront(), RHsurfaceOutside()
+            RHbacksheet(), RHbackEncap(), RHfrontEncap(), RHsurfaceOutside()
         n : float
             Fit parameter for relative humidity       
         Ea : float 
@@ -701,7 +701,7 @@ class energyCalcs:
         rh_outdoor : pandas series
             Relative Humidity of material of interest 
             Acceptable relative humiditys can be calculated 
-            from these functions: RHbacksheet(), RHbackEncap(), RHfront()
+            from these functions: RHbacksheet(), RHbackEncap(), RHfrontEncap()
                                   RHsurfaceOutside()
         n : float
             Fit parameter for relative humidity 
@@ -1023,7 +1023,7 @@ class relativeHumidity:
     
     
     
-    def RHfront(surface_temp, SDw , So = 1.81390702, Eas = 16.729):
+    def RHfrontEncap(surface_temp, SDw , So = 1.81390702, Eas = 16.729):
         """
         Function returns Relative Humidity of Frontside Solar Module Encapsulant
         
