@@ -8,7 +8,7 @@ import numpy as np
 from numba import jit
 import pandas as pd
 from scipy.constants import convert_temperature
-
+import pvlib
 
 class EnergyCalcs:
     """
@@ -1580,3 +1580,104 @@ class BOLIDLeTID:
         plt.xlabel('Exposure length (t)')
         plt.ylabel('% Defects in Each State')
         plt.show()
+
+
+class Standards:
+
+    def ideal_installation_distance(df_tmy, metadata, T=70, x0 = 6, tilt=20, azimuth=180,
+                                  skymodel='isotropic'):
+        '''
+        #MIKE : Explanation HERE
+        
+        #MIKE REFERENCE for the paper... 
+        
+        1. Takes a weather file
+        2. Calculates the module temperature with PVLIB, at infinity gap
+        3. Calculates the module temperature with PVLIB, at 0
+        4. Calculates the 98 percentile for 2 
+        5. Calculates the 98 percentile for 3
+        5. Use both percentiles to calculate x
+        
+        Parameters
+        ----------
+        df_tmy : DataFrame
+            Dataframe with the weather data. Must have
+            'air_temperature' and 'wind_speed'
+        metadata : Dictionary
+            must have 'latitude' and 'longitude'
+        T : float, optional
+            Temperature goal for the IEC 63126. The default is 70; 80 is also 
+            another common value
+        x0 : float, optional
+            Decay constant, based on the characteristic distance. Comes from 
+            paper REF #MIKE
+        tilt : float, optional
+            Tilt of the PV array. The default is 20.
+        azimuth : float, optional
+            Azimuth of the PV array. The default is 180, facing south
+        skymodel : str
+            Tells PVlib which sky model to use. Default 'isotropic'.
+            
+        Returns
+        -------
+        x : float
+            Recommended installation distance per IEC 63126.
+    
+        '''    
+        
+        # 1. Calculate Sun Position & POA Irradiance
+        
+        # Make Location
+        # make a Location object corresponding to this TMY
+        location = pvlib.location.Location(latitude=metadata['latitude'],
+                                           longitude=metadata['longitude'])
+      
+        
+        # Calculate Sun Position
+        # Note: TMY datasets are right-labeled hourly intervals, e.g. the
+        # 10AM to 11AM interval is labeled 11.  We should calculate solar position in
+        # the middle of the interval (10:30), so we subtract 30 minutes:
+        times = df_tmy.index - pd.Timedelta('30min')
+        solar_position = location.get_solarposition(times)
+        # but remember to shift the index back to line up with the TMY data:
+        solar_position.index += pd.Timedelta('30min')
+        
+        
+        # Calculate POA_Global
+        df_poa = pvlib.irradiance.get_total_irradiance(
+        surface_tilt=tilt,  # tilted 20 degrees from horizontal
+        surface_azimuth=azimuth,  # facing South
+        dni=df_tmy['dni'],
+        ghi=df_tmy['ghi'],
+        dhi=df_tmy['dhi'],
+        solar_zenith=solar_position['apparent_zenith'],
+        solar_azimuth=solar_position['azimuth'],
+        model=skymodel)
+        
+        # Access the library of values for the SAPM (King's) Model
+        all_parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['sapm']
+    
+        #2. Calculate the module temperature with PVLIB, at infinity gap
+        parameters = all_parameters['open_rack_glass_polymer']
+        # note the "splat" operator "**" which expands the dictionary "parameters"
+        # into a comma separated list of keyword arguments
+        T1 = pvlib.temperature.sapm_cell(
+                           poa_global=df_poa['poa_global'], temp_air=df_tmy['air_temperature'], wind_speed=df_tmy['wind_speed'],**parameters)
+             
+        
+        #3. Calculate the module temperature with PVLIB, at 0 gap
+        parameters = all_parameters['insulated_back_glass_polymer']
+        T0 = pvlib.temperature.sapm_cell(
+                           poa_global=df_poa['poa_global'], temp_air=df_tmy['air_temperature'], wind_speed=df_tmy['wind_speed'],**parameters)
+             
+        # Make the DataFrame
+        results = pd.DataFrame({'timestamp':T1.index, 'T1':T1.values})
+        results['T0'] = T0.values
+        
+        # Calculate the Quantiles
+        T1p = results['T1'].quantile(q=0.98, interpolation='linear')
+        T0p = results['T0'].quantile(q=0.98, interpolation='linear')
+    
+        x=-x0 * np.log(1-(T0p-T)/(T0p-T1p))
+
+        return x
