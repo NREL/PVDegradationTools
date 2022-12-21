@@ -17,13 +17,13 @@ class EnergyCalcs:
 
     """
 
-    def k(avgWVP):
+    def k(avg_wvp):
         """
         Determine the rate of water ingress of water through edge seal material
 
         Parameters
         -----------
-        avgWVP : float
+        avg_wvp : float
             Average of the Yearly water vapor
             pressure for 1 year
 
@@ -34,11 +34,11 @@ class EnergyCalcs:
 
         """
 
-        k = .0013 * (avgWVP)**.4933
+        k = .0013 * (avg_wvp)**.4933
 
         return k
 
-    def edgeSealWidth(k):
+    def edge_seal_width(k):
         """
         Determine the width of edge seal required for a 25 year water ingress
 
@@ -64,7 +64,7 @@ class EnergyCalcs:
     # Numba Machine Language Level
 
     @jit(nopython=True, error_model='python')
-    def dewYield(h, tD, tA, windSpeed, n):
+    def dew_yield(h, tD, tA, wind_speed, n):
         """
         Find the dew yield in (mm·d−1).  Calculation taken from journal
         "Estimating dew yield worldwide from a few meteo data"
@@ -80,38 +80,38 @@ class EnergyCalcs:
             Dewpoint temperature in Celsius
         tA : float
             Air temperature "dry bulb temperature"
-        windSpeed : float
+        wind_speed : float
             Air or windspeed measure in m*s^-1  or m/s
         n : float
             Total sky cover(okta)
 
         Returns
         -------
-        dewYield : float
+        dew_yield : float
             Amount of dew yield in (mm·d−1)
 
         """
-        windSpeedCutOff = 4.4
-        dewYield = (1/12) * (.37 * (1 + (0.204323 * h) - (0.0238893 * h**2) -
+        wind_speed_cut_off = 4.4
+        dew_yield = (1/12) * (.37 * (1 + (0.204323 * h) - (0.0238893 * h**2) -
                              (18.0132 - (1.04963 * h**2) + (0.21891 * h**2)) * (10**(-3) * tD)) *
                              ((((tD + 273.15) / 285)**4)*(1 - (n/8))) +
                              (0.06 * (tD - tA)) *
-                             (1 + 100 * (1 - np.exp(- (windSpeed / windSpeedCutOff)**20))))
+                             (1 + 100 * (1 - np.exp(- (wind_speed / wind_speed_cut_off)**20))))
 
-        return dewYield
+        return dew_yield
 
 ############
 # Water Vapor Pressure
 ############
 
-    def waterVaporPressure(dewPtTemp):
+    def water_vapor_pressure(dew_pt_temp):
         """
         Find the average water vapor pressure (kPa) based on the Dew Point
         Temperature model created from Mike Kempe on 10/07/19 from Miami,FL excel sheet.
 
         Parameters
         ----------
-        dewPtTemp : float
+        dew_pt_temp : float
             Dew Point Temperature
 
         Returns
@@ -120,21 +120,21 @@ class EnergyCalcs:
             Water vapor pressure in kPa
 
         """
-        watervaporpressure = (np.exp((3.257532E-13 * dewPtTemp**6) -
-                                     (1.568073E-10 * dewPtTemp**6) +
-                                     (2.221304E-08 * dewPtTemp**4) +
-                                     (2.372077E-7 * dewPtTemp**3) -
-                                     (4.031696E-04 * dewPtTemp**2) +
-                                     (7.983632E-02 * dewPtTemp) -
+        water_vapor_pressure = (np.exp((3.257532E-13 * dew_pt_temp**6) -
+                                     (1.568073E-10 * dew_pt_temp**6) +
+                                     (2.221304E-08 * dew_pt_temp**4) +
+                                     (2.372077E-7 * dew_pt_temp**3) -
+                                     (4.031696E-04 * dew_pt_temp**2) +
+                                     (7.983632E-02 * dew_pt_temp) -
                                      (5.698355E-1)))
 
-        return watervaporpressure
+        return water_vapor_pressure
 
 ############
 # Solder Fatigue
 ############
 
-    def _avgDailyTempChange(localTime, cell_Temp):
+    def _avg_daily_temp_change(local_time, cell_temp):
         """
         Helper function. Get the average of a year for the daily maximum temperature change.
 
@@ -144,24 +144,24 @@ class EnergyCalcs:
 
         Parameters
         ------------
-        localTime : timestamp series
+        local_time : timestamp series
             Local time of specific site by the hour
             year-month-day hr:min:sec . (Example) 2002-01-01 01:00:00
-        cell_Temp : float series
+        cell_temp : float series
             Photovoltaic module cell temperature(Celsius) for every hour of a year
 
         Returns
         -------
-        avgDailyTempChange : float
+        avg_daily_temp_change : float
             Average Daily Temerature Change for 1-year (Celsius)
-        avgMaxCellTemp : float
+        avg_max_cell_temp : float
             Average of Daily Maximum Temperature for 1-year (Celsius)
 
         """
         # Setup frame for vector processing
         timeAndTemp_df = pd.DataFrame(columns=['Cell Temperature'])
-        timeAndTemp_df['Cell Temperature'] = cell_Temp
-        timeAndTemp_df.index = localTime
+        timeAndTemp_df['Cell Temperature'] = cell_temp
+        timeAndTemp_df.index = local_time
         timeAndTemp_df['month'] = timeAndTemp_df.index.month
         timeAndTemp_df['day'] = timeAndTemp_df.index.day
 
@@ -170,55 +170,55 @@ class EnergyCalcs:
             ['month', 'day'])['Cell Temperature'].max()
         dailyMinCellTemp_series = timeAndTemp_df.groupby(
             ['month', 'day'])['Cell Temperature'].min()
-        cellTempChange = pd.DataFrame(
+        cell_temp_change = pd.DataFrame(
             {'Max': dailyMaxCellTemp_series, 'Min': dailyMinCellTemp_series})
-        cellTempChange['TempChange'] = cellTempChange['Max'] - \
-            cellTempChange['Min']
+        cell_temp_change['TempChange'] = cell_temp_change['Max'] - \
+            cell_temp_change['Min']
 
         # Find the average temperature change for every day of one year (C)
-        avgDailyTempChange = cellTempChange['TempChange'].mean()
+        avg_daily_temp_change = cell_temp_change['TempChange'].mean()
         # Find daily maximum cell temperature average
-        avgMaxCellTemp = dailyMaxCellTemp_series.mean()
+        avg_max_cell_temp = dailyMaxCellTemp_series.mean()
 
-        return avgDailyTempChange, avgMaxCellTemp
+        return avg_daily_temp_change, avg_max_cell_temp
 
-    def _timesOverReversalNumber(cell_Temp, reversalTemp):
+    def _times_over_reversal_number(cell_temp, reversal_temp):
         """
         Helper function. Get the number of times a temperature increases or decreases over a
         specific temperature gradient.
 
         Parameters
         ------------
-        cell_Temp : float series
+        cell_temp : float series
             Photovoltaic module cell temperature(Celsius)
-        reversalTemp : float
+        reversal_temp : float
             Temperature threshold to cross above and below
 
         Returns
         --------
-        numChangesTempHist : int
+        num_changes_temp_hist : int
             Number of times the temperature threshold is crossed
 
         """
         # Find the number of times the temperature crosses over 54.8(C)
 
         temp_df = pd.DataFrame()
-        temp_df['CellTemp'] = cell_Temp
-        temp_df['COMPARE'] = cell_Temp
+        temp_df['CellTemp'] = cell_temp
+        temp_df['COMPARE'] = cell_temp
         temp_df['COMPARE'] = temp_df.COMPARE.shift(-1)
 
-        #reversalTemp = 54.8
+        #reversal_temp = 54.8
 
         temp_df['cross'] = (
-            ((temp_df.CellTemp >= reversalTemp) & (temp_df.COMPARE < reversalTemp)) |
-            ((temp_df.COMPARE > reversalTemp) & (temp_df.CellTemp <= reversalTemp)) |
-            (temp_df.CellTemp == reversalTemp))
+            ((temp_df.CellTemp >= reversal_temp) & (temp_df.COMPARE < reversal_temp)) |
+            ((temp_df.COMPARE > reversal_temp) & (temp_df.CellTemp <= reversal_temp)) |
+            (temp_df.CellTemp == reversal_temp))
 
-        numChangesTempHist = temp_df.cross.sum()
+        num_changes_temp_hist = temp_df.cross.sum()
 
-        return numChangesTempHist
+        return num_changes_temp_hist
 
-    def solderFatigue(localTime, cell_Temp, reversalTemp):
+    def solderFatigue(local_time, cell_temp, reversal_temp):
         """
         Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
         Damage will be returned as the rate of solder fatigue for one year. Based on:
@@ -230,18 +230,18 @@ class EnergyCalcs:
 
         Parameters
         ------------
-        localTime : timestamp series
+        local_time : timestamp series
             Local time of specific site by the hour year-month-day hr:min:sec
             (Example) 2002-01-01 01:00:00
-        cell_Temp : float series
+        cell_temp : float series
             Photovoltaic module cell temperature(Celsius) for every hour of a year
-        reversalTemp : float
+        reversal_temp : float
             Temperature threshold to cross above and below
 
         Returns
         --------
         damage : float series
-            Solder fatigue damage for a time interval depending on localTime (kPa)
+            Solder fatigue damage for a time interval depending on local_time (kPa)
 
         """
 
@@ -253,23 +253,23 @@ class EnergyCalcs:
         #   1) Average of the Daily Maximum Cell Temperature (C)
         #   2) Average of the Daily Maximum Temperature change avg(daily max - daily min)
         #   3) Number of times the temperaqture crosses above or below the reversal Temperature
-        MeanDailyMaxCellTempChange, dailyMaxCellTemp_Average = EnergyCalcs._avgDailyTempChange(
-            localTime, cell_Temp)
+        MeanDailyMaxCellTempChange, dailyMaxCellTemp_Average = EnergyCalcs._avg_daily_temp_change(
+            local_time, cell_temp)
         # Needs to be in Kelvin for equation specs
         dailyMaxCellTemp_Average = convert_temperature(
             dailyMaxCellTemp_Average, 'Celsius', 'Kelvin')
-        numChangesTempHist = EnergyCalcs._timesOverReversalNumber(
-            cell_Temp, reversalTemp)
+        num_changes_temp_hist = EnergyCalcs._times_over_reversal_number(
+            cell_temp, reversal_temp)
 
         # k = Boltzmann's Constant
         damage = 405.6 * (MeanDailyMaxCellTempChange ** 1.9) * \
-                         (numChangesTempHist**.33) * \
+                         (num_changes_temp_hist**.33) * \
             np.exp(-(.12/(.00008617333262145*dailyMaxCellTemp_Average)))
         # Convert pascals to kilopascals
         damage = damage/1000
         return damage
 
-    def _power(cellTemp, POAglobal):
+    def _power(cell_temp, poa_global):
         """
         TODO:   check units
                 add documentation
@@ -280,7 +280,7 @@ class EnergyCalcs:
 
         Parameters
         ------------
-        cellTemp : float
+        cell_temp : float
             Cell Temperature of a solar module (C)
 
         Returns
@@ -291,8 +291,8 @@ class EnergyCalcs:
         # KW/hr
 
         # Why is there two definitions?
-        power = 0.0002 * POAglobal * (1 + (25 - cellTemp) * .004)
-        power = POAglobal * (1 + (25 - cellTemp) * .004)
+        power = 0.0002 * poa_global * (1 + (25 - cell_temp) * .004)
+        power = poa_global * (1 + (25 - cell_temp) * .004)
 
         return power
 
@@ -304,7 +304,7 @@ class EnergyCalcs:
     ############################################
 
 
-    def _rateOfDegEnv(POAglobal, Toutdoor, refTemp, x, Tf):
+    def _rateOfDegEnv(poa_global, Toutdoor, refTemp, x, Tf):
         """
         Helper function. Find the rate of degradation kenetics using the Fischer model.
         Degradation kentics model interpolated 50 coatings with respect to
@@ -315,7 +315,7 @@ class EnergyCalcs:
 
         Parameters
         ------------
-        POAglobal : float
+        poa_global : float
             (Global) Plan of Array irradiance (W/m^2)
         Toutdoor : float
             Solar module cell temperature (C)
@@ -333,7 +333,7 @@ class EnergyCalcs:
             rate of Degradation (NEED TO ADD METRIC)
 
         """
-        return POAglobal**(x) * Tf ** ((Toutdoor - refTemp)/10)
+        return poa_global**(x) * Tf ** ((Toutdoor - refTemp)/10)
 
     def _rateOfDegChamber(Ichamber, x):
         """
@@ -381,7 +381,7 @@ class EnergyCalcs:
 
         return chamberAccelerationFactor
 
-    def vantHoffDeg(Ichamber, POAglobal, Toutdoor, refTemp, x=0.64, Tf=1.41):
+    def vantHoffDeg(Ichamber, poa_global, Toutdoor, refTemp, x=0.64, Tf=1.41):
         """
         NOTE
 
@@ -391,7 +391,7 @@ class EnergyCalcs:
         -----------
         Ichamber : float
             Irradiance of Controlled Condition W/m^2
-        POAglobal : float or series
+        poa_global : float or series
             Global Plane of Array Irradiance W/m^2
         Toutdoor : pandas series
             Solar module temperature or Cell temperature (C)
@@ -408,7 +408,7 @@ class EnergyCalcs:
             Degradation acceleration factor
 
         """
-        rateOfDegEnv = EnergyCalcs._rateOfDegEnv(POAglobal=POAglobal,
+        rateOfDegEnv = EnergyCalcs._rateOfDegEnv(poa_global=poa_global,
                                                  Toutdoor=Toutdoor,
                                                  refTemp=refTemp,
                                                  x=x,
@@ -481,7 +481,7 @@ class EnergyCalcs:
 
         return Toeq
 
-    def IwaVantHoff(POAglobal, Toutdoor, Teq=None, x=0.64, Tf=1.41):
+    def IwaVantHoff(poa_global, Toutdoor, Teq=None, x=0.64, Tf=1.41):
         """
         NOTE
 
@@ -491,7 +491,7 @@ class EnergyCalcs:
 
         Parameters
         -----------
-        POAglobal : float or series
+        poa_global : float or series
             Global Plane of Array Irradiance W/m^2
         Toutdoor : pandas series
             Solar module temperature or Cell temperature (C)
@@ -510,10 +510,10 @@ class EnergyCalcs:
         """
         if Teq is None:
             Teq = EnergyCalcs._ToeqVantHoff(Toutdoor, Tf)
-        toSum = (POAglobal ** x) * (Tf ** ((Toutdoor - Teq)/10))
+        toSum = (poa_global ** x) * (Tf ** ((Toutdoor - Teq)/10))
         summation = toSum.sum(axis=0, skipna=True)
 
-        Iwa = (summation / len(POAglobal)) ** (1 / x)
+        Iwa = (summation / len(poa_global)) ** (1 / x)
 
         return Iwa
 
@@ -524,13 +524,13 @@ class EnergyCalcs:
     ############################################
 
 
-    def _arrheniusDenominator(POAglobal, RHoutdoor, Toutdoor, Ea, x, n):
+    def _arrheniusDenominator(poa_global, RHoutdoor, Toutdoor, Ea, x, n):
         """
         Helper function. Calculates the rate of degredation of the Environmnet
 
         Parameters
         ----------
-        POAglobal : float
+        poa_global : float
             (Global) Plan of Array irradiance (W/m^2)
         x : float
             Fit parameter
@@ -551,7 +551,7 @@ class EnergyCalcs:
             Degradation rate of environment
         """
 
-        environmentDegradationRate = POAglobal**(x) * RHoutdoor**(
+        environmentDegradationRate = poa_global**(x) * RHoutdoor**(
             n) * np.exp(- (Ea / (0.00831446261815324 * (Toutdoor + 273.15))))
 
         return environmentDegradationRate
@@ -587,7 +587,7 @@ class EnergyCalcs:
                                               (Tchamber+273.15)))))
         return arrheniusNumerator
 
-    def arrheniusCalc(Ichamber, RHchamber, RHoutdoor, POAglobal, Tchamber, Toutdoor,
+    def arrheniusCalc(Ichamber, RHchamber, RHoutdoor, poa_global, Tchamber, Toutdoor,
                         Ea, x=0.64, n=1):
         """
         NOTE
@@ -610,7 +610,7 @@ class EnergyCalcs:
             Acceptable relative humiditys can be calculated
             from these functions: RHbacksheet(), RHbackEncap(), RHfrontEncap(),
             RHsurfaceOutside()
-        POAglobal : pandas series
+        poa_global : pandas series
             Global Plane of Array Irradiance W/m^2
         Tchamber : float
             Reference temperature (C) "Chamber Temperature"
@@ -629,7 +629,7 @@ class EnergyCalcs:
             Degradation acceleration factor
 
         """
-        arrheniusDenominator = EnergyCalcs._arrheniusDenominator(POAglobal=POAglobal,
+        arrheniusDenominator = EnergyCalcs._arrheniusDenominator(poa_global=poa_global,
                                                                  RHoutdoor=RHoutdoor,
                                                                  Toutdoor=Toutdoor,
                                                                  Ea=Ea,
@@ -793,7 +793,7 @@ class EnergyCalcs:
 
         return RHwa
 
-    def IwaArrhenius(POAglobal, RHoutdoor, Toutdoor, Ea,
+    def IwaArrhenius(poa_global, RHoutdoor, Toutdoor, Ea,
                      RHwa=None, Teq=None, x=0.64, n=1):
         """
         TODO:   CHECK
@@ -805,7 +805,7 @@ class EnergyCalcs:
 
         Parameters
         ----------
-        POAglobal : float
+        poa_global : float
             (Global) Plan of Array irradiance (W/m^2)
         RHoutdoor : pandas series
             Relative Humidity of material of interest
@@ -838,7 +838,7 @@ class EnergyCalcs:
         if RHwa is None:
             RHwa = EnergyCalcs._RHwaArrhenius(RHoutdoor, Toutdoor, Ea)
 
-        numerator = POAglobal**(x) * RHoutdoor**(n) * \
+        numerator = poa_global**(x) * RHoutdoor**(n) * \
             np.exp(- (Ea / (0.00831446261815324 * (Toutdoor + 273.15))))
         sumOfNumerator = numerator.sum(axis=0, skipna=True)
 
@@ -1051,9 +1051,9 @@ class relativeHumidity:
             rH_ambient, ambient_temp, surface_temp)
 
         # Generate a series of the numerator values "prior to summation"
-        SDwNumerator_series = So * np.exp(- (Eas / (0.00831446261815324 * (surface_temp + 273.15)))) * \
-            RH_surface * \
-            np.exp(- (Ead / (0.00831446261815324 * (surface_temp + 273.15))))
+        SDwNumerator_series = So * np.exp(- (Eas / (0.00831446261815324 * (surface_temp + 273.15))))\
+                                * RH_surface * \
+                                np.exp(- (Ead / (0.00831446261815324 * (surface_temp + 273.15))))
 
         return SDwNumerator_series
 
@@ -1063,21 +1063,21 @@ class relativeHumidity:
         module Encapsulant
 
         The function returns values needed for the denominator of the Diffusivity
-        weighted water content equation(SDw). This function will return a pandas 
-        series prior to summation of the denominator 
+        weighted water content equation(SDw). This function will return a pandas
+        series prior to summation of the denominator
 
         Parameters
         ----------
         Ead : float
-            Encapsulant diffusivity activation energy in [kJ/mol] 
-            38.14(kJ/mol) is the suggested value for EVA.    
+            Encapsulant diffusivity activation energy in [kJ/mol]
+            38.14(kJ/mol) is the suggested value for EVA.
         surface_temp : pandas series (float)
-            The surface temperature in Celsius of the solar panel module 
+            The surface temperature in Celsius of the solar panel module
 
         Returns
         -------
         SDwDenominator : pandas series (float)
-            Denominator of the SDw equation prior to summation   
+            Denominator of the SDw equation prior to summation
 
         """
 
@@ -1095,26 +1095,26 @@ class relativeHumidity:
         Parameters
         ----------
         rH_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%) 
+            The ambient outdoor environmnet relative humidity in (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         ambient_temp : pandas series (float)
-            The ambient outdoor environmnet temperature in Celsius                                    
+            The ambient outdoor environmnet temperature in Celsius
         surface_temp : pandas series (float)
-            The surface temperature in Celsius of the solar panel module 
+            The surface temperature in Celsius of the solar panel module
         So : float
-            Float, Encapsulant solubility prefactor in [g/cm3] 
-            So = 1.81390702(g/cm3) is the suggested value for EVA.                           
-        Eas : float 
-            Encapsulant solubility activation energy in [kJ/mol] 
-            Eas = 16.729(kJ/mol) is the suggested value for EVA.  
-        Ead : float 
-            Encapsulant diffusivity activation energy in [kJ/mol] 
-            Ead = 38.14(kJ/mol) is the suggested value for EVA. 
+            Float, Encapsulant solubility prefactor in [g/cm3]
+            So = 1.81390702(g/cm3) is the suggested value for EVA.
+        Eas : float
+            Encapsulant solubility activation energy in [kJ/mol]
+            Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        Ead : float
+            Encapsulant diffusivity activation energy in [kJ/mol]
+            Ead = 38.14(kJ/mol) is the suggested value for EVA.
 
         Returns
-        ------            
+        ------
         SDw : float
-            Diffusivity weighted water content       
+            Diffusivity weighted water content
 
         """
 
@@ -1141,9 +1141,9 @@ class relativeHumidity:
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         SDw : float
-            Diffusivity weighted water content. *See EnergyCalcs.SDw() function        
+            Diffusivity weighted water content. *See EnergyCalcs.SDw() function
         So : float
-            Encapsulant solubility prefactor in [g/cm3] 
+            Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
         Eas : float
             Encapsulant solubility activation energy in [kJ/mol]
@@ -1176,16 +1176,16 @@ class relativeHumidity:
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         So : float
-            Encapsulant solubility prefactor in [g/cm3] 
-            So = 1.81390702(g/cm3) is the suggested value for EVA.                           
+            Encapsulant solubility prefactor in [g/cm3]
+            So = 1.81390702(g/cm3) is the suggested value for EVA.
         Eas : float
-            Encapsulant solubility activation energy in [kJ/mol] 
-            Eas = 16.729(kJ/mol) is the suggested value for EVA.         
+            Encapsulant solubility activation energy in [kJ/mol]
+            Eas = 16.729(kJ/mol) is the suggested value for EVA.
 
         Returns
         -------
         Csat : pandas series (float)
-            Saturation of Water Concentration (g/cm³)                             
+            Saturation of Water Concentration (g/cm³)
 
         """
 
@@ -1196,21 +1196,21 @@ class relativeHumidity:
         return Csat
 
     def _Ceq(Csat, rH_SurfaceOutside):
-        """       
+        """
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns Equilibration water concentration (g/cm³)
 
         Parameters
         ------------
         Csat : pandas series (float)
-            Saturation of Water Concentration (g/cm³)  
-        rH_SurfaceOutside : pandas series (float) 
+            Saturation of Water Concentration (g/cm³)
+        rH_SurfaceOutside : pandas series (float)
             The relative humidity of the surface of a solar module (%)
 
         Returns
         --------
         Ceq : pandas series (float)
-            Equilibration water concentration (g/cm³) 
+            Equilibration water concentration (g/cm³)
 
         """
 
@@ -1221,11 +1221,12 @@ class relativeHumidity:
     # Returns a numpy array
 
     @jit(nopython=True)
-    def Ce_numba(start, surface_temp, RH_surface, WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
+    def Ce_numba(start, surface_temp, RH_surface,
+                    WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
-        Module Encapsulant. This function returns a numpy array of the Concentration of water in the 
-        encapsulant at every time step         
+        Module Encapsulant. This function returns a numpy array of the Concentration of water in the
+        encapsulant at every time step
 
         Numba was used to isolate recursion requiring a for loop
         Numba Functions compile and run in machine code but can not use pandas (Very fast).
@@ -1240,30 +1241,30 @@ class relativeHumidity:
         surface_temp : pandas series (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
-        rH_Surface : list (float) 
-            The relative humidity of the surface of a solar module (%)                                             
+        rH_Surface : list (float)
+            The relative humidity of the surface of a solar module (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         WVTRo : float
-            Water Vapor Transfer Rate prefactor (g/m2/day). 
+            Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
-        EaWVTR : float 
-            Water Vapor Transfer Rate activation energy (kJ/mol) . 
-            It is suggested to use 0.15(mm) thick PET as a default 
-            for the backsheet and set EaWVTR=55.0255(kJ/mol)     
+        EaWVTR : float
+            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            It is suggested to use 0.15(mm) thick PET as a default
+            for the backsheet and set EaWVTR=55.0255(kJ/mol)
         So : float
-            Encapsulant solubility prefactor in [g/cm3] 
+            Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
-        l : float 
-            Thickness of the backside encapsulant (mm). 
-            The suggested value for encapsulat is EVA l=0.5(mm)   
+        l : float
+            Thickness of the backside encapsulant (mm).
+            The suggested value for encapsulat is EVA l=0.5(mm)
         Eas : float
-            Encapsulant solubility activation energy in [kJ/mol] 
-            Eas = 16.729(kJ/mol) is the suggested value for EVA. 
+            Encapsulant solubility activation energy in [kJ/mol]
+            Eas = 16.729(kJ/mol) is the suggested value for EVA.
 
         Returns
         --------
         Ce_list : numpy array
-            Concentration of water in the encapsulant at every time step                                    
+            Concentration of water in the encapsulant at every time step
 
         """
 
