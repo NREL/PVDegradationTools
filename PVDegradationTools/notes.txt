@@ -1,0 +1,55 @@
+==================================================================
+PV Degradation Tools
+Updates and TODO list
+2022.12.21
+==================================================================
+_______________________
+==  Required Inputs  ==
+    - avgWVP
+        average water vapor pressure (yearly)
+    - elevation
+    - temperature, dew-point
+    - temperature, dry-bulb
+    - total sky cover, n
+    - timestamp series, yyyy-mm-dd hh:mm:ss
+    - global POA, array or float
+    - chamber temperature, refTemp
+    - chamber irradiance, array
+    
+    - cell temperature
+    - reversalTemp
+    - fit param for RH, n
+    - deg param, x
+    - temp multiplier, Tf
+    - act energy, Ea
+
+
+
+
+___________________
+===    To Do   ====
+    -  solderFatigue
+    -  _power, needs: test, document, units
+    -  Toutdoor: rename to Tcell or Tmodule
+    -  camel case function names
+    -  arguments series > variables > defaults
+    -  pylint pep8
+    -  make slides for functions ( what works,
+                                   what it does,
+                                   ?)
+    
+____________________________________________
+====   Changes   ===========================
+
+ = energyCalcs 
+    - uniform function argument order and naming
+    - uniform function names
+    - automate substeps (no need to call RHwaArrhenius,
+                                         TeqArrhenius,
+                                         ToeqVantHoff,
+                                         etc)
+    - default parameters added (x = 0.64,
+                                Tf = 1.41,
+                                n = 1 )
+    - all internal function calls use explicit arguments
+
