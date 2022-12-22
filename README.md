@@ -1,5 +1,12 @@
 <table>
 <tr>
+  <td>Version</td>
+  <td>
+  <a href="https://zenodo.org/badge/latestdoi/248347431"> FORTHCOMING </a>
+</td>
+</tr>
+
+<tr>
   <td>License</td>
   <td>
     <a href="https://github.com/NREL/PVDegradationTools/blob/master/LICENSE.md">
@@ -7,7 +14,16 @@
     </a>
 </td>
 </tr>
+<tr>
+  <td>Documentation</td>
+  <td>
+	<a href='https://pvdegradationtools.readthedocs.io/en/latest/?badge=latest'>
+	    <img src='https://readthedocs.org/projects/pvdegradationtools/badge/?version=latest' alt='Documentation Status' />
+	</a>
+  </td>
+</tr>
 </table>
+
 
 
 # PV Degradation Tools
@@ -19,7 +35,9 @@ This repository contains functions for calculating degradation of photovoltaic m
 Documentation
 =============
 
-Upcoming. Look at the tutorials folder for examples. 
+[Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder. 
+
+We also have documentation in [ReadTheDocs](https://pvdegradationtools.readthedocs.io) where you can find more details on the API functions.
 
 
 Installation
@@ -52,7 +70,7 @@ Getting support
 ===============
 
 If you suspect that you may have discovered a bug or if you'd like to
-change something about CF-MFA, then please make an issue on our
+change something about PVDegradationTools, then please make an issue on our
 [GitHub issues page](hhttps://github.com/NREL/PVDegradationTools/issues).
 
 
