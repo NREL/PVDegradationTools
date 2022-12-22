@@ -70,7 +70,7 @@ Getting support
 ===============
 
 If you suspect that you may have discovered a bug or if you'd like to
-change something about CF-MFA, then please make an issue on our
+change something about PVDegradationTools, then please make an issue on our
 [GitHub issues page](hhttps://github.com/NREL/PVDegradationTools/issues).
 
 
