@@ -9,6 +9,33 @@
 </tr>
 </table>
 
+<table>
+<tr>
+  <td>Version</td>
+  <td>
+  <a href="https://zenodo.org/badge/latestdoi/248347431"><img src="https://zenodo.org/badge/248347431.svg" alt="DOI"></a>
+</td>
+</tr>
+
+<tr>
+  <td>License</td>
+  <td>
+    <a href="https://github.com/NREL/PVDegradationTools/blob/master/LICENSE.md">
+    <img src="https://img.shields.io/pypi/l/pvlib.svg" alt="license" />
+    </a>
+</td>
+</tr>
+<tr>
+  <td>Documentation</td>
+  <td>
+	<a href='https://pvdegradationtools.readthedocs.io/en/latest/?badge=latest'>
+	    <img src='https://readthedocs.org/projects/pv-ice/badge/?version=latest' alt='Documentation Status' />
+	</a>
+  </td>
+</tr>
+</table>
+
+
 
 # PV Degradation Tools
 
