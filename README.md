@@ -35,7 +35,9 @@ This repository contains functions for calculating degradation of photovoltaic m
 Documentation
 =============
 
-Tutorials on the usage of functions are located in the "docs > Tutorials" folder. We also have documentation in [readhtedocs](https://pvdegradationtools.readthedocs.io) where you can find more details on the API functions.
+[Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder. 
+
+We also have documentation in [ReadTheDocs](https://pvdegradationtools.readthedocs.io) where you can find more details on the API functions.
 
 
 Installation
