@@ -1530,19 +1530,22 @@ class BOLIDLeTID:
 
 class Standards:
 
-    def ideal_installation_distance(df_tmy, metadata, T=70, x0 = 6, tilt=20, azimuth=180,
-                                  skymodel='isotropic'):
+    def ideal_installation_distance(df_tmy, metadata, level=0, x0 = 6, tilt=None, 
+                                    azimuth=180, skymodel='isotropic'):
         '''
-        #MIKE : Explanation HERE
-        
-        #MIKE REFERENCE for the paper... 
-        
+    
+        Preliminary calculation for module gap according to IEC 63126. The
+        steps of the calculation are:
         1. Takes a weather file
-        2. Calculates the module temperature with PVLIB, at infinity gap
-        3. Calculates the module temperature with PVLIB, at 0
-        4. Calculates the 98 percentile for 2 
-        5. Calculates the 98 percentile for 3
-        5. Use both percentiles to calculate x
+        2. Calculates the module temperature with PVLIB, for an open rack 
+           polymer-back which is assumed to have infinite gap
+        3. Calculates the module temperature with PVLIB, for an insulated 
+            back module which is assumed to be flush mount with a roof (gap=0)
+        4. Calculates the 98 percentile for step 2 
+        5. Calculates the 98 percentile for step 3
+        5. Use both percentiles to calculate the effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216), I.e. T98=80 or T98=70 respectively.
+        
+        Reference: M. Kempe, PVSC Proceedings 2023 (forthcoming)
         
         Parameters
         ----------
@@ -1551,14 +1554,16 @@ class Standards:
             'air_temperature' and 'wind_speed'
         metadata : Dictionary
             must have 'latitude' and 'longitude'
-        T : float, optional
-            Temperature goal for the IEC 63126. The default is 70; 80 is also 
-            another common value
+        level : int, optional
+            Options 0, or 1. Level 1 or Level 0 module (in IEC 63216) define 
+            the testing regime for the module; the boundaries are defined 
+            internally, to use a level 0 module is the boundary is less than 
+            70, and for Level 1 is less than 80. Above 80 Level 2 testing 
+            regime is required.
         x0 : float, optional
-            Decay constant, based on the characteristic distance. Comes from 
-            paper REF #MIKE
+            Thermal decay constant, [Kempe, PVSC Proceedings 2023]
         tilt : float, optional
-            Tilt of the PV array. The default is 20.
+            Tilt of the PV array. If None, uses latitude. 
         azimuth : float, optional
             Azimuth of the PV array. The default is 180, facing south
         skymodel : str
@@ -1568,9 +1573,15 @@ class Standards:
         -------
         x : float
             Recommended installation distance per IEC 63126.
+            effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216)
     
         '''    
         
+        if level == 0:
+            T98 = 70 
+        if level == 1:
+            T98 = 80
+
         # 1. Calculate Sun Position & POA Irradiance
         
         # Make Location
@@ -1578,6 +1589,9 @@ class Standards:
         location = pvlib.location.Location(latitude=metadata['latitude'],
                                            longitude=metadata['longitude'])
       
+        # TODO: change for handling HSAT tracking passed or requested
+        if tilt is None:
+            tilt = float(metadata['latitude'])
         
         # Calculate Sun Position
         # Note: TMY datasets are right-labeled hourly intervals, e.g. the
@@ -1624,6 +1638,6 @@ class Standards:
         T1p = results['T1'].quantile(q=0.98, interpolation='linear')
         T0p = results['T0'].quantile(q=0.98, interpolation='linear')
     
-        x=-x0 * np.log(1-(T0p-T)/(T0p-T1p))
+        x=-x0 * np.log(1-(T0p-T98)/(T0p-T1p))
 
         return x

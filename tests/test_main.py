@@ -46,5 +46,5 @@ def test_ideal_installation_distance():
     df_tmy['dhi']=df_tmy['DHI']
     x = PVDegradationTools.Standards.ideal_installation_distance(df_tmy, 
                                                                  metadata)
-    assert (x == 5.576844600035705)
+    assert (x == 5.116572312951921)
     
