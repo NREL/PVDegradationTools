@@ -272,7 +272,7 @@ class EnergyCalcs:
     def _power(cell_temp, poa_global):
         """
         TODO:   check units
-                add documentation
+                check 2 different functions
         Helper function. Find the relative power produced from a solar module.
 
         Model derived from Mike Kempe Calculation on paper
@@ -282,6 +282,8 @@ class EnergyCalcs:
         ------------
         cell_temp : float
             Cell Temperature of a solar module (C)
+        poa_global : float
+            plane-of-array irradiance, global. (W/m^2) 
 
         Returns
         --------
@@ -304,7 +306,7 @@ class EnergyCalcs:
     ############################################
 
 
-    def _rateOfDegEnv(poa_global, Toutdoor, refTemp, x, Tf):
+    def _deg_rate_env(poa_global, t_outdoor, ref_temp, x, Tf):
         """
         Helper function. Find the rate of degradation kenetics using the Fischer model.
         Degradation kentics model interpolated 50 coatings with respect to
@@ -317,9 +319,9 @@ class EnergyCalcs:
         ------------
         poa_global : float
             (Global) Plan of Array irradiance (W/m^2)
-        Toutdoor : float
+        t_outdoor : float
             Solar module cell temperature (C)
-        refTemp : float
+        ref_temp : float
             Reference temperature (C) "Chamber Temperature"
         x : float
             Fit parameter
@@ -333,9 +335,9 @@ class EnergyCalcs:
             rate of Degradation (NEED TO ADD METRIC)
 
         """
-        return poa_global**(x) * Tf ** ((Toutdoor - refTemp)/10)
+        return poa_global**(x) * Tf ** ((t_outdoor - ref_temp)/10)
 
-    def _rateOfDegChamber(Ichamber, x):
+    def _deg_rate_chamber(I_chamber, x):
         """
         Helper function. Find the rate of degradation kenetics of a simulated chamber. Mike Kempe's
         calculation of the rate of degradation inside a accelerated degradation chamber.
@@ -344,7 +346,7 @@ class EnergyCalcs:
 
         Parameters
         ----------
-        Ichamber : float
+        I_chamber : float
             Irradiance of Controlled Condition W/m^2
         x : float
             Fit parameter
@@ -354,11 +356,11 @@ class EnergyCalcs:
         chamberdegradationrate : float
             Degradation rate of chamber
         """
-        chamberdegradationrate = Ichamber ** (x)
+        chamberdegradationrate = I_chamber ** (x)
 
         return chamberdegradationrate
 
-    def _accelerationFactor(numerator, denominator):
+    def _acceleration_factor(numerator, denominator):
         """
         Helper Function. Find the acceleration factor
 
@@ -381,7 +383,7 @@ class EnergyCalcs:
 
         return chamberAccelerationFactor
 
-    def vantHoffDeg(Ichamber, poa_global, Toutdoor, refTemp, x=0.64, Tf=1.41):
+    def vantHoff_deg(I_chamber, poa_global, t_outdoor, ref_temp, x=0.64, Tf=1.41):
         """
         NOTE
 
@@ -389,13 +391,13 @@ class EnergyCalcs:
 
         Parameters
         -----------
-        Ichamber : float
+        I_chamber : float
             Irradiance of Controlled Condition W/m^2
         poa_global : float or series
             Global Plane of Array Irradiance W/m^2
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
-        refTemp : float
+        ref_temp : float
             Reference temperature (C) "Chamber Temperature"
         x : float
             fit parameter
@@ -408,17 +410,17 @@ class EnergyCalcs:
             Degradation acceleration factor
 
         """
-        rateOfDegEnv = EnergyCalcs._rateOfDegEnv(poa_global=poa_global,
-                                                 Toutdoor=Toutdoor,
-                                                 refTemp=refTemp,
+        rateOfDegEnv = EnergyCalcs._deg_rate_env(poa_global=poa_global,
+                                                 t_outdoor=t_outdoor,
+                                                 ref_temp=ref_temp,
                                                  x=x,
                                                  Tf=Tf)
         #sumOfDegEnv = rateOfDegEnv.sum(axis = 0, skipna = True)
         avgOfDegEnv = rateOfDegEnv.mean()
 
-        rateOfDegChamber = EnergyCalcs._rateOfDegChamber(Ichamber, x)
+        rateOfDegChamber = EnergyCalcs._deg_rate_chamber(I_chamber, x)
 
-        accelerationFactor = EnergyCalcs._accelerationFactor(
+        accelerationFactor = EnergyCalcs._acceleration_factor(
             rateOfDegChamber, avgOfDegEnv)
 
         return accelerationFactor
@@ -429,17 +431,15 @@ class EnergyCalcs:
     # Vant Hoff Environmental Characterization
     ############################################
 
-    def _ToeqVantHoff(Toutdoor, Tf=1.41):
+    def _to_eq_vantHoff(t_outdoor, Tf=1.41):
         """
-        NOTE: new
-
         Function to obtain the Vant Hoff temperature equivalent (C)
 
         Parameters
         ----------
         Tf : float
             Multiplier for the increase in degradation for every 10(C) temperature increase
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
 
         Returns
@@ -448,40 +448,15 @@ class EnergyCalcs:
             Vant Hoff temperature equivalent (C)
 
         """
-        toSum = Tf ** (Toutdoor / 10)
+        toSum = Tf ** (t_outdoor / 10)
         summation = toSum.sum(axis=0, skipna=True)
 
-        Toeq = (10 / np.log(Tf)) * np.log(summation / len(Toutdoor))
+        Toeq = (10 / np.log(Tf)) * np.log(summation / len(t_outdoor))
 
         return Toeq
 
-    def ToeqVantHoff(Toutdoor, Tf):
-        """
-        TODO:   REMOVE?
 
-        Function to obtain the Vant Hoff temperature equivalent (C)
-
-        Parameters
-        ----------
-        Tf : float
-            Multiplier for the increase in degradation for every 10(C) temperature increase
-        Toutdoor : pandas series
-            Solar module temperature or Cell temperature (C)
-
-        Returns
-        -------
-        Toeq : float
-            Vant Hoff temperature equivalent (C)
-
-        """
-        toSum = Tf ** (Toutdoor / 10)
-        summation = toSum.sum(axis=0, skipna=True)
-
-        Toeq = (10 / np.log(Tf)) * np.log(summation / len(Toutdoor))
-
-        return Toeq
-
-    def IwaVantHoff(poa_global, Toutdoor, Teq=None, x=0.64, Tf=1.41):
+    def IwaVantHoff(poa_global, t_outdoor, Teq=None, x=0.64, Tf=1.41):
         """
         NOTE
 
@@ -493,7 +468,7 @@ class EnergyCalcs:
         -----------
         poa_global : float or series
             Global Plane of Array Irradiance W/m^2
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
         Teq : series
             VantHoff equivalent temperature (C)
@@ -509,8 +484,8 @@ class EnergyCalcs:
 
         """
         if Teq is None:
-            Teq = EnergyCalcs._ToeqVantHoff(Toutdoor, Tf)
-        toSum = (poa_global ** x) * (Tf ** ((Toutdoor - Teq)/10))
+            Teq = EnergyCalcs._to_eq_vantHoff(t_outdoor, Tf)
+        toSum = (poa_global ** x) * (Tf ** ((t_outdoor - Teq)/10))
         summation = toSum.sum(axis=0, skipna=True)
 
         Iwa = (summation / len(poa_global)) ** (1 / x)
@@ -524,7 +499,7 @@ class EnergyCalcs:
     ############################################
 
 
-    def _arrheniusDenominator(poa_global, RHoutdoor, Toutdoor, Ea, x, n):
+    def _arrhenius_denominator(poa_global, rh_outdoor, t_outdoor, Ea, x, n):
         """
         Helper function. Calculates the rate of degredation of the Environmnet
 
@@ -534,13 +509,13 @@ class EnergyCalcs:
             (Global) Plan of Array irradiance (W/m^2)
         x : float
             Fit parameter
-        RHoutdoor : pandas series
+        rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative
             humiditys can be calculated from these functions: RHbacksheet(),
             RHbackEncap(); RHfrontEncap();  RHsurfaceOutside()
         n : float
             Fit parameter for relative humidity
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
         Ea : float
             Degredation Activation Energy (kJ/mol)
@@ -551,23 +526,23 @@ class EnergyCalcs:
             Degradation rate of environment
         """
 
-        environmentDegradationRate = poa_global**(x) * RHoutdoor**(
-            n) * np.exp(- (Ea / (0.00831446261815324 * (Toutdoor + 273.15))))
+        environmentDegradationRate = poa_global**(x) * rh_outdoor**(
+            n) * np.exp(- (Ea / (0.00831446261815324 * (t_outdoor + 273.15))))
 
         return environmentDegradationRate
 
-    def _arrheniusNumerator(Ichamber, RHchamber,  Tchamber, Ea, x, n):
+    def _arrhenius_numerator(I_chamber, rh_chamber,  T_chamber, Ea, x, n):
         """
         Helper function. Find the rate of degradation of a simulated chamber.
 
         Parameters
         ----------
-        Ichamber : float
+        I_chamber : float
             Irradiance of Controlled Condition W/m^2
         Rhchamber : float
             Relative Humidity of Controlled Condition (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
-        Tchamber : float
+        T_chamber : float
             Reference temperature (C) "Chamber Temperature"
         Ea : float
             Degredation Activation Energy (kJ/mol)
@@ -582,12 +557,12 @@ class EnergyCalcs:
             Degradation rate of the chamber
         """
 
-        arrheniusNumerator = (Ichamber ** (x) * RHchamber ** (n) *
+        arrheniusNumerator = (I_chamber ** (x) * rh_chamber ** (n) *
                               np.exp(- (Ea / (0.00831446261815324 *
-                                              (Tchamber+273.15)))))
+                                              (T_chamber+273.15)))))
         return arrheniusNumerator
 
-    def arrheniusCalc(Ichamber, RHchamber, RHoutdoor, poa_global, Tchamber, Toutdoor,
+    def arrheniusCalc(I_chamber, rh_chamber, rh_outdoor, poa_global, T_chamber, t_outdoor,
                         Ea, x=0.64, n=1):
         """
         NOTE
@@ -600,21 +575,21 @@ class EnergyCalcs:
 
         Parameters
         ----------
-        Ichamber : float
+        I_chamber : float
             Irradiance of Controlled Condition W/m^2
-        RHchamber : float
+        rh_chamber : float
             Relative Humidity of Controlled Condition (%).
             EXAMPLE: "50 = 50% NOT .5 = 50%"
-        RHoutdoor : pandas series
+        rh_outdoor : pandas series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
             from these functions: RHbacksheet(), RHbackEncap(), RHfrontEncap(),
             RHsurfaceOutside()
         poa_global : pandas series
             Global Plane of Array Irradiance W/m^2
-        Tchamber : float
+        T_chamber : float
             Reference temperature (C) "Chamber Temperature"
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
         Ea : float
             Degredation Activation Energy (kJ/mol)
@@ -629,19 +604,20 @@ class EnergyCalcs:
             Degradation acceleration factor
 
         """
-        arrheniusDenominator = EnergyCalcs._arrheniusDenominator(poa_global=poa_global,
-                                                                 RHoutdoor=RHoutdoor,
-                                                                 Toutdoor=Toutdoor,
+        arrheniusDenominator = EnergyCalcs._arrhenius_denominator(poa_global=poa_global,
+                                                                 rh_outdoor=rh_outdoor,
+                                                                 t_outdoor=t_outdoor,
                                                                  Ea=Ea,
                                                                  x=x,
                                                                  n=n)
 
         AvgOfDenominator = arrheniusDenominator.mean()
 
-        arrheniusNumerator = EnergyCalcs._arrheniusNumerator(Ichamber=Ichamber, RHchamber=RHchamber,
-                                                             Tchamber=Tchamber, Ea=Ea, x=x, n=n)
+        arrheniusNumerator = EnergyCalcs._arrhenius_numerator(I_chamber=I_chamber, 
+                                                             rh_chamber=rh_chamber,
+                                                             T_chamber=T_chamber, Ea=Ea, x=x, n=n)
 
-        accelerationFactor = EnergyCalcs._accelerationFactor(
+        accelerationFactor = EnergyCalcs._acceleration_factor(
             arrheniusNumerator, AvgOfDenominator)
 
         return accelerationFactor
@@ -652,14 +628,14 @@ class EnergyCalcs:
     # Arrhenius Environmental Characterization
     ############################################
 
-    def _TeqArrhenius(Toutdoor, Ea):
+    def _T_eq_arrhenius(t_outdoor, Ea):
         """
         Get the Temperature equivalent required for the settings of the controlled environment
         Calculation is used in determining Arrhenius Environmental Characterization
 
         Parameters
         -----------
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
         Ea : float
             Degredation Activation Energy (kJ/mol)
@@ -673,46 +649,15 @@ class EnergyCalcs:
         """
 
         summationFrame = np.exp(- (Ea /
-                                   (0.00831446261815324 * (Toutdoor + 273.15))))
+                                   (0.00831446261815324 * (t_outdoor + 273.15))))
         sumForTeq = summationFrame.sum(axis=0, skipna=True)
-        Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(Toutdoor))))
+        Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(t_outdoor))))
         # Convert to celsius
         Teq = Teq - 273.15
 
         return Teq
 
-    def TeqArrhenius(Toutdoor, Ea):
-        """
-        TODO:   REMOVE?
-
-        Get the Temperature equivalent required for the settings of the controlled environment
-        Calculation is used in determining Arrhenius Environmental Characterization
-
-        Parameters
-        -----------
-        Toutdoor : pandas series
-            Solar module temperature or Cell temperature (C)
-        Ea : float
-            Degredation Activation Energy (kJ/mol)
-
-        Returns
-        -------
-        Teq : float
-            Temperature equivalent (Celsius) required
-            for the settings of the controlled environment
-
-        """
-
-        summationFrame = np.exp(- (Ea /
-                                   (0.00831446261815324 * (Toutdoor + 273.15))))
-        sumForTeq = summationFrame.sum(axis=0, skipna=True)
-        Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(Toutdoor))))
-        # Convert to celsius
-        Teq = Teq - 273.15
-
-        return Teq
-
-    def _RHwaArrhenius(RHoutdoor, Toutdoor, Ea, Teq=None, n=1):
+    def _RH_wa_arrhenius(rh_outdoor, t_outdoor, Ea, Teq=None, n=1):
         """
         NOTE
 
@@ -721,11 +666,11 @@ class EnergyCalcs:
 
         Parameters
         -----------
-        RHoutdoor : pandas series
+        rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative
             humiditys can be calculated from the below functions:
             RHbacksheet(), RHbackEncap(), RHfrontEncap(), RHsurfaceOutside()
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             solar module temperature or Cell temperature (C)
         Ea : float
             Degredation Activation Energy (kJ/mol)
@@ -742,17 +687,17 @@ class EnergyCalcs:
         """
 
         if Teq is None:
-            Teq = EnergyCalcs._TeqArrhenius(Toutdoor, Ea)
+            Teq = EnergyCalcs._T_eq_arrhenius(t_outdoor, Ea)
 
-        summationFrame = (RHoutdoor ** n) * np.exp(- (Ea /
-                                                      (0.00831446261815324 * (Toutdoor + 273.15))))
+        summationFrame = (rh_outdoor ** n) * np.exp(- (Ea /
+                                                      (0.00831446261815324 * (t_outdoor + 273.15))))
         sumForRHwa = summationFrame.sum(axis=0, skipna=True)
         RHwa = (sumForRHwa / (len(summationFrame) * np.exp(- (Ea /
                                                 (0.00831446261815324 * (Teq + 273.15)))))) ** (1/n)
 
         return RHwa
 
-    def RHwaArrhenius(RHoutdoor, Toutdoor, Ea, Teq=None, n=1):
+    def RHwaArrhenius(rh_outdoor, t_outdoor, Ea, Teq=None, n=1):
         """
         NOTE
 
@@ -761,11 +706,11 @@ class EnergyCalcs:
 
         Parameters
         -----------
-        RHoutdoor : pandas series
+        rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative
             humiditys can be calculated from the below functions:
             RHbacksheet(), RHbackEncap(), RHfrontEncap(), RHsurfaceOutside()
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             solar module temperature or Cell temperature (C)
         Teq : float
             Temperature equivalent (Celsius) required
@@ -783,17 +728,17 @@ class EnergyCalcs:
         """
 
         if Teq is None:
-            Teq = EnergyCalcs._TeqArrhenius(Toutdoor, Ea)
+            Teq = EnergyCalcs._T_eq_arrhenius(t_outdoor, Ea)
 
-        summationFrame = (RHoutdoor ** n) * np.exp(- (Ea /
-                                                      (0.00831446261815324 * (Toutdoor + 273.15))))
+        summationFrame = (rh_outdoor ** n) * np.exp(- (Ea /
+                                                      (0.00831446261815324 * (t_outdoor + 273.15))))
         sumForRHwa = summationFrame.sum(axis=0, skipna=True)
         RHwa = (sumForRHwa / (len(summationFrame) * np.exp(- (Ea /
                                                 (0.00831446261815324 * (Teq + 273.15)))))) ** (1/n)
 
         return RHwa
 
-    def IwaArrhenius(poa_global, RHoutdoor, Toutdoor, Ea,
+    def IwaArrhenius(poa_global, rh_outdoor, t_outdoor, Ea,
                      RHwa=None, Teq=None, x=0.64, n=1):
         """
         TODO:   CHECK
@@ -807,12 +752,12 @@ class EnergyCalcs:
         ----------
         poa_global : float
             (Global) Plan of Array irradiance (W/m^2)
-        RHoutdoor : pandas series
+        rh_outdoor : pandas series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
             from these functions: RHbacksheet(), RHbackEncap(), RHfrontEncap()
                                   RHsurfaceOutside()
-        Toutdoor : pandas series
+        t_outdoor : pandas series
             Solar module temperature or Cell temperature (C)
         Ea : float
             Degradation Activation Energy (kJ/mol)
@@ -833,13 +778,13 @@ class EnergyCalcs:
 
         """
         if Teq is None:
-            Teq = EnergyCalcs._TeqArrhenius(Toutdoor, Ea)
+            Teq = EnergyCalcs._T_eq_arrhenius(t_outdoor, Ea)
 
         if RHwa is None:
-            RHwa = EnergyCalcs._RHwaArrhenius(RHoutdoor, Toutdoor, Ea)
+            RHwa = EnergyCalcs._RH_wa_arrhenius(rh_outdoor, t_outdoor, Ea)
 
-        numerator = poa_global**(x) * RHoutdoor**(n) * \
-            np.exp(- (Ea / (0.00831446261815324 * (Toutdoor + 273.15))))
+        numerator = poa_global**(x) * rh_outdoor**(n) * \
+            np.exp(- (Ea / (0.00831446261815324 * (t_outdoor + 273.15))))
         sumOfNumerator = numerator.sum(axis=0, skipna=True)
 
         denominator = (len(numerator)) * ((RHwa)**n) * \
@@ -854,30 +799,30 @@ class EnergyCalcs:
 # Misc. Functions for Energy Calcs
 ############
 
-    def _rH_Above85(rH):
+    def _rh_Above85(rh):
         """
         Helper function. Determines if the relative humidity is above 85%.
 
         Parameters
         ----------
-        rH : float
+        rh : float
             Relative Humidity %
 
         Returns
         --------
-        rHabove85 : boolean
+        rhabove85 : boolean
             True if the relative humidity is above 85% or False if the relative
             humidity is below 85%
 
         """
 
-        if rH > 85:
-            rHabove85 = True
+        if rh > 85:
+            rhabove85 = True
 
         else:
-            rHabove85 = False
+            rhabove85 = False
 
-        return rHabove85
+        return rhabove85
 
     def _hoursRH_Above85(df):
         """
@@ -894,7 +839,7 @@ class EnergyCalcs:
             Number of hours relative humidity is above 85%
 
         """
-        booleanDf = df.apply(lambda x: EnergyCalcs._rH_Above85(x))
+        booleanDf = df.apply(lambda x: EnergyCalcs._rh_Above85(x))
         numhoursabove85 = booleanDf.sum()
 
         return numhoursabove85
@@ -982,13 +927,13 @@ class relativeHumidity:
 
         return Psat
 
-    def RHsurfaceOutside(rH_ambient, ambient_temp, surface_temp):
+    def RHsurfaceOutside(rh_ambient, ambient_temp, surface_temp):
         """
         Function calculates the Relative Humidity of a Solar Panel Surface
 
         Parameters
         ----------
-        rH_ambient : float
+        rh_ambient : float
             The ambient outdoor environmnet relative humidity
         ambient_temp : float
             The ambient outdoor environmnet temperature in Celsius
@@ -997,21 +942,21 @@ class relativeHumidity:
 
         Returns
         --------
-        rH_Surface : float
+        rh_Surface : float
             The relative humidity of the surface of a solar module
 
         """
-        rH_Surface = rH_ambient * \
+        rh_Surface = rh_ambient * \
             (relativeHumidity.Psat(ambient_temp) /
              relativeHumidity.Psat(surface_temp))
 
-        return rH_Surface
+        return rh_Surface
 
         ###########
         # Front Encapsulant RH
         ###########
 
-    def SDwNumerator(rH_ambient, ambient_temp, surface_temp, So=1.81390702, Eas=16.729, Ead=38.14):
+    def SDwNumerator(rh_ambient, ambient_temp, surface_temp, So=1.81390702, Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
@@ -1022,7 +967,7 @@ class relativeHumidity:
 
         Parameters
         ----------
-        rH_ambient : pandas series (float)
+        rh_ambient : pandas series (float)
             The ambient outdoor environmnet relative humidity in (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         ambient_temp : pandas series (float)
@@ -1047,12 +992,12 @@ class relativeHumidity:
         """
 
         # Get the relative humidity of the surface
-        RH_surface = relativeHumidity.RHsurfaceOutside(
-            rH_ambient, ambient_temp, surface_temp)
+        rh_surface = relativeHumidity.RHsurfaceOutside(
+            rh_ambient, ambient_temp, surface_temp)
 
         # Generate a series of the numerator values "prior to summation"
         SDwNumerator_series = So * np.exp(- (Eas / (0.00831446261815324 * (surface_temp + 273.15))))\
-                                * RH_surface * \
+                                * rh_surface * \
                                 np.exp(- (Ead / (0.00831446261815324 * (surface_temp + 273.15))))
 
         return SDwNumerator_series
@@ -1085,7 +1030,7 @@ class relativeHumidity:
                                    (0.00831446261815324 * (surface_temp + 273.15))))
         return SDwDenominator
 
-    def SDw(rH_ambient, ambient_temp, surface_temp, So=1.81390702,  Eas=16.729, Ead=38.14):
+    def SDw(rh_ambient, ambient_temp, surface_temp, So=1.81390702,  Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
@@ -1094,7 +1039,7 @@ class relativeHumidity:
 
         Parameters
         ----------
-        rH_ambient : pandas series (float)
+        rh_ambient : pandas series (float)
             The ambient outdoor environmnet relative humidity in (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         ambient_temp : pandas series (float)
@@ -1119,7 +1064,7 @@ class relativeHumidity:
         """
 
         numerator = relativeHumidity.SDwNumerator(
-            rH_ambient, ambient_temp, surface_temp, So,  Eas, Ead)
+            rh_ambient, ambient_temp, surface_temp, So,  Eas, Ead)
         # get the summation of the numerator
         numerator = numerator.sum(axis=0, skipna=True)
 
@@ -1195,7 +1140,7 @@ class relativeHumidity:
 
         return Csat
 
-    def _Ceq(Csat, rH_SurfaceOutside):
+    def _Ceq(Csat, rh_SurfaceOutside):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns Equilibration water concentration (g/cm³)
@@ -1204,7 +1149,7 @@ class relativeHumidity:
         ------------
         Csat : pandas series (float)
             Saturation of Water Concentration (g/cm³)
-        rH_SurfaceOutside : pandas series (float)
+        rh_SurfaceOutside : pandas series (float)
             The relative humidity of the surface of a solar module (%)
 
         Returns
@@ -1214,14 +1159,14 @@ class relativeHumidity:
 
         """
 
-        Ceq = Csat * (rH_SurfaceOutside/100)
+        Ceq = Csat * (rh_SurfaceOutside/100)
 
         return Ceq
 
     # Returns a numpy array
 
     @jit(nopython=True)
-    def Ce_numba(start, surface_temp, RH_surface,
+    def Ce_numba(start, surface_temp, rh_surface,
                     WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
@@ -1241,7 +1186,7 @@ class relativeHumidity:
         surface_temp : pandas series (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
-        rH_Surface : list (float)
+        rh_Surface : list (float)
             The relative humidity of the surface of a solar module (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         WVTRo : float
@@ -1271,7 +1216,7 @@ class relativeHumidity:
         dataPoints = len(surface_temp)
         Ce_list = np.zeros(dataPoints)
 
-        for i in range(0, len(RH_surface)):
+        for i in range(0, len(rh_surface)):
 
             if i == 0:
                 # Ce = Initial start of concentration of water
@@ -1281,13 +1226,14 @@ class relativeHumidity:
 
             Ce = Ce + ((WVTRo/100/100/24 * np.exp(-((EaWVTR) / (0.00831446261815324 * (surface_temp[i] + 273.15))))) /
                        (So * l/10 * np.exp(-((Eas) / (0.00831446261815324 * (surface_temp[i] + 273.15))))) *
-                       (RH_surface[i]/100 * So * np.exp(-((Eas) / (0.00831446261815324 * (surface_temp[i] + 273.15)))) - Ce))
+                       (rh_surface[i]/100 * So * np.exp(-((Eas) / (0.00831446261815324 * (surface_temp[i] + 273.15)))) - Ce))
 
             Ce_list[i] = Ce
 
         return Ce_list
 
-    def RHbackEncap(rH_ambient, ambient_temp, surface_temp, WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
+    def RHbackEncap(rh_ambient,ambient_temp,surface_temp,
+                    WVTRo=7970633554,EaWVTR=55.0255,So=1.81390702,l=0.5,Eas=16.729):
         """
         RHbackEncap()
 
@@ -1296,30 +1242,30 @@ class relativeHumidity:
 
         Parameters
         -----------
-        rH_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%) 
+        rh_ambient : pandas series (float)
+            The ambient outdoor environmnet relative humidity in (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         ambient_temp : pandas series (float)
-            The ambient outdoor environmnet temperature in Celsius   
-        surface_temp : list (float) 
+            The ambient outdoor environmnet temperature in Celsius
+        surface_temp : list (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         WVTRo : float
-            Water Vapor Transfer Rate prefactor (g/m2/day). 
+            Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
-        EaWVTR : float 
-            Water Vapor Transfer Rate activation energy (kJ/mol) . 
-            It is suggested to use 0.15(mm) thick PET as a default 
-            for the backsheet and set EaWVTR=55.0255(kJ/mol)     
+        EaWVTR : float
+            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            It is suggested to use 0.15(mm) thick PET as a default
+            for the backsheet and set EaWVTR=55.0255(kJ/mol)
         So : float
-            Encapsulant solubility prefactor in [g/cm3] 
+            Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
-        l : float 
-            Thickness of the backside encapsulant (mm). 
-            The suggested value for encapsulat is EVA l=0.5(mm)   
+        l : float
+            Thickness of the backside encapsulant (mm).
+            The suggested value for encapsulat is EVA l=0.5(mm)
         Eas : float
-            Encapsulant solubility activation energy in [kJ/mol] 
-            Eas = 16.729(kJ/mol) is the suggested value for EVA. 
+            Encapsulant solubility activation energy in [kJ/mol]
+            Eas = 16.729(kJ/mol) is the suggested value for EVA.
 
         Returns
         --------  
@@ -1328,22 +1274,22 @@ class relativeHumidity:
 
         """
 
-        RH_surface = relativeHumidity.RHsurfaceOutside(rH_ambient=rH_ambient,
+        rh_surface = relativeHumidity.RHsurfaceOutside(rh_ambient=rh_ambient,
                                                        ambient_temp=ambient_temp,
                                                        surface_temp=surface_temp)
 
         Csat = relativeHumidity._Csat(
             surface_temp=surface_temp, So=So, Eas=Eas)
-        Ceq = relativeHumidity._Ceq(Csat=Csat, rH_SurfaceOutside=RH_surface)
+        Ceq = relativeHumidity._Ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
         start = Ceq[0]
 
         # Need to convert these series to numpy arrays for numba function
         surface_temp_numba = surface_temp.to_numpy()
-        RH_surface_numba = RH_surface.to_numpy()
+        rh_surface_numba = rh_surface.to_numpy()
         Ce_nparray = relativeHumidity.Ce_numba(start=start,
                                                surface_temp=surface_temp_numba,
-                                               RH_surface=RH_surface_numba,
+                                               rh_surface=rh_surface_numba,
                                                WVTRo=WVTRo,
                                                EaWVTR=EaWVTR,
                                                So=So,
@@ -1377,7 +1323,7 @@ class relativeHumidity:
         RHbacksheet_series : pandas series (float)
             Relative Humidity of Backside Backsheet of a Solar Module
 
-        @return rH_Surface     -
+        @return rh_Surface     -
 \                             
         """
 
@@ -1388,20 +1334,20 @@ class relativeHumidity:
 
 class Degradation:
 
-    def degradation(Spectra, Module_RH, Module_Temperature, wavelengths,
+    def degradation(spectra, module_rh, module_temp, wavelengths,
                     Ea=40.0, n=1.0, x=0.64, C2=0.07, C=1.0):
         '''
         Compute degredation as double integral of Arrhenius (Activation
-        Energy, RH, Temperature) and Spectral (wavelength, irradiance)
+        Energy, RH, Temperature) and spectral (wavelength, irradiance)
         functions over wavelength and time.
 
         Parameters
         ----------
-        Spectra : pd.Series type=Float
+        spectra : pd.Series type=Float
             front or rear irradiance at each wavelength in "wavelengths"
-        Module_RH : pd.Series type=Float
+        module_rh : pd.Series type=Float
             module RH, time indexed
-        Module_Temperature : pd.Series type=Float
+        module_temp : pd.Series type=Float
             module temperature, time indexed
         wavelengths : int-array
             integer array (or list) of wavelengths tested w/ uniform delta
@@ -1428,9 +1374,9 @@ class Degradation:
         '''
         # --- TO DO ---
         # unpack input-dataframe
-        # Spectra = df['Spectra']
-        # Module_Temperature = df['Module_Temperature']
-        # Module_RH = df['Module_RH']
+        # spectra = df['spectra']
+        # module_temp = df['module_temp']
+        # module_rh = df['module_rh']
 
         # Constants
         R = 0.0083145  # Gas Constant in [kJ/mol*K]
@@ -1440,12 +1386,12 @@ class Degradation:
 
         # Integral over Wavelength
         try:
-            irr = pd.DataFrame(Spectra.tolist(), index=Spectra.index)
+            irr = pd.DataFrame(spectra.tolist(), index=spectra.index)
         except:
             # TODO: Fix this except it works on some cases, veto it by cases
             print("USING THE EXCEPT in PVDegradations Degradation function")
-            #irr = data['Spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
-            irr = Spectra.str.strip('[]').str.split(
+            #irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+            irr = spectra.str.strip('[]').str.split(
                 ',', expand=True).astype(float)
 
         irr.columns = wavelengths
@@ -1454,13 +1400,13 @@ class Degradation:
         irr = irr*sensitivitywavelengths
         irr *= np.array(wav_bin)
         irr = irr**x
-        data = pd.DataFrame(index=Spectra.index)
+        data = pd.DataFrame(index=spectra.index)
         data['G_integral'] = irr.sum(axis=1)
 
         EApR = -Ea/R
-        C4 = np.exp(EApR/Module_Temperature)
+        C4 = np.exp(EApR/module_temp)
 
-        RHn = Module_RH**n
+        RHn = module_rh**n
         data['Arr_integrand'] = C4*RHn
 
         data['dD'] = data['G_integral']*data['Arr_integrand']
