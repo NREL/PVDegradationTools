@@ -511,8 +511,8 @@ class EnergyCalcs:
             Fit parameter
         rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative
-            humiditys can be calculated from these functions: RHbacksheet(),
-            RHbackEncap(); rh_front_encap();  rh_surface_outside()
+            humiditys can be calculated from these functions: rh_backsheet(),
+            rh_back_encap(); rh_front_encap();  rh_surface_outside()
         n : float
             Fit parameter for relative humidity
         temp_cell : pandas series
@@ -583,7 +583,7 @@ class EnergyCalcs:
         rh_outdoor : pandas series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
-            from these functions: RHbacksheet(), RHbackEncap(), rh_front_encap(),
+            from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(),
             rh_surface_outside()
         poa_global : pandas series
             Global Plane of Array Irradiance W/m^2
@@ -669,7 +669,7 @@ class EnergyCalcs:
         rh_outdoor : pandas series
             Relative Humidity of material of interest. Acceptable relative
             humiditys can be calculated from the below functions:
-            RHbacksheet(), RHbackEncap(), rh_front_encap(), rh_surface_outside()
+            rh_backsheet(), rh_back_encap(), rh_front_encap(), rh_surface_outside()
         temp_cell : pandas series
             solar module temperature or Cell temperature (C)
         Ea : float
@@ -697,46 +697,6 @@ class EnergyCalcs:
 
         return RHwa
 
-    def RHwaArrhenius(rh_outdoor, temp_cell, Ea, Teq=None, n=1):
-        """
-        NOTE:   make internal
-
-        Get the Relative Humidity Weighted Average.
-        Calculation is used in determining Arrhenius Environmental Characterization
-
-        Parameters
-        -----------
-        rh_outdoor : pandas series
-            Relative Humidity of material of interest. Acceptable relative
-            humiditys can be calculated from the below functions:
-            RHbacksheet(), RHbackEncap(), rh_front_encap(), rh_surface_outside()
-        temp_cell : pandas series
-            solar module temperature or Cell temperature (C)
-        Teq : float
-            Temperature equivalent (Celsius) required
-            for the settings of the controlled environment
-        Ea : float
-            Degredation Activation Energy (kJ/mol)
-        n : float
-            Fit parameter for relative humidity
-
-        Returns
-        --------
-        RHwa : float
-            Relative Humidity Weighted Average (%)
-
-        """
-
-        if Teq is None:
-            Teq = EnergyCalcs._T_eq_arrhenius(temp_cell, Ea)
-
-        summationFrame = (rh_outdoor ** n) * np.exp(- (Ea /
-                                                      (0.00831446261815324 * (temp_cell + 273.15))))
-        sumForRHwa = summationFrame.sum(axis=0, skipna=True)
-        RHwa = (sumForRHwa / (len(summationFrame) * np.exp(- (Ea /
-                                                (0.00831446261815324 * (Teq + 273.15)))))) ** (1/n)
-
-        return RHwa
 
     def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
                      RHwa=None, Teq=None, x=0.64, n=1):
@@ -755,7 +715,7 @@ class EnergyCalcs:
         rh_outdoor : pandas series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
-            from these functions: RHbacksheet(), RHbackEncap(), rh_front_encap()
+            from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap()
                                   rh_surface_outside()
         temp_cell : pandas series
             Solar module temperature or Cell temperature (C)
@@ -890,7 +850,7 @@ class RelativeHumidity:
 
     1) rh_surface_outside : Relative Humidity of the Surface of a Solar Module
     2) rh_front_encap : Relative Humidity of the Frontside Encapsulant of a Solar Module
-    3) RHbackEncapsulant : Relative Humidity of the backside Encapsulant of a Solar Module
+    3) rh_back_encapsulant : Relative Humidity of the backside Encapsulant of a Solar Module
     4) RHbacksheet : Relative
 
     """
@@ -899,7 +859,7 @@ class RelativeHumidity:
     # Surface RH
     ###########
 
-    def Psat(temp):
+    def _psat(temp):
         """
         Function to generate the point of saturation dependent on temperature
         Calculation created by Michael Kempe, implemented by Derek Holsapple
@@ -914,18 +874,18 @@ class RelativeHumidity:
 
         Returns
         -------
-        Psat : float
+        _psat : float
             Point of saturation
 
         """
 
-        Psat = np.exp(-0.000000002448137*temp**4
+        psat = np.exp(-0.000000002448137*temp**4
                       + 0.000001419572*temp**3
                       - 0.0003779559*temp**2
                       + 0.07796986*temp
                       - 0.5796729)
 
-        return Psat
+        return psat
 
     def rh_surface_outside(rh_ambient, temp_ambient, temp_surface):
         """
@@ -947,8 +907,8 @@ class RelativeHumidity:
 
         """
         rh_Surface = rh_ambient * \
-            (RelativeHumidity.Psat(temp_ambient) /
-             RelativeHumidity.Psat(temp_surface))
+            (RelativeHumidity._psat(temp_ambient) /
+             RelativeHumidity._psat(temp_surface))
 
         return rh_Surface
 
@@ -956,7 +916,7 @@ class RelativeHumidity:
         # Front Encapsulant RH
         ###########
 
-    def SDwNumerator(rh_ambient, temp_ambient, temp_surface, So=1.81390702, Eas=16.729, Ead=38.14):
+    def _diffusivity_numerator(rh_ambient, temp_ambient, temp_surface, So=1.81390702, Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
@@ -986,7 +946,7 @@ class RelativeHumidity:
 
         Returns
         -------
-        SDwNumerator_series : pandas series (float)
+        diff_numerator : pandas series (float)
             Nnumerator of the Sdw equation prior to summation
 
         """
@@ -996,19 +956,19 @@ class RelativeHumidity:
             rh_ambient, temp_ambient, temp_surface)
 
         # Generate a series of the numerator values "prior to summation"
-        SDwNumerator_series = So * np.exp(- (Eas / (0.00831446261815324 * (temp_surface + 273.15))))\
+        diff_numerator = So * np.exp(- (Eas / (0.00831446261815324 * (temp_surface + 273.15))))\
                                 * rh_surface * \
                                 np.exp(- (Ead / (0.00831446261815324 * (temp_surface + 273.15))))
 
-        return SDwNumerator_series
+        return diff_numerator
 
-    def SDwDenominator(temp_surface, Ead=38.14):
+    def _diffusivity_denominator(temp_surface, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
 
         The function returns values needed for the denominator of the Diffusivity
-        weighted water content equation(SDw). This function will return a pandas
+        weighted water content equation(diffuse_water). This function will return a pandas
         series prior to summation of the denominator
 
         Parameters
@@ -1021,16 +981,18 @@ class RelativeHumidity:
 
         Returns
         -------
-        SDwDenominator : pandas series (float)
-            Denominator of the SDw equation prior to summation
+        diff_denominator : pandas series (float)
+            Denominator of the diffuse_water equation prior to summation
 
         """
 
-        SDwDenominator = np.exp(- (Ead /
+        diff_denominator = np.exp(- (Ead /
                                    (0.00831446261815324 * (temp_surface + 273.15))))
-        return SDwDenominator
+        return diff_denominator
 
-    def SDw(rh_ambient, temp_ambient, temp_surface, So=1.81390702,  Eas=16.729, Ead=38.14):
+       
+    def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_surface,
+                                    So=1.81390702,  Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
@@ -1058,35 +1020,37 @@ class RelativeHumidity:
 
         Returns
         ------
-        SDw : float
+        diffuse_water : float
             Diffusivity weighted water content
 
         """
 
-        numerator = RelativeHumidity.SDwNumerator(
+        numerator = RelativeHumidity._diffusivity_numerator(
             rh_ambient, temp_ambient, temp_surface, So,  Eas, Ead)
         # get the summation of the numerator
         numerator = numerator.sum(axis=0, skipna=True)
 
-        denominator = RelativeHumidity.SDwDenominator(temp_surface, Ead)
+        denominator = RelativeHumidity._diffusivity_denominator(temp_surface, Ead)
         # get the summation of the denominator
         denominator = denominator.sum(axis=0, skipna=True)
 
-        SDw = (numerator / denominator)/100
+        diffuse_water = (numerator / denominator)/100
 
-        return SDw
+        return diffuse_water
 
-    def rh_front_encap(temp_surface, SDw, So=1.81390702, Eas=16.729):
+    def rh_front_encap(rh_ambient, temp_ambient, temp_surface, So=1.81390702, Eas=16.729):
         """
         Function returns Relative Humidity of Frontside Solar Module Encapsulant
 
         Parameters
         ----------
+        rh_ambient : series (float)
+            ambient Relative Humidity (%)
+        temp_ambient : series (float)
+            ambient outdoor temperature (C)        
         temp_surface : pandas series (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
-        SDw : float
-            Diffusivity weighted water content. *See EnergyCalcs.SDw() function
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
@@ -1101,7 +1065,11 @@ class RelativeHumidity:
             Relative Humidity of Frontside Solar module Encapsulant
 
         """
-        RHfront_series = (SDw / (So * np.exp(- (Eas / (0.00831446261815324 *
+        diffuse_water = RelativeHumidity._diffusivity_weighted_water(rh_ambient=rh_ambient,
+                                                                    temp_ambient=temp_ambient,
+                                                                    temp_surface=temp_surface)
+        
+        RHfront_series = (diffuse_water / (So * np.exp(- (Eas / (0.00831446261815324 *
                                                        (temp_surface + 273.15)))))) * 100
 
         return RHfront_series
@@ -1110,7 +1078,7 @@ class RelativeHumidity:
         # Back Encapsulant Relative Humidity
         ###########
 
-    def _Csat(temp_surface, So=1.81390702, Eas=16.729):
+    def _csat(temp_surface, So=1.81390702, Eas=16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns saturation of Water Concentration (g/cm³)
@@ -1140,7 +1108,7 @@ class RelativeHumidity:
 
         return Csat
 
-    def _Ceq(Csat, rh_SurfaceOutside):
+    def _ceq(Csat, rh_SurfaceOutside):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns Equilibration water concentration (g/cm³)
@@ -1181,7 +1149,7 @@ class RelativeHumidity:
         start : float
             Initial value of the Concentration of water in the encapsulant
             currently takes the first value produced from
-            the _Ceq(Saturation of Water Concentration) as a point
+            the _ceq(Saturation of Water Concentration) as a point
             of acceptable equilibrium
         temp_surface : pandas series (float)
             The surface temperature in Celsius of the solar panel module
@@ -1232,10 +1200,10 @@ class RelativeHumidity:
 
         return Ce_list
 
-    def RHbackEncap(rh_ambient,temp_ambient,temp_surface,
-                    WVTRo=7970633554,EaWVTR=55.0255,So=1.81390702,l=0.5,Eas=16.729):
+    def rh_back_encap(rh_ambient, temp_ambient, temp_surface,
+                    WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
         """
-        RHbackEncap()
+        rh_back_encap()
 
         Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
         and return a pandas series for each time step        
@@ -1278,9 +1246,9 @@ class RelativeHumidity:
                                                        temp_ambient=temp_ambient,
                                                        temp_surface=temp_surface)
 
-        Csat = RelativeHumidity._Csat(
+        Csat = RelativeHumidity._csat(
             temp_surface=temp_surface, So=So, Eas=Eas)
-        Ceq = RelativeHumidity._Ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
+        Ceq = RelativeHumidity._ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
         start = Ceq[0]
 
@@ -1306,15 +1274,15 @@ class RelativeHumidity:
         # Back Sheet Relative Humidity
         ###########
 
-    def RHbacksheet(RHbackEncap, rh_surface_outside):
+    def rh_backsheet(rh_back_encap, rh_surface_outside):
         """
         Function to calculate the Relative Humidity of Backside BackSheet of a Solar Module
         and return a pandas series for each time step
 
         Parameters
         ----------
-        RHbackEncap : pandas series (float)
-            Relative Humidity of Frontside Solar module Encapsulant. *See RHbackEncap()
+        rh_back_encap : pandas series (float)
+            Relative Humidity of Frontside Solar module Encapsulant. *See rh_back_encap()
         rh_surface_outside : pandas series (float)
             The relative humidity of the surface of a solar module. *See rh_surface_outside()
 
@@ -1327,7 +1295,7 @@ class RelativeHumidity:
 \                             
         """
 
-        RHbacksheet_series = (RHbackEncap + rh_surface_outside)/2
+        RHbacksheet_series = (rh_back_encap + rh_surface_outside)/2
 
         return RHbacksheet_series
 

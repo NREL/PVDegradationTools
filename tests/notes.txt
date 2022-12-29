@@ -47,40 +47,21 @@ ____________________________________________
 ====   Tests     ===========================
  
  R = Runs   V = Verified    X = Broken
+ M = Missing Data            
  
  - EnergyCalcs
     [R] k
     [R] water_vapor_pressure
     [R] edge_seal_width
-    [ ] dew_yield
+    [M] dew_yield
     [ ] solder_fatigue
     [R] vantHoff_deg
     [R] Iwa VantHoff
     [R] arrhenius_deg
-    [ ] IwaArrhenius
+    [R] IwaArrhenius
 
 - RelativeHumidity
     [R] rh_surface_outdside
-
-
-____________________________________________
-====   Changes   ===========================
-
- = 
- 
- 
- 
- 
- 
- = energyCalcs 
-    - uniform function argument order and naming
-    - uniform function names
-    - automate substeps (no need to call RHwaArrhenius,
-                                         TeqArrhenius,
-                                         ToeqVantHoff,
-                                         etc)
-    - default parameters added (x = 0.64,
-                                Tf = 1.41,
-                                n = 1 )
-    - all internal function calls use explicit arguments
-
+    [R] rh_front_encap
+    [R] rh_back_encap
+    [R] rh_backsheet
