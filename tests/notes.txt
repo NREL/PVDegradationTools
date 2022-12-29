@@ -32,12 +32,10 @@ _______________________
 
 ___________________
 ===    To Do   ====
-    -  solderFatigue
+    -  solderFatigue: test, move to Degradation
     -  _power, needs: test, document, units
-    -  Toutdoor: rename to Tcell or Tmodule
     -  camel case function names
     -  arguments series > variables > defaults
-    -  pylint pep8
     -  make slides for functions ( what works,
                                    what it does,
                                    ?)
@@ -54,7 +52,7 @@ ____________________________________________
     [R] water_vapor_pressure
     [R] edge_seal_width
     [M] dew_yield
-    [ ] solder_fatigue
+    [ ] solder_fatigue --> moved to Degradation
     [R] vantHoff_deg
     [R] Iwa VantHoff
     [R] arrhenius_deg
@@ -65,3 +63,7 @@ ____________________________________________
     [R] rh_front_encap
     [R] rh_back_encap
     [R] rh_backsheet
+
+- Degradation
+    [ ] degradation
+    [R] solder_fatigue

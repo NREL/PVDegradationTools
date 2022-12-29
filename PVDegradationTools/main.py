@@ -111,7 +111,7 @@ class EnergyCalcs:
 
         Parameters
         ----------
-        dew_pt_temp : float
+        dew_pt_temp : float, or float series
             Dew Point Temperature
 
         Returns
@@ -134,145 +134,12 @@ class EnergyCalcs:
 # Solder Fatigue
 ############
 
-    def _avg_daily_temp_change(local_time, temp_cell):
-        """
-        Helper function. Get the average of a year for the daily maximum temperature change.
-
-        For every 24hrs this function will find the delta between the maximum
-        temperature and minimun temperature.  It will then take the deltas for
-        every day of the year and return the average delta.
-
-        Parameters
-        ------------
-        local_time : timestamp series
-            Local time of specific site by the hour
-            year-month-day hr:min:sec . (Example) 2002-01-01 01:00:00
-        temp_cell : float series
-            Photovoltaic module cell temperature(Celsius) for every hour of a year
-
-        Returns
-        -------
-        avg_daily_temp_change : float
-            Average Daily Temerature Change for 1-year (Celsius)
-        avg_max_temp_cell : float
-            Average of Daily Maximum Temperature for 1-year (Celsius)
-
-        """
-        # Setup frame for vector processing
-        timeAndTemp_df = pd.DataFrame(columns=['Cell Temperature'])
-        timeAndTemp_df['Cell Temperature'] = temp_cell
-        timeAndTemp_df.index = local_time
-        timeAndTemp_df['month'] = timeAndTemp_df.index.month
-        timeAndTemp_df['day'] = timeAndTemp_df.index.day
-
-        # Group by month and day to determine the max and min cell Temperature (C) for each day
-        dailyMaxCellTemp_series = timeAndTemp_df.groupby(
-            ['month', 'day'])['Cell Temperature'].max()
-        dailyMinCellTemp_series = timeAndTemp_df.groupby(
-            ['month', 'day'])['Cell Temperature'].min()
-        temp_cell_change = pd.DataFrame(
-            {'Max': dailyMaxCellTemp_series, 'Min': dailyMinCellTemp_series})
-        temp_cell_change['TempChange'] = temp_cell_change['Max'] - \
-            temp_cell_change['Min']
-
-        # Find the average temperature change for every day of one year (C)
-        avg_daily_temp_change = temp_cell_change['TempChange'].mean()
-        # Find daily maximum cell temperature average
-        avg_max_temp_cell = dailyMaxCellTemp_series.mean()
-
-        return avg_daily_temp_change, avg_max_temp_cell
-
-    def _times_over_reversal_number(temp_cell, reversal_temp):
-        """
-        Helper function. Get the number of times a temperature increases or decreases over a
-        specific temperature gradient.
-
-        Parameters
-        ------------
-        temp_cell : float series
-            Photovoltaic module cell temperature(Celsius)
-        reversal_temp : float
-            Temperature threshold to cross above and below
-
-        Returns
-        --------
-        num_changes_temp_hist : int
-            Number of times the temperature threshold is crossed
-
-        """
-        # Find the number of times the temperature crosses over 54.8(C)
-
-        temp_df = pd.DataFrame()
-        temp_df['CellTemp'] = temp_cell
-        temp_df['COMPARE'] = temp_cell
-        temp_df['COMPARE'] = temp_df.COMPARE.shift(-1)
-
-        #reversal_temp = 54.8
-
-        temp_df['cross'] = (
-            ((temp_df.CellTemp >= reversal_temp) & (temp_df.COMPARE < reversal_temp)) |
-            ((temp_df.COMPARE > reversal_temp) & (temp_df.CellTemp <= reversal_temp)) |
-            (temp_df.CellTemp == reversal_temp))
-
-        num_changes_temp_hist = temp_df.cross.sum()
-
-        return num_changes_temp_hist
-
-    def solderFatigue(local_time, temp_cell, reversal_temp):
-        """
-        Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
-        Damage will be returned as the rate of solder fatigue for one year. Based on:
-
-            Bosco, N., Silverman, T. and Kurtz, S. (2020). Climate specific thermomechanical
-            fatigue of flat plate photovoltaic module solder joints. [online] Available
-            at: https://www.sciencedirect.com/science/article/pii/S0026271416300609
-            [Accessed 12 Feb. 2020].
-
-        Parameters
-        ------------
-        local_time : timestamp series
-            Local time of specific site by the hour year-month-day hr:min:sec
-            (Example) 2002-01-01 01:00:00
-        temp_cell : float series
-            Photovoltaic module cell temperature(Celsius) for every hour of a year
-        reversal_temp : float
-            Temperature threshold to cross above and below
-
-        Returns
-        --------
-        damage : float series
-            Solder fatigue damage for a time interval depending on local_time (kPa)
-
-        """
-
-        # TODO Make this function have more utility.
-        # People want to run all the scenarios from the bosco paper.
-        # Currently have everything hard coded for hourly calculation
-        # i.e. 405.6, 1.9, .33, .12
-        # Get the:
-        #   1) Average of the Daily Maximum Cell Temperature (C)
-        #   2) Average of the Daily Maximum Temperature change avg(daily max - daily min)
-        #   3) Number of times the temperaqture crosses above or below the reversal Temperature
-        MeanDailyMaxCellTempChange, dailyMaxCellTemp_Average = EnergyCalcs._avg_daily_temp_change(
-            local_time, temp_cell)
-        # Needs to be in Kelvin for equation specs
-        dailyMaxCellTemp_Average = convert_temperature(
-            dailyMaxCellTemp_Average, 'Celsius', 'Kelvin')
-        num_changes_temp_hist = EnergyCalcs._times_over_reversal_number(
-            temp_cell, reversal_temp)
-
-        # k = Boltzmann's Constant
-        damage = 405.6 * (MeanDailyMaxCellTempChange ** 1.9) * \
-                         (num_changes_temp_hist**.33) * \
-            np.exp(-(.12/(.00008617333262145*dailyMaxCellTemp_Average)))
-        # Convert pascals to kilopascals
-        damage = damage/1000
-        return damage
-
     def _power(temp_cell, poa_global):
         """
         TODO:   check units
                 check 2 different functions
+                This is unused. Delete?
+
         Helper function. Find the relative power produced from a solar module.
 
         Model derived from Mike Kempe Calculation on paper
@@ -385,7 +252,6 @@ class EnergyCalcs:
 
     def vantHoff_deg(I_chamber, poa_global, temp_cell, temp_chamber, x=0.64, Tf=1.41):
         """
-        NOTE
 
         Vant Hoff Irradiance Degradation
 
@@ -393,7 +259,7 @@ class EnergyCalcs:
         -----------
         I_chamber : float
             Irradiance of Controlled Condition W/m^2
-        poa_global : float or series
+        poa_global : float series
             Global Plane of Array Irradiance W/m^2
         temp_cell : pandas series
             Solar module temperature or Cell temperature (C)
@@ -458,17 +324,15 @@ class EnergyCalcs:
 
     def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.64, Tf=1.41):
         """
-        NOTE
-
         IWa : Environment Characterization (W/m^2)
         *for one year of degredation the controlled environmnet lamp settings will
             need to be set to IWa
 
         Parameters
         -----------
-        poa_global : float or series
+        poa_global : float series
             Global Plane of Array Irradiance W/m^2
-        temp_cell : pandas series
+        temp_cell : float series
             Solar module temperature or Cell temperature (C)
         Teq : series
             VantHoff equivalent temperature (C)
@@ -505,7 +369,7 @@ class EnergyCalcs:
 
         Parameters
         ----------
-        poa_global : float
+        poa_global : float series
             (Global) Plan of Array irradiance (W/m^2)
         x : float
             Fit parameter
@@ -562,7 +426,7 @@ class EnergyCalcs:
                                               (temp_chamber+273.15)))))
         return arrheniusNumerator
 
-    def arrhenius_deg(I_chamber, rh_chamber, rh_outdoor, poa_global, temp_chamber, temp_cell,
+    def arrhenius_deg(I_chamber, rh_chamber, temp_chamber, rh_outdoor, poa_global, temp_cell,
                         Ea, x=0.64, n=1):
         """
         NOTE
@@ -580,15 +444,15 @@ class EnergyCalcs:
         rh_chamber : float
             Relative Humidity of Controlled Condition (%).
             EXAMPLE: "50 = 50% NOT .5 = 50%"
-        rh_outdoor : pandas series
+        temp_chamber : float
+            Reference temperature (C) "Chamber Temperature"
+        rh_outdoor : float series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
             from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(),
             rh_surface_outside()
         poa_global : pandas series
             Global Plane of Array Irradiance W/m^2
-        temp_chamber : float
-            Reference temperature (C) "Chamber Temperature"
         temp_cell : pandas series
             Solar module temperature or Cell temperature (C)
         Ea : float
@@ -1302,7 +1166,7 @@ class RelativeHumidity:
 
 class Degradation:
 
-    def degradation(spectra, module_rh, module_temp, wavelengths,
+    def degradation(spectra, rh_module, temp_module, wavelengths,
                     Ea=40.0, n=1.0, x=0.64, C2=0.07, C=1.0):
         '''
         Compute degredation as double integral of Arrhenius (Activation
@@ -1313,9 +1177,9 @@ class Degradation:
         ----------
         spectra : pd.Series type=Float
             front or rear irradiance at each wavelength in "wavelengths"
-        module_rh : pd.Series type=Float
+        rh_module : pd.Series type=Float
             module RH, time indexed
-        module_temp : pd.Series type=Float
+        temp_module : pd.Series type=Float
             module temperature, time indexed
         wavelengths : int-array
             integer array (or list) of wavelengths tested w/ uniform delta
@@ -1343,8 +1207,8 @@ class Degradation:
         # --- TO DO ---
         # unpack input-dataframe
         # spectra = df['spectra']
-        # module_temp = df['module_temp']
-        # module_rh = df['module_rh']
+        # temp_module = df['temp_module']
+        # rh_module = df['rh_module']
 
         # Constants
         R = 0.0083145  # Gas Constant in [kJ/mol*K]
@@ -1372,9 +1236,9 @@ class Degradation:
         data['G_integral'] = irr.sum(axis=1)
 
         EApR = -Ea/R
-        C4 = np.exp(EApR/module_temp)
+        C4 = np.exp(EApR/temp_module)
 
-        RHn = module_rh**n
+        RHn = rh_module**n
         data['Arr_integrand'] = C4*RHn
 
         data['dD'] = data['G_integral']*data['Arr_integrand']
@@ -1382,6 +1246,143 @@ class Degradation:
         degradation = C*data['dD'].sum(axis=0)
 
         return degradation
+
+    def _avg_daily_temp_change(time_range, temp_cell):
+        """
+        Helper function. Get the average of a year for the daily maximum temperature change.
+
+        For every 24hrs this function will find the delta between the maximum
+        temperature and minimun temperature.  It will then take the deltas for
+        every day of the year and return the average delta.
+
+        Parameters
+        ------------
+        time_range : timestamp series
+            Local time of specific site by the hour
+            year-month-day hr:min:sec . (Example) 2002-01-01 01:00:00
+        temp_cell : float series
+            Photovoltaic module cell temperature(Celsius) for every hour of a year
+
+        Returns
+        -------
+        avg_daily_temp_change : float
+            Average Daily Temerature Change for 1-year (Celsius)
+        avg_max_temp_cell : float
+            Average of Daily Maximum Temperature for 1-year (Celsius)
+
+        """
+        # Setup frame for vector processing
+        timeAndTemp_df = pd.DataFrame(columns=['Cell Temperature'])
+        timeAndTemp_df['Cell Temperature'] = temp_cell
+        timeAndTemp_df.index = time_range
+        timeAndTemp_df['month'] = timeAndTemp_df.index.month
+        timeAndTemp_df['day'] = timeAndTemp_df.index.day
+
+        # Group by month and day to determine the max and min cell Temperature (C) for each day
+        dailyMaxCellTemp_series = timeAndTemp_df.groupby(
+            ['month', 'day'])['Cell Temperature'].max()
+        dailyMinCellTemp_series = timeAndTemp_df.groupby(
+            ['month', 'day'])['Cell Temperature'].min()
+        temp_cell_change = pd.DataFrame(
+            {'Max': dailyMaxCellTemp_series, 'Min': dailyMinCellTemp_series})
+        temp_cell_change['TempChange'] = temp_cell_change['Max'] - \
+            temp_cell_change['Min']
+
+        # Find the average temperature change for every day of one year (C)
+        avg_daily_temp_change = temp_cell_change['TempChange'].mean()
+        # Find daily maximum cell temperature average
+        avg_max_temp_cell = dailyMaxCellTemp_series.mean()
+
+        return avg_daily_temp_change, avg_max_temp_cell
+
+    def _times_over_reversal_number(temp_cell, reversal_temp):
+        """
+        Helper function. Get the number of times a temperature increases or decreases over a
+        specific temperature gradient.
+
+        Parameters
+        ------------
+        temp_cell : float series
+            Photovoltaic module cell temperature(Celsius)
+        reversal_temp : float
+            Temperature threshold to cross above and below
+
+        Returns
+        --------
+        num_changes_temp_hist : int
+            Number of times the temperature threshold is crossed
+
+        """
+        # Find the number of times the temperature crosses over 54.8(C)
+
+        temp_df = pd.DataFrame()
+        temp_df['CellTemp'] = temp_cell
+        temp_df['COMPARE'] = temp_cell
+        temp_df['COMPARE'] = temp_df.COMPARE.shift(-1)
+
+        #reversal_temp = 54.8
+
+        temp_df['cross'] = (
+            ((temp_df.CellTemp >= reversal_temp) & (temp_df.COMPARE < reversal_temp)) |
+            ((temp_df.COMPARE > reversal_temp) & (temp_df.CellTemp <= reversal_temp)) |
+            (temp_df.CellTemp == reversal_temp))
+
+        num_changes_temp_hist = temp_df.cross.sum()
+
+        return num_changes_temp_hist
+
+    def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=405.6, Q=0.12):
+        """
+        Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
+        Damage will be returned as the rate of solder fatigue for one year. Based on:
+
+            Bosco, N., Silverman, T. and Kurtz, S. (2020). Climate specific thermomechanical
+            fatigue of flat plate photovoltaic module solder joints. [online] Available
+            at: https://www.sciencedirect.com/science/article/pii/S0026271416300609
+            [Accessed 12 Feb. 2020].
+
+        Parameters
+        ------------
+        time_range : timestamp series
+            Local time of specific site by the hour year-month-day hr:min:sec
+            (Example) 2002-01-01 01:00:00
+        temp_cell : float series
+            Photovoltaic module cell temperature(Celsius) for every hour of a year
+        reversal_temp : float
+            Temperature threshold to cross above and below
+
+        Returns
+        --------
+        damage : float series
+            Solder fatigue damage for a time interval depending on time_range (kPa)
+
+        """
+
+        # TODO Make this function have more utility.
+        # People want to run all the scenarios from the bosco paper.
+        # Currently have everything hard coded for hourly calculation
+        # i.e. 405.6, 1.9, .33, .12
+        # Get the:
+        #  Average of the Daily Maximum Cell Temperature (C)
+        #  Average of the Daily Maximum Temperature change avg(daily max - daily min) temp_amplitude
+        #  Number of times the temperature crosses above or below the reversal Temperature
+
+        # Boltzmann Constant
+        k = .00008617333262145
+        
+        temp_amplitude, temp_max_avg = Degradation._avg_daily_temp_change(time_range, temp_cell)
+        
+        temp_max_avg = convert_temperature(temp_max_avg, 'Celsius', 'Kelvin')
+        
+        num_changes_temp_hist = Degradation._times_over_reversal_number(temp_cell, reversal_temp)
+
+        damage = C1*(temp_amplitude**n)*(num_changes_temp_hist**b)*np.exp(-(Q/(k*temp_max_avg)))
+        
+        # Convert pascals to kilopascals
+        damage = damage/1000
+        
+        return damage
+
 
 
 class BOLIDLeTID:
