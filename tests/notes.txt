@@ -7,12 +7,16 @@ _______________________
 ==  Required Inputs  ==
     - avgWVP
         average water vapor pressure (yearly)
+        - requires dew-point
     - elevation
     - temperature, dew-point
     - temperature, dry-bulb
     - total sky cover, n
     - timestamp series, yyyy-mm-dd hh:mm:ss
     - global POA, array or float
+        - pvlib.irradiance.get_total_irradiance
+        - total['poa_global']
+        - requires DNI, DHI, GHI, dry-bulb
     - chamber temperature, refTemp
     - chamber irradiance, array
     
@@ -38,9 +42,36 @@ ___________________
                                    what it does,
                                    ?)
     
+
+____________________________________________
+====   Tests     ===========================
+ 
+ R = Runs   V = Verified    X = Broken
+ 
+ - EnergyCalcs
+    [R] k
+    [R] water_vapor_pressure
+    [R] edge_seal_width
+    [ ] dew_yield
+    [ ] solder_fatigue
+    [R] vantHoff_deg
+    [R] Iwa VantHoff
+    [R] arrhenius_deg
+    [ ] IwaArrhenius
+
+- RelativeHumidity
+    [R] rh_surface_outdside
+
+
 ____________________________________________
 ====   Changes   ===========================
 
+ = 
+ 
+ 
+ 
+ 
+ 
  = energyCalcs 
     - uniform function argument order and naming
     - uniform function names
