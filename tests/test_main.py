@@ -32,14 +32,15 @@ WEATHERFILE = '722740TYA.CSV'
 
 PSM3FILE = 'psm3_pytest.csv'
 
-PSM, = pvlib.iotools.read_psm3(PSM3FILE)
+#PSM, = pvlib.iotools.read_psm3(PSM3FILE)
+PSM = pd.read_csv(PSM3FILE, header=2)
 
 
 def test_water_vapor_pressure():
     wvp = PVD.EnergyCalcs.water_vapor_pressure(PSM['Dew Point'])
     assert wvp.__len__() == PSM.__len__()
     avg_wvp = wvp.mean()
-    assert wvp == pytest.approx(0.542, abs=0.001)
+    assert avg_wvp == pytest.approx(0.542, abs=0.001)
 
 def test_k():
     wvp = PVD.EnergyCalcs.water_vapor_pressure(PSM['Dew Point'])
@@ -55,21 +56,69 @@ def test_edge_seal_width():
     assert edge_seal_width == pytest.approx(0.449, abs=0.002)
 
 def test_vantHoff_deg():
-    vantHoff_deg = PVD.EnergyCalcs.vantHoff_deg(I_chamber=1e3, poa_global=PSM['poa_global'],
+    vantHoff_deg = PVD.EnergyCalcs.vantHoff_deg(I_chamber=1000, poa_global=PSM['poa_global'],
                                                 temp_cell=PSM['temp_cell'], temp_chamber=60)
-    assert vantHoff_deg == pytest.approx(11, abs=.05)
+    print(vantHoff_deg)
+    assert vantHoff_deg == pytest.approx(8.98, abs=.02)
 
 def test_iwa_vantHoff():
     irr_weighted_avg = PVD.EnergyCalcs.IwaVantHoff(poa_global=PSM['poa_global'],
                                                     temp_cell=PSM['temp_cell'])
-    assert irr_weighted_avg == pytest.approx(226.7, abs=0.5)
+    assert irr_weighted_avg == pytest.approx(286.78, abs=0.5)
 
 def test_arrhenius_deg():
-    pass
+    rh_chamber = 15
+    temp_chamber = 60
+    I_chamber = 1e3
+    Ea = 40
+    rh_surface = PVD.RelativeHumidity.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
+                                                        temp_ambient=PSM['Temperature'],
+                                                        temp_surface=PSM['temp_module'])
+    arrhenius_deg = PVD.EnergyCalcs.arrhenius_deg(I_chamber=I_chamber, rh_chamber=rh_chamber,
+                                              rh_outdoor=rh_surface, poa_global=PSM['poa_global'],
+                                              temp_chamber=temp_chamber, temp_cell=PSM['temp_cell'],
+                                              Ea=Ea)
+    assert arrhenius_deg == pytest.approx(14.34, abs=0.1)
 
 def test_iwa_arrhenius():
-    pass
+    Ea = 40
+    irr_weighted_avg = PVD.EnergyCalcs.IwaArrhenius(poa_global=PSM['poa_global'], 
+                                                  rh_outdoor=PSM['Relative Humidity'],
+                                                  temp_cell=PSM['temp_cell'], Ea=Ea)
+    assert irr_weighted_avg == pytest.approx(247.28, abs=0.1)
 
+def test_rh_surface_outside():
+    rh_surface = PVD.RelativeHumidity.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
+                                                        temp_ambient=PSM['Temperature'],
+                                                        temp_surface=PSM['temp_module'])
+    assert rh_surface.__len__() == PSM.__len__()
+    assert rh_surface[17] == pytest.approx(81.99, abs=0.1)
+
+def test_rh_front_encap():
+    rh_front_encap = PVD.RelativeHumidity.rh_front_encap(rh_ambient=PSM['Relative Humidity'],
+                                                    temp_ambient=PSM['Temperature'],
+                                                    temp_surface=PSM['temp_module'])
+    assert rh_front_encap.__len__() == PSM.__len__()
+    assert rh_front_encap.iloc[17] == pytest.approx(50.131446, abs=.01)
+
+def test_rh_back_encap():
+    rh_back_encap = PVD.RelativeHumidity.rh_back_encap(rh_ambient=PSM['Relative Humidity'],
+                                                    temp_ambient=PSM['Temperature'],
+                                                    temp_surface=PSM['temp_module'])
+    assert rh_back_encap.__len__() == PSM.__len__()
+    assert rh_back_encap[17] == pytest.approx(80.5295, abs=0.01)
+
+def test_rh_backsheet():
+    rh_back_encap = PVD.RelativeHumidity.rh_back_encap(rh_ambient=PSM['Relative Humidity'],
+                                                    temp_ambient=PSM['Temperature'],
+                                                    temp_surface=PSM['temp_module'])
+    rh_surface = PVD.RelativeHumidity.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
+                                                        temp_ambient=PSM['Temperature'],
+                                                        temp_surface=PSM['temp_module'])
+    rh_backsheet = PVD.RelativeHumidity.rh_backsheet(rh_back_encap=rh_back_encap,
+                                                    rh_surface_outside=rh_surface)
+    assert rh_backsheet.__len__() == PSM.__len__()
+    assert rh_backsheet[17] == pytest.approx(81.259, abs=0.01)
 
 def test_degradation():
     data=pd.read_csv(INPUTWEATHERSPECTRA)
