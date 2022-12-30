@@ -1271,6 +1271,10 @@ class Degradation:
             Average of Daily Maximum Temperature for 1-year (Celsius)
 
         """
+        
+        if time_range.dtype == 'object':
+            time_range = pd.to_datetime(time_range)
+        
         # Setup frame for vector processing
         timeAndTemp_df = pd.DataFrame(columns=['Cell Temperature'])
         timeAndTemp_df['Cell Temperature'] = temp_cell

@@ -42,8 +42,6 @@ ___________________
         - finish Degradation.degradation tutorial
 
     - pytests
-        - make weatherfile with all pvlib data
-        - convert tutorial funcs into pytests
         - auto pytest on push
 
 ____________________________________________

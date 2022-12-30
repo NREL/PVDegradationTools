@@ -15,7 +15,6 @@ import numpy as np
 import pytest
 import os
 import pandas as pd
-import pvlib
 
 # try navigating to tests directory so tests run from here.
 try:
@@ -30,11 +29,12 @@ INPUTWEATHERSPECTRA = 'test_weatherandspectra.csv'
 
 WEATHERFILE = '722740TYA.CSV'
 
-PSM3FILE = 'psm3_pytest.csv'
+PSM3FILE = 'psm3_pytest_2.csv'
 
-#PSM, = pvlib.iotools.read_psm3(PSM3FILE)
 PSM = pd.read_csv(PSM3FILE, header=2)
 
+
+# -- EnergyCalcs
 
 def test_water_vapor_pressure():
     wvp = PVD.EnergyCalcs.water_vapor_pressure(PSM['Dew Point'])
@@ -87,6 +87,8 @@ def test_iwa_arrhenius():
                                                   temp_cell=PSM['temp_cell'], Ea=Ea)
     assert irr_weighted_avg == pytest.approx(247.28, abs=0.1)
 
+# -- RelativeHumidity
+
 def test_rh_surface_outside():
     rh_surface = PVD.RelativeHumidity.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
                                                         temp_ambient=PSM['Temperature'],
@@ -120,12 +122,21 @@ def test_rh_backsheet():
     assert rh_backsheet.__len__() == PSM.__len__()
     assert rh_backsheet[17] == pytest.approx(81.259, abs=0.01)
 
+# -- Degradation
+
 def test_degradation():
     data=pd.read_csv(INPUTWEATHERSPECTRA)
     wavelengths = np.array(range(280,420,20))
     degradation = PVD.Degradation.degradation(data, wavelengths)
     assert (degradation == 3.252597282885626e-39)
     
+def test_solder_fatigue():
+    damage = PVD.Degradation.solder_fatigue(time_range=PSM['time_range'],
+                                            temp_cell=PSM['temp_cell'])
+    assert damage == pytest.approx(14.25, abs=0.1)
+
+# -- Standards
+
 def test_ideal_installation_distance():
     df_tmy, metadata = pvlib.iotools.read_tmy3(filename=WEATHERFILE, 
                                                coerce_year=2021, recolumn=True)
