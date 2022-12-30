@@ -41,6 +41,11 @@ ___________________
         - add wind speed to test_weatherandspectra.csv
         - finish Degradation.degradation tutorial
 
+    - pytests
+        - make weatherfile with all pvlib data
+        - convert tutorial funcs into pytests
+        - auto pytest on push
+
 ____________________________________________
 ====   Tests     ===========================
  

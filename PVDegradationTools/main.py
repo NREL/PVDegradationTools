@@ -1222,7 +1222,7 @@ class Degradation:
             irr.columns = wavelengths
         except:
             # TODO: Fix this except it works on some cases, veto it by cases
-            print("USING THE EXCEPT in PVDegradations Degradation function")
+            print("Removing brackets from spectral irradiance data")
             #irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
             irr = spectra.str.strip('[]').str.split(
                 ',', expand=True).astype(float)
