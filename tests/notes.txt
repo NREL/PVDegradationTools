@@ -32,14 +32,14 @@ _______________________
 
 ___________________
 ===    To Do   ====
-    -  solderFatigue: test, move to Degradation
     -  _power, needs: test, document, units
-    -  camel case function names
     -  arguments series > variables > defaults
     -  make slides for functions ( what works,
                                    what it does,
                                    ?)
-    
+    - Tutorial - 2
+        - add wind speed to test_weatherandspectra.csv
+        - finish Degradation.degradation tutorial
 
 ____________________________________________
 ====   Tests     ===========================
@@ -65,5 +65,5 @@ ____________________________________________
     [R] rh_backsheet
 
 - Degradation
-    [ ] degradation
+    [R] degradation
     [R] solder_fatigue

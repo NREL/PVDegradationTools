@@ -1219,14 +1219,14 @@ class Degradation:
         # Integral over Wavelength
         try:
             irr = pd.DataFrame(spectra.tolist(), index=spectra.index)
+            irr.columns = wavelengths
         except:
             # TODO: Fix this except it works on some cases, veto it by cases
             print("USING THE EXCEPT in PVDegradations Degradation function")
             #irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
             irr = spectra.str.strip('[]').str.split(
                 ',', expand=True).astype(float)
-
-        irr.columns = wavelengths
+            irr.columns = wavelengths
 
         sensitivitywavelengths = np.exp(-C2*wavelengths)
         irr = irr*sensitivitywavelengths
