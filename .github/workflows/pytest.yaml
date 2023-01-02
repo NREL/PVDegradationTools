@@ -1,0 +1,30 @@
+name: test
+
+on: [pull_request, push]
+
+jobs:
+  pytest:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7"]
+
+      steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install PVDegradation Tools
+        run: |
+          pip install PVDegradationTools
+      
+      - name: Test with pytest ${{ matrix.env }}
+        uses: GabrielBB/xvfb-action@v1  # GUI testing requires xvfb
+        with:
+          run: |
+            pytest --cov=PVDegradationTools
