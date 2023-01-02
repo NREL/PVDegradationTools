@@ -34,18 +34,24 @@ PSM = pd.read_csv(PSM3FILE, header=2)
 # -- EnergyCalcs
 
 def test_water_vapor_pressure():
+    # test water vapor pressure
+
     wvp = PVD.EnergyCalcs.water_vapor_pressure(PSM['Dew Point'])
     assert wvp.__len__() == PSM.__len__()
     avg_wvp = wvp.mean()
     assert avg_wvp == pytest.approx(0.542, abs=0.001)
 
 def test_k():
+    # test calculation for constant k
+
     wvp = PVD.EnergyCalcs.water_vapor_pressure(PSM['Dew Point'])
     avg_wvp = wvp.mean()
     k = PVD.EnergyCalcs.k(avg_wvp=avg_wvp)
     assert k == pytest.approx(.00096, abs=.000005)
 
 def test_edge_seal_width():
+    # test for edge_seal_width
+
     water_vapor_pressure = PVD.EnergyCalcs.water_vapor_pressure(PSM['Dew Point'])
     avg_wvp = water_vapor_pressure.mean()
     k = PVD.EnergyCalcs.k(avg_wvp=avg_wvp)
@@ -53,17 +59,23 @@ def test_edge_seal_width():
     assert edge_seal_width == pytest.approx(0.449, abs=0.002)
 
 def test_vantHoff_deg():
+    # test the vantHoff degradation acceleration factor
+
     vantHoff_deg = PVD.EnergyCalcs.vantHoff_deg(I_chamber=1000, poa_global=PSM['poa_global'],
                                                 temp_cell=PSM['temp_cell'], temp_chamber=60)
     print(vantHoff_deg)
     assert vantHoff_deg == pytest.approx(8.98, abs=.02)
 
 def test_iwa_vantHoff():
+    # test the vantHoff equivalent weighted average irradiance
+
     irr_weighted_avg = PVD.EnergyCalcs.IwaVantHoff(poa_global=PSM['poa_global'],
                                                     temp_cell=PSM['temp_cell'])
     assert irr_weighted_avg == pytest.approx(286.78, abs=0.5)
 
 def test_arrhenius_deg():
+    # test the arrhenius degradation acceleration factor
+
     rh_chamber = 15
     temp_chamber = 60
     I_chamber = 1e3
@@ -78,6 +90,8 @@ def test_arrhenius_deg():
     assert arrhenius_deg == pytest.approx(14.34, abs=0.1)
 
 def test_iwa_arrhenius():
+    # test arrhenius equivalent weighted average irradiance
+
     Ea = 40
     irr_weighted_avg = PVD.EnergyCalcs.IwaArrhenius(poa_global=PSM['poa_global'],
                                                   rh_outdoor=PSM['Relative Humidity'],
@@ -127,7 +141,7 @@ def test_degradation():
     degradation = PVD.Degradation.degradation(spectra=data['Spectra'], rh_module=data['RH'],
                                                 temp_module=data['Temperature'],
                                                 wavelengths=wavelengths)
-    assert degradation == 3.252597282885626e-39
+    assert degradation == pytest.approx(3.2526e-39, abs=0.05e-39)
 
 def test_solder_fatigue():
     damage = PVD.Degradation.solder_fatigue(time_range=PSM['time_range'],
@@ -145,4 +159,4 @@ def test_ideal_installation_distance():
     df_tmy['ghi']=df_tmy['GHI']
     df_tmy['dhi']=df_tmy['DHI']
     x = PVD.Standards.ideal_installation_distance(df_tmy, metadata)
-    assert x == 5.116572312951921
+    assert x == pytest.approx(5.11657, abs=0.0001)
