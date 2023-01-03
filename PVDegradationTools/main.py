@@ -130,10 +130,6 @@ class EnergyCalcs:
 
         return water_vapor_pressure
 
-############
-# Solder Fatigue
-############
-
     def _power(temp_cell, poa_global):
         """
         TODO:   check units
@@ -751,7 +747,7 @@ class RelativeHumidity:
 
         return psat
 
-    def rh_surface_outside(rh_ambient, temp_ambient, temp_surface):
+    def rh_surface_outside(rh_ambient, temp_ambient, temp_module):
         """
         Function calculates the Relative Humidity of a Solar Panel Surface
 
@@ -761,7 +757,7 @@ class RelativeHumidity:
             The ambient outdoor environmnet relative humidity
         temp_ambient : float
             The ambient outdoor environmnet temperature in Celsius
-        temp_surface : float
+        temp_module : float
             The surface temperature in Celsius of the solar panel module
 
         Returns
@@ -772,7 +768,7 @@ class RelativeHumidity:
         """
         rh_Surface = rh_ambient * \
             (RelativeHumidity._psat(temp_ambient) /
-             RelativeHumidity._psat(temp_surface))
+             RelativeHumidity._psat(temp_module))
 
         return rh_Surface
 
@@ -780,7 +776,7 @@ class RelativeHumidity:
         # Front Encapsulant RH
         ###########
 
-    def _diffusivity_numerator(rh_ambient, temp_ambient, temp_surface, So=1.81390702, Eas=16.729, Ead=38.14):
+    def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
@@ -796,7 +792,7 @@ class RelativeHumidity:
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
-        temp_surface : pandas series (float)
+        temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
         So : float
             Float, Encapsulant solubility prefactor in [g/cm3]
@@ -817,16 +813,16 @@ class RelativeHumidity:
 
         # Get the relative humidity of the surface
         rh_surface = RelativeHumidity.rh_surface_outside(
-            rh_ambient, temp_ambient, temp_surface)
+            rh_ambient, temp_ambient, temp_module)
 
         # Generate a series of the numerator values "prior to summation"
-        diff_numerator = So * np.exp(- (Eas / (0.00831446261815324 * (temp_surface + 273.15))))\
+        diff_numerator = So * np.exp(- (Eas / (0.00831446261815324 * (temp_module + 273.15))))\
                                 * rh_surface * \
-                                np.exp(- (Ead / (0.00831446261815324 * (temp_surface + 273.15))))
+                                np.exp(- (Ead / (0.00831446261815324 * (temp_module + 273.15))))
 
         return diff_numerator
 
-    def _diffusivity_denominator(temp_surface, Ead=38.14):
+    def _diffusivity_denominator(temp_module, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
         module Encapsulant
@@ -840,7 +836,7 @@ class RelativeHumidity:
         Ead : float
             Encapsulant diffusivity activation energy in [kJ/mol]
             38.14(kJ/mol) is the suggested value for EVA.
-        temp_surface : pandas series (float)
+        temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
 
         Returns
@@ -851,11 +847,11 @@ class RelativeHumidity:
         """
 
         diff_denominator = np.exp(- (Ead /
-                                   (0.00831446261815324 * (temp_surface + 273.15))))
+                                   (0.00831446261815324 * (temp_module + 273.15))))
         return diff_denominator
 
        
-    def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_surface,
+    def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
                                     So=1.81390702,  Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining Relative Humidity of Frontside Solar
@@ -870,7 +866,7 @@ class RelativeHumidity:
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
-        temp_surface : pandas series (float)
+        temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
         So : float
             Float, Encapsulant solubility prefactor in [g/cm3]
@@ -890,11 +886,11 @@ class RelativeHumidity:
         """
 
         numerator = RelativeHumidity._diffusivity_numerator(
-            rh_ambient, temp_ambient, temp_surface, So,  Eas, Ead)
+            rh_ambient, temp_ambient, temp_module, So,  Eas, Ead)
         # get the summation of the numerator
         numerator = numerator.sum(axis=0, skipna=True)
 
-        denominator = RelativeHumidity._diffusivity_denominator(temp_surface, Ead)
+        denominator = RelativeHumidity._diffusivity_denominator(temp_module, Ead)
         # get the summation of the denominator
         denominator = denominator.sum(axis=0, skipna=True)
 
@@ -902,7 +898,7 @@ class RelativeHumidity:
 
         return diffuse_water
 
-    def rh_front_encap(rh_ambient, temp_ambient, temp_surface, So=1.81390702, Eas=16.729):
+    def rh_front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
         """
         Function returns Relative Humidity of Frontside Solar Module Encapsulant
 
@@ -912,7 +908,7 @@ class RelativeHumidity:
             ambient Relative Humidity (%)
         temp_ambient : series (float)
             ambient outdoor temperature (C)        
-        temp_surface : pandas series (float)
+        temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         So : float
@@ -931,10 +927,10 @@ class RelativeHumidity:
         """
         diffuse_water = RelativeHumidity._diffusivity_weighted_water(rh_ambient=rh_ambient,
                                                                     temp_ambient=temp_ambient,
-                                                                    temp_surface=temp_surface)
+                                                                    temp_module=temp_module)
         
         RHfront_series = (diffuse_water / (So * np.exp(- (Eas / (0.00831446261815324 *
-                                                       (temp_surface + 273.15)))))) * 100
+                                                       (temp_module + 273.15)))))) * 100
 
         return RHfront_series
 
@@ -942,14 +938,14 @@ class RelativeHumidity:
         # Back Encapsulant Relative Humidity
         ###########
 
-    def _csat(temp_surface, So=1.81390702, Eas=16.729):
+    def _csat(temp_module, So=1.81390702, Eas=16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
         Module Encapsulant, and returns saturation of Water Concentration (g/cm³)
 
         Parameters
         -----------
-        temp_surface : pandas series (float)
+        temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         So : float
@@ -968,7 +964,7 @@ class RelativeHumidity:
 
         # Saturation of water concentration
         Csat = So * \
-            np.exp(- (Eas / (0.00831446261815324 * (273.15 + temp_surface))))
+            np.exp(- (Eas / (0.00831446261815324 * (273.15 + temp_module))))
 
         return Csat
 
@@ -998,7 +994,7 @@ class RelativeHumidity:
     # Returns a numpy array
 
     @jit(nopython=True)
-    def Ce_numba(start, temp_surface, rh_surface,
+    def Ce_numba(start, temp_module, rh_surface,
                     WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
@@ -1015,7 +1011,7 @@ class RelativeHumidity:
             currently takes the first value produced from
             the _ceq(Saturation of Water Concentration) as a point
             of acceptable equilibrium
-        temp_surface : pandas series (float)
+        temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         rh_Surface : list (float)
@@ -1045,7 +1041,7 @@ class RelativeHumidity:
 
         """
 
-        dataPoints = len(temp_surface)
+        dataPoints = len(temp_module)
         Ce_list = np.zeros(dataPoints)
 
         for i in range(0, len(rh_surface)):
@@ -1056,15 +1052,15 @@ class RelativeHumidity:
             else:
                 Ce = Ce_list[i-1]
 
-            Ce = Ce + ((WVTRo/100/100/24 * np.exp(-((EaWVTR) / (0.00831446261815324 * (temp_surface[i] + 273.15))))) /
-                       (So * l/10 * np.exp(-((Eas) / (0.00831446261815324 * (temp_surface[i] + 273.15))))) *
-                       (rh_surface[i]/100 * So * np.exp(-((Eas) / (0.00831446261815324 * (temp_surface[i] + 273.15)))) - Ce))
+            Ce = Ce + ((WVTRo/100/100/24 * np.exp(-((EaWVTR) / (0.00831446261815324 * (temp_module[i] + 273.15))))) /
+                       (So * l/10 * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))) *
+                       (rh_surface[i]/100 * So * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15)))) - Ce))
 
             Ce_list[i] = Ce
 
         return Ce_list
 
-    def rh_back_encap(rh_ambient, temp_ambient, temp_surface,
+    def rh_back_encap(rh_ambient, temp_ambient, temp_module,
                     WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
         """
         rh_back_encap()
@@ -1079,7 +1075,7 @@ class RelativeHumidity:
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
-        temp_surface : list (float)
+        temp_module : list (float)
             The surface temperature in Celsius of the solar panel module
             "module temperature (C)"
         WVTRo : float
@@ -1108,19 +1104,19 @@ class RelativeHumidity:
 
         rh_surface = RelativeHumidity.rh_surface_outside(rh_ambient=rh_ambient,
                                                        temp_ambient=temp_ambient,
-                                                       temp_surface=temp_surface)
+                                                       temp_module=temp_module)
 
         Csat = RelativeHumidity._csat(
-            temp_surface=temp_surface, So=So, Eas=Eas)
+            temp_module=temp_module, So=So, Eas=Eas)
         Ceq = RelativeHumidity._ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
         start = Ceq[0]
 
         # Need to convert these series to numpy arrays for numba function
-        temp_surface_numba = temp_surface.to_numpy()
+        temp_module_numba = temp_module.to_numpy()
         rh_surface_numba = rh_surface.to_numpy()
         Ce_nparray = RelativeHumidity.Ce_numba(start=start,
-                                               temp_surface=temp_surface_numba,
+                                               temp_module=temp_module_numba,
                                                rh_surface=rh_surface_numba,
                                                WVTRo=WVTRo,
                                                EaWVTR=EaWVTR,
@@ -1129,7 +1125,7 @@ class RelativeHumidity:
                                                Eas=Eas)
 
         #RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) / 
-        #                   (0.00831446261815324 * (temp_surface + 273.15))  )) ))
+        #                   (0.00831446261815324 * (temp_module + 273.15))  )) ))
         RHback_series = 100 * (Ce_nparray / Csat)
 
         return RHback_series
@@ -1354,6 +1350,14 @@ class Degradation:
             Photovoltaic module cell temperature(Celsius) for every hour of a year
         reversal_temp : float
             Temperature threshold to cross above and below
+        n : float
+            fit parameter, see the paper for details on appropriate values
+        b : float
+            fit parameter, see the paper for details on appropriate values
+        C1 : float
+            scaling constant, see the paper for details on appropriate values
+        Q : float
+            activation energy [eV]. See the paper for appropriate values
 
         Returns
         --------
@@ -1366,10 +1370,6 @@ class Degradation:
         # People want to run all the scenarios from the bosco paper.
         # Currently have everything hard coded for hourly calculation
         # i.e. 405.6, 1.9, .33, .12
-        # Get the:
-        #  Average of the Daily Maximum Cell Temperature (C)
-        #  Average of the Daily Maximum Temperature change avg(daily max - daily min) temp_amplitude
-        #  Number of times the temperature crosses above or below the reversal Temperature
 
         # Boltzmann Constant
         k = .00008617333262145
@@ -1510,14 +1510,15 @@ class Standards:
         Preliminary calculation for module gap according to IEC 63126. The
         steps of the calculation are:
         1. Takes a weather file
-        2. Calculates the module temperature with PVLIB, for an open rack 
+        2. Calculates the module temperature with PVLIB, for an open rack
            polymer-back which is assumed to have infinite gap
-        3. Calculates the module temperature with PVLIB, for an insulated 
+        3. Calculates the module temperature with PVLIB, for an insulated
             back module which is assumed to be flush mount with a roof (gap=0)
-        4. Calculates the 98 percentile for step 2 
+        4. Calculates the 98 percentile for step 2
         5. Calculates the 98 percentile for step 3
-        5. Use both percentiles to calculate the effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216), I.e. T98=80 or T98=70 respectively.
-        
+        5. Use both percentiles to calculate the effective gap "x" for the lower limit to use a
+           Level 1 or Level 0 module (in IEC 63216), I.e. T98=80 or T98=70 respectively.
+
         Reference: M. Kempe, PVSC Proceedings 2023 (forthcoming)
         
         Parameters
@@ -1541,31 +1542,31 @@ class Standards:
             Azimuth of the PV array. The default is 180, facing south
         skymodel : str
             Tells PVlib which sky model to use. Default 'isotropic'.
-            
+
         Returns
         -------
         x : float
             Recommended installation distance per IEC 63126.
             effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216)
-    
-        '''    
+
+        '''
         
         if level == 0:
-            T98 = 70 
+            T98 = 70
         if level == 1:
             T98 = 80
 
         # 1. Calculate Sun Position & POA Irradiance
-        
+
         # Make Location
         # make a Location object corresponding to this TMY
         location = pvlib.location.Location(latitude=metadata['latitude'],
                                            longitude=metadata['longitude'])
-      
+
         # TODO: change for handling HSAT tracking passed or requested
         if tilt is None:
             tilt = float(metadata['latitude'])
-        
+
         # Calculate Sun Position
         # Note: TMY datasets are right-labeled hourly intervals, e.g. the
         # 10AM to 11AM interval is labeled 11.  We should calculate solar position in
