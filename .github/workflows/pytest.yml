@@ -40,4 +40,4 @@ jobs:
         pytest
     - name: Collect coverage
       run: |
-        pytest --cov
+        pytest --cov=PVDegradationTools tests/
