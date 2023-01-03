@@ -34,39 +34,36 @@ ___________________
 ===    To Do   ====
     -  _power, needs: test, document, units
     -  arguments series > variables > defaults
-    -  make slides for functions ( what works,
-                                   what it does,
-                                   ?)
+
     - Tutorial - 2
         - add wind speed to test_weatherandspectra.csv
         - finish Degradation.degradation tutorial
-
-    - pytests
-        - auto pytest on push
+    
+    - Solder Fatigue
+        - improve documentation for parameters and defaults
 
 ____________________________________________
 ====   Tests     ===========================
  
- R = Runs   V = Verified    X = Broken
- M = Missing Data            
+ R = Runs   V = Verified    X = Broken         
  
  - EnergyCalcs
-    [R] k
-    [R] water_vapor_pressure
-    [R] edge_seal_width
-    [M] dew_yield
+    [v] k
+    [v] water_vapor_pressure
+    [v] edge_seal_width
+    [B] dew_yield
     [ ] solder_fatigue --> moved to Degradation
-    [R] vantHoff_deg
-    [R] Iwa VantHoff
-    [R] arrhenius_deg
-    [R] IwaArrhenius
+    [v] vantHoff_deg
+    [v] Iwa VantHoff
+    [v] arrhenius_deg
+    [V] IwaArrhenius
 
 - RelativeHumidity
-    [R] rh_surface_outdside
-    [R] rh_front_encap
-    [R] rh_back_encap
-    [R] rh_backsheet
+    [V] rh_surface_outdside
+    [V] rh_front_encap
+    [V] rh_back_encap
+    [V] rh_backsheet
 
 - Degradation
-    [R] degradation
-    [R] solder_fatigue
+    [V] degradation
+    [V] solder_fatigue

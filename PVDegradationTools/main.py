@@ -1341,6 +1341,10 @@ class Degradation:
             at: https://www.sciencedirect.com/science/article/pii/S0026271416300609
             [Accessed 12 Feb. 2020].
 
+        This function uses the default values for 60-min input intervals from Table 4 of the above
+        paper. For other use cases, please refer to the paper for recommended values of C1 and
+        the reversal temperature.
+        
         Parameters
         ------------
         time_range : timestamp series
@@ -1349,15 +1353,16 @@ class Degradation:
         temp_cell : float series
             Photovoltaic module cell temperature(Celsius) for every hour of a year
         reversal_temp : float
-            Temperature threshold to cross above and below
+            Temperature threshold to cross above and below.
+            See the paper for other use cases
         n : float
-            fit parameter, see the paper for details on appropriate values
+            fit parameter for daily max temperature amplitude
         b : float
-            fit parameter, see the paper for details on appropriate values
+            fit parameter for reversal temperature
         C1 : float
             scaling constant, see the paper for details on appropriate values
         Q : float
-            activation energy [eV]. See the paper for appropriate values
+            activation energy [eV]
 
         Returns
         --------

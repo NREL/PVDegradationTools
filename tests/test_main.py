@@ -174,6 +174,9 @@ def test_solder_fatigue():
 # -- Standards
 
 def test_ideal_installation_distance():
+    # test ideal installation calculation
+    # requires TMY3-like weather file
+
     df_tmy, metadata = pvlib.iotools.read_tmy3(filename=WEATHERFILE,
                                                coerce_year=2021, recolumn=True)
     df_tmy['air_temperature'] = df_tmy['DryBulb']
