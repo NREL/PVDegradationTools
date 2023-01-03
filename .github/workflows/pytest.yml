@@ -38,3 +38,6 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Collect coverage
+      run: |
+        pytest --cov api/
