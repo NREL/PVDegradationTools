@@ -20,8 +20,10 @@ via simulation (for example: results from `_bifacial_radiance <https://github.co
 
 2. Degradation
 
-  * Van 't Hoff
-  * Arrhenius
+  * Van 't Hoff degradation acceleration factor
+  * Van 't Hoff environment characterization
+  * Arrhenius degradation acceleration factor
+  * Arrhenius environment characterization
   * Solder Fatigue
   * Spectral Degradation
 
