@@ -342,7 +342,7 @@ class StressFactors:
         diffuse_water = StressFactors._diffusivity_weighted_water(rh_ambient=rh_ambient,
                                                                     temp_ambient=temp_ambient,
                                                                     temp_module=temp_module)
-        
+
         RHfront_series = (diffuse_water / (So * np.exp(- (Eas / (0.00831446261815324 *
                                                        (temp_module + 273.15)))))) * 100
 
@@ -404,8 +404,6 @@ class StressFactors:
         Ceq = Csat * (rh_SurfaceOutside/100)
 
         return Ceq
-
-    # Returns a numpy array
 
     @jit(nopython=True)
     def Ce_numba(start, temp_module, rh_surface,
@@ -543,10 +541,6 @@ class StressFactors:
         RHback_series = 100 * (Ce_nparray / Csat)
 
         return RHback_series
-
-        ###########
-        # Back Sheet Relative Humidity
-        ###########
 
     def rh_backsheet(rh_back_encap, rh_surface_outside):
         """
@@ -694,12 +688,6 @@ class Degradation:
 
         return accelerationFactor
 
-
-##############################################################################################
-    ############################################
-    # Vant Hoff Environmental Characterization
-    ############################################
-
     def _to_eq_vantHoff(temp_cell, Tf=1.41):
         """
         Function to obtain the Vant Hoff temperature equivalent (C)
@@ -758,13 +746,6 @@ class Degradation:
         Iwa = (summation / len(poa_global)) ** (1 / x)
 
         return Iwa
-
-
-##############################################################################################
-    ############################################
-    # Arrhenius Degradation Function
-    ############################################
-
 
     def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, x, n):
         """
@@ -887,12 +868,6 @@ class Degradation:
 
         return accelerationFactor
 
-
-###############################################################################
-    ############################################
-    # Arrhenius Environmental Characterization
-    ############################################
-
     def _T_eq_arrhenius(temp_cell, Ea):
         """
         Get the Temperature equivalent required for the settings of the controlled environment
@@ -961,7 +936,6 @@ class Degradation:
                                                 (0.00831446261815324 * (Teq + 273.15)))))) ** (1/n)
 
         return RHwa
-
 
     def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
                      RHwa=None, Teq=None, x=0.64, n=1):
@@ -1505,7 +1479,7 @@ class Standards:
             effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216)
 
         '''
-        
+
         if level == 0:
             T98 = 70
         if level == 1:
@@ -1530,8 +1504,8 @@ class Standards:
         solar_position = location.get_solarposition(times)
         # but remember to shift the index back to line up with the TMY data:
         solar_position.index += pd.Timedelta('30min')
-        
-        
+
+
         # Calculate POA_Global
         df_poa = pvlib.irradiance.get_total_irradiance(
         surface_tilt=tilt,  # tilted 20 degrees from horizontal
@@ -1542,31 +1516,31 @@ class Standards:
         solar_zenith=solar_position['apparent_zenith'],
         solar_azimuth=solar_position['azimuth'],
         model=skymodel)
-        
+
         # Access the library of values for the SAPM (King's) Model
         all_parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['sapm']
-    
+
         #2. Calculate the module temperature with PVLIB, at infinity gap
         parameters = all_parameters['open_rack_glass_polymer']
         # note the "splat" operator "**" which expands the dictionary "parameters"
         # into a comma separated list of keyword arguments
         T1 = pvlib.temperature.sapm_cell(
                            poa_global=df_poa['poa_global'], temp_air=df_tmy['air_temperature'], wind_speed=df_tmy['wind_speed'],**parameters)
-             
-        
+
+
         #3. Calculate the module temperature with PVLIB, at 0 gap
         parameters = all_parameters['insulated_back_glass_polymer']
         T0 = pvlib.temperature.sapm_cell(
                            poa_global=df_poa['poa_global'], temp_air=df_tmy['air_temperature'], wind_speed=df_tmy['wind_speed'],**parameters)
-             
+
         # Make the DataFrame
         results = pd.DataFrame({'timestamp':T1.index, 'T1':T1.values})
         results['T0'] = T0.values
-        
+
         # Calculate the Quantiles
         T1p = results['T1'].quantile(q=0.98, interpolation='linear')
         T0p = results['T0'].quantile(q=0.98, interpolation='linear')
-    
+
         x=-x0 * np.log(1-(T0p-T98)/(T0p-T1p))
 
         return x
