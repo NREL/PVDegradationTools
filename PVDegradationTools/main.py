@@ -1542,3 +1542,103 @@ class Standards:
         x=-x0 * np.log(1-(T0p-T98)/(T0p-T1p))
 
         return x
+
+    def calculate_T98Temperature(df_tmy, metadata, Tval=0.98, tilt=None, 
+                                    azimuth=180, skymodel='isotropic',
+                                    moduleandmountingtype = 'open_rack_glass_polymer'):
+        '''
+    
+        Preliminary calculation for module gap according to IEC 63126. The
+        steps of the calculation are:
+        1. Takes a weather file
+        2. Calculates the module temperature with PVLIB, for an open rack
+           polymer-back which is assumed to have infinite gap
+        3. Calculates the module temperature with PVLIB, for an insulated
+            back module which is assumed to be flush mount with a roof (gap=0)
+        4. Calculates the 98 percentile for step 2
+        5. Calculates the 98 percentile for step 3
+        5. Use both percentiles to calculate the effective gap "x" for the lower limit to use a
+           Level 1 or Level 0 module (in IEC 63216), I.e. T98=80 or T98=70 respectively.
+
+        Reference: M. Kempe, PVSC Proceedings 2023 (forthcoming)
+        
+        Parameters
+        ----------
+        df_tmy : DataFrame
+            Dataframe with the weather data. Must have
+            'air_temperature' and 'wind_speed'
+        metadata : Dictionary
+            must have 'latitude' and 'longitude'
+        Tval : int
+            Confidence interval value. Defalt T98 = 0.98
+        tilt : float, optional
+            Tilt of the PV array. If None, uses latitude. 
+        azimuth : float, optional
+            Azimuth of the PV array. The default is 180, facing south
+        skymodel : str
+            Tells PVlib which sky model to use. Default 'isotropic'.
+        moduleandmountingtype : str
+            To request sapm model parameters. Options: 
+            'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
+            'close_mount_glass_glass', 'insulated_back_glass_polymer'
+
+        Returns
+        -------
+        x : float
+            Recommended installation distance per IEC 63126.
+            effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216)
+
+        '''
+
+        # 1. Calculate Sun Position & POA Irradiance
+
+        # Make Location
+        # make a Location object corresponding to this TMY
+        location = pvlib.location.Location(latitude=metadata['latitude'],
+                                           longitude=metadata['longitude'])
+
+        # TODO: change for handling HSAT tracking passed or requested
+        if tilt is None:
+            tilt = float(metadata['latitude'])
+
+        # Calculate Sun Position
+        # Note: TMY/NSRDB datasets are right-labeled hourly intervals, e.g. the
+        # 10AM to 11AM interval is labeled 11.  We should calculate solar position in
+        # the middle of the interval (10:30), so we subtract 30 minutes:
+        times = df_tmy.index - pd.Timedelta('30min')
+        solar_position = location.get_solarposition(times)
+        # but remember to shift the index back to line up with the TMY data:
+        solar_position.index += pd.Timedelta('30min')
+
+
+        # Calculate POA_Global
+        df_poa = pvlib.irradiance.get_total_irradiance(
+        surface_tilt=tilt,  # tilted 20 degrees from horizontal
+        surface_azimuth=azimuth,  # facing South
+        dni=df_tmy['dni'],
+        ghi=df_tmy['ghi'],
+        dhi=df_tmy['dhi'],
+        solar_zenith=solar_position['apparent_zenith'],
+        solar_azimuth=solar_position['azimuth'],
+        model=skymodel)
+
+        # Access the library of values for the SAPM (King's) Model
+        all_parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['sapm']
+
+        #2. Calculate the module temperature with PVLIB, at infinity gap
+        parameters = all_parameters[moduleandmountingtype]
+        # note the "splat" operator "**" which expands the dictionary "parameters"
+        # into a comma separated list of keyword arguments
+        T1 = pvlib.temperature.sapm_cell(
+                           poa_global=df_poa['poa_global'], 
+                           temp_air=df_tmy['air_temperature'], 
+                           wind_speed=df_tmy['wind_speed'],**parameters)
+
+
+        # Make the DataFrame
+        results = pd.DataFrame({'timestamp':T1.index, 'T1':T1.values})
+
+        # Calculate the Quantiles
+        T1p = results['T1'].quantile(q=Tval, interpolation='linear')
+
+        return T1p
