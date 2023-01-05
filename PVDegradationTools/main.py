@@ -1,7 +1,6 @@
 """
-Contains energy algorithms for processing.
+Contains classes for calculating Degradation, Stress Factors, and Standards calculations for PV Modules.
 
-@author: Derek Holsapple NREL 2020
 """
 
 import numpy as np
@@ -1315,7 +1314,6 @@ class Degradation:
         damage = damage/1000
         
         return damage
-
 
 
 class BOLIDLeTID:
