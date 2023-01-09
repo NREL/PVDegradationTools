@@ -8,7 +8,7 @@ It currently offers functions to calculate test-chamber irradiance settings, the
 you will only need a .psm3 weather file, which can be retrieved from NREL's `National Solar Radiation Database <https://nsrdb.nrel.gov/>`_ (NSRDB).
 
 In some cases, such as calculating the relative backsheet spectral degradation, you will need spectraly resolved irradiance. This can be field data or data produced
-via simulation (for example: results from `_bifacial_radiance <https://github.com/NREL/bifacial_radiance>`_)
+via simulation (for example: results from `bifacial_radiance <https://github.com/NREL/bifacial_radiance>`_)
 
 **Package Functions:**
 
