@@ -8,11 +8,17 @@ Modules, methods, classes and attributes are explained here.
 
 .. automodule:: PVDegradationTools.main
 
-RH Functions 
+Stress Factors 
 -------------------
-.. autofunction:: RHfront
+.. autoclass:: StressFactors
+  :members:
 
-Soldering Degradation Functions
+Degradation
 -------------------------------
-Some other function here
+.. autoclass:: Degradation
+  :members:
 
+Standards
+-------------------
+.. autoclass:: Standards
+  :members:
