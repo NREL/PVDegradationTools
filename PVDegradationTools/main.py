@@ -646,7 +646,7 @@ class Degradation:
 
         return chamberAccelerationFactor
 
-    def vantHoff_deg(I_chamber, poa_global, temp_cell, temp_chamber, x=0.64, Tf=1.41):
+    def vantHoff_deg(I_chamber, poa_global, temp_cell, temp_chamber, x=0.5, Tf=1.41):
         """
 
         Van 't Hoff Irradiance Degradation
@@ -712,7 +712,7 @@ class Degradation:
         return Toeq
 
 
-    def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.64, Tf=1.41):
+    def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.5, Tf=1.41):
         """
         IWa : Environment Characterization (W/m^2)
         *for one year of degredation the controlled environmnet lamp settings will
@@ -810,7 +810,7 @@ class Degradation:
         return arrheniusNumerator
 
     def arrhenius_deg(I_chamber, rh_chamber, temp_chamber, rh_outdoor, poa_global, temp_cell,
-                        Ea, x=0.64, n=1):
+                        Ea, x=0.5, n=1):
         """
         Calculate the Acceleration Factor between the rate of degredation of a
         modeled environmnet versus a modeled controlled environmnet
@@ -937,7 +937,7 @@ class Degradation:
         return RHwa
 
     def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
-                     RHwa=None, Teq=None, x=0.64, n=1):
+                     RHwa=None, Teq=None, x=0.5, n=1):
         """
         TODO:   CHECK
                 STANDARDIZE
@@ -1086,7 +1086,7 @@ class Degradation:
         return MJ
 
     def degradation(spectra, rh_module, temp_module, wavelengths,
-                    Ea=40.0, n=1.0, x=0.64, C2=0.07, C=1.0):
+                    Ea=40.0, n=1.0, x=0.5, C2=0.07, C=1.0):
         '''
         Compute degredation as double integral of Arrhenius (Activation
         Energy, RH, Temperature) and spectral (wavelength, irradiance)
