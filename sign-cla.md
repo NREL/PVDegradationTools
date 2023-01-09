@@ -83,7 +83,7 @@ Sending the Email
 -----------------
 
 Send an email to PVDegradationTools's official Open Sourceror
-at [silvana.ayala@nrel.gov](mailto:silvana.ayala@nrel.gov), 
+at [silvana.ovaitt@nrel.gov](mailto:silvana.ovaitt@nrel.gov), 
 cc-ing [michael.kempe@nrel.gov](mailto:michael.kempe@nrel.gov),
 with the subject "CLA PVDegradationTools" 
 and the following body:
