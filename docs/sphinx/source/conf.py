@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Relative_Humidity_for_Solar_Modules documentation build configuration file, May 2020
+# PVDegradationTools documentation build configuration file, Jan 2023
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -77,7 +77,7 @@ extensions = [
 # Document Python Code
 #autodoc_mock_imports = ['bs4', 'requests']
 #autoapi_type = 'python'
-#autoapi_dirs = '../../../Relative_Humidity_for_Solar_Modules'
+#autoapi_dirs = '../../../PVDegradationTools'
 
 napoleon_use_rtype = False  # group rtype on same line together with return
 
@@ -94,9 +94,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Relative Humidity for Solar Modules'
-copyright = '2020, NREL'
-author = 'Derek Holsapple'
+project = 'PV Degration Tools'
+copyright = '2023, NREL'
+author = 'Mike Kempe'
 release = '0.1.0'
 version = '0.1.0'  
 
@@ -140,7 +140,7 @@ html_static_path = ['_static']
 html_show_copyright = True
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'Relative_Humidity_for_Solar_Modulesdoc'
+htmlhelp_basename = 'PVDegradationToolsdoc'
 
 # A workaround for the responsive tables always having annoying scrollbars.
 def setup(app):
@@ -164,7 +164,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'Relative_Humidity_for_Solar_Modules.tex', u'Relative_Humidity_for_Solar_Modules\\_Python Documentation',
+  ('index', 'PVDegradationTools.tex', u'PVDegradationTools\\_Python Documentation',
    u'NREL, github contributors', 'manual'),
 ]
 
@@ -189,9 +189,9 @@ latex_documents = [
 #latex_domain_indices = True
 """
 # extlinks alias
-extlinks = {'issue': ('https://github.com/NREL/Relative_Humidity_for_Solar_Modules/issues/%s', 'GH'),
-            'pull': ('https://github.com/NREL/Relative_Humidity_for_Solar_Modules/pull/%s', 'GH'),
-            'wiki': ('https://github.com/NREL/Relative_Humidity_for_Solar_Modules/wiki/%s', 'wiki '),
+extlinks = {'issue': ('https://github.com/NREL/PVDegradationTools/issues/%s', 'GH'),
+            'pull': ('https://github.com/NREL/PVDegradationTools/pull/%s', 'GH'),
+            'wiki': ('https://github.com/NREL/PVDegradationTools/wiki/%s', 'wiki '),
             'doi': ('http://dx.doi.org/%s', 'DOI: '),
             'ghuser': ('https://github.com/%s', '@')}
 """
@@ -200,7 +200,7 @@ extlinks = {'issue': ('https://github.com/NREL/Relative_Humidity_for_Solar_Modul
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'Relative_Humidity_for_Solar_Modules', u'Relative_Humidity_for_Solar_Modules Documentation',
+    ('index', 'PVDegradationTools', u'PVDegradationTools Documentation',
      [u'NREL, github contributors'], 1)
 ]
 
@@ -214,8 +214,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Relative_Humidity_for_Solar_Modules', u'Relative_Humidity_for_Solar_Modules Documentation',
-   u'NREL, github contributors', 'Relative_Humidity_for_Solar_Modules', 'One line description of project.',
+  ('index', 'PVDegradationTools', u'PVDegradationTools Documentation',
+   u'NREL, github contributors', 'PVDegradationTools', 'One line description of project.',
    'Miscellaneous'),
 ]
 
