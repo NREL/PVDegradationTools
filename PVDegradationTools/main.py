@@ -1,5 +1,5 @@
 """
-Contains classes for calculating Degradation, Stress Factors, and Standards calculations for PV Modules.
+Contains classes for calculating Stress Factors, Degradation, and installation Standards for PV Modules.
 
 """
 
