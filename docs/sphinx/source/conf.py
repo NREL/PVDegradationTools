@@ -94,11 +94,11 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'PV Degration Tools'
+project = 'PV Degradation Tools'
 copyright = '2023, NREL'
 author = 'Mike Kempe'
 release = '0.1.0'
-version = '0.1.0'  
+version = '0.1.0'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
