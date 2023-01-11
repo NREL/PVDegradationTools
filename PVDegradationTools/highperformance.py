@@ -204,3 +204,6 @@ class HighPerformance:
         # -- Result Management
         res = client.gather(futures)
         results = pd.DataFrame(res, columns=('latitude','longitude',job))
+        _save_results(results, usr)
+
+        return results
