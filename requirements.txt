@@ -1,3 +1,4 @@
+NREL-rex==0.2.76
 numpy==1.19.4
 numba==0.56.4
 pandas==1.0.3
