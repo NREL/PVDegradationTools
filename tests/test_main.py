@@ -88,7 +88,7 @@ def test_rh_back_encap():
     assert rh_back_encap.__len__() == PSM.__len__()
     assert rh_back_encap[17] == pytest.approx(80.5295, abs=0.01)
 
-def test_rh_backsheet():
+def test_rh_backsheet_from_encap():
     # test the calculation for backsheet relative humidity
     # requires PSM3 weather file
 
@@ -98,10 +98,33 @@ def test_rh_backsheet():
     rh_surface = PVD.StressFactors.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
                                                         temp_ambient=PSM['Temperature'],
                                                         temp_module=PSM['temp_module'])
-    rh_backsheet = PVD.StressFactors.rh_backsheet(rh_back_encap=rh_back_encap,
-                                                    rh_surface_outside=rh_surface)
+    rh_backsheet = PVD.StressFactors.rh_backsheet_from_encap(rh_back_encap=rh_back_encap,
+                                                            rh_surface_outside=rh_surface)
     assert rh_backsheet.__len__() == PSM.__len__()
     assert rh_backsheet[17] == pytest.approx(81.259, abs=0.01)
+
+def test_rh_backsheet():
+    # test the calculation for backsheet relative humidity directly from weather variables
+    # requires PSM3 weather file
+
+    rh_backsheet = PVD.StressFactors.rh_backsheet(rh_ambient=PSM['Relative Humidity'],
+                                                    temp_ambient=PSM['Temperature'],
+                                                    temp_module=PSM['temp_module'])
+    assert rh_backsheet.__len__() == PSM.__len__()
+    assert rh_backsheet[17] == pytest.approx(81.259, abs=0.01)
+
+def test_rh_module():
+    # test the rh_module function
+    # requires PSM3 weather file
+
+    rh_module = PVD.StressFactors.rh_module(rh_ambient=PSM['Relative Humidity'],
+                                            temp_ambient=PSM['Temperature'],
+                                            temp_module=PSM['temp_module'])
+    assert rh_module.__len__() == PSM.__len__()
+    assert rh_module['surface_outside'][17] == pytest.approx(81.99, abs=0.1)
+    assert rh_module['front_encap'][17] == pytest.approx(50.131446, abs=.01)
+    assert rh_module['back_encap'][17] == pytest.approx(80.5295, abs=0.01)
+    assert rh_module['backsheet'][17] == pytest.approx(81.259, abs=0.01)
 
 # --------------------------------------------------------------------------------------------------
 # -- Degradation
