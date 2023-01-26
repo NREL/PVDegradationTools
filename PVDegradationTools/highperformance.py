@@ -12,8 +12,8 @@ StressFactors.rh_backsheet() are not accepted as they require too many substeps
 TODO:
  [x] output file name and path
  [x] output file structure
- [ ] shell/slurm integration
- [ ] test with ideal_installation_distance
+ [x] shell/slurm integration
+ [x] test with ideal_installation_distance
  [ ] test with k, water_vapor_pressure, etc
 """
 import os
@@ -102,6 +102,9 @@ class HighPerformance:
             with NSRDBX(weather_file, hsds=False) as f:
                 times = f.time_index
                 gids = f.region_gids(region=region, region_col=region_col)
+                # TEST ----------
+                gids = gids[:30]
+                # ---------------
                 meta = f.meta[f.meta.index.isin(gids)]
 
             data = []
@@ -132,7 +135,7 @@ class HighPerformance:
             if function in dir(_class):
                 _func = getattr(_class,function)
 
-        params = {**params,'weather_df':weather_df,'metadata':meta}
+        params = {**params,'df_tmy':weather_df,'metadata':meta}
         calc = _func(**params)
 
         results = [lat, lon, calc]
@@ -141,8 +144,8 @@ class HighPerformance:
 
     def _save_results(results_df, usr):
         '''
-        Save results dataframe as .csv (pickle?)
-        
+        Save results dataframe as .csv
+
         Parameters
         -----------
         results_df : data frame
@@ -155,8 +158,8 @@ class HighPerformance:
         out_path = rf'/scratch/{usr}/pvd_jobs/run_{filedate}'
         if not os.path.exists(out_path):
             os.makedirs(out_path)
-        out_file = out_path + r'pvd_results.csv'
-        
+        out_file = out_path + r'/pvd_results.csv'
+
         results_df.to_csv(out_file)
 
     def submit(ini_file=None):
@@ -195,7 +198,7 @@ class HighPerformance:
         scheduler_file = rf'/scratch/{usr}/scheduler.json'
         client = Client(scheduler_file=scheduler_file)
         futures = []
-        for gid, row in meta.iterros():
+        for gid, row in meta.iterrows():
             meta_dict = row.loc[['latitude','longitude']].to_dict()
             df_weather_filtered = df_weather.loc[:,gid]
             futures.append(client.submit(HighPerformance._run_one,
@@ -203,7 +206,10 @@ class HighPerformance:
 
         # -- Result Management
         res = client.gather(futures)
-        results = pd.DataFrame(res, columns=('latitude','longitude',job))
-        _save_results(results, usr)
-
+        results = pd.DataFrame(res, columns=('latitude','longitude',job))        
+        HighPerformance._save_results(results, usr)
+        print('\n==============================')
+        print(' HPC Job Finished')
+        print('==============================')
+        client.shutdown()
         return results
