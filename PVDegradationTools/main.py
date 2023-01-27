@@ -23,6 +23,7 @@ class StressFactors:
         This function was determined from numerical calculations from several locations and thus produces typical responses.
         This simplification works because the environmental temperature is not as important as local water vapor pressure.
         For the same environmental water concentration, a higher temperature results in lower absorption in the edge seal but lower diffusivity through the edge seal. In practice, these effects nearly cancel out makeing absolute humidity the primary parameter determining moisture ingress through edge seals.
+        See: Kempe, Nobles, Postak Calderon,"Moisture ingress prediction in polyisobutylene‐based edge seal with molecular sieve desiccant", Progress in Photovoltaics, DOI: 10.1002/pip.2947
 
         Parameters
         -----------
@@ -32,7 +33,7 @@ class StressFactors:
 
         Returns
         -------
-        k : float
+        k : float [cm/h^0.5]
             Ingress rate of water through edge seal. 
             Specifically it is the ratio of the breakthrough distance X/t^0.5.
             With this constant, one can determine an approximate estimate of the ingress distance for a particular climate without more complicated numerical methods and detailed environmental analysis.
@@ -45,17 +46,18 @@ class StressFactors:
 
     def edge_seal_width(k):
         """
-        Determine the width of edge seal required for a 25 year water ingress
+        Determine the width of edge seal required for a 25 year water ingress.
 
         Parameters
         ----------
-        k: float
-            Rate of water ingress
+        k: float 
+            Ingress rate of water through edge seal. [cm/h^0.5]
+            Specifically it is the ratio of the breakthrough distance X/t^0.5.
 
         Returns
         ----------
-        width : float
-            Width of edge seal required for a 25 year water ingress (mm)
+        width : float 
+            Width of edge seal required for a 25 year water ingress. [cm]
         """
 
         width = k * (25 * 365.25 * 24)**.5
@@ -68,29 +70,27 @@ class StressFactors:
     @jit(nopython=True, error_model='python')
     def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
         """
-        Find the dew yield in (mm·d−1).  Calculation taken from journal
-        "Estimating dew yield worldwide from a few meteo data"
-            -D. Beysens
-
-        (ADD IEEE reference)
+        Estimates the dew yield in [mm/day].  Calculation taken from:
+        Beysens, "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167 (2016) 146-155
 
         Parameters
         -----------
         elevation : int
-            Site elevation in kilometers
+            Site elevation [km]
         dew_point : float
-            Dewpoint temperature in Celsius
+            Dewpoint temperature in Celsius [°C]
         dry_bulb : float
-            Air temperature "dry bulb temperature"
+            Air temperature "dry bulb temperature" [°C]
         wind_speed : float
-            Air or windspeed measure in m*s^-1  or m/s
+            Air or windspeed measure [m/s]
         n : float
             Total sky cover(okta)
+            This is a quasi emperical scale from 0 to 8 used in meterology which corresponds to 0-sky completely clear, to 8-sky completely cloudy. Does not account for cloud type or thickness.
 
         Returns
         -------
         dew_yield : float
-            Amount of dew yield in (mm·d−1)
+            Amount of dew yield in [mm/day]
 
         """
         wind_speed_cut_off = 4.4
@@ -104,85 +104,63 @@ class StressFactors:
 
     def water_vapor_pressure(dew_pt_temp):
         """
-        Find the average water vapor pressure (kPa) based on the Dew Point
-        Temperature model created from Mike Kempe on 10/07/19 from Miami,FL excel sheet.
-
-        Parameters
-        ----------
-        dew_pt_temp : float, or float series
-            Dew Point Temperature
-
-        Returns
-        --------
-        watervaporpressure : float
-            Water vapor pressure in kPa
+        I'm wanting to discontinue use of the function and replace it with _psat(temp) because these are teh same function.
 
         """
-        water_vapor_pressure = (np.exp((3.257532E-13 * dew_pt_temp**6) -
-                                     (1.568073E-10 * dew_pt_temp**6) +
-                                     (2.221304E-08 * dew_pt_temp**4) +
-                                     (2.372077E-7 * dew_pt_temp**3) -
-                                     (4.031696E-04 * dew_pt_temp**2) +
-                                     (7.983632E-02 * dew_pt_temp) -
-                                     (5.698355E-1)))
+        water_vapor_pressure = (np.exp((3.2575315268E-13 * dew_pt_temp**6) -
+                                     (1.5680734584E-10 * dew_pt_temp**5) +
+                                     (2.2213041913E-08 * dew_pt_temp**4) +
+                                     (2.3720766595E-7 * dew_pt_temp**3) -
+                                     (4.0316963015E-04 * dew_pt_temp**2) +
+                                     (7.9836323361E-02 * dew_pt_temp) -
+                                     (5.6983551678E-1)))
 
         return water_vapor_pressure
 
-
-    """
-    There are currently 4 selections for relative Humidity
-
-    1) rh_surface_outside : Relative Humidity of the Surface of a Solar Module
-    2) rh_front_encap : Relative Humidity of the Frontside Encapsulant of a Solar Module
-    3) rh_back_encapsulant : Relative Humidity of the backside Encapsulant of a Solar Module
-    4) RHbacksheet : Relative
-    """
-
     def _psat(temp):
         """
-        Function to generate the point of saturation dependent on temperature
-        Calculation created by Michael Kempe, implemented by Derek Holsapple
-
-        3rd, 4th, 5th, and 6th order polynomial fits were explored.  The best fit
-        was determined to be the 4th
+        Function calculated the water saturation temperature or dew point for a given water vapor pressure.
+        Water vapor pressure model created from an emperical fit of ln(Psat) vs temperature using a 6th order polynomial fit in microsoft Excel. The fit produced  R^2=0.999813.
+        Calculation created by Michael Kempe, unpublished data.
 
         Parameters
         -----------
         temp : float
-            Temperature in Celsius
+            Temperature [°C]
 
         Returns
         -------
         _psat : float
-            Point of saturation
+            Water vapor pressure [kPa]
 
         """
-
-        psat = np.exp(-0.000000002448137*temp**4
-                      + 0.000001419572*temp**3
-                      - 0.0003779559*temp**2
-                      + 0.07796986*temp
-                      - 0.5796729)
+        psat = np.exp((3.2575315268E-13 * temp**6) -
+                       (1.5680734584E-10 * temp**5) +
+                       (2.2213041913E-08 * temp**4) +
+                       (2.3720766595E-7 * temp**3) -
+                       (4.0316963015E-04 * temp**2) +
+                       (7.9836323361E-02 * temp) -
+                       (5.6983551678E-1))
 
         return psat
 
     def rh_surface_outside(rh_ambient, temp_ambient, temp_module):
         """
-        Function calculates the Relative Humidity of a Solar Panel Surface
+        Function calculates the Relative Humidity of a Solar Panel Surface at module temperature
 
         Parameters
         ----------
         rh_ambient : float
-            The ambient outdoor environmnet relative humidity
+            The ambient outdoor environmnet relative humidity expressed as a fraction or as a percent.
         temp_ambient : float
-            The ambient outdoor environmnet temperature in Celsius
+            The ambient outdoor environmnet temperature [°C]
         temp_module : float
-            The surface temperature in Celsius of the solar panel module
+            The surface temperature of the solar panel module [°C]
 
         Returns
         --------
         rh_Surface : float
-            The relative humidity of the surface of a solar module
+            The relative humidity of the surface of a solar module as a fraction or percent depending on input.
 
         """
         rh_Surface = rh_ambient * \
@@ -197,9 +175,9 @@ class StressFactors:
 
     def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14):
         """
-        Calculation is used in determining Relative Humidity of Frontside Solar
-        module Encapsulant
-
+        Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
+        This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
+        
         The function returns values needed for the numerator of the Diffusivity weighted water
         content equation. This function will return a pandas series prior to summation of the
         numerator
@@ -243,9 +221,9 @@ class StressFactors:
 
     def _diffusivity_denominator(temp_module, Ead=38.14):
         """
-        Calculation is used in determining Relative Humidity of Frontside Solar
-        module Encapsulant
-
+        Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
+        This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
+        
         The function returns values needed for the denominator of the Diffusivity
         weighted water content equation(diffuse_water). This function will return a pandas
         series prior to summation of the denominator
@@ -273,10 +251,10 @@ class StressFactors:
     def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
                                     So=1.81390702,  Eas=16.729, Ead=38.14):
         """
-        Calculation is used in determining Relative Humidity of Frontside Solar
-        module Encapsulant
+        Calculation is used in determining a weighted average water content at the surface of a module.
+        It is used as a constant water content that is equivalent to the time varying one with respect to moisture ingress.
 
-        The function calculates the Diffusivity weighted water content equation. 
+        The function calculates the Diffusivity weighted water content. 
 
         Parameters
         ----------
@@ -319,17 +297,17 @@ class StressFactors:
 
     def rh_front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
         """
-        Function returns Relative Humidity of Frontside Solar Module Encapsulant
+        Function returns a diffusivity weighted average Relative Humidity of the module surface.
 
         Parameters
         ----------
         rh_ambient : series (float)
             ambient Relative Humidity (%)
         temp_ambient : series (float)
-            ambient outdoor temperature (C)        
+            ambient outdoor temperature [°C]        
         temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
-            "module temperature (C)"
+            "module temperature [°C]"
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
@@ -360,13 +338,13 @@ class StressFactors:
     def _csat(temp_module, So=1.81390702, Eas=16.729):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
-        Module Encapsulant, and returns saturation of Water Concentration (g/cm³)
+        Module Encapsulant, and returns saturation of Water Concentration [g/cm³]
 
         Parameters
         -----------
         temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
-            "module temperature (C)"
+            "module temperature [°C]"
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
@@ -430,7 +408,7 @@ class StressFactors:
             of acceptable equilibrium
         temp_module : pandas series (float)
             The surface temperature in Celsius of the solar panel module
-            "module temperature (C)"
+            "module temperature [°C]"
         rh_Surface : list (float)
             The relative humidity of the surface of a solar module (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
@@ -494,7 +472,7 @@ class StressFactors:
             The ambient outdoor environmnet temperature in Celsius
         temp_module : list (float)
             The surface temperature in Celsius of the solar panel module
-            "module temperature (C)"
+            "module temperature [°C]"
         WVTRo : float
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
@@ -589,7 +567,7 @@ class StressFactors:
             The ambient outdoor environmnet temperature in Celsius
         temp_module : list (float)
             The surface temperature in Celsius of the solar panel module
-            "module temperature (C)"
+            "module temperature [°C]"
         WVTRo : float
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
@@ -643,7 +621,7 @@ class StressFactors:
             The ambient outdoor environmnet temperature in Celsius
         temp_module : list (float)
             The surface temperature in Celsius of the solar panel module
-            "module temperature (C)"
+            "module temperature [°C]"
         WVTRo : float
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
@@ -717,16 +695,16 @@ class Degradation:
         Parameters
         ------------
         poa_global : float
-            (Global) Plan of Array irradiance (W/m^2)
+            (Global) Plan of Array irradiance (W/m²)
         temp_cell : float
-            Solar module cell temperature (C)
+            Solar module cell temperature [°C]
         temp_chamber : float
-            Reference temperature (C) "Chamber Temperature"
+            Reference temperature [°C] "Chamber Temperature"
         x : float
             Fit parameter
         Tf : float
             Multiplier for the increase in degradation
-                                          for every 10(C) temperature increase
+                                          for every 10[°C] temperature increase
 
         Returns
         --------
@@ -746,7 +724,7 @@ class Degradation:
         Parameters
         ----------
         I_chamber : float
-            Irradiance of Controlled Condition W/m^2
+            Irradiance of Controlled Condition W/m²
         x : float
             Fit parameter
 
@@ -790,17 +768,17 @@ class Degradation:
         Parameters
         -----------
         I_chamber : float
-            Irradiance of Controlled Condition W/m^2
+            Irradiance of Controlled Condition W/m²
         poa_global : float series
-            Global Plane of Array Irradiance W/m^2
+            Global Plane of Array Irradiance W/m²
         temp_cell : pandas series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
         temp_chamber : float
-            Reference temperature (C) "Chamber Temperature"
+            Reference temperature [°C] "Chamber Temperature"
         x : float
             fit parameter
         Tf : float
-            Multiplier for the increase in degradation for every 10(C) temperature increase
+            Multiplier for the increase in degradation for every 10[°C] temperature increase
 
         Returns
         -------
@@ -825,19 +803,19 @@ class Degradation:
 
     def _to_eq_vantHoff(temp_cell, Tf=1.41):
         """
-        Function to obtain the Vant Hoff temperature equivalent (C)
+        Function to obtain the Vant Hoff temperature equivalent [°C]
 
         Parameters
         ----------
         Tf : float
-            Multiplier for the increase in degradation for every 10(C) temperature increase
+            Multiplier for the increase in degradation for every 10[°C] temperature increase
         temp_cell : pandas series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
 
         Returns
         -------
         Toeq : float
-            Vant Hoff temperature equivalent (C)
+            Vant Hoff temperature equivalent [°C]
 
         """
         toSum = Tf ** (temp_cell / 10)
@@ -850,27 +828,27 @@ class Degradation:
 
     def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.5, Tf=1.41):
         """
-        IWa : Environment Characterization (W/m^2)
+        IWa : Environment Characterization (W/m²)
         *for one year of degredation the controlled environmnet lamp settings will
             need to be set to IWa
 
         Parameters
         -----------
         poa_global : float series
-            Global Plane of Array Irradiance W/m^2
+            Global Plane of Array Irradiance W/m²
         temp_cell : float series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
         Teq : series
-            VantHoff equivalent temperature (C)
+            VantHoff equivalent temperature [°C]
         x : float
             Fit parameter
         Tf : float
-            Multiplier for the increase in degradation for every 10(C) temperature increase
+            Multiplier for the increase in degradation for every 10[°C] temperature increase
 
         Returns
         --------
         Iwa : float
-            Environment Characterization (W/m^2)
+            Environment Characterization (W/m²)
 
         """
         if Teq is None:
@@ -889,7 +867,7 @@ class Degradation:
         Parameters
         ----------
         poa_global : float series
-            (Global) Plan of Array irradiance (W/m^2)
+            (Global) Plan of Array irradiance (W/m²)
         x : float
             Fit parameter
         rh_outdoor : pandas series
@@ -899,7 +877,7 @@ class Degradation:
         n : float
             Fit parameter for relative humidity
         temp_cell : pandas series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
         Ea : float
             Degredation Activation Energy (kJ/mol)
 
@@ -921,12 +899,12 @@ class Degradation:
         Parameters
         ----------
         I_chamber : float
-            Irradiance of Controlled Condition W/m^2
+            Irradiance of Controlled Condition W/m²
         Rhchamber : float
             Relative Humidity of Controlled Condition (%)
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_chamber : float
-            Reference temperature (C) "Chamber Temperature"
+            Reference temperature [°C] "Chamber Temperature"
         Ea : float
             Degredation Activation Energy (kJ/mol)
         x : float
@@ -957,21 +935,21 @@ class Degradation:
         Parameters
         ----------
         I_chamber : float
-            Irradiance of Controlled Condition W/m^2
+            Irradiance of Controlled Condition W/m²
         rh_chamber : float
             Relative Humidity of Controlled Condition (%).
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_chamber : float
-            Reference temperature (C) "Chamber Temperature"
+            Reference temperature [°C] "Chamber Temperature"
         rh_outdoor : float series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
             from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(),
             rh_surface_outside()
         poa_global : pandas series
-            Global Plane of Array Irradiance W/m^2
+            Global Plane of Array Irradiance W/m²
         temp_cell : pandas series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
         Ea : float
             Degredation Activation Energy (kJ/mol)
         x : float
@@ -1011,7 +989,7 @@ class Degradation:
         Parameters
         -----------
         temp_cell : pandas series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
         Ea : float
             Degredation Activation Energy (kJ/mol)
 
@@ -1046,11 +1024,11 @@ class Degradation:
             humiditys can be calculated from the below functions:
             rh_backsheet(), rh_back_encap(), rh_front_encap(), rh_surface_outside()
         temp_cell : pandas series
-            solar module temperature or Cell temperature (C)
+            solar module temperature or Cell temperature [°C]
         Ea : float
             Degredation Activation Energy (kJ/mol)
         Teq : series
-            Equivalent Arrhenius temperature (C)
+            Equivalent Arrhenius temperature [°C]
         n : float
             Fit parameter for relative humidity
 
@@ -1078,21 +1056,21 @@ class Degradation:
         TODO:   CHECK
                 STANDARDIZE
 
-        Function to calculate IWa, the Environment Characterization (W/m^2)
+        Function to calculate IWa, the Environment Characterization (W/m²)
         *for one year of degredation the controlled environmnet lamp settings will
             need to be set at IWa
 
         Parameters
         ----------
         poa_global : float
-            (Global) Plan of Array irradiance (W/m^2)
+            (Global) Plan of Array irradiance (W/m²)
         rh_outdoor : pandas series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
             from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap()
                                   rh_surface_outside()
         temp_cell : pandas series
-            Solar module temperature or Cell temperature (C)
+            Solar module temperature or Cell temperature [°C]
         Ea : float
             Degradation Activation Energy (kJ/mol)
         RHwa : float
@@ -1108,7 +1086,7 @@ class Degradation:
         Returns
         --------
         Iwa : float
-            Environment Characterization (W/m^2)
+            Environment Characterization (W/m²)
 
         """
         if Teq is None:
@@ -1182,17 +1160,17 @@ class Degradation:
         """
         NOTE: unused, remove?
 
-        Helper Function to convert Wh/m^2 to GJ/m^-2
+        Helper Function to convert Wh/m² to GJ/m²
 
         Parameters
         -----------
         wh : float
-            Input Value in Wh/m^2
+            Input Value in Wh/m²
 
         Returns
         -------
         gj : float
-            Value in GJ/m^-2
+            Value in GJ/m²
 
         """
 
@@ -1204,7 +1182,7 @@ class Degradation:
         """
         NOTE: unused, remove?
 
-        Helper Function to convert GJ/m^-2 to MJ/y^-1
+        Helper Function to convert GJ/m² to MJ/y
 
         Parameters
         -----------
@@ -1337,7 +1315,7 @@ class Degradation:
         timeAndTemp_df['month'] = timeAndTemp_df.index.month
         timeAndTemp_df['day'] = timeAndTemp_df.index.day
 
-        # Group by month and day to determine the max and min cell Temperature (C) for each day
+        # Group by month and day to determine the max and min cell Temperature [°C] for each day
         dailyMaxCellTemp_series = timeAndTemp_df.groupby(
             ['month', 'day'])['Cell Temperature'].max()
         dailyMinCellTemp_series = timeAndTemp_df.groupby(
@@ -1347,7 +1325,7 @@ class Degradation:
         temp_cell_change['TempChange'] = temp_cell_change['Max'] - \
             temp_cell_change['Min']
 
-        # Find the average temperature change for every day of one year (C)
+        # Find the average temperature change for every day of one year [°C]
         avg_daily_temp_change = temp_cell_change['TempChange'].mean()
         # Find daily maximum cell temperature average
         avg_max_temp_cell = dailyMaxCellTemp_series.mean()
@@ -1372,7 +1350,7 @@ class Degradation:
             Number of times the temperature threshold is crossed
 
         """
-        # Find the number of times the temperature crosses over 54.8(C)
+        # Find the number of times the temperature crosses over 54.8(°C)
 
         temp_df = pd.DataFrame()
         temp_df['CellTemp'] = temp_cell
@@ -1570,7 +1548,7 @@ class Standards:
                                     azimuth=180, skymodel='isotropic'):
         '''
     
-        Preliminary calculation for module gap according to IEC 63126. The
+        Preliminary calculation for module gap according to IEC TS 63126. The
         steps of the calculation are:
         1. Takes a weather file
         2. Calculates the module temperature with PVLIB, for an open rack
@@ -1580,7 +1558,7 @@ class Standards:
         4. Calculates the 98 percentile for step 2
         5. Calculates the 98 percentile for step 3
         5. Use both percentiles to calculate the effective gap "x" for the lower limit to use a
-           Level 1 or Level 0 module (in IEC 63216), I.e. T98=80 or T98=70 respectively.
+           Level 1 or Level 0 module (in IEC TS 63216), I.e. T98=80 or T98=70 respectively.
 
         Reference: M. Kempe, PVSC Proceedings 2023 (forthcoming)
         
@@ -1592,7 +1570,7 @@ class Standards:
         metadata : Dictionary
             must have 'latitude' and 'longitude'
         level : int, optional
-            Options 0, or 1. Level 1 or Level 0 module (in IEC 63216) define 
+            Options 0, or 1. Level 1 or Level 0 module (in IEC TS 63216) define 
             the testing regime for the module; the boundaries are defined 
             internally, to use a level 0 module is the boundary is less than 
             70, and for Level 1 is less than 80. Above 80 Level 2 testing 
@@ -1609,8 +1587,8 @@ class Standards:
         Returns
         -------
         x : float
-            Recommended installation distance per IEC 63126.
-            effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC 63216)
+            Recommended installation distance per IEC TS 63126.
+            effective gap "x" for the lower limit to use a Level 1 or Level 0 module (in IEC TS 63216)
 
         '''
 
