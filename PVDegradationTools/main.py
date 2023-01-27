@@ -18,18 +18,24 @@ class StressFactors:
 
     def k(avg_wvp):
         """
-        Determine the rate of water ingress of water through edge seal material
+        This function generates a constant k, relating the average moisture ingress rate through a specific edge seal, Helioseal 101.
+        Is an emperical estimation the rate of water ingress of water through edge seal material.
+        This function was determined from numerical calculations from several locations and thus produces typical responses.
+        This simplification works because the environmental temperature is not as important as local water vapor pressure.
+        For the same environmental water concentration, a higher temperature results in lower absorption in the edge seal but lower diffusivity through the edge seal. In practice, these effects nearly cancel out makeing absolute humidity the primary parameter determining moisture ingress through edge seals.
 
         Parameters
         -----------
         avg_wvp : float
-            Average of the Yearly water vapor
-            pressure for 1 year
+            Time averaged water vapor pressure for an environment in kPa. 
+            When looking at outdoor data, one should average over 1 year
 
         Returns
         -------
         k : float
-            Ingress rate of water through edge seal
+            Ingress rate of water through edge seal. 
+            Specifically it is the ratio of the breakthrough distance X/t^0.5.
+            With this constant, one can determine an approximate estimate of the ingress distance for a particular climate without more complicated numerical methods and detailed environmental analysis.
 
         """
 
