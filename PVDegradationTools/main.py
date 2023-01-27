@@ -547,10 +547,11 @@ class StressFactors:
 
         return RHback_series
 
-    def rh_backsheet(rh_back_encap, rh_surface_outside):
+    def rh_backsheet_from_encap(rh_back_encap, rh_surface_outside):
         """
-        Function to calculate the Relative Humidity of Backside BackSheet of a Solar Module
-        and return a pandas series for each time step
+        Function to calculate the Relative Humidity of solar module backsheet as timeseries.
+        Requires the RH of the backside encapsulant and the outside surface of the module.
+        See StressFactors.rh_back_encap and StressFactors.rh_surface_outside
 
         Parameters
         ----------
@@ -572,6 +573,135 @@ class StressFactors:
 
         return RHbacksheet_series
 
+    def rh_backsheet(rh_ambient, temp_ambient, temp_module,
+                    WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
+        """Function to calculate the Relative Humidity of solar module backsheet as timeseries.
+        This function uses the same formula as StressFactors.rh_backsheet_from_encap but does
+        not require you to independently solve for the backside ecapsulant and surface humidity
+        before calculation. 
+
+        Parameters
+        ----------
+        rh_ambient : pandas series (float)
+            The ambient outdoor environmnet relative humidity in (%)
+            EXAMPLE: "50 = 50% NOT .5 = 50%"
+        temp_ambient : pandas series (float)
+            The ambient outdoor environmnet temperature in Celsius
+        temp_module : list (float)
+            The surface temperature in Celsius of the solar panel module
+            "module temperature (C)"
+        WVTRo : float
+            Water Vapor Transfer Rate prefactor (g/m2/day).
+            The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
+        EaWVTR : float
+            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            It is suggested to use 0.15(mm) thick PET as a default
+            for the backsheet and set EaWVTR=55.0255(kJ/mol)
+        So : float
+            Encapsulant solubility prefactor in [g/cm3]
+            So = 1.81390702(g/cm3) is the suggested value for EVA.
+        l : float
+            Thickness of the backside encapsulant (mm).
+            The suggested value for encapsulat is EVA l=0.5(mm)
+        Eas : float
+            Encapsulant solubility activation energy in [kJ/mol]
+            Eas = 16.729(kJ/mol) is the suggested value for EVA.
+
+        Returns
+        --------
+        rh_backsheet : float series or array
+            relative humidity of the PV backsheet as a time-series   
+        """
+
+        rh_back_encap = StressFactors.rh_back_encap(rh_ambient=rh_ambient,
+                                                    temp_ambient=temp_ambient,
+                                                    temp_module=temp_module, WVTRo=WVTRo,
+                                                    EaWVTR=EaWVTR, So=So, l=l, Eas=Eas)
+        rh_surface = StressFactors.rh_surface_outside(rh_ambient=rh_ambient,
+                                                    temp_ambient=temp_ambient,
+                                                    temp_module=temp_module)
+        rh_backsheet = (rh_back_encap + rh_surface)/2
+        return rh_backsheet
+
+    def rh_module(rh_ambient, temp_ambient, temp_module,
+                WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729,
+                pandas=True):
+        """
+        Generate the relative humidity for the following components
+        - outside surface of the module
+        - frontside encapsulant
+        - backside encpasulant
+        - backsheet
+        To generate these individually, see StressFactors.rh_surface_outside, etc
+
+        Parameters
+        ----------
+        rh_ambient : pandas series (float)
+            The ambient outdoor environmnet relative humidity in (%)
+            EXAMPLE: "50 = 50% NOT .5 = 50%"
+        temp_ambient : pandas series (float)
+            The ambient outdoor environmnet temperature in Celsius
+        temp_module : list (float)
+            The surface temperature in Celsius of the solar panel module
+            "module temperature (C)"
+        WVTRo : float
+            Water Vapor Transfer Rate prefactor (g/m2/day).
+            The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
+        EaWVTR : float
+            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            It is suggested to use 0.15(mm) thick PET as a default
+            for the backsheet and set EaWVTR=55.0255(kJ/mol)
+        So : float
+            Encapsulant solubility prefactor in [g/cm3]
+            So = 1.81390702(g/cm3) is the suggested value for EVA.
+        l : float
+            Thickness of the backside encapsulant (mm).
+            The suggested value for encapsulat is EVA l=0.5(mm)
+        Eas : float
+            Encapsulant solubility activation energy in [kJ/mol]
+            Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        pandas: boolean, default=True
+            If true, the calculation will return a dataframe containing named columns
+            for each material. If false, it will instead return a tuple where each value is
+            a time series.
+
+        Returns
+        --------
+        rh_surface_outside : float series
+            relative humidity immediately outside the surface of a module
+        rh_front_encap : float series
+            relative humidity of the module front encapsulant
+        rh_back_encap : float series
+            relative humidity of the module backside encapsulant
+        rh_backsheet : float series or array
+            relative humidity of the PV backsheet as a time-series
+        """
+
+        rh_surface_outside = StressFactors.rh_surface_outside(rh_ambient=rh_ambient,
+                                                            temp_ambient=temp_ambient,
+                                                            temp_module=temp_module)
+
+        rh_front_encap = StressFactors.rh_front_encap(rh_ambient, temp_ambient, temp_module,
+                                                    So=So, Eas=Eas)
+
+        rh_back_encap = StressFactors.rh_back_encap(rh_ambient=rh_ambient,
+                                                    temp_ambient=temp_ambient,
+                                                    temp_module=temp_module, WVTRo=WVTRo,
+                                                    EaWVTR=EaWVTR, So=So, l=l, Eas=Eas)
+
+        rh_backsheet = StressFactors.rh_backsheet_from_encap(rh_back_encap=rh_back_encap,
+                                                            rh_surface_outside=rh_surface_outside)
+
+        if not pandas:
+            return (rh_surface_outside, rh_front_encap, rh_back_encap, rh_backsheet)
+        
+        else:
+            data = {'surface_outside': rh_surface_outside,
+                    'front_encap': rh_front_encap,
+                    'back_encap': rh_back_encap,
+                    'backsheet': rh_backsheet}
+            results = pd.DataFrame(data=data)
+            return results
 
 class Degradation:
 
