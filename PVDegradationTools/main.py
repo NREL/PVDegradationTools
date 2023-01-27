@@ -94,8 +94,8 @@ class StressFactors:
 
         """
         wind_speed_cut_off = 4.4
-        dew_yield = (1/12) * (.37 * (1 + (0.204323 * h) - (0.0238893 * h**2) -
-                             (18.0132 - (1.04963 * h**2) + (0.21891 * h**2)) * (10**(-3) * dew_point)) *
+        dew_yield = (1/12) * (.37 * (1 + (0.204323 * elevation) - (0.0238893 * elevation**2) -
+                             (18.0132 - (1.04963 * elevation**2) + (0.21891 * elevation**2)) * (10**(-3) * dew_point)) *
                              ((((dew_point + 273.15) / 285)**4)*(1 - (n/8))) +
                              (0.06 * (dew_point - dry_bulb)) *
                              (1 + 100 * (1 - np.exp(- (wind_speed / wind_speed_cut_off)**20))))
