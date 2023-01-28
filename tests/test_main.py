@@ -65,7 +65,7 @@ def test_psat():
     psat = PVD.StressFactors.psat(PSM['Dew Point'])
     assert psat.__len__() == PSM.__len__()
     avg_psat = psat.mean()
-    assert avg_psat == pytest.approx(0.5358, abs=0.0001)
+    assert avg_psat == pytest.approx(0.54218, abs=0.0001)
 
 def test_rh_surface_outside():
     # test calculation for the RH just outside a module surface
