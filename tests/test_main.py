@@ -35,11 +35,12 @@ PSM = pd.read_csv(PSM3FILE, header=2)
 
 def test_water_vapor_pressure():
     # test water vapor pressure
+    # *DEPRECATED*
 
     wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
     assert wvp.__len__() == PSM.__len__()
     avg_wvp = wvp.mean()
-    assert avg_wvp == pytest.approx(0.542, abs=0.001)
+    assert avg_wvp == pytest.approx(0.54218, abs=0.0001)
 
 def test_k():
     # test calculation for constant k
@@ -57,6 +58,14 @@ def test_edge_seal_width():
     k = PVD.StressFactors.k(avg_wvp=avg_wvp)
     edge_seal_width = PVD.StressFactors.edge_seal_width(k=k)
     assert edge_seal_width == pytest.approx(0.449, abs=0.002)
+
+def test_psat():
+    # test saturation point
+
+    psat = PVD.StressFactors.psat(PSM['Dew Point'])
+    assert psat.__len__() == PSM.__len__()
+    avg_psat = psat.mean()
+    assert avg_psat == pytest.approx(0.5358, abs=0.0001)
 
 def test_rh_surface_outside():
     # test calculation for the RH just outside a module surface
@@ -76,7 +85,7 @@ def test_rh_front_encap():
                                                     temp_ambient=PSM['Temperature'],
                                                     temp_module=PSM['temp_module'])
     assert rh_front_encap.__len__() == PSM.__len__()
-    assert rh_front_encap.iloc[17] == pytest.approx(50.131446, abs=.01)
+    assert rh_front_encap.iloc[17] == pytest.approx(50.289, abs=.001)
 
 def test_rh_back_encap():
     # test calculation for RH of module backside encapsulant
@@ -86,7 +95,7 @@ def test_rh_back_encap():
                                                     temp_ambient=PSM['Temperature'],
                                                     temp_module=PSM['temp_module'])
     assert rh_back_encap.__len__() == PSM.__len__()
-    assert rh_back_encap[17] == pytest.approx(80.5295, abs=0.01)
+    assert rh_back_encap[17] == pytest.approx(80.4576, abs=0.001)
 
 def test_rh_backsheet_from_encap():
     # test the calculation for backsheet relative humidity
@@ -101,7 +110,7 @@ def test_rh_backsheet_from_encap():
     rh_backsheet = PVD.StressFactors.rh_backsheet_from_encap(rh_back_encap=rh_back_encap,
                                                             rh_surface_outside=rh_surface)
     assert rh_backsheet.__len__() == PSM.__len__()
-    assert rh_backsheet[17] == pytest.approx(81.259, abs=0.01)
+    assert rh_backsheet[17] == pytest.approx(81.2238, abs=0.001)
 
 def test_rh_backsheet():
     # test the calculation for backsheet relative humidity directly from weather variables
@@ -111,7 +120,7 @@ def test_rh_backsheet():
                                                     temp_ambient=PSM['Temperature'],
                                                     temp_module=PSM['temp_module'])
     assert rh_backsheet.__len__() == PSM.__len__()
-    assert rh_backsheet[17] == pytest.approx(81.259, abs=0.01)
+    assert rh_backsheet[17] == pytest.approx(81.2238, abs=0.001)
 
 def test_rh_module():
     # test the rh_module function
@@ -122,9 +131,9 @@ def test_rh_module():
                                             temp_module=PSM['temp_module'])
     assert rh_module.__len__() == PSM.__len__()
     assert rh_module['surface_outside'][17] == pytest.approx(81.99, abs=0.1)
-    assert rh_module['front_encap'][17] == pytest.approx(50.131446, abs=.01)
-    assert rh_module['back_encap'][17] == pytest.approx(80.5295, abs=0.01)
-    assert rh_module['backsheet'][17] == pytest.approx(81.259, abs=0.01)
+    assert rh_module['front_encap'][17] == pytest.approx(50.2891, abs=0.001)
+    assert rh_module['back_encap'][17] == pytest.approx(80.4576, abs=0.001)
+    assert rh_module['backsheet'][17] == pytest.approx(81.2238, abs=0.001)
 
 # --------------------------------------------------------------------------------------------------
 # -- Degradation

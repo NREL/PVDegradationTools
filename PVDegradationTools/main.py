@@ -18,12 +18,18 @@ class StressFactors:
 
     def k(avg_wvp):
         """
-        This function generates a constant k, relating the average moisture ingress rate through a specific edge seal, Helioseal 101.
-        Is an emperical estimation the rate of water ingress of water through edge seal material.
-        This function was determined from numerical calculations from several locations and thus produces typical responses.
-        This simplification works because the environmental temperature is not as important as local water vapor pressure.
-        For the same environmental water concentration, a higher temperature results in lower absorption in the edge seal but lower diffusivity through the edge seal. In practice, these effects nearly cancel out makeing absolute humidity the primary parameter determining moisture ingress through edge seals.
-        See: Kempe, Nobles, Postak Calderon,"Moisture ingress prediction in polyisobutylene‐based edge seal with molecular sieve desiccant", Progress in Photovoltaics, DOI: 10.1002/pip.2947
+        This function generates a constant k, relating the average moisture ingress rate through a
+        specific edge seal, Helioseal 101. Is an emperical estimation the rate of water ingress of
+        water through edge seal material. This function was determined from numerical calculations
+        from several locations and thus produces typical responses. This simplification works
+        because the environmental temperature is not as important as local water vapor pressure.
+        For the same environmental water concentration, a higher temperature results in lower
+        absorption in the edge seal but lower diffusivity through the edge seal. In practice, these
+        effects nearly cancel out makeing absolute humidity the primary parameter determining
+        moisture ingress through edge seals.
+        
+        See: Kempe, Nobles, Postak Calderon,"Moisture ingress prediction in polyisobutylene‐based
+        edge seal with molecular sieve desiccant", Progress in Photovoltaics, DOI: 10.1002/pip.2947
 
         Parameters
         -----------
@@ -34,9 +40,11 @@ class StressFactors:
         Returns
         -------
         k : float [cm/h^0.5]
-            Ingress rate of water through edge seal. 
+            Ingress rate of water through edge seal.
             Specifically it is the ratio of the breakthrough distance X/t^0.5.
-            With this constant, one can determine an approximate estimate of the ingress distance for a particular climate without more complicated numerical methods and detailed environmental analysis.
+            With this constant, one can determine an approximate estimate of the ingress distance
+            for a particular climate without more complicated numerical methods and detailed
+            environmental analysis.
 
         """
 
@@ -50,7 +58,7 @@ class StressFactors:
 
         Parameters
         ----------
-        k: float 
+        k: float
             Ingress rate of water through edge seal. [cm/h^0.5]
             Specifically it is the ratio of the breakthrough distance X/t^0.5.
 
@@ -64,6 +72,50 @@ class StressFactors:
 
         return width
 
+    def edge_seal_from_dew_pt(dew_pt_temp, all_results=False):
+        """
+        Compute the edge seal width required for 25 year water ingress directly from
+        dew pt tempterature.
+
+        Parameters
+        ----------
+        dew_pt_temp : float, or float series
+            Dew Point Temperature
+        all_results : boolean
+            If true, returns all calculation steps: psat, avg_psat, k, edge seal width
+            If false, returns only edge seal width
+
+        Returns
+        ----------
+        edge_seal_width: float
+            Width of edge seal [mm] required for 25 year water ingress
+
+        Optional Returns
+        ----------
+        psat : series
+            Hourly saturation point
+        avg_psat : float
+            Average saturation point over sample times
+        k : float
+            Ingress rate of water vapor
+        """
+        
+        psat = StressFactors.psat(dew_pt_temp)
+        avg_psat = psat.mean()
+
+        k = .0013 * (avg_psat)**.4933
+
+        edge_seal_width = StressFactors.edge_seal_width(k)
+
+        if all_results:
+            return {'psat':psat,
+                    'avg_psat':avg_psat,
+                    'k':k,
+                    'edge_seal_width':edge_seal_width}
+
+        return edge_seal_width
+
+        
 
     # Numba Machine Language Level
 
@@ -71,7 +123,8 @@ class StressFactors:
     def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
         """
         Estimates the dew yield in [mm/day].  Calculation taken from:
-        Beysens, "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167 (2016) 146-155
+        Beysens, "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167
+        (2016) 146-155
 
         Parameters
         -----------
@@ -85,7 +138,9 @@ class StressFactors:
             Air or windspeed measure [m/s]
         n : float
             Total sky cover(okta)
-            This is a quasi emperical scale from 0 to 8 used in meterology which corresponds to 0-sky completely clear, to 8-sky completely cloudy. Does not account for cloud type or thickness.
+            This is a quasi emperical scale from 0 to 8 used in meterology which corresponds to
+            0-sky completely clear, to 8-sky completely cloudy. Does not account for cloud type
+            or thickness.
 
         Returns
         -------
@@ -104,7 +159,21 @@ class StressFactors:
 
     def water_vapor_pressure(dew_pt_temp):
         """
-        I'm wanting to discontinue use of the function and replace it with _psat(temp) because these are teh same function.
+        **DEPRECATED**
+        Use StressFactors.psat()
+
+        Find the average water vapor pressure (kPa) based on the Dew Point
+        Temperature model created from Mike Kempe on 10/07/19 from Miami,FL excel sheet.
+
+        Parameters
+        ----------
+        dew_pt_temp : float, or float series
+            Dew Point Temperature
+
+        Returns
+        --------
+        watervaporpressure : float
+            Water vapor pressure in kPa
 
         """
         water_vapor_pressure = (np.exp((3.2575315268E-13 * dew_pt_temp**6) -
@@ -117,23 +186,15 @@ class StressFactors:
 
         return water_vapor_pressure
 
-    def _psat(temp):
+    def psat(temp):
         """
-        Function calculated the water saturation temperature or dew point for a given water vapor pressure.
-        Water vapor pressure model created from an emperical fit of ln(Psat) vs temperature using a 6th order polynomial fit in microsoft Excel. The fit produced  R^2=0.999813.
+        Function calculated the water saturation temperature or dew point for a given water vapor
+        pressure. Water vapor pressure model created from an emperical fit of ln(Psat) vs
+        temperature using a 6th order polynomial fit in microsoft Excel. The fit produced
+        R^2=0.999813.
         Calculation created by Michael Kempe, unpublished data.
-
-        Parameters
-        -----------
-        temp : float
-            Temperature [°C]
-
-        Returns
-        -------
-        _psat : float
-            Water vapor pressure [kPa]
-
         """
+
         psat = np.exp((3.2575315268E-13 * temp**6) -
                        (1.5680734584E-10 * temp**5) +
                        (2.2213041913E-08 * temp**4) +
@@ -164,8 +225,8 @@ class StressFactors:
 
         """
         rh_Surface = rh_ambient * \
-            (StressFactors._psat(temp_ambient) /
-             StressFactors._psat(temp_module))
+            (StressFactors.psat(temp_ambient) /
+             StressFactors.psat(temp_module))
 
         return rh_Surface
 
