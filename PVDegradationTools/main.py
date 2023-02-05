@@ -157,35 +157,6 @@ class StressFactors:
 
         return dew_yield
 
-    def water_vapor_pressure(dew_pt_temp):
-        """
-        **DEPRECATED**
-        Use StressFactors.psat()
-
-        Find the average water vapor pressure (kPa) based on the Dew Point
-        Temperature model created from Mike Kempe on 10/07/19 from Miami,FL excel sheet.
-
-        Parameters
-        ----------
-        dew_pt_temp : float, or float series
-            Dew Point Temperature
-
-        Returns
-        --------
-        watervaporpressure : float
-            Water vapor pressure in kPa
-
-        """
-        water_vapor_pressure = (np.exp((3.2575315268E-13 * dew_pt_temp**6) -
-                                     (1.5680734584E-10 * dew_pt_temp**5) +
-                                     (2.2213041913E-08 * dew_pt_temp**4) +
-                                     (2.3720766595E-7 * dew_pt_temp**3) -
-                                     (4.0316963015E-04 * dew_pt_temp**2) +
-                                     (7.9836323361E-02 * dew_pt_temp) -
-                                     (5.6983551678E-1)))
-
-        return water_vapor_pressure
-
     def psat(temp):
         """
         Function calculated the water saturation temperature or dew point for a given water vapor
@@ -233,99 +204,25 @@ class StressFactors:
         ###########
         # Front Encapsulant RH
         ###########
-
-    def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14):
-        """
-        Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
-        This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
-        
-        The function returns values needed for the numerator of the Diffusivity weighted water
-        content equation. This function will return a pandas series prior to summation of the
-        numerator
-
-        Parameters
-        ----------
-        rh_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%)
-            EXAMPLE: "50 = 50% NOT .5 = 50%"
-        temp_ambient : pandas series (float)
-            The ambient outdoor environmnet temperature in Celsius
-        temp_module : pandas series (float)
-            The surface temperature in Celsius of the solar panel module
-        So : float
-            Float, Encapsulant solubility prefactor in [g/cm3]
-            So = 1.81390702(g/cm3) is the suggested value for EVA.
-        Eas : float
-            Encapsulant solubility activation energy in [kJ/mol]
-            Eas = 16.729(kJ/mol) is the suggested value for EVA.
-        Ead : float
-            Encapsulant diffusivity activation energy in [kJ/mol]
-            Ead = 38.14(kJ/mol) is the suggested value for EVA.
-
-        Returns
-        -------
-        diff_numerator : pandas series (float)
-            Nnumerator of the Sdw equation prior to summation
-
-        """
-
-        # Get the relative humidity of the surface
-        rh_surface = StressFactors.rh_surface_outside(
-            rh_ambient, temp_ambient, temp_module)
-
-        # Generate a series of the numerator values "prior to summation"
-        diff_numerator = So * np.exp(- (Eas / (0.00831446261815324 * (temp_module + 273.15))))\
-                                * rh_surface * \
-                                np.exp(- (Ead / (0.00831446261815324 * (temp_module + 273.15))))
-
-        return diff_numerator
-
-    def _diffusivity_denominator(temp_module, Ead=38.14):
-        """
-        Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
-        This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
-        
-        The function returns values needed for the denominator of the Diffusivity
-        weighted water content equation(diffuse_water). This function will return a pandas
-        series prior to summation of the denominator
-
-        Parameters
-        ----------
-        Ead : float
-            Encapsulant diffusivity activation energy in [kJ/mol]
-            38.14(kJ/mol) is the suggested value for EVA.
-        temp_module : pandas series (float)
-            The surface temperature in Celsius of the solar panel module
-
-        Returns
-        -------
-        diff_denominator : pandas series (float)
-            Denominator of the diffuse_water equation prior to summation
-
-        """
-
-        diff_denominator = np.exp(- (Ead /
-                                   (0.00831446261815324 * (temp_module + 273.15))))
-        return diff_denominator
-
        
     def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
                                     So=1.81390702,  Eas=16.729, Ead=38.14):
         """
         Calculation is used in determining a weighted average water content at the surface of a module.
-        It is used as a constant water content that is equivalent to the time varying one with respect to moisture ingress.
+        It is used as a constant water content that is equivalent to the time varying one with respect 
+        to moisture ingress.
 
         The function calculates the Diffusivity weighted water content. 
 
         Parameters
         ----------
         rh_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%)
+            The ambient outdoor environmnet relative humidity in [%]
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
         temp_module : pandas series (float)
-            The surface temperature in Celsius of the solar panel module
+            The surface temperature of the solar panel [°C]
         So : float
             Float, Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
@@ -339,16 +236,23 @@ class StressFactors:
         Returns
         ------
         diffuse_water : float
-            Diffusivity weighted water content
+            Diffusivity weighted water content [g/cm3]
 
         """
 
-        numerator = StressFactors._diffusivity_numerator(
-            rh_ambient, temp_ambient, temp_module, So,  Eas, Ead)
+        # Get the relative humidity of the surface
+        rh_surface = StressFactors.rh_surface_outside(
+            rh_ambient, temp_ambient, temp_module)
+
+        # Generate a series of the numerator values "prior to summation"
+        numerator = So * np.exp(- (Eas / (0.00831446261815324 * (temp_module + 273.15))))\
+                                * rh_surface * \
+                                np.exp(- (Ead / (0.00831446261815324 * (temp_module + 273.15))))
+
         # get the summation of the numerator
         numerator = numerator.sum(axis=0, skipna=True)
 
-        denominator = StressFactors._diffusivity_denominator(temp_module, Ead)
+        denominator = np.exp(- (Ead / (0.00831446261815324 * (temp_module + 273.15))))
         # get the summation of the denominator
         denominator = denominator.sum(axis=0, skipna=True)
 
@@ -363,11 +267,11 @@ class StressFactors:
         Parameters
         ----------
         rh_ambient : series (float)
-            ambient Relative Humidity (%)
+            ambient Relative Humidity [%]
         temp_ambient : series (float)
             ambient outdoor temperature [°C]        
         temp_module : pandas series (float)
-            The surface temperature in Celsius of the solar panel module
+            The surface temperature in Celsius of the solar module
             "module temperature [°C]"
         So : float
             Encapsulant solubility prefactor in [g/cm3]
@@ -416,7 +320,7 @@ class StressFactors:
         Returns
         -------
         Csat : pandas series (float)
-            Saturation of Water Concentration (g/cm³)
+            Saturation of Water Concentration [g/cm³]
 
         """
 
@@ -429,19 +333,19 @@ class StressFactors:
     def _ceq(Csat, rh_SurfaceOutside):
         """
         Calculation is used in determining Relative Humidity of Backside Solar
-        Module Encapsulant, and returns Equilibration water concentration (g/cm³)
+        Module Encapsulant, and returns Equilibration water concentration [g/cm³]
 
         Parameters
         ------------
         Csat : pandas series (float)
-            Saturation of Water Concentration (g/cm³)
+            Saturation of Water Concentration [g/cm³]
         rh_SurfaceOutside : pandas series (float)
-            The relative humidity of the surface of a solar module (%)
+            The relative humidity of the surface of a solar module [%]
 
         Returns
         --------
         Ceq : pandas series (float)
-            Equilibration water concentration (g/cm³)
+            Equilibration water concentration [g/cm³]
 
         """
 
@@ -471,20 +375,20 @@ class StressFactors:
             The surface temperature in Celsius of the solar panel module
             "module temperature [°C]"
         rh_Surface : list (float)
-            The relative humidity of the surface of a solar module (%)
+            The relative humidity of the surface of a solar module [%]
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         WVTRo : float
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
         EaWVTR : float
-            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            Water Vapor Transfer Rate activation energy [kJ/mol] .
             It is suggested to use 0.15(mm) thick PET as a default
             for the backsheet and set EaWVTR=55.0255(kJ/mol)
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
         l : float
-            Thickness of the backside encapsulant (mm).
+            Thickness of the backside encapsulant [mm].
             The suggested value for encapsulat is EVA l=0.5(mm)
         Eas : float
             Encapsulant solubility activation energy in [kJ/mol]
@@ -527,7 +431,7 @@ class StressFactors:
         Parameters
         -----------
         rh_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%)
+            The ambient outdoor environmnet relative humidity in [%]
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
@@ -538,14 +442,14 @@ class StressFactors:
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
         EaWVTR : float
-            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            Water Vapor Transfer Rate activation energy [kJ/mol] .
             It is suggested to use 0.15(mm) thick PET as a default
             for the backsheet and set EaWVTR=55.0255(kJ/mol)
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
         l : float
-            Thickness of the backside encapsulant (mm).
+            Thickness of the backside encapsulant [mm].
             The suggested value for encapsulat is EVA l=0.5(mm)
         Eas : float
             Encapsulant solubility activation energy in [kJ/mol]
@@ -622,7 +526,7 @@ class StressFactors:
         Parameters
         ----------
         rh_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%)
+            The ambient outdoor environmnet relative humidity in [%]
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
@@ -633,14 +537,14 @@ class StressFactors:
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
         EaWVTR : float
-            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            Water Vapor Transfer Rate activation energy [kJ/mol] .
             It is suggested to use 0.15(mm) thick PET as a default
             for the backsheet and set EaWVTR=55.0255(kJ/mol)
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
         l : float
-            Thickness of the backside encapsulant (mm).
+            Thickness of the backside encapsulant [mm].
             The suggested value for encapsulat is EVA l=0.5(mm)
         Eas : float
             Encapsulant solubility activation energy in [kJ/mol]
@@ -676,7 +580,7 @@ class StressFactors:
         Parameters
         ----------
         rh_ambient : pandas series (float)
-            The ambient outdoor environmnet relative humidity in (%)
+            The ambient outdoor environmnet relative humidity in [%]
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_ambient : pandas series (float)
             The ambient outdoor environmnet temperature in Celsius
@@ -687,14 +591,14 @@ class StressFactors:
             Water Vapor Transfer Rate prefactor (g/m2/day).
             The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
         EaWVTR : float
-            Water Vapor Transfer Rate activation energy (kJ/mol) .
+            Water Vapor Transfer Rate activation energy [kJ/mol] .
             It is suggested to use 0.15(mm) thick PET as a default
             for the backsheet and set EaWVTR=55.0255(kJ/mol)
         So : float
             Encapsulant solubility prefactor in [g/cm3]
             So = 1.81390702(g/cm3) is the suggested value for EVA.
         l : float
-            Thickness of the backside encapsulant (mm).
+            Thickness of the backside encapsulant [mm].
             The suggested value for encapsulat is EVA l=0.5(mm)
         Eas : float
             Encapsulant solubility activation energy in [kJ/mol]
@@ -940,7 +844,7 @@ class Degradation:
         temp_cell : pandas series
             Solar module temperature or Cell temperature [°C]
         Ea : float
-            Degredation Activation Energy (kJ/mol)
+            Degredation Activation Energy [kJ/mol]
 
         Returns
         -------
@@ -962,12 +866,12 @@ class Degradation:
         I_chamber : float
             Irradiance of Controlled Condition W/m²
         Rhchamber : float
-            Relative Humidity of Controlled Condition (%)
+            Relative Humidity of Controlled Condition [%]
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_chamber : float
             Reference temperature [°C] "Chamber Temperature"
         Ea : float
-            Degredation Activation Energy (kJ/mol)
+            Degredation Activation Energy [kJ/mol]
         x : float
             Fit parameter
         n : float
@@ -998,7 +902,7 @@ class Degradation:
         I_chamber : float
             Irradiance of Controlled Condition W/m²
         rh_chamber : float
-            Relative Humidity of Controlled Condition (%).
+            Relative Humidity of Controlled Condition [%].
             EXAMPLE: "50 = 50% NOT .5 = 50%"
         temp_chamber : float
             Reference temperature [°C] "Chamber Temperature"
@@ -1012,7 +916,7 @@ class Degradation:
         temp_cell : pandas series
             Solar module temperature or Cell temperature [°C]
         Ea : float
-            Degredation Activation Energy (kJ/mol)
+            Degredation Activation Energy [kJ/mol]
         x : float
             Fit parameter
         n : float
@@ -1052,7 +956,7 @@ class Degradation:
         temp_cell : pandas series
             Solar module temperature or Cell temperature [°C]
         Ea : float
-            Degredation Activation Energy (kJ/mol)
+            Degredation Activation Energy [kJ/mol]
 
         Returns
         -------
@@ -1087,7 +991,7 @@ class Degradation:
         temp_cell : pandas series
             solar module temperature or Cell temperature [°C]
         Ea : float
-            Degredation Activation Energy (kJ/mol)
+            Degredation Activation Energy [kJ/mol]
         Teq : series
             Equivalent Arrhenius temperature [°C]
         n : float
@@ -1096,7 +1000,7 @@ class Degradation:
         Returns
         --------
         RHwa : float
-            Relative Humidity Weighted Average (%)
+            Relative Humidity Weighted Average [%]
 
         """
 
@@ -1133,9 +1037,9 @@ class Degradation:
         temp_cell : pandas series
             Solar module temperature or Cell temperature [°C]
         Ea : float
-            Degradation Activation Energy (kJ/mol)
+            Degradation Activation Energy [kJ/mol]
         RHwa : float
-            Relative Humidity Weighted Average (%)
+            Relative Humidity Weighted Average [%]
         Teq : float
             Temperature equivalent (Celsius) required
             for the settings of the controlled environment
