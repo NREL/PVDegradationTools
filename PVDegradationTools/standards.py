@@ -52,11 +52,11 @@ def module_temperature(nsrdb_file, gid,
     solar_position = location.get_solarposition(times)
 
     with NSRDBX(nsrdb_file, hsds=False) as f:
-        dni = f.get_gid_df('dni', gid)
-        ghi = f.get_gid_df('ghi', gid)
-        dhi = f.get_gid_df('dni', gid)
-        air_temperature = f.get_gid_df('air_temperature', gid)
-        wind_speed = f.get_gid_df('wind_speed', gid)
+        dni = f.get_gid_ts('dni', gid)
+        ghi = f.get_gid_ts('ghi', gid)
+        dhi = f.get_gid_ts('dhi', gid)
+        air_temperature = f.get_gid_ts('air_temperature', gid)
+        wind_speed = f.get_gid_ts('wind_speed', gid)
 
     #TODO: change for handling HSAT tracking passed or requested
     if tilt is None:
@@ -77,8 +77,9 @@ def module_temperature(nsrdb_file, gid,
     module_temperature = pvlib.temperature.sapm_module(
         poa_global=df_poa['poa_global'], 
         temp_air=air_temperature, 
-        wind_speed=wind_speed, 
-        **parameters)
+        wind_speed=wind_speed,
+        a=parameters['a'],
+        b=parameters['b'])
 
     return module_temperature
 
@@ -121,8 +122,8 @@ def ideal_installation_distance(T_0, T_inf, level=0, x_0=6.1):
     if level == 1:
         T98 = 80
 
-    Tq_0 = T_0.quantile(q=0.98, interpolation='linear').values
-    Tq_inf = T_inf.quantile(q=0.98, interpolation='linear').values
+    Tq_0 = T_0.quantile(q=0.98, interpolation='linear')
+    Tq_inf = T_inf.quantile(q=0.98, interpolation='linear')
 
     x = -x_0 * np.log(1-(Tq_0-T98)/(Tq_0-Tq_inf))
 
@@ -137,9 +138,15 @@ def test_pipeline(nsrdb_file, gid):
                        temp_model='sapm', conf='insulated_back_glass_polymer', 
                        tilt=None, azimuth=180, sky_model='isotropic')
 
+    print(T_0)
+
     T_inf = module_temperature(nsrdb_file, gid, 
                        temp_model='sapm', conf='open_rack_glass_polymer', 
                        tilt=None, azimuth=180, sky_model='isotropic')
 
+    print(T_inf)
+
     x = ideal_installation_distance(T_0, T_inf, level=0, x_0=6.1)
+
+    return x
 
