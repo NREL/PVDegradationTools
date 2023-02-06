@@ -1,4 +1,11 @@
-from PVDegradationTools.main import StressFactors, Degradation, BOLIDLeTID, Standards
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+#!/usr/bin/env python3
+
+"""Collection of submodules of PVDegradationTools.
+"""
+
+from .main import StressFactors, Degradation, BOLIDLeTID
+
+from . import standards
+from . import _version
+
+__version__ = _version.get_versions()['version']
