@@ -138,13 +138,9 @@ def test_pipeline(nsrdb_file, gid):
                        temp_model='sapm', conf='insulated_back_glass_polymer', 
                        tilt=None, azimuth=180, sky_model='isotropic')
 
-    print(T_0)
-
     T_inf = module_temperature(nsrdb_file, gid, 
                        temp_model='sapm', conf='open_rack_glass_polymer', 
                        tilt=None, azimuth=180, sky_model='isotropic')
-
-    print(T_inf)
 
     x = ideal_installation_distance(T_0, T_inf, level=0, x_0=6.1)
 
