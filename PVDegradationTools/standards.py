@@ -2,6 +2,7 @@
 """
 
 import numpy as np
+import pandas as pd
 import pvlib
 from rex import NSRDBX
 
@@ -80,6 +81,16 @@ def module_temperature(nsrdb_file, gid,
         wind_speed=wind_speed,
         a=parameters['a'],
         b=parameters['b'])
+
+
+    # cell_temperature = pvlib.temperature.sapm_cell(
+    #     poa_global=df_poa['poa_global'], 
+    #     temp_air=air_temperature, 
+    #     wind_speed=wind_speed,
+    #     **parameters)
+
+    # pd.testing.assert_series_equal(module_temperature, cell_temperature)
+    # #TODO: Why is cell and module temp the same?
 
     return module_temperature
 
