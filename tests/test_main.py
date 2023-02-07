@@ -33,19 +33,19 @@ PSM = pd.read_csv(PSM3FILE, header=2)
 # --------------------------------------------------------------------------------------------------
 # -- StressFactors
 
-def test_water_vapor_pressure():
-    # test water vapor pressure
-    # *DEPRECATED*
+# def test_water_vapor_pressure():
+#     # test water vapor pressure
+#     # *DEPRECATED*
 
-    wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
-    assert wvp.__len__() == PSM.__len__()
-    avg_wvp = wvp.mean()
-    assert avg_wvp == pytest.approx(0.54218, abs=0.0001)
+#     wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
+#     assert wvp.__len__() == PSM.__len__()
+#     avg_wvp = wvp.mean()
+#     assert avg_wvp == pytest.approx(0.54218, abs=0.0001)
 
 def test_k():
     # test calculation for constant k
 
-    wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
+    wvp = PVD.StressFactors.psat(PSM['Dew Point'])
     avg_wvp = wvp.mean()
     k = PVD.StressFactors.k(avg_wvp=avg_wvp)
     assert k == pytest.approx(.00096, abs=.000005)
@@ -53,7 +53,7 @@ def test_k():
 def test_edge_seal_width():
     # test for edge_seal_width
 
-    water_vapor_pressure = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
+    water_vapor_pressure = PVD.StressFactors.psat(PSM['Dew Point'])
     avg_wvp = water_vapor_pressure.mean()
     k = PVD.StressFactors.k(avg_wvp=avg_wvp)
     edge_seal_width = PVD.StressFactors.edge_seal_width(k=k)
