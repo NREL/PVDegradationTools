@@ -7,6 +7,8 @@ import pvlib
 from rex import NSRDBX
 
 
+
+
 def module_temperature(nsrdb_file, gid, 
                        temp_model='sapm', conf='open_rack_glass_polymer', 
                        tilt=None, azimuth=180, sky_model='isotropic'):
@@ -50,7 +52,9 @@ def module_temperature(nsrdb_file, gid,
                                        altitude=meta['elevation'])
     
     #TODO: Is timeshift necessary? NSRDB/TMY timestamps are XX:30
-    solar_position = location.get_solarposition(times)
+    times_shift = times - pd.Timedelta('30min')
+    solar_position = location.get_solarposition(times_shift)
+    solar_position.index += pd.Timedelta('30min')
 
     with NSRDBX(nsrdb_file, hsds=False) as f:
         dni = f.get_gid_ts('dni', gid)
@@ -82,15 +86,12 @@ def module_temperature(nsrdb_file, gid,
         a=parameters['a'],
         b=parameters['b'])
 
-
     # cell_temperature = pvlib.temperature.sapm_cell(
     #     poa_global=df_poa['poa_global'], 
     #     temp_air=air_temperature, 
     #     wind_speed=wind_speed,
     #     **parameters)
-
-    # pd.testing.assert_series_equal(module_temperature, cell_temperature)
-    # #TODO: Why is cell and module temp the same?
+    #pd.testing.assert_series_equal(module_temperature, cell_temperature)
 
     return module_temperature
 
