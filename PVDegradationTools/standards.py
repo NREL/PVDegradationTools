@@ -6,9 +6,6 @@ import pandas as pd
 import pvlib
 from rex import NSRDBX
 
-
-
-
 def module_temperature(nsrdb_file, gid, 
                        temp_model='sapm', conf='open_rack_glass_polymer', 
                        tilt=None, azimuth=180, sky_model='isotropic'):
@@ -52,9 +49,9 @@ def module_temperature(nsrdb_file, gid,
                                        altitude=meta['elevation'])
     
     #TODO: Is timeshift necessary? NSRDB/TMY timestamps are XX:30
-    times_shift = times - pd.Timedelta('30min')
-    solar_position = location.get_solarposition(times_shift)
-    solar_position.index += pd.Timedelta('30min')
+    #times_shift = times - pd.Timedelta('30min')
+    solar_position = location.get_solarposition(times)
+    #solar_position.index += pd.Timedelta('30min')
 
     with NSRDBX(nsrdb_file, hsds=False) as f:
         dni = f.get_gid_ts('dni', gid)

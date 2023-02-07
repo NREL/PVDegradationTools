@@ -14,7 +14,7 @@ gids = np.array([481541, 482563, 483583, 483584, 483585, 484606, 484607, 484608,
 
 def test_pipeline_single():
     x = PVD.standards.test_pipeline(nsrdb_file, gid)
-    assert x == pytest.approx(2.2574347934306602)
+    assert x == pytest.approx(2.459131550393533)
 
 def test_pipeline_multiple():
     x = []
