@@ -1,0 +1,15 @@
+Running on: r2i7n35, Machine Type: x86_64-redhat-linux-gnu
+INFO - 2023-02-09 19:09:25,079 [collect.py:78] : Collection is being run with collection pattern: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5. Target output path is: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5
+INFO - 2023-02-09 19:09:25,087 [loggers.py:600] : Running with rex version 0.2.77
+INFO - 2023-02-09 19:09:25,090 [collection.py:480] : Combining meta data from list of 2 source files: [PosixPath('/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff_j0.h5'), PosixPath('/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff_j1.h5')]
+INFO - 2023-02-09 19:09:25,110 [collection.py:501] : Writing meta data with shape (27, 8)
+INFO - 2023-02-09 19:09:25,115 [collection.py:654] : Collecting dataset 'T98_0' from files based on pattern '/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5' to output: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5
+INFO - 2023-02-09 19:09:25,136 [collection.py:322] : Collecting T98_0...
+INFO - 2023-02-09 19:09:25,151 [collection.py:680] : Collection complete
+INFO - 2023-02-09 19:09:25,151 [collection.py:654] : Collecting dataset 'T98_inf' from files based on pattern '/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5' to output: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5
+INFO - 2023-02-09 19:09:25,174 [collection.py:322] : Collecting T98_inf...
+INFO - 2023-02-09 19:09:25,189 [collection.py:680] : Collection complete
+INFO - 2023-02-09 19:09:25,189 [collection.py:654] : Collecting dataset 'x' from files based on pattern '/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5' to output: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5
+INFO - 2023-02-09 19:09:25,213 [collection.py:322] : Collecting x...
+INFO - 2023-02-09 19:09:25,228 [collection.py:680] : Collection complete
+INFO - 2023-02-09 19:09:25,235 [collection.py:616] : Moved chunk files from /home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5 to sub_dir: chunk_files

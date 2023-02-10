@@ -70,7 +70,7 @@ setup(
     ],
 
     # What does your project relate to?
-    keywords='photovoltaics pv rlative humidity',
+    keywords='photovoltaics pv relative humidity',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
@@ -122,4 +122,10 @@ setup(
     #        'sample=sample:main',
     #    ],
     #},
+    package_dir={"pvd": "PVDegradationTools"},
+    entry_points={
+        "console_scripts": [
+            "pvd=PVDegradationTools.cli:cli",
+        ]
+    },
 )

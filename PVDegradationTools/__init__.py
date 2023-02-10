@@ -3,7 +3,10 @@ from pathlib import Path
 
 from .main import StressFactors, Degradation, BOLIDLeTID
 
+from . import cli
+from . import humidity
 from . import standards
+from . import utilities
 from . import _version
 
 __version__ = _version.get_versions()['version']

@@ -1,31 +1,25 @@
 import PVDegradationTools as PVD
-import numpy as np
 import pytest
-import os
-import pandas as pd
 
-nsrdb_file = '/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
+nsrdb_fp = '/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
+gid = 479494 #NREL location
 
-gid = 479494
-gids = np.array([481541, 482563, 483583, 483584, 483585, 484606, 484607, 484608,
-                 485630, 485631, 485632, 485633, 486654, 486655, 486657, 487679,
-                 487682, 488705, 489730, 489731, 490757, 491780, 491781, 492807,
-                 492808, 493834, 493835])
+def test_calc_standoff():
+    res = PVD.standards.calc_standoff(
+        nsrdb_fp,
+        gid,
+        tilt=None,
+        azimuth=180,
+        sky_model='isotropic',
+        temp_model='sapm',
+        module_type='glass_polymer',
+        level=0,
+        x_0=6.1)
 
-def test_pipeline_single():
-    x = PVD.standards.test_pipeline(nsrdb_file, gid)
-    assert x == pytest.approx(2.459131550393533)
+    assert res == pytest.approx({'x': 2.459131550393533, 
+                                 'T98_0': 79.39508117890611, 
+                                 'T98_inf': 51.07779401289873})
 
-def test_pipeline_multiple():
-    x = []
-    for gid in gids:
-        x.append(PVD.standards.test_pipeline(nsrdb_file, gid))
-    df = pd.DataFrame(x, index = gids, columns=['x'])
-    df.index.name = 'gid'
-    
-    data = pd.read_csv(os.path.join(PVD.TEST_DATA_DIR, 'gid_x.csv'), index_col='gid')
-    pd.testing.assert_frame_equal(df, data)
 
 if __name__ == "__main__":
-    test_pipeline_single()
-    test_pipeline_multiple()
+    test_calc_standoff()

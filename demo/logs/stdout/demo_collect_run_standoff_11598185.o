@@ -1,0 +1,15 @@
+Running on: r2i7n35, Machine Type: x86_64-redhat-linux-gnu
+INFO - 2023-02-09 19:02:34,195 [collect.py:78] : Collection is being run with collection pattern: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/output*.h5. Target output path is: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/output.h5
+INFO - 2023-02-09 19:02:34,203 [loggers.py:600] : Running with rex version 0.2.77
+INFO - 2023-02-09 19:02:34,206 [collection.py:480] : Combining meta data from list of 2 source files: [PosixPath('/home/mspringe/projects/degtools/github/PVDegradationTools/demo/output_j0.h5'), PosixPath('/home/mspringe/projects/degtools/github/PVDegradationTools/demo/output_j1.h5')]
+INFO - 2023-02-09 19:02:34,228 [collection.py:501] : Writing meta data with shape (27, 8)
+INFO - 2023-02-09 19:02:34,233 [collection.py:654] : Collecting dataset 'T98_0' from files based on pattern '/home/mspringe/projects/degtools/github/PVDegradationTools/demo/output*.h5' to output: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/output.h5
+INFO - 2023-02-09 19:02:34,255 [collection.py:322] : Collecting T98_0...
+INFO - 2023-02-09 19:02:34,271 [collection.py:680] : Collection complete
+INFO - 2023-02-09 19:02:34,271 [collection.py:654] : Collecting dataset 'T98_inf' from files based on pattern '/home/mspringe/projects/degtools/github/PVDegradationTools/demo/output*.h5' to output: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/output.h5
+INFO - 2023-02-09 19:02:34,295 [collection.py:322] : Collecting T98_inf...
+INFO - 2023-02-09 19:02:34,311 [collection.py:680] : Collection complete
+INFO - 2023-02-09 19:02:34,311 [collection.py:654] : Collecting dataset 'x' from files based on pattern '/home/mspringe/projects/degtools/github/PVDegradationTools/demo/output*.h5' to output: /home/mspringe/projects/degtools/github/PVDegradationTools/demo/output.h5
+INFO - 2023-02-09 19:02:34,334 [collection.py:322] : Collecting x...
+INFO - 2023-02-09 19:02:34,350 [collection.py:680] : Collection complete
+INFO - 2023-02-09 19:02:34,359 [collection.py:616] : Moved chunk files from /home/mspringe/projects/degtools/github/PVDegradationTools/demo/output*.h5 to sub_dir: chunk_files

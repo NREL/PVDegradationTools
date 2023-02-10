@@ -1,0 +1,17 @@
+{
+    "execution_control": {
+        "option": "local",
+        "allocation": "[REQUIRED IF ON HPC]",
+        "walltime": "[REQUIRED IF ON HPC]",
+        "memory": null,
+        "queue": null,
+        "feature": null,
+        "conda_env": null,
+        "module": null,
+        "sh_script": null
+    },
+    "collect_pattern": "PIPELINE",
+    "project_points": null,
+    "datasets": null,
+    "purge_chunks": false
+}
