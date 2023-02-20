@@ -112,6 +112,7 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
     Read a older TMY-like weather file and convert to h5 for use in PVD
 
     TODO: figure out scale_facator and np.int32 for smaller file
+          expand for international locations?
 
     Parameters:
     -----------
@@ -122,7 +123,7 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
     '''
     from pvlib import iotools
 
-    src_data, src_meta = iotools.tmy.read_tmy3(file_in)
+    src_data, src_meta = iotools.tmy.read_tmy3(file_in, coerce_year=2023)
 
     save_cols = {'DNI':'dni',
             'DHI':'dhi',
@@ -154,3 +155,118 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
                             dset_data=df_new[col].values,
                             attrs={'scale_factor':100},
                             dtype=np.int64)
+
+def get_poa_irradiance(
+    nsrdb_fp, 
+    gid,
+    solar_position,
+    tilt=None, 
+    azimuth=180, 
+    sky_model='isotropic'):
+
+    """
+    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the 
+    National Solar Radiation Database (NSRDB) for a given location (gid).
+
+    TODO: only return 'poa_global', its the only one we seem to use
+    
+    Parameters
+    ----------
+    nsrdb_fp : str
+        The file path to the NSRDB file.
+    gid : int
+        The geographical location ID in the NSRDB file.
+    tilt : float, optional
+        The tilt angle of the PV panels in degrees, if None, the latitude of the 
+        location is used.
+    azimuth : float, optional
+        The azimuth angle of the PV panels in degrees, 180 by default - facing south.
+    sky_model : str, optional
+        The pvlib sky model to use, 'isotropic' by default.
+    
+    Returns
+    -------
+    poa : pandas.DataFrame
+         Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse', 
+         'poa_sky_diffuse', 'poa_ground_diffuse'.
+    """
+    from pvlib.irradiance import get_total_irradiance
+    
+    with NSRDBX(nsrdb_fp, hsds=False) as f:
+        meta = f.meta.loc[gid]
+        dni = f.get_gid_ts('dni', gid)
+        ghi = f.get_gid_ts('ghi', gid)
+        dhi = f.get_gid_ts('dhi', gid)
+
+    #TODO: change for handling HSAT tracking passed or requested
+    if tilt is None:
+        tilt = float(meta['latitude'])
+
+    poa = get_total_irradiance(
+        surface_tilt=tilt,
+        surface_azimuth=azimuth,
+        dni=dni,
+        ghi=ghi,
+        dhi=dhi,
+        solar_zenith=solar_position['apparent_zenith'],
+        solar_azimuth=solar_position['azimuth'],
+        model=sky_model)
+
+    return poa
+
+def get_module_temperature(
+    nsrdb_fp, 
+    gid,
+    poa,
+    temp_model='sapm', 
+    conf='open_rack_glass_polymer'):
+
+    """
+    Calculate module temperature based on weather data from the National Solar Radiation 
+    Database (NSRDB) for a given location (gid).
+
+    TODO: change input "poa" to accept only "poa_global" instead of the entire dataframe
+    
+    Parameters
+    ----------
+    nsrdb_file : str
+        The file path to the NSRDB file.
+    gid : int
+        The geographical location ID in the NSRDB file.
+    poa : pandas.DataFrame
+         Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse', 
+         'poa_sky_diffuse', 'poa_ground_diffuse'.
+    temp_model : str, optional
+        The temperature model to use, 'sapm' from pvlib by default.
+    conf : str, optional
+        The configuration of the PV module architecture and mounting configuration.
+        Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
+        'close_mount_glass_glass', 'insulated_back_glass_polymer'
+    
+    Returns
+    -------
+    module_temperature : pandas.DataFrame
+        The module temperature in degrees Celsius at each time step.
+    """
+
+    from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS, sapm_module, sapm_cell
+    
+    with NSRDBX(nsrdb_fp, hsds=False) as f:
+        air_temperature = f.get_gid_ts('air_temperature', gid)
+        wind_speed = f.get_gid_ts('wind_speed', gid)
+
+    parameters = TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
+    module_temperature = sapm_module(
+        poa_global=poa['poa_global'], 
+        temp_air=air_temperature, 
+        wind_speed=wind_speed,
+        a=parameters['a'],
+        b=parameters['b'])
+
+    cell_temperature = sapm_cell(poa_global=poa['poa_global'],
+                                 temp_air=air_temperature,
+                                 wind_speed=wind_speed,
+                                 **parameters)
+    
+    return {'temp_module':module_temperature,
+            'temp_cell':cell_temperature}
