@@ -6,8 +6,12 @@ Contains classes for calculating Stress Factors, Degradation, and installation S
 import numpy as np
 from numba import jit
 import pandas as pd
+from datetime import date
+from datetime import datetime as dt
 from scipy.constants import convert_temperature
 import pvlib
+import os
+from PVDegradationTools import utilities as utils
 
 class StressFactors:
     """
@@ -193,6 +197,8 @@ class StressFactors:
         temperature using a 6th order polynomial fit in microsoft Excel. The fit produced
         R^2=0.999813.
         Calculation created by Michael Kempe, unpublished data.
+
+        #TODO:  verify this is consistant with psat in main branch (main is most up to date)
         """
 
         psat = np.exp((3.2575315268E-13 * temp**6) -
@@ -1167,7 +1173,6 @@ class Degradation:
 
         return IWa
 
-
 ############
 # Misc. Functions for Energy Calcs
 ############
@@ -1490,7 +1495,6 @@ class Degradation:
         
         return damage
 
-
 class BOLIDLeTID:
     """
     Class for Field extrapolation of BOLID and LeTID
@@ -1602,5 +1606,89 @@ class BOLIDLeTID:
         plt.ylabel('% Defects in Each State')
         plt.show()
 
+class Scenario:
+    """
+    The scenario object contains all necessary parameters and criteria for a given scenario.
+    Generally speaking, this will be information such as:
+    Scenario Name, Path, Geographic Location, Module Type, Racking Type
+    """
 
+    def __init__(self, name=None, path=None, project_points=None, modules=[]) -> None:
+        """
+        Initialize the degradation scenario object.
 
+        Parameters:
+        -----------
+        name : (str)
+            custom name for deg. scenario. If none given, will use date of initialization (DDMMYY)
+        path : (str, pathObj)
+            File path to operate within and store results. If none given, new folder "name" will be
+            created in the working directory.
+        project_points : (str, pathObj)
+            Spatial area to perform calculation for. This can be Country or Country and State.
+            # TODO: add handling for smaller/larger selection. Pass gids?
+        modules : (list, str)
+            List of module names to include in calculations.
+        """
+        self.name= ''
+        self.path= ''
+        self.modules= modules
+
+        filedate = dt.strftime(date.today(), "%d%m%y")
+
+        if name is None:
+            self.name = filedate
+        else:
+            self.name = name
+
+        if path is None:
+            self.path = os.path.join(os.getcwd(),f'pvd_job_{self.name}')
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
+        os.chdir(self.path)
+    
+    def addLocation(self, country, region):
+        """
+        Add a location to the scenario. Generates "project_points" and saves the file path within
+        Scenario dictionary.
+        
+        #TODO:  expand utilities.write_gids to return a file path.
+                expand  " to take country and region parameters
+
+        Parameters:
+        -----------
+        country : (str)
+            Country to iterate over
+        region : (str)
+            Region or state to iterate over
+        """
+        
+        #project_points_path = utils.write_gids(country, region)
+
+        file_name = f'project_points_{self.name}.csv'
+
+        self.project_points = file_name
+    
+    def addModule(self, module_name, CECmod=None, racking=None):
+        """
+        Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
+        the given scenario.
+
+        Parameters:
+        -----------
+
+        """
+        # TODO: actually fetch these parameters
+        CEC_params = dict()
+        
+        # remove module if found in instance list
+        for i in range(self.modules.__len__()):
+            if self.modules[i]['module_name'] == module_name:
+                print(f'WARNING - Module already found by name "{module_name}"')
+                print('Module will be replaced with new instance.')
+                self.modules.pop(i)
+        
+        # add the module and parameters
+        self.modules.append({'module_name':module_name,
+                            'CEC_params':CEC_params,
+                            'racking_type':racking})
