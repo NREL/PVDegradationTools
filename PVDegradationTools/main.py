@@ -1613,7 +1613,7 @@ class Scenario:
     Scenario Name, Path, Geographic Location, Module Type, Racking Type
     """
 
-    def __init__(self, name=None, path=None, project_points=None, modules=[]) -> None:
+    def __init__(self, name=None, path=None, gids=None, modules=[]) -> None:
         """
         Initialize the degradation scenario object.
 
@@ -1624,7 +1624,7 @@ class Scenario:
         path : (str, pathObj)
             File path to operate within and store results. If none given, new folder "name" will be
             created in the working directory.
-        project_points : (str, pathObj)
+        gids : (str, pathObj)
             Spatial area to perform calculation for. This can be Country or Country and State.
             # TODO: add handling for smaller/larger selection. Pass gids?
         modules : (list, str)
@@ -1633,6 +1633,7 @@ class Scenario:
         self.name= ''
         self.path= ''
         self.modules= modules
+        self.gids = gids
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
@@ -1647,27 +1648,39 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
     
-    def addLocation(self, country, region):
+    def addLocation(self, weather_df_path=None, region=None):
         """
-        Add a location to the scenario. Generates "project_points" and saves the file path within
+        Add a location to the scenario. Generates "gids.csv" and saves the file path within
         Scenario dictionary.
         
-        #TODO:  expand utilities.write_gids to return a file path.
-                expand  " to take country and region parameters
+        #TODO:  - expand utilities.write_gids to return a file path. (CHECK FOR FULL PATH)
+                - expand  " to take country and region parameters
+                - right now, limited to 1 "location" (or 1 batch of gids and 1 file)
+                  Would it be beneficial to have this function append the file with new gids?
 
         Parameters:
         -----------
-        country : (str)
-            Country to iterate over
+        weather_df_path : (str, path_obj)
+            File path to the source dataframe for weather and spatial data. Default should be NSRDB
         region : (str)
             Region or state to iterate over
         """
         
-        #project_points_path = utils.write_gids(country, region)
+        if self.gids is not None:
+            print('Scenario already has designated project points.\nNothing has been added.')
+            return None
 
-        file_name = f'project_points_{self.name}.csv'
-
-        self.project_points = file_name
+        if not weather_df_path:
+            weather_df_path = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
+        
+        
+        file_name = f'gids_{self.name}'
+        gids_path = utils.write_gids(weather_df_path,
+                                     region=region,
+                                     region_col='state',
+                                     out_fn=file_name)
+       
+        self.gids = gids_path
     
     def addModule(self, module_name, CECmod=None, racking=None):
         """

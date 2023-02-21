@@ -23,14 +23,18 @@ def write_gids(nsrdb_fp, region='Colorado', region_col='state', out_fn='gids'):
 
     Returns:
     -----------
-    None
+    project_points_path : (str)
+        File path to the newly created "gids.csv"
     """
 
     with NSRDBX(nsrdb_fp, hsds=False) as f:
         gids = f.region_gids(region=region, region_col=region_col)   
 
+    file_out = f'{out_fn}.csv'
     df_gids = pd.DataFrame(gids, columns=['gid'])
-    df_gids.to_csv('{}.csv'.format(out_fn), index=False)
+    df_gids.to_csv(file_out, index=False)
+
+    return file_out
 
 
 def _get_state(id):

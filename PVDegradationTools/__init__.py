@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from .main import StressFactors, Degradation, BOLIDLeTID
+from .main import StressFactors, Degradation, BOLIDLeTID, Scenario
 
 from . import cli
 from . import humidity
