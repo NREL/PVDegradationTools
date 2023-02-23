@@ -1685,12 +1685,11 @@ class Scenario:
     def addModule(self,
                   module_name,
                   model='sapm',
-                  racking='open_rack_glass_polymer'):
+                  racking='open_rack_glass_polymer',
+                  material='EVA'):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
         the given scenario.
-
-        TODO: include M.Kempe's material dictionary
 
         Parameters:
         -----------
@@ -1704,6 +1703,9 @@ class Scenario:
             temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
+        material : (str)
+            Name of the material desired. For a complete list, see data/materials.json.
+            To add a custom material, see PVDegradationTools.addMaterial (ex: EVA, Tedlar)
         """
         # TODO: actually fetch these parameters
         # However, these params don't seem relevant to any of our calculations, nor can I find them
@@ -1719,8 +1721,12 @@ class Scenario:
         
         # generate temperature model params
         temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
+
+        # fetch material parameters (Eas, Ead, So, etc)
+        mat_params = utils._read_material(name=material)
         
         # add the module and parameters
         self.modules.append({'module_name':module_name,
                              'temperature_model':model,
-                             'temperature_params':temp_params})
+                             'temperature_params':temp_params,
+                             'material_params':mat_params})

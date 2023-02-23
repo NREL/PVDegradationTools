@@ -1,4 +1,5 @@
 import os
+import json
 import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
@@ -274,3 +275,70 @@ def get_module_temperature(
     
     return {'temp_module':module_temperature,
             'temp_cell':cell_temperature}
+
+def _read_material(name):
+    """
+    read a material from materials.json and return the parameter dictionary
+    
+    Parameters:
+    -----------
+    name : (str)
+        unique name of material
+    
+    Returns:
+    --------
+    mat_dict : (dict)
+        dictionary of material parameters
+    """
+    root = os.path.realpath(__file__)
+    root = root.split(r'/')[:-1]
+    file = os.path.join('/',*root,'data','materials.json')
+    with open(file) as f:
+        data = json.load(f)
+    mat_dict = data[name]
+    return mat_dict
+
+def add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
+    '''
+    Add a new material to the materials.json database. Check the parameters for specific units
+    
+    Parameters:
+    -----------
+    name : (str)
+        Unique material name
+    alias : (str)
+        Material alias (ex: PET1, EVA)
+    Ead : (float)
+        Diffusivity Activation Energy [kJ/mol]
+    Eas : (float)
+        Solubility Activation Energy [kJ/mol]
+    So : (float)
+        Solubility Prefactor [g/cm^3]
+    Do : (float)
+        Diffusivity Prefactor [cm^2/s] (unused)
+    Eap : (float)
+        Permeability Activation Energy [kJ/mol] (unused)
+    Po : (float)
+        Permeability Prefactor [g*mm/m^2/day] (unused)
+    fickian : (boolean)
+        I have no idea what this means (unused)
+    '''
+
+    OUT_FILE = os.path.join('data','materials.json')
+
+    material_dict = {
+        'alias':alias,
+        'Fickian':fickian,
+        'Ead':Ead,
+        'Do':Do,
+        'Eas':Eas,
+        'So': So,
+        'Eap':Eap,
+        'Po':Po}
+
+    with open(OUT_FILE) as f:
+        data = json.load(f)
+    data.update({name:material_dict})
+
+    with open(OUT_FILE,'w') as f:
+        json.dump(data, f, indent=4)
