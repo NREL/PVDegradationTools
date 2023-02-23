@@ -9,7 +9,7 @@ import pandas as pd
 from datetime import date
 from datetime import datetime as dt
 from scipy.constants import convert_temperature
-import pvlib
+from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 import os
 from PVDegradationTools import utilities as utils
 
@@ -1682,16 +1682,32 @@ class Scenario:
        
         self.gids = gids_path
     
-    def addModule(self, module_name, CECmod=None, racking=None):
+    def addModule(self,
+                  module_name,
+                  model='sapm',
+                  racking='open_rack_glass_polymer'):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
         the given scenario.
 
+        TODO: include M.Kempe's material dictionary
+
         Parameters:
         -----------
-
+        module_name : (str)
+            unique name for the module. adding multiple modules of the same name will replace the
+            existing entry.
+        model : (str, default = 'sapm')
+            Pvlib temperature model to use when generating parameters. For now, this needs to remain
+            'sapm' as all humidity and degradation functions use 'sapm' parameters
+        racking : (str)
+            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
+            'open_rack_glass_glass', 'open_rack_glass_polymer',
+            'close_mount_glass_glass', 'insulated_back_glass_polymer'
         """
         # TODO: actually fetch these parameters
+        # However, these params don't seem relevant to any of our calculations, nor can I find them
+        # anywhere. I can see calculations which use them (pvlib.pvsystem.calcparams_cec)
         CEC_params = dict()
         
         # remove module if found in instance list
@@ -1701,7 +1717,10 @@ class Scenario:
                 print('Module will be replaced with new instance.')
                 self.modules.pop(i)
         
+        # generate temperature model params
+        temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
+        
         # add the module and parameters
         self.modules.append({'module_name':module_name,
-                            'CEC_params':CEC_params,
-                            'racking_type':racking})
+                             'temperature_model':model,
+                             'temperature_params':temp_params})
