@@ -15,6 +15,7 @@ from gaps import ProjectPoints
 #TODO: move into 'spectral.py'
 def get_solar_position(
     nsrdb_fp, 
+    hsds,
     gid):
 
     """
@@ -34,7 +35,7 @@ def get_solar_position(
         Solar position like zenith and azimuth.
     """
 
-    with NSRDBX(nsrdb_fp, hsds=False) as f:
+    with NSRDBX(nsrdb_fp, hsds=hsds) as f:
         meta = f.meta.loc[gid]
         times = f.time_index
 
@@ -51,6 +52,7 @@ def get_solar_position(
 #TODO: move into 'spectral.py'
 def get_poa_irradiance(
     nsrdb_fp, 
+    hsds,
     gid,
     solar_position,
     tilt=None, 
@@ -82,7 +84,7 @@ def get_poa_irradiance(
          'poa_sky_diffuse', 'poa_ground_diffuse'.
     """
 
-    with NSRDBX(nsrdb_fp, hsds=False) as f:
+    with NSRDBX(nsrdb_fp, hsds=hsds) as f:
         meta = f.meta.loc[gid]
         dni = f.get_gid_ts('dni', gid)
         ghi = f.get_gid_ts('ghi', gid)
@@ -107,6 +109,7 @@ def get_poa_irradiance(
 #TODO: move into 'temperature.py'
 def get_module_temperature(
     nsrdb_fp, 
+    hsds,
     gid,
     poa,
     temp_model='sapm', 
@@ -138,7 +141,7 @@ def get_module_temperature(
         The module temperature in degrees Celsius at each time step.
     """
 
-    with NSRDBX(nsrdb_fp, hsds=False) as f:
+    with NSRDBX(nsrdb_fp, hsds=hsds) as f:
         air_temperature = f.get_gid_ts('air_temperature', gid)
         wind_speed = f.get_gid_ts('wind_speed', gid)
 
@@ -195,6 +198,7 @@ def get_eff_gap(T_0, T_inf, level=0, x_0=6.1):
 
 def calc_standoff(
     nsrdb_fp,
+    hsds,
     gid,
     tilt=None,
     azimuth=180,
@@ -215,10 +219,10 @@ def calc_standoff(
         conf_0 = 'close_mount_glass_glass'
         conf_inf = 'open_rack_glass_glass'
   
-    solar_position = get_solar_position(nsrdb_fp, gid)
-    poa = get_poa_irradiance(nsrdb_fp, gid, solar_position, tilt, azimuth, sky_model)
-    T_0 = get_module_temperature(nsrdb_fp, gid, poa, temp_model, conf_0)
-    T_inf = get_module_temperature(nsrdb_fp, gid, poa, temp_model, conf_inf)
+    solar_position = get_solar_position(nsrdb_fp, hsds, gid)
+    poa = get_poa_irradiance(nsrdb_fp, hsds, gid, solar_position, tilt, azimuth, sky_model)
+    T_0 = get_module_temperature(nsrdb_fp, hsds, gid, poa, temp_model, conf_0)
+    T_inf = get_module_temperature(nsrdb_fp, hsds, gid, poa, temp_model, conf_inf)
     x, T98_0, T98_inf = get_eff_gap(T_0, T_inf, level, x_0)
 
     return {'x':x, 'T98_0':T98_0, 'T98_inf':T98_inf}
@@ -229,6 +233,7 @@ def run_standoff(
     out_dir, 
     tag,
     nsrdb_fp,
+    hsds,
     max_workers=None,
     tilt=None,
     azimuth=180,
@@ -273,6 +278,7 @@ def run_standoff(
             future = executor.submit(
                 calc_standoff,
                 nsrdb_fp, 
+                hsds,
                 gid, 
                 tilt, 
                 azimuth, 
