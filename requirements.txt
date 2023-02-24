@@ -7,4 +7,4 @@ pytest-cov==2.8.1
 python-dateutil==2.8.1
 pytz==2020.1
 NREL-rex==0.2.77
-git+https://github.com/NREL/gaps.git#egg=gaps
+git+https://github.com/NREL/gaps#egg=gaps
