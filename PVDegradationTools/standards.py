@@ -10,7 +10,7 @@ from rex import Outputs
 from pathlib import Path
 from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from gaps import ProjectPoints
+#from gaps import ProjectPoints
 
 #TODO: move into 'spectral.py'
 def get_solar_position(
