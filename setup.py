@@ -87,7 +87,9 @@ setup(
     install_requires=['matplotlib',
                        'numpy',
                       'pandas',
-                      'tqdm >= 4.32.1'
+                      'tqdm >= 4.32.1',
+                      'pvlib',
+                      'numba=0.56.4'
                       ],
 
     # List additional groups of dependencies here (e.g. development
