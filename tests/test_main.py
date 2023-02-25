@@ -63,17 +63,14 @@ def test_psat():
     # test saturation point
 
     psat = PVD.StressFactors.psat(35)
-    assert psat == pytest.approx(5.849871724837016, abs=0.0001)
+    assert psat == pytest.approx(5.849871724837016, abs=0.0001), "psat() not working"
 
 def test_rh_surface_outside():
     # test calculation for the RH just outside a module surface
     # requires PSM3 weather file
 
-    rh_surface = PVD.StressFactors.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
-                                                        temp_ambient=PSM['Temperature'],
-                                                        temp_module=PSM['temp_module'])
-    assert rh_surface.__len__() == PSM.__len__()
-    assert rh_surface[17] == pytest.approx(81.99, abs=0.1)
+    rh_surface = PVD.StressFactors.rh_surface_outside(50, 35, 55)
+    assert rh_surface == pytest.approx(18.247746468009066, abs=0.0000001)
 
 def test_rh_front_encap():
     # test calculation for RH of module fronside encapsulant
