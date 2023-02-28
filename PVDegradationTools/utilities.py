@@ -298,9 +298,12 @@ def _read_material(name):
     mat_dict = data[name]
     return mat_dict
 
-def add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
+def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
     '''
-    Add a new material to the materials.json database. Check the parameters for specific units
+    Add a new material to the materials.json database. Check the parameters for specific units.
+    If material already exists, parameters will be updated.
+
+    TODO: check if material is already existing
     
     Parameters:
     -----------
@@ -324,8 +327,10 @@ def add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=
         I have no idea what this means (unused)
     '''
 
-    OUT_FILE = os.path.join('data','materials.json')
-
+    root = os.path.realpath(__file__)
+    root = root.split(r'/')[:-1]
+    OUT_FILE = os.path.join('/',*root,'data','materials.json')
+    
     material_dict = {
         'alias':alias,
         'Fickian':fickian,
