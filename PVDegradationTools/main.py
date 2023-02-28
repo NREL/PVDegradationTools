@@ -1648,7 +1648,7 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
     
-    def addLocation(self, weather_df_path=None, region=None):
+    def addLocation(self, weather_df_path=None, region=None, region_col='state'):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
         Scenario dictionary.
@@ -1668,7 +1668,8 @@ class Scenario:
         
         if self.gids is not None:
             print('Scenario already has designated project points.\nNothing has been added.')
-            return None
+            print(self.gids)
+            return
 
         if not weather_df_path:
             weather_df_path = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
@@ -1677,10 +1678,11 @@ class Scenario:
         file_name = f'gids_{self.name}'
         gids_path = utils.write_gids(weather_df_path,
                                      region=region,
-                                     region_col='state',
+                                     region_col=region_col,
                                      out_fn=file_name)
        
         self.gids = gids_path
+        print(f'Location Added - {self.gids}')
     
     def addModule(self,
                   module_name,
@@ -1712,6 +1714,14 @@ class Scenario:
         # anywhere. I can see calculations which use them (pvlib.pvsystem.calcparams_cec)
         CEC_params = dict()
         
+        # fetch material parameters (Eas, Ead, So, etc)
+        try:
+            mat_params = utils._read_material(name=material)
+        except:
+            print('Material Not Found - No module added to scenario.')
+            print('If you need to add a custom material, use .add_material()')
+            return
+
         # remove module if found in instance list
         for i in range(self.modules.__len__()):
             if self.modules[i]['module_name'] == module_name:
@@ -1721,12 +1731,34 @@ class Scenario:
         
         # generate temperature model params
         temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
-
-        # fetch material parameters (Eas, Ead, So, etc)
-        mat_params = utils._read_material(name=material)
-        
+            
         # add the module and parameters
         self.modules.append({'module_name':module_name,
                              'temperature_model':model,
                              'temperature_params':temp_params,
                              'material_params':mat_params})
+        print(f'Module "{module_name}" added.')
+
+    def add_material(self,name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
+        """
+        add a new material type to master list
+        """
+        utils._add_material(name=name, alias=alias,
+                            Ead=Ead, Eas=Eas, So=So,
+                            Do=Do, Eap=Eap, Po=Po, fickian=fickian)
+        print('Material has been added.')
+        print('To add the material as a module in your current scene, run .addModule()')
+
+    def viewScenario(self):
+        '''
+        Print all scenario information currently stored
+        '''
+
+        import pprint
+        pp = pprint.PrettyPrinter(indent=4,sort_dicts=False)
+        print(f'Name : {self.name}')
+        print(f'gid file : {self.gids}')
+        print('test modules :')
+        for mod in self.modules:
+            pp.pprint(mod)
+        return
