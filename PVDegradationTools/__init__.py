@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 import sys
 
-from .main import StressFactors, Degradation, BOLIDLeTID, Scenario
+from .main import StressFactors, Degradation, Scenario
 
 if 'gaps' in sys.modules: #Workaround until gaps is on pypi
     from . import cli

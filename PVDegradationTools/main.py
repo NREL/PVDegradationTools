@@ -1495,15 +1495,6 @@ class Degradation:
         
         return damage
 
-class BOLIDLeTID:
-    """
-    Class for Field extrapolation of BOLID and LeTID
-    """
-
-    ###########
-    # field Degradation Profile
-    ###########
-
     def fieldDegradationProfile(T, x0=[1E16, 0, 0], t=np.linspace(0, 1000, 10000),
                                 v_AB=4E3, v_BA=1E13, v_BC=1.25E10,
                                 v_CB=1E9, Ea_AB=0.475, Ea_BA=1.32,

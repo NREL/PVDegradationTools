@@ -4,6 +4,31 @@ import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
 
+def _extract_weather(nsrdb_fp, gids):
+    """
+    Extract weather data for a given site and operation
+    """
+
+    if not nsrdb_fp:
+        nsrdb_fp = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
+    
+    weather_params = ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni','relative_humidity']
+
+    with NSRDBX(nsrdb_fp, hsds=False) as f:
+        meta = f.meta[f.meta.index.isin(gids)]
+        data = []
+        for p in weather_params:
+            data.append(f.get_gid_df(p,gids))
+    
+    columns = pd.MultiIndex.from_product([weather_params, gids], names=["par", "gid"])
+    weather_df = pd.concat(data, axis=1)
+    weather_df.columns = columns
+    weather_df = weather_df.swaplevel(axis=1).sort_index(axis=1)
+
+    
+    return weather_df, meta
+    
+
 def write_gids(nsrdb_fp, region='Colorado', region_col='state', out_fn='gids'):
     """
     Generate a .CSV file containing the GIDs for the spatial test range.
