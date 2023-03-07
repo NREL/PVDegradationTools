@@ -1,4 +1,4 @@
 hs_endpoint = https://developer.nrel.gov/api/hsds
 hs_username =
 hs_password =
-hs_api_key = UCaEeYw0eAQEYDRq8S0LIQTFlwznp9AwBqTaLOXH
+hs_api_key = ${{ secrets.API_KEY }}
