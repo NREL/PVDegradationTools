@@ -204,7 +204,7 @@ def calc_standoff(
     azimuth=180,
     sky_model='isotropic',
     temp_model='sapm',
-    module_type='glass_polymer',
+    module_type='glass_polymer', # self.module
     level=0,
     x_0=6.1):
 

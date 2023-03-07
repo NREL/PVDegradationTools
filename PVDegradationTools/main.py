@@ -1621,17 +1621,16 @@ class Scenario:
         modules : (list, str)
             List of module names to include in calculations.
         """
-        self.name= ''
-        self.path= ''
-        self.modules= modules
+        self.name = ''
+        self.path = ''
+        self.modules = modules
         self.gids = gids
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
         if name is None:
-            self.name = filedate
-        else:
-            self.name = name
+            name = filedate
+        self.name = name
 
         if path is None:
             self.path = os.path.join(os.getcwd(),f'pvd_job_{self.name}')
@@ -1753,3 +1752,24 @@ class Scenario:
         for mod in self.modules:
             pp.pprint(mod)
         return
+
+    def runJob(self, job=None):
+        '''
+        Run a named function on the scenario object
+        
+        Parameters:
+        -----------
+        job : (str, default=None)
+        '''
+
+        import PVDegradationTools as PVD
+
+        # TODO: update to handle errors or passing bad args
+
+        class_list = [ c for c in dir(PVD) if not c.startswith('_') ]
+        for c in class_list:
+            _class = getattr(PVD,c)
+            if function in dir(_class):
+                _func = getattr(_class,function)
+        
+        _func(**params)
