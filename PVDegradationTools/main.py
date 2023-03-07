@@ -1638,22 +1638,26 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
     
-    def addLocation(self, weather_df_path=None, region=None, region_col='state'):
+    def addLocation(self, weather_fp=None, region=None, region_col='state',
+                    lat_long=None, gids=None):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
-        Scenario dictionary.
+        Scenario dictionary. This can be done in three ways: Pass (region, region_col) for gid list,
+        pass (gid) for a single location, pass (lat, long) for a single location.
         
         #TODO:  - expand utilities.write_gids to return a file path. (CHECK FOR FULL PATH)
                 - expand  " to take country and region parameters
-                - right now, limited to 1 "location" (or 1 batch of gids and 1 file)
-                  Would it be beneficial to have this function append the file with new gids?
 
         Parameters:
         -----------
-        weather_df_path : (str, path_obj)
+        weather_fp : (str, path_obj)
             File path to the source dataframe for weather and spatial data. Default should be NSRDB
         region : (str)
             Region or state to iterate over
+        region_col : (str)
+            Region column name within h5 file (example "State")
+        lat : (tuple - float)
+            latitute and longitude of a single location
         """
         
         if self.gids is not None:
@@ -1661,14 +1665,15 @@ class Scenario:
             print(self.gids)
             return
 
-        if not weather_df_path:
-            weather_df_path = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
-        
+        if not weather_fp:
+            weather_fp = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
         
         file_name = f'gids_{self.name}'
-        gids_path = utils.write_gids(weather_df_path,
+        gids_path = utils.write_gids(weather_fp,
                                      region=region,
                                      region_col=region_col,
+                                     lat_long=lat_long,
+                                     gids=gids,
                                      out_fn=file_name)
        
         self.gids = gids_path
@@ -1676,8 +1681,8 @@ class Scenario:
     
     def addModule(self,
                   module_name,
-                  model='sapm',
-                  racking='open_rack_glass_polymer',
+                  model='sapm', #move
+                  racking='open_rack_glass_polymer', #move ?? split RACKING_CONSTRUCTION
                   material='EVA'):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
@@ -1720,6 +1725,7 @@ class Scenario:
                 self.modules.pop(i)
         
         # generate temperature model params
+        # TODO: move to temperature based functions
         temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
             
         # add the module and parameters
@@ -1753,6 +1759,11 @@ class Scenario:
             pp.pprint(mod)
         return
 
+    def addFunction(self, func_name, parameters):
+        """
+        """
+        pass
+    
     def runJob(self, job=None):
         '''
         Run a named function on the scenario object
@@ -1762,14 +1773,4 @@ class Scenario:
         job : (str, default=None)
         '''
 
-        import PVDegradationTools as PVD
-
-        # TODO: update to handle errors or passing bad args
-
-        class_list = [ c for c in dir(PVD) if not c.startswith('_') ]
-        for c in class_list:
-            _class = getattr(PVD,c)
-            if function in dir(_class):
-                _func = getattr(_class,function)
-        
-        _func(**params)
+        pass

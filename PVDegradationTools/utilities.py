@@ -29,7 +29,11 @@ def _extract_weather(nsrdb_fp, gids):
     return weather_df, meta
     
 
-def write_gids(nsrdb_fp, region='Colorado', region_col='state', out_fn='gids'):
+def write_gids(nsrdb_fp,
+               region = 'Colorado', region_col = 'state',
+               lat_long = None,
+               gids = None,
+               out_fn = 'gids'):
     """
     Generate a .CSV file containing the GIDs for the spatial test range.
     The .CSV file will be saved to the working directory
@@ -44,6 +48,8 @@ def write_gids(nsrdb_fp, region='Colorado', region_col='state', out_fn='gids'):
         Name of the NSRDB region you are filtering into the GID list
     region_col : (str, default = "Sate")
         Name of the NSRDB region type
+    lat_long : (tuple)
+        Either single (Lat, Long) or series of (lat,Long) pairs
     out_fd : (str, default = "gids")
         Name of data column you want to retrieve. Generally, this should be "gids"
 
@@ -52,9 +58,15 @@ def write_gids(nsrdb_fp, region='Colorado', region_col='state', out_fn='gids'):
     project_points_path : (str)
         File path to the newly created "gids.csv"
     """
-
-    with NSRDBX(nsrdb_fp, hsds=False) as f:
-        gids = f.region_gids(region=region, region_col=region_col)   
+    
+    if not gids:
+        with NSRDBX(nsrdb_fp, hsds=False) as f:
+            if lat_long:
+                gids = f.lat_lon_gid(lat_long)
+                if isinstance(gids, int):
+                    gids = [gids]
+            else:
+                gids = f.region_gids(region=region, region_col=region_col)   
 
     file_out = f'{out_fn}.csv'
     df_gids = pd.DataFrame(gids, columns=['gid'])
