@@ -12,6 +12,7 @@ from scipy.constants import convert_temperature
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 import os
 from PVDegradationTools import utilities as utils
+import PVDegradationTools as PVD
 
 class StressFactors:
     """
@@ -1604,7 +1605,7 @@ class Scenario:
     Scenario Name, Path, Geographic Location, Module Type, Racking Type
     """
 
-    def __init__(self, name=None, path=None, gids=None, modules=[]) -> None:
+    def __init__(self, name=None, path=None, gids=None, modules=[], pipeline=[]) -> None:
         """
         Initialize the degradation scenario object.
 
@@ -1625,6 +1626,7 @@ class Scenario:
         self.path = ''
         self.modules = modules
         self.gids = gids
+        self.pipeline = pipeline
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
@@ -1753,16 +1755,57 @@ class Scenario:
         import pprint
         pp = pprint.PrettyPrinter(indent=4,sort_dicts=False)
         print(f'Name : {self.name}')
+        print(f'pipeline: {self.pipeline}')
         print(f'gid file : {self.gids}')
         print('test modules :')
         for mod in self.modules:
             pp.pprint(mod)
         return
 
-    def addFunction(self, func_name, parameters):
+    def addFunction(self, func_name, func_params):
         """
+        Add a PVD function to the scenario pipeline
+
+        Parameters:
+        -----------
+        func_name : (str)
+            The name of the requested PVD function. Do not include the class.
+        func_params : (dict)
+            The required parameters to run the requested PVD function
+        
+        Returns:
+        --------
+        func_name : (str)
+            the name of the PVD function requested
         """
-        pass
+        from inspect import signature
+        
+        # find the function in PVD
+        class_list = [c for c in dir(PVD) if not c.startswith('_')]
+        for c in class_list:
+            _class = getattr(PVD,c)
+            if func_name in dir(_class):
+                _func = getattr(_class,func_name)
+
+        # check if necessary parameters given
+        reqs_all = signature(_func).parameters
+        reqs = []
+        for param in reqs_all:
+            if reqs_all[param].default == reqs_all[param].empty:
+                reqs.append(param)
+
+        if not all( x in func_params for x in reqs):
+            print(f'FAILED: Requestion function {func_name} did not receive enough parameters')
+            print(f'Requestion function: \n {_func} \n ---')
+            print(f'Required Parameters: \n {reqs} \n ---')
+            print('Function has not been added to pipeline.')
+            return None
+
+        job_dict = {'job':_func,
+                    'params':func_params}                
+        
+        self.pipeline.append(job_dict)
+        return func_name
     
     def runJob(self, job=None):
         '''
@@ -1774,3 +1817,22 @@ class Scenario:
         '''
 
         pass
+
+    def exportScenario(self, file_path=None):
+        '''
+        Export the scenario dictionaries to a json configuration file
+        '''
+        
+        import json
+
+        if not file_path:
+            file_path = os.getcwd()
+        out_file = os.path.join(file_path,f'{self.name}.json') 
+
+        scene_dict = {'name': self.name,
+                      'pipeline': self.pipeline,
+                      'gid_file': self.gids,
+                      'test_modules': self.modules}
+        
+        with open(out_file, 'r') as f:
+            json.dump(scene_dict, f, indent=4)
