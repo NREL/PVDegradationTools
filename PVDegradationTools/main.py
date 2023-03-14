@@ -13,6 +13,7 @@ from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 import os
 from PVDegradationTools import utilities as utils
 import PVDegradationTools as PVD
+import json
 
 class StressFactors:
     """
@@ -1605,7 +1606,7 @@ class Scenario:
     Scenario Name, Path, Geographic Location, Module Type, Racking Type
     """
 
-    def __init__(self, name=None, path=None, gids=None, modules=[], pipeline=[]) -> None:
+    def __init__(self, name=None, path=None, gids=None, modules=[], pipeline=[], file=None) -> None:
         """
         Initialize the degradation scenario object.
 
@@ -1618,12 +1619,26 @@ class Scenario:
             created in the working directory.
         gids : (str, pathObj)
             Spatial area to perform calculation for. This can be Country or Country and State.
-            # TODO: add handling for smaller/larger selection. Pass gids?
         modules : (list, str)
             List of module names to include in calculations.
+        pipeline : (list, str)
+            List of function names to run in job pipeline
+        file : (path)
+            Full file path to a pre-generated Scenario object. If specified, all other parameters
+            will be ignored and taken from the .json file.
         """
-        self.name = ''
-        self.path = ''
+        
+        if file is not None:
+            with open(file,'r') as f:
+                data = json.load()
+            name = data['name']
+            path = data['path']
+            modules = data['modules']
+            gids = data['gids']
+            pipeline = data['pipeline']
+        
+        self.name = name
+        self.path = path
         self.modules = modules
         self.gids = gids
         self.pipeline = pipeline
@@ -1762,9 +1777,11 @@ class Scenario:
             pp.pprint(mod)
         return
 
-    def addFunction(self, func_name, func_params):
+    def addFunction(self, func_name=None, func_params=None):
         """
         Add a PVD function to the scenario pipeline
+
+        TODO: list public functions if no func_name given or bad func_name given
 
         Parameters:
         -----------
@@ -1778,22 +1795,14 @@ class Scenario:
         func_name : (str)
             the name of the PVD function requested
         """
-        from inspect import signature
+
+        _func, reqs = PVD.Scenario._verify_function(func_name)
         
-        # find the function in PVD
-        class_list = [c for c in dir(PVD) if not c.startswith('_')]
-        for c in class_list:
-            _class = getattr(PVD,c)
-            if func_name in dir(_class):
-                _func = getattr(_class,func_name)
-
-        # check if necessary parameters given
-        reqs_all = signature(_func).parameters
-        reqs = []
-        for param in reqs_all:
-            if reqs_all[param].default == reqs_all[param].empty:
-                reqs.append(param)
-
+        if _func == None:
+            print(f'FAILED: Requested function "{func_name}" not found')
+            print('Function has not been added to pipeline.')
+            return None
+        
         if not all( x in func_params for x in reqs):
             print(f'FAILED: Requestion function {func_name} did not receive enough parameters')
             print(f'Requestion function: \n {_func} \n ---')
@@ -1801,7 +1810,8 @@ class Scenario:
             print('Function has not been added to pipeline.')
             return None
 
-        job_dict = {'job':_func,
+        # add the function and arguments to pipeline
+        job_dict = {'job':func_name,
                     'params':func_params}                
         
         self.pipeline.append(job_dict)
@@ -1811,28 +1821,60 @@ class Scenario:
         '''
         Run a named function on the scenario object
         
+        TODO: overhaul with futures/slurm
+              capture results
+
         Parameters:
         -----------
         job : (str, default=None)
         '''
 
-        pass
+        for job in self.pipeline:
+            args = job['parameters']
+            _func = PVD.Scenario._verify_function(job['job'],args)[0]
+            _func(**args)
 
     def exportScenario(self, file_path=None):
         '''
         Export the scenario dictionaries to a json configuration file
+        
+        TODO cannot export functions as objects within pipeline. need to export name only
         '''
         
-        import json
-
         if not file_path:
-            file_path = os.getcwd()
-        out_file = os.path.join(file_path,f'{self.name}.json') 
+            file_path = self.path
+        file_name = f'config_{self.name}.json'
+        out_file = os.path.join(file_path,file_name) 
 
         scene_dict = {'name': self.name,
+                      'path': self.path,
                       'pipeline': self.pipeline,
                       'gid_file': self.gids,
                       'test_modules': self.modules}
         
-        with open(out_file, 'r') as f:
+        with open(out_file, 'w') as f:
             json.dump(scene_dict, f, indent=4)
+        print(f'{file_name} exported')
+    
+    def _verify_function(func_name):
+        
+        from inspect import signature
+        
+        # find the function in PVD
+        class_list = [c for c in dir(PVD) if not c.startswith('_')]
+        func_list = []
+        for c in class_list:
+            _class = getattr(PVD,c)
+            if func_name in dir(_class):
+                _func = getattr(_class,func_name)
+        if _func == None:
+            return (None,None)
+
+        # check if necessary parameters given
+        reqs_all = signature(_func).parameters
+        reqs = []
+        for param in reqs_all:
+            if reqs_all[param].default == reqs_all[param].empty:
+                reqs.append(param)
+        
+        return(_func, reqs)
