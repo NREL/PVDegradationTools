@@ -254,7 +254,7 @@ def get_poa_irradiance(
         solar_azimuth=solar_position['azimuth'],
         model=sky_model)
 
-    return poa
+    return poa['poa_global']
 
 def get_module_temperature(
     nsrdb_fp, 
@@ -268,6 +268,7 @@ def get_module_temperature(
     Database (NSRDB) for a given location (gid).
 
     TODO: change input "poa" to accept only "poa_global" instead of the entire dataframe
+          other temperature models? (sapm, pvsyst, ross, fuentes, faiman)
     
     Parameters
     ----------
@@ -299,7 +300,7 @@ def get_module_temperature(
 
     parameters = TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
     module_temperature = sapm_module(
-        poa_global=poa['poa_global'], 
+        poa_global=poa, 
         temp_air=air_temperature, 
         wind_speed=wind_speed,
         a=parameters['a'],

@@ -1698,7 +1698,6 @@ class Scenario:
     
     def addModule(self,
                   module_name,
-                  model='sapm', #move
                   racking='open_rack_glass_polymer', #move ?? split RACKING_CONSTRUCTION
                   material='EVA'):
         """
@@ -1710,9 +1709,6 @@ class Scenario:
         module_name : (str)
             unique name for the module. adding multiple modules of the same name will replace the
             existing entry.
-        model : (str, default = 'sapm')
-            Pvlib temperature model to use when generating parameters. For now, this needs to remain
-            'sapm' as all humidity and degradation functions use 'sapm' parameters
         racking : (str)
             temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
@@ -1743,12 +1739,10 @@ class Scenario:
         
         # generate temperature model params
         # TODO: move to temperature based functions
-        temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
+        # temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
             
         # add the module and parameters
         self.modules.append({'module_name':module_name,
-                             'temperature_model':model,
-                             'temperature_params':temp_params,
                              'material_params':mat_params})
         print(f'Module "{module_name}" added.')
 
@@ -1832,7 +1826,7 @@ class Scenario:
         for job in self.pipeline:
             args = job['parameters']
             _func = PVD.Scenario._verify_function(job['job'],args)[0]
-            _func(**args)
+            result = _func(**args)
 
     def exportScenario(self, file_path=None):
         '''
