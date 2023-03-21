@@ -1606,7 +1606,8 @@ class Scenario:
     Scenario Name, Path, Geographic Location, Module Type, Racking Type
     """
 
-    def __init__(self, name=None, path=None, gids=None, modules=[], pipeline=[], file=None) -> None:
+    def __init__(self, name=None, path=None, gids=None, modules=[], pipeline=[],
+                 hpc=False, file=None) -> None:
         """
         Initialize the degradation scenario object.
 
@@ -1661,9 +1662,6 @@ class Scenario:
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
         Scenario dictionary. This can be done in three ways: Pass (region, region_col) for gid list,
         pass (gid) for a single location, pass (lat, long) for a single location.
-        
-        #TODO:  - expand utilities.write_gids to return a file path. (CHECK FOR FULL PATH)
-                - expand  " to take country and region parameters
 
         Parameters:
         -----------
@@ -1717,11 +1715,7 @@ class Scenario:
             Name of the material desired. For a complete list, see data/materials.json.
             To add a custom material, see PVDegradationTools.addMaterial (ex: EVA, Tedlar)
         """
-        # TODO: actually fetch these parameters
-        # However, these params don't seem relevant to any of our calculations, nor can I find them
-        # anywhere. I can see calculations which use them (pvlib.pvsystem.calcparams_cec)
-        CEC_params = dict()
-        
+
         # fetch material parameters (Eas, Ead, So, etc)
         try:
             mat_params = utils._read_material(name=material)
@@ -1817,12 +1811,16 @@ class Scenario:
         
         TODO: overhaul with futures/slurm
               capture results
+              standardize result format for all of PVD
 
         Parameters:
         -----------
         job : (str, default=None)
         '''
-
+        if self.hpc:
+            # do something else
+            pass
+        
         for job in self.pipeline:
             args = job['parameters']
             _func = PVD.Scenario._verify_function(job['job'],args)[0]
@@ -1832,7 +1830,8 @@ class Scenario:
         '''
         Export the scenario dictionaries to a json configuration file
         
-        TODO cannot export functions as objects within pipeline. need to export name only
+        TODO exporting functions as name string within pipeline. cannot .json dump <PVD.func>
+             Need to make sure name is verified > stored > export > import > re-verify > converted
         '''
         
         if not file_path:
