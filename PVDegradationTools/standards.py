@@ -152,11 +152,7 @@ def get_eff_gap(T_0, T_inf, level=1, x_0=6.1):
     Parameters
     ----------
     level : int, optional
-        Options 0, or 1. Level 1 or Level 0 module (in IEC TS 63216) define 
-        the testing regime for the module; the boundaries are defined 
-        internally, to use a level 0 module is the boundary is less than 
-        70, and for Level 1 is less than 80. Above 80 Level 2 testing 
-        regime is required.
+        Options 1, or 2. Temperature level 1 or level 2 according to IEC TS 63216.
     x0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
 
@@ -194,7 +190,7 @@ def calc_standoff(
     sky_model='isotropic',
     temp_model='sapm',
     module_type='glass_polymer', # self.module
-    level=0,
+    level=1,
     x_0=6.1,
     wind_speed_factor=1):
 
@@ -231,7 +227,7 @@ def run_calc_standoff(
     sky_model='isotropic',
     temp_model='sapm',
     module_type='glass_polymer',
-    level=0,
+    level=1,
     x_0=6.1,
     wind_speed_factor=1
 ):
