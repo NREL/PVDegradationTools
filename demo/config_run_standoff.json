@@ -21,7 +21,7 @@
     "sky_model": "isotropic",
     "temp_model": "sapm",
     "module_type": "glass_polymer",
-    "level": 0,
+    "level": 1,
     "x_0": 6.1,
-    "wind_speed_factor": 1
+    "wind_speed_factor": 1.71
 }

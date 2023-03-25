@@ -145,7 +145,7 @@ def get_module_temperature(
 
     return module_temperature
 
-def get_eff_gap(T_0, T_inf, level=0, x_0=6.1):
+def get_eff_gap(T_0, T_inf, level=1, x_0=6.1):
     '''
     Calculate an ideal installation distance for roof top mounded PV systems.
     
@@ -173,9 +173,9 @@ def get_eff_gap(T_0, T_inf, level=0, x_0=6.1):
     to IEC TS 63126, PVSC Proceedings 2023
     '''
 
-    if level == 0:
-        T98 = 70
     if level == 1:
+        T98 = 70
+    if level == 2:
         T98 = 80
 
     T98_0 = T_0.quantile(q=0.98, interpolation='linear')
