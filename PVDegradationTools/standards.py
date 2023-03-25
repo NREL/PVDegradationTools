@@ -12,11 +12,12 @@ from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
 #from gaps import ProjectPoints
 
+from . import utilities
+
 #TODO: move into 'spectral.py'
 def get_solar_position(
-    nsrdb_fp, 
-    hsds,
-    gid):
+    weather_df, 
+    meta):
 
     """
     Calculate solar position using pvlib based on weather data from the 
@@ -24,10 +25,10 @@ def get_solar_position(
     
     Parameters
     ----------
-    nsrdb_fp : str
-        The file path to the NSRDB file.
-    gid : int
-        The geographical location ID in the NSRDB file.
+    weather_df : pandas.DataFrame
+        Weather data for given location.
+    meta : pandas.Series
+        Meta data of location.
     
     Returns
     -------
@@ -35,25 +36,26 @@ def get_solar_position(
         Solar position like zenith and azimuth.
     """
 
-    with NSRDBX(nsrdb_fp, hsds=hsds) as f:
-        meta = f.meta.loc[gid]
-        times = f.time_index
-
-    location = pvlib.location.Location(
-        latitude=meta['latitude'],
-        longitude=meta['longitude'],
-        altitude=meta['elevation'])
+    # location = pvlib.location.Location(
+    #     latitude=meta['latitude'],
+    #     longitude=meta['longitude'],
+    #     altitude=meta['elevation'])
     
     #TODO: check if timeshift is necessary
-    solar_position = location.get_solarposition(times)
+    #times = weather_df.index
+    #solar_position = location.get_solarposition(times)
+    solar_position = pvlib.solarposition.get_solarposition(
+        time = weather_df.index, 
+        latitude = meta['latitude'], 
+        longitude = meta['longitude'],
+        altitude = meta['elevation'])
 
     return solar_position
 
 #TODO: move into 'spectral.py'
 def get_poa_irradiance(
-    nsrdb_fp, 
-    hsds,
-    gid,
+    weather_df, 
+    meta,
     solar_position,
     tilt=None, 
     azimuth=180, 
@@ -84,12 +86,6 @@ def get_poa_irradiance(
          'poa_sky_diffuse', 'poa_ground_diffuse'.
     """
 
-    with NSRDBX(nsrdb_fp, hsds=hsds) as f:
-        meta = f.meta.loc[gid]
-        dni = f.get_gid_ts('dni', gid)
-        ghi = f.get_gid_ts('ghi', gid)
-        dhi = f.get_gid_ts('dhi', gid)
-
     #TODO: change for handling HSAT tracking passed or requested
     if tilt is None:
         tilt = float(meta['latitude'])
@@ -97,9 +93,9 @@ def get_poa_irradiance(
     poa = pvlib.irradiance.get_total_irradiance(
         surface_tilt=tilt,
         surface_azimuth=azimuth,
-        dni=dni,
-        ghi=ghi,
-        dhi=dhi,
+        dni=weather_df['dni'],
+        ghi=weather_df['ghi'],
+        dhi=weather_df['dhi'],
         solar_zenith=solar_position['apparent_zenith'],
         solar_azimuth=solar_position['azimuth'],
         model=sky_model)
@@ -108,12 +104,11 @@ def get_poa_irradiance(
 
 #TODO: move into 'temperature.py'
 def get_module_temperature(
-    nsrdb_fp, 
-    hsds,
-    gid,
+    weather_df, 
     poa,
     temp_model='sapm', 
-    conf='open_rack_glass_polymer'):
+    conf='open_rack_glass_polymer',
+    wind_speed_factor=1):
 
     """
     Calculate module temperature based on weather data from the National Solar Radiation 
@@ -140,16 +135,11 @@ def get_module_temperature(
     module_temperature : pandas.DataFrame
         The module temperature in degrees Celsius at each time step.
     """
-
-    with NSRDBX(nsrdb_fp, hsds=hsds) as f:
-        air_temperature = f.get_gid_ts('air_temperature', gid)
-        wind_speed = f.get_gid_ts('wind_speed', gid)
-
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
     module_temperature = pvlib.temperature.sapm_module(
         poa_global=poa['poa_global'], 
-        temp_air=air_temperature, 
-        wind_speed=wind_speed,
+        temp_air=weather_df['air_temperature'], 
+        wind_speed=weather_df['wind_speed']*wind_speed_factor,
         a=parameters['a'],
         b=parameters['b'])
 
@@ -197,16 +187,16 @@ def get_eff_gap(T_0, T_inf, level=0, x_0=6.1):
 
 
 def calc_standoff(
-    nsrdb_fp,
-    hsds,
-    gid,
+    weather_df,
+    meta,
     tilt=None,
     azimuth=180,
     sky_model='isotropic',
     temp_model='sapm',
     module_type='glass_polymer', # self.module
     level=0,
-    x_0=6.1):
+    x_0=6.1,
+    wind_speed_factor=1):
 
     """
     modeling chain example   #TODO: write docstring
@@ -219,21 +209,22 @@ def calc_standoff(
         conf_0 = 'close_mount_glass_glass'
         conf_inf = 'open_rack_glass_glass'
   
-    solar_position = get_solar_position(nsrdb_fp, hsds, gid)
-    poa = get_poa_irradiance(nsrdb_fp, hsds, gid, solar_position, tilt, azimuth, sky_model)
-    T_0 = get_module_temperature(nsrdb_fp, hsds, gid, poa, temp_model, conf_0)
-    T_inf = get_module_temperature(nsrdb_fp, hsds, gid, poa, temp_model, conf_inf)
+    solar_position = get_solar_position(weather_df, meta)
+    poa = get_poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
+    T_0 = get_module_temperature(weather_df, poa, temp_model, conf_0, wind_speed_factor)
+    T_inf = get_module_temperature(weather_df, poa, temp_model, conf_inf, wind_speed_factor)
     x, T98_0, T98_inf = get_eff_gap(T_0, T_inf, level, x_0)
 
     return {'x':x, 'T98_0':T98_0, 'T98_inf':T98_inf}
 
 
-def run_standoff(
+def run_calc_standoff(
     project_points, 
     out_dir, 
     tag,
-    nsrdb_fp,
-    hsds,
+    weather_db,
+    weather_satellite,
+    weather_names,
     max_workers=None,
     tilt=None,
     azimuth=180,
@@ -242,11 +233,24 @@ def run_standoff(
     module_type='glass_polymer',
     level=0,
     x_0=6.1,
+    wind_speed_factor=1
 ):
 
     """
     parallelization utilizing gaps     #TODO: write docstring
     """
+
+    #inputs
+    weather_arg = {}
+    weather_arg['satellite'] = weather_satellite
+    weather_arg['names'] = weather_names
+    weather_arg['NREL_HPC'] = True  #TODO: add argument or auto detect
+    weather_arg['attributes'] = [
+        'air_temperature', 
+        'wind_speed', 
+        'dhi', 'ghi', 
+        'dni','relative_humidity'
+        ]
 
     all_fields = ['x', 'T98_0', 'T98_inf']
 
@@ -258,7 +262,13 @@ def run_standoff(
     chunks = {n : None for n in all_fields}
     dtypes = {n : "float32" for n in all_fields}
 
-    with NSRDBX(nsrdb_fp, hsds=False) as f:
+    #TODO: is there a better way to add the meta data?
+    nsrdb_fnames, hsds  = utilities.get_NSRDB_fnames(
+        weather_arg['satellite'], 
+        weather_arg['names'], 
+        weather_arg['NREL_HPC'])
+    
+    with NSRDBX(nsrdb_fnames[0], hsds=hsds) as f:
         meta = f.meta[f.meta.index.isin(project_points.gids)]
  
     Outputs.init_h5(
@@ -268,25 +278,29 @@ def run_standoff(
         attrs,
         chunks,
         dtypes,
-        meta=meta.reset_index(),
+        meta=meta.reset_index()
     )
 
     future_to_point = {}
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         for point in project_points:
             gid = int(point.gid)
+            weather_df, meta = utilities.get_weather(
+                database = weather_db, 
+                id = gid, 
+                **weather_arg)
             future = executor.submit(
                 calc_standoff,
-                nsrdb_fp, 
-                hsds,
-                gid, 
+                weather_df, 
+                meta,
                 tilt, 
                 azimuth, 
                 sky_model,
                 temp_model, 
                 module_type, 
                 level, 
-                x_0
+                x_0,
+                wind_speed_factor
             )
             future_to_point[future] = gid
 

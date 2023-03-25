@@ -3,31 +3,121 @@ import json
 import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
+import glob
+import pvlib
 
-def _extract_weather(nsrdb_fp, gids):
-    """
-    Extract weather data for a given site and operation
-    """
 
-    if not nsrdb_fp:
-        nsrdb_fp = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
-    
-    weather_params = ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni','relative_humidity']
+#TODO: move weather into it's own file?
+def get_weather(database, id, **kwargs):
+    if type(id) is tuple:
+        location = id
+        gid = None
+        lat = location[0]
+        lon = location[1]
+    elif type(id) is int:
+        gid = id
+        location = None
+    else:
+        raise TypeError(
+            'Project points needs to be either location tuple (latitude, longitude), or gid integer.')
 
-    with NSRDBX(nsrdb_fp, hsds=False) as f:
-        meta = f.meta[f.meta.index.isin(gids)]
-        data = []
-        for p in weather_params:
-            data.append(f.get_gid_df(p,gids))
-    
-    columns = pd.MultiIndex.from_product([weather_params, gids], names=["par", "gid"])
-    weather_df = pd.concat(data, axis=1)
-    weather_df.columns = columns
-    weather_df = weather_df.swaplevel(axis=1).sort_index(axis=1)
+    if database == 'NSRDB':
+        weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
+    elif database == 'PVGIS':
+        weather_df, meta = pvlib.iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
+    else:
+        raise NameError('Weather database not found.')
 
-    
     return weather_df, meta
+
+
+def get_NSRDB_fnames(satellite, names, NREL_HPC = False):
+
+    #satellite - NSRDB satellite
+    #names - PVlib naming convention year or 'TMY'
+    #NREL_HPC - if run at eagle
+
+    sat_map = {'GOES' : 'full_disc',
+           'METEOSAT' : 'meteosat',
+           'Himawari' : 'himawari',
+           'SUNY' : 'india',
+           'CONUS' : 'conus',
+           'Americas' : 'current'}
+
+    if NREL_HPC:
+        hpc_fp = '/datasets/NSRDB/'
+        hsds = False
+    else:
+        hpc_fp = '/nrel/nsrdb/'
+        hsds = True
+        
+    if type(names) == int:
+        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(names))
+        nsrdb_fnames = glob.glob(nsrdb_fp)
+    else:
+        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}*.h5'.format(names.lower()))
+        nsrdb_fnames = glob.glob(nsrdb_fp)
+        
+    if len(nsrdb_fnames) == 0:
+        raise FileNotFoundError(
+            "Couldn't find NSRDB input files! \nSearched for: '{}'".format(nsrdb_fp))
     
+    return nsrdb_fnames, hsds
+
+
+
+def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=None):
+    """
+    Extract weather data for a given site
+    """
+    
+    #provide either gid or location tuple (gid is faster)
+
+    nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
+    
+    dattr = {}
+    for i, file in enumerate(nsrdb_fnames):
+        with NSRDBX(file, hsds=hsds) as f:
+            if i == 0:
+                if gid == None: #TODO: add exception handling
+                    gid = f.lat_lon_gid(location)
+                meta = f['meta', gid].iloc[0]
+                index = f.time_index
+            
+            lattr = f.datasets
+            for attr in lattr:
+                dattr[attr] = file
+                
+    if attributes == None:
+        attributes = list(dattr.keys())
+        try:
+            attributes.remove('meta')
+            attributes.remove('tmy_year_short')
+        except ValueError:
+            pass
+        
+    weather_df = pd.DataFrame(index=index, columns=attributes)
+
+    for dset in attributes:
+        with NSRDBX(dattr[dset], hsds=hsds) as f:   
+            weather_df[dset] = f[dset, :, gid]
+
+    return weather_df, meta.to_dict()
+    
+
+
+def gid_downsampling(meta, n):   
+    lon_sub = sorted(meta['longitude'].unique())[0:-1:max(1,2*n)]
+    lat_sub = sorted(meta['latitude'].unique())[0:-1:max(1,2*n)]
+
+    gids_sub = meta[(meta['longitude'].isin(lon_sub)) & 
+                    (meta['latitude'].isin(lat_sub))].index
+
+    meta_sub = meta.loc[gids_sub]
+    
+    return meta_sub, gids_sub
+
+
 
 def write_gids(nsrdb_fp,
                region = 'Colorado', region_col = 'state',

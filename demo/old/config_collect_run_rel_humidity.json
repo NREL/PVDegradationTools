@@ -4,14 +4,14 @@
         "allocation": "[REQUIRED IF ON HPC]",
         "walltime": "[REQUIRED IF ON HPC]",
         "memory": null,
-        "nodes": 1,
         "queue": null,
         "feature": null,
         "conda_env": null,
         "module": null,
-        "sh_script": null,
-        "max_workers": null
+        "sh_script": null
     },
-    "project_points": "[REQUIRED]",
-    "nsrdb_fp": "[REQUIRED]"
+    "collect_pattern": "PIPELINE",
+    "project_points": null,
+    "datasets": null,
+    "purge_chunks": false
 }

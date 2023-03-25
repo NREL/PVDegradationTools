@@ -5,6 +5,9 @@
         },
         {
             "collect-run-standoff": "./config_collect_run_standoff.json"
+        },
+        {
+            "run-rel_humidity": "./config_run_rel_humidity.json"
         }
     ],
     "logging": {

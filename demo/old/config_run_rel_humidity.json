@@ -12,6 +12,6 @@
         "sh_script": null,
         "max_workers": null
     },
-    "project_points": "[REQUIRED]",
-    "nsrdb_fp": "[REQUIRED]"
+    "project_points": "./gids_DENVER.csv",
+    "nsrdb_fp": "/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
 }

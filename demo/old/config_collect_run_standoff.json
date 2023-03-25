@@ -11,7 +11,7 @@
         "sh_script": null
     },
     "collect_pattern": "PIPELINE",
-    "project_points": null,
+    "project_points": "./gids_DENVER.csv",
     "datasets": null,
     "purge_chunks": false
 }
