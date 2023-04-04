@@ -1831,7 +1831,13 @@ class Scenario:
         Export the scenario dictionaries to a json configuration file
         
         TODO exporting functions as name string within pipeline. cannot .json dump <PVD.func>
-             Need to make sure name is verified > stored > export > import > re-verify > converted
+             Need to make sure name is verified > stored > export > import > re-verify > converted.
+             This could get messy. Need to streamline the process or make it bullet proof
+        
+        Parameters:
+        -----------
+        file_path : (str, default = None)
+            Desired file path to save the scenario.json file
         '''
         
         if not file_path:
@@ -1849,8 +1855,42 @@ class Scenario:
             json.dump(scene_dict, f, indent=4)
         print(f'{file_name} exported')
     
-    def _verify_function(func_name):
+    def importScenario(self, file_path=None):
+        """
+        Import scenario dictionaries from an existing 'scenario.json' file
+        """
         
+        with open(file_path,'r') as f:
+            data = json.load()
+        name = data['name']
+        path = data['path']
+        modules = data['modules']
+        gids = data['gids']
+        pipeline = data['pipeline']
+
+        self.name = name
+        self.path = path
+        self.modules = modules
+        self.gids = gids
+        self.pipeline = pipeline
+    
+    def _verify_function(func_name):
+        """
+        Check all classes in PVD for a function of the name "func_name". Returns a callable function
+        and list of all function parameters with no default values.
+        
+        Parameters:
+        -----------
+        func_name : (str)
+            Name of the desired function. Only returns for 1:1 matches
+        
+        Returns:
+        --------
+        _func : (func)
+            callable instance of named function internal to PVD
+        reqs : (list(str))
+            list of minimum required paramters to run the requested funciton
+        """
         from inspect import signature
         
         # find the function in PVD

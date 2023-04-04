@@ -354,12 +354,12 @@ def get_module_temperature(
     conf='open_rack_glass_polymer'):
 
     """
-    Calculate module temperature based on weather data from the National Solar Radiation 
+    Calculate module temperature based on weather data from the National Solar Radiation
     Database (NSRDB) for a given location (gid).
 
     TODO: change input "poa" to accept only "poa_global" instead of the entire dataframe
           other temperature models? (sapm, pvsyst, ross, fuentes, faiman)
-    
+
     Parameters
     ----------
     nsrdb_file : str
@@ -375,7 +375,7 @@ def get_module_temperature(
         The configuration of the PV module architecture and mounting configuration.
         Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
         'close_mount_glass_glass', 'insulated_back_glass_polymer'
-    
+
     Returns
     -------
     module_temperature : pandas.DataFrame
@@ -383,7 +383,7 @@ def get_module_temperature(
     """
 
     from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS, sapm_module, sapm_cell
-    
+
     with NSRDBX(nsrdb_fp, hsds=False) as f:
         air_temperature = f.get_gid_ts('air_temperature', gid)
         wind_speed = f.get_gid_ts('wind_speed', gid)
@@ -400,19 +400,19 @@ def get_module_temperature(
                                  temp_air=air_temperature,
                                  wind_speed=wind_speed,
                                  **parameters)
-    
+
     return {'temp_module':module_temperature,
             'temp_cell':cell_temperature}
 
 def _read_material(name):
     """
     read a material from materials.json and return the parameter dictionary
-    
+
     Parameters:
     -----------
     name : (str)
         unique name of material
-    
+
     Returns:
     --------
     mat_dict : (dict)
@@ -432,7 +432,7 @@ def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian
     If material already exists, parameters will be updated.
 
     TODO: check if material is already existing
-    
+
     Parameters:
     -----------
     name : (str)
@@ -458,7 +458,7 @@ def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian
     root = os.path.realpath(__file__)
     root = root.split(r'/')[:-1]
     OUT_FILE = os.path.join('/',*root,'data','materials.json')
-    
+
     material_dict = {
         'alias':alias,
         'Fickian':fickian,
