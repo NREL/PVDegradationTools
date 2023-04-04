@@ -103,18 +103,40 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
             weather_df[dset] = f[dset, :, gid]
 
     return weather_df, meta.to_dict()
-    
 
+def read_weather(file_in, file_type=None):
+    """
+    Read a locally stored weather file of any PVLIB compatible type
 
-def gid_downsampling(meta, n):   
+    TODO: add error handling
+          check file types (anything .csv will cause trouble)
+
+    Parameters:
+    -----------
+    file_in : (path)
+        full file path to the desired weather file
+    """
+    if not file_type:
+        file_type = file_in[-4:]
+    read_list = [ i for i in dir(pvlib.iotools) if i.startswith('read') ]
+
+    for func in read_list:
+        if file_type in func:
+            read_func = func
+
+    weather_df, meta = read_func(file_in)
+
+    return weather_df, meta.to_dict()
+
+def gid_downsampling(meta, n):
     lon_sub = sorted(meta['longitude'].unique())[0:-1:max(1,2*n)]
     lat_sub = sorted(meta['latitude'].unique())[0:-1:max(1,2*n)]
 
-    gids_sub = meta[(meta['longitude'].isin(lon_sub)) & 
+    gids_sub = meta[(meta['longitude'].isin(lon_sub)) &
                     (meta['latitude'].isin(lat_sub))].index
 
     meta_sub = meta.loc[gids_sub]
-    
+
     return meta_sub, gids_sub
 
 
@@ -127,7 +149,7 @@ def write_gids(nsrdb_fp,
     """
     Generate a .CSV file containing the GIDs for the spatial test range.
     The .CSV file will be saved to the working directory
-    
+
     TODO: specify output file name and directory?
 
     Parameters:
