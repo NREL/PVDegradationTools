@@ -22,11 +22,11 @@ except:
 
 TESTDIR = os.path.dirname(__file__)  # this folder
 
-INPUTWEATHERSPECTRA = r'test_weatherandspectra.csv'
+INPUTWEATHERSPECTRA = os.path.join('data',r'test_weatherandspectra.csv')
 
-WEATHERFILE = r'722740TYA.CSV'
+WEATHERFILE = os.path.join('data',r'722740TYA.CSV')
 
-PSM3FILE = r'psm3_pytest_2.csv'
+PSM3FILE = os.path.join('data',r'psm3_pytest_2.csv')
 
 PSM = pd.read_csv(PSM3FILE, header=2)
 
