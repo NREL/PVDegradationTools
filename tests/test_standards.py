@@ -1,25 +1,46 @@
-import PVDegradationTools as PVD
+import os
+import json
 import pytest
+import pandas as pd
+import PVDegradationTools as PVD
 
-nsrdb_fp = '/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
-gid = 479494 #NREL location
+#Load weather data
+weather_df = pd.read_pickle(os.path.join(PVD.TEST_DATA_DIR, 'weather_df_year.pkl'))
+with open(os.path.join(PVD.TEST_DATA_DIR, 'meta.json')) as file:
+    meta = json.load(file)
 
 def test_calc_standoff():
-    res = PVD.standards.calc_standoff(
-        nsrdb_fp,
-        gid,
+    result_l1 = PVD.standards.calc_standoff(
+        weather_df,
+        meta,
         tilt=None,
         azimuth=180,
         sky_model='isotropic',
         temp_model='sapm',
         module_type='glass_polymer',
-        level=0,
-        x_0=6.1)
+        level=1,
+        x_0=6.1,
+        wind_speed_factor=1.71)
+    
+    result_l2 = PVD.standards.calc_standoff(
+        weather_df,
+        meta,
+        tilt=None,
+        azimuth=180,
+        sky_model='isotropic',
+        temp_model='sapm',
+        module_type='glass_polymer',
+        level=2,
+        x_0=6.1,
+        wind_speed_factor=1.71)
+    
+    expected_result_l1 = {'x': 2.3835484140461736, 
+                        'T98_0': 79.03006155479213, 
+                        'T98_inf': 51.11191792458173}
+    
+    expected_result_l2 = {'x': -0.20832926385165268, 
+                          'T98_0': 79.03006155479213, 
+                          'T98_inf': 51.11191792458173}
 
-    assert res == pytest.approx({'x': 2.459131550393533, 
-                                 'T98_0': 79.39508117890611, 
-                                 'T98_inf': 51.07779401289873})
-
-
-if __name__ == "__main__":
-    test_calc_standoff()
+    assert expected_result_l1 == pytest.approx(result_l1)
+    assert expected_result_l2 == pytest.approx(result_l2)

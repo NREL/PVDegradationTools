@@ -1,5 +1,5 @@
 from PVDegradationTools.standards import run_calc_standoff
-from PVDegradationTools.humidity import run_rel_humidity
+from PVDegradationTools.humidity import run_calc_rel_humidity
 from gaps.cli import CLICommandConfiguration, make_cli
 
 commands = [
@@ -10,7 +10,7 @@ commands = [
     ),
     CLICommandConfiguration(
         name="run-rel_humidity", 
-        function=run_rel_humidity, 
+        function=run_calc_rel_humidity, 
         split_keys=["project_points"]
     ),
 ]

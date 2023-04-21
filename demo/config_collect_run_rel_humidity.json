@@ -1,11 +1,11 @@
 {
     "execution_control": {
-        "option": "local",
-        "allocation": "[REQUIRED IF ON HPC]",
-        "walltime": "[REQUIRED IF ON HPC]",
+        "option": "eagle",
+        "allocation": "pvsoiling",
+        "walltime": 1,
         "memory": null,
         "queue": null,
-        "feature": null,
+        "feature": "--partition=debug",
         "conda_env": null,
         "module": null,
         "sh_script": null
