@@ -2,10 +2,10 @@
     "run-standoff": {
         "pipeline_index": 0,
         "demo_run_standoff_j0": {
-            "job_id": "11885102",
+            "job_id": "12044117",
             "hardware": "slurm",
             "job_status": "successful",
-            "time_submitted": "25-Mar-2023 07:29:38",
+            "time_submitted": "05-Apr-2023 14:10:49",
             "azimuth": 180,
             "level": 1,
             "max_workers": null,
@@ -15,22 +15,22 @@
             "tag": "_j0",
             "temp_model": "sapm",
             "tilt": null,
-            "time_start": "25-Mar-2023 07:29:47",
+            "time_start": "05-Apr-2023 14:11:12",
             "weather_db": "NSRDB",
             "weather_names": "TMY",
             "weather_satellite": "Americas",
             "wind_speed_factor": 1.71,
             "x_0": 6.1,
             "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff_j0.h5",
-            "runtime_seconds": 5.318018,
-            "time_end": "25-Mar-2023 07:29:53",
-            "total_runtime": "0:00:05"
+            "runtime_seconds": 8.629321,
+            "time_end": "05-Apr-2023 14:11:21",
+            "total_runtime": "0:00:08"
         },
         "demo_run_standoff_j1": {
-            "job_id": "11885103",
+            "job_id": "12044118",
             "hardware": "slurm",
             "job_status": "successful",
-            "time_submitted": "25-Mar-2023 07:29:38",
+            "time_submitted": "05-Apr-2023 14:10:49",
             "azimuth": 180,
             "level": 1,
             "max_workers": null,
@@ -40,25 +40,25 @@
             "tag": "_j1",
             "temp_model": "sapm",
             "tilt": null,
-            "time_start": "25-Mar-2023 07:29:47",
+            "time_start": "05-Apr-2023 14:11:12",
             "weather_db": "NSRDB",
             "weather_names": "TMY",
             "weather_satellite": "Americas",
             "wind_speed_factor": 1.71,
             "x_0": 6.1,
             "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff_j1.h5",
-            "runtime_seconds": 5.328652,
-            "time_end": "25-Mar-2023 07:29:53",
-            "total_runtime": "0:00:05"
+            "runtime_seconds": 8.328676,
+            "time_end": "05-Apr-2023 14:11:21",
+            "total_runtime": "0:00:08"
         }
     },
     "collect-run-standoff": {
         "pipeline_index": 1,
         "demo_collect_run_standoff": {
-            "job_id": "11885104",
+            "job_id": "12044119",
             "hardware": "slurm",
             "job_status": "successful",
-            "time_submitted": "25-Mar-2023 07:29:56",
+            "time_submitted": "05-Apr-2023 14:11:26",
             "collect_pattern": [
                 "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5",
                 "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5"
@@ -66,9 +66,9 @@
             "datasets": null,
             "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5",
             "purge_chunks": false,
-            "runtime_seconds": 0.178954,
-            "time_end": "25-Mar-2023 07:30:04",
-            "time_start": "25-Mar-2023 07:30:04",
+            "runtime_seconds": 0.171406,
+            "time_end": "05-Apr-2023 14:11:35",
+            "time_start": "05-Apr-2023 14:11:34",
             "total_runtime": "0:00:00"
         }
     }

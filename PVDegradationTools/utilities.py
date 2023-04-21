@@ -7,8 +7,31 @@ import glob
 import pvlib
 
 
+
+
 #TODO: move weather into it's own file?
 def get_weather(database, id, **kwargs):
+    """
+    Get weather data directly from  NSRDB or use PVLIB i/o tools
+
+    Parameters:
+    -----------
+    database : (str)
+        'NSRDB' or 'PVGIS'
+    id : (int or tuple)
+        If NSRDB, id is the gid for the desired location
+        If PVGIS, id is a tuple of (latitude, longitude) for the desired location
+    **kwargs : 
+        Additional keyword arguments to pass to the get_weather function
+        (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
+
+    Returns:
+    --------
+    weather_df : (pd.DataFrame)
+        DataFrame of weather data
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
     if type(id) is tuple:
         location = id
         gid = None
@@ -32,6 +55,59 @@ def get_weather(database, id, **kwargs):
 
 
 def get_NSRDB_fnames(satellite, names, NREL_HPC = False):
+    """
+    Get a list of NSRDB files for a given satellite and year
+
+    Parameters:
+    -----------
+    satellite : (str)
+        'GOES', 'METEOSAT', 'Himawari', 'SUNY', 'CONUS', 'Americas'
+    names : (int or str)
+        PVLIB naming convention year or 'TMY':
+        If int, year of desired data
+        If str, 'TMY' or 'TMY3'
+    NREL_HPC : (bool)
+        If True, use NREL HPC path
+        If False, use AWS path
+
+    Returns:
+    --------
+    nsrdb_fnames : (list)
+        List of NSRDB files for a given satellite and year
+    hsds : (bool)
+        If True, use h5pyd to access NSRDB files
+        If False, use h5py to access NSRDB files
+    """
+    #satellite - NSRDB satellite
+    #names - PVlib naming convention year or 'TMY'
+    #NREL_HPC - if run at eagle
+
+    sat_map = {'GOES' : 'full_disc',
+           'METEOSAT' : 'meteosat',
+           'Himawari' : 'himawari',
+           'SUNY' : 'india',
+           'CONUS' : 'conus',
+           'Americas' : 'current'}
+
+    if NREL_HPC:
+        hpc_fp = '/datasets/NSRDB/'
+        hsds = False
+    else:
+        hpc_fp = '/nrel/nsrdb/'
+        hsds = True
+        
+    if type(names) == int:
+        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(names))
+        nsrdb_fnames = glob.glob(nsrdb_fp)
+    else:
+        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}*.h5'.format(names.lower()))
+        nsrdb_fnames = glob.glob(nsrdb_fp)
+        
+    if len(nsrdb_fnames) == 0:
+        raise FileNotFoundError(
+            "Couldn't find NSRDB input files! \nSearched for: '{}'".format(nsrdb_fp))
+    
+    return nsrdb_fnames, hsds
 
     #satellite - NSRDB satellite
     #names - PVlib naming convention year or 'TMY'
@@ -67,12 +143,34 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC = False):
 
 
 def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=None):
+    # write doc string documentation for function
     """
-    Extract weather data for a given site
-    """
-    
-    #provide either gid or location tuple (gid is faster)
+    Get NSRDB weather data from different satellites and years. Provide either gid or location tuple.
 
+    Parameters:
+    -----------
+    satellite : (str)
+        'GOES', 'METEOSAT', 'Himawari', 'SUNY', 'CONUS', 'Americas'
+    names : (int or str)
+        If int, year of desired data
+        If str, 'TMY' or 'TMY3'
+    NREL_HPC : (bool)
+        If True, use NREL HPC path
+        If False, use AWS path
+    gid : (int)
+        gid for the desired location
+    location : (tuple)
+        (latitude, longitude) for the desired location
+    attributes : (list)
+        List of weather attributes to extract from NSRDB
+
+    Returns:
+    --------
+    weather_df : (pd.DataFrame)
+        DataFrame of weather data
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
     nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
     
     dattr = {}
@@ -129,6 +227,24 @@ def read_weather(file_in, file_type=None):
     return weather_df, meta.to_dict()
 
 def gid_downsampling(meta, n):
+    """
+    Downsample the NSRDB GID grid by a factor of n
+
+    Parameters:
+    -----------
+    meta : (pd.DataFrame)
+        DataFrame of NSRDB meta data
+    n : (int)
+        Downsample factor
+
+    Returns:
+    --------
+    meta_sub : (pd.DataFrame)
+        DataFrame of NSRDB meta data
+    gids_sub : (list)
+        List of GIDs for the downsampled NSRDB meta data
+    """
+
     lon_sub = sorted(meta['longitude'].unique())[0:-1:max(1,2*n)]
     lat_sub = sorted(meta['latitude'].unique())[0:-1:max(1,2*n)]
 
