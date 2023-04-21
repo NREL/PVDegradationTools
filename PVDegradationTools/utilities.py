@@ -202,7 +202,7 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
 
     return weather_df, meta.to_dict()
 
-def read_weather(file_in, file_type=None):
+def read_weather(file_in, file_type):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
@@ -213,6 +213,9 @@ def read_weather(file_in, file_type=None):
     -----------
     file_in : (path)
         full file path to the desired weather file
+    file_type : (str)
+        type of weather file from list below (verified)
+        [psm3, tmy3, epw]
     """
     if not file_type:
         file_type = file_in[-4:]
@@ -220,11 +223,14 @@ def read_weather(file_in, file_type=None):
 
     for func in read_list:
         if file_type in func:
-            read_func = func
+            _read_func = getattr(pvlib.iotools,func)
 
-    weather_df, meta = read_func(file_in)
+    weather_df, meta = _read_func(file_in)
 
-    return weather_df, meta.to_dict()
+    if not isinstance(meta, dict):
+        meta = meta.to_dict()
+
+    return weather_df, meta
 
 def gid_downsampling(meta, n):
     """
@@ -561,6 +567,11 @@ def _read_material(name):
     file = os.path.join('/',*root,'data','materials.json')
     with open(file) as f:
         data = json.load(f)
+    
+    if name is None:
+        material_list = data.keys()
+        return [*material_list]
+    
     mat_dict = data[name]
     return mat_dict
 

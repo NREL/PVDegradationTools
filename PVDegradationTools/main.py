@@ -1725,7 +1725,7 @@ class Scenario:
             return
 
         # remove module if found in instance list
-        for i in range(self.modules.__len__()):
+        for i in range(len(self.modules)):
             if self.modules[i]['module_name'] == module_name:
                 print(f'WARNING - Module already found by name "{module_name}"')
                 print('Module will be replaced with new instance.')
@@ -1740,10 +1740,16 @@ class Scenario:
                              'material_params':mat_params})
         print(f'Module "{module_name}" added.')
 
-    def add_material(self,name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
+    def addMaterial(self,name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
         """
         add a new material type to master list
         """
+
+        if name is None and alias is None:
+            materials = utils._read_material(None)
+            print('Available Materials: \n', materials)
+            return None
+
         utils._add_material(name=name, alias=alias,
                             Ead=Ead, Eas=Eas, So=So,
                             Do=Do, Eap=Eap, Po=Po, fickian=fickian)
@@ -1785,12 +1791,12 @@ class Scenario:
         """
 
         _func, reqs = PVD.Scenario._verify_function(func_name)
-        
-        if _func == None:
+
+        if _func is None:
             print(f'FAILED: Requested function "{func_name}" not found')
             print('Function has not been added to pipeline.')
             return None
-        
+
         if not all( x in func_params for x in reqs):
             print(f'FAILED: Requestion function {func_name} did not receive enough parameters')
             print(f'Requestion function: \n {_func} \n ---')
@@ -1839,7 +1845,7 @@ class Scenario:
         file_path : (str, default = None)
             Desired file path to save the scenario.json file
         '''
-        
+
         if not file_path:
             file_path = self.path
         file_name = f'config_{self.name}.json'
@@ -1850,16 +1856,16 @@ class Scenario:
                       'pipeline': self.pipeline,
                       'gid_file': self.gids,
                       'test_modules': self.modules}
-        
+
         with open(out_file, 'w') as f:
             json.dump(scene_dict, f, indent=4)
         print(f'{file_name} exported')
-    
+
     def importScenario(self, file_path=None):
         """
         Import scenario dictionaries from an existing 'scenario.json' file
         """
-        
+
         with open(file_path,'r') as f:
             data = json.load()
         name = data['name']
@@ -1873,7 +1879,7 @@ class Scenario:
         self.modules = modules
         self.gids = gids
         self.pipeline = pipeline
-    
+
     def _verify_function(func_name):
         """
         Check all classes in PVD for a function of the name "func_name". Returns a callable function
@@ -1892,7 +1898,7 @@ class Scenario:
             list of minimum required paramters to run the requested funciton
         """
         from inspect import signature
-        
+
         # find the function in PVD
         class_list = [c for c in dir(PVD) if not c.startswith('_')]
         func_list = []
@@ -1900,7 +1906,7 @@ class Scenario:
             _class = getattr(PVD,c)
             if func_name in dir(_class):
                 _func = getattr(_class,func_name)
-        if _func == None:
+        if _func is None:
             return (None,None)
 
         # check if necessary parameters given
@@ -1909,5 +1915,5 @@ class Scenario:
         for param in reqs_all:
             if reqs_all[param].default == reqs_all[param].empty:
                 reqs.append(param)
-        
+
         return(_func, reqs)
