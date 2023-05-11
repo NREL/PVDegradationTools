@@ -42,7 +42,7 @@ def eff_gap(T_0, T_inf, level=1, x_0=6.1):
 
     if level == 1:
         T98 = 70
-    if level == 2:
+    elif level == 2:
         T98 = 80
 
     T98_0 = T_0.quantile(q=0.98, interpolation='linear')
@@ -121,9 +121,9 @@ def run_calc_standoff(
     project_points, 
     out_dir, 
     tag,
-    weather_db,
-    weather_satellite,
-    weather_names,
+    #weather_db,
+    #weather_satellite,
+    #weather_names,
     max_workers=None,
     tilt=None,
     azimuth=180,
@@ -141,14 +141,16 @@ def run_calc_standoff(
 
     #inputs
     weather_arg = {}
-    weather_arg['satellite'] = weather_satellite
-    weather_arg['names'] = weather_names
+    #weather_arg['satellite'] = weather_satellite
+    #weather_arg['names'] = weather_names
     weather_arg['NREL_HPC'] = True  #TODO: add argument or auto detect
     weather_arg['attributes'] = [
         'air_temperature', 
         'wind_speed', 
-        'dhi', 'ghi', 
-        'dni','relative_humidity'
+        'dhi', 
+        'ghi', 
+        'dni',
+        'relative_humidity'
         ]
 
     all_fields = ['x', 'T98_0', 'T98_inf']
@@ -161,14 +163,14 @@ def run_calc_standoff(
     chunks = {n : None for n in all_fields}
     dtypes = {n : "float32" for n in all_fields}
 
-    #TODO: is there a better way to add the meta data?
-    nsrdb_fnames, hsds  = weather.get_NSRDB_fnames(
-        weather_arg['satellite'], 
-        weather_arg['names'], 
-        weather_arg['NREL_HPC'])
+    # #TODO: is there a better way to add the meta data?
+    # nsrdb_fnames, hsds  = weather.get_NSRDB_fnames(
+    #     weather_arg['satellite'], 
+    #     weather_arg['names'], 
+    #     weather_arg['NREL_HPC'])
     
-    with NSRDBX(nsrdb_fnames[0], hsds=hsds) as f:
-        meta = f.meta[f.meta.index.isin(project_points.gids)]
+    # with NSRDBX(nsrdb_fnames[0], hsds=hsds) as f:
+    #     meta = f.meta[f.meta.index.isin(project_points.gids)]
  
     Outputs.init_h5(
         out_fp,
@@ -177,17 +179,24 @@ def run_calc_standoff(
         attrs,
         chunks,
         dtypes,
-        meta=meta.reset_index()
+        #meta=meta.reset_index()
+        meta=project_points.df
     )
 
     future_to_point = {}
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        for point in project_points:
-            gid = int(point.gid)
+        for idx, point in project_points.df.iterrows():
+            database = point.weather_db
+            gid = idx #int(point.gid)
+            df_weather_kwargs = point.drop('weather_db', inplace=False).filter(like='weather_')
+            df_weather_kwargs.index = df_weather_kwargs.index.map(lambda arg: arg.lstrip('weather_'))
+            weather_kwarg = weather_arg | df_weather_kwargs.to_dict()
+
             weather_df, meta = weather.load(
-                database = weather_db, 
+                database = database, 
                 id = gid, 
-                **weather_arg)
+                #satellite = point.satellite,  #TODO: check input
+                **weather_kwarg)
             future = executor.submit(
                 calc_standoff,
                 weather_df, 
@@ -208,8 +217,8 @@ def run_calc_standoff(
                 result = future.result()
                 gid = future_to_point.pop(future)
 
-                ind = project_points.index(gid)
+                #ind = project_points.index(gid)  
                 for dset, data in result.items():
-                    out[dset,  ind] = np.array([data])
+                    out[dset,  idx] = np.array([data])
 
     return out_fp.as_posix()

@@ -14,7 +14,6 @@
     },
     "project_points": "./gids_DENVER.csv",
     "weather_db": "NSRDB",
-    "weather_satellite": "Americas",
     "weather_names": "TMY",
     "tilt": null,
     "azimuth": 180,

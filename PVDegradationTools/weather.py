@@ -6,7 +6,7 @@ import pvlib
 import os
 import glob
 import pandas as pd
-from rex import NSRDBX
+from rex import NSRDBX, Outputs
 
 def load(database, id, **kwargs):
     """
@@ -47,13 +47,15 @@ def load(database, id, **kwargs):
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
     elif database == 'PVGIS':
         weather_df, meta = pvlib.iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
+    elif database == 'local':
+        weather_df, meta = read_h5(gid=gid, **kwargs)
     else:
         raise NameError('Weather database not found.')
 
     return weather_df, meta
 
 
-def read_file(file_in, file_type):
+def read_file(file_in, file_type, **_):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
@@ -84,7 +86,52 @@ def read_file(file_in, file_type):
     return weather_df, meta
 
 
-def get_NSRDB_fnames(satellite, names, NREL_HPC = False):
+def read_h5(gid, file, attributes=None, **_):
+    """
+    Read a locally stored h5 weather file that follows NSRDB conventions.
+    
+    Parameters:
+    -----------
+    file_path : (str)
+        file path and name of h5 file to be read
+    gid : (int)
+        gid for the desired location
+    attributes : (list)
+        List of weather attributes to extract from NSRDB
+
+    Returns:
+    --------
+    weather_df : (pd.DataFrame)
+        DataFrame of weather data
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
+
+    fp = os.path.join(os.path.dirname(__file__), file)
+
+    with Outputs(fp, mode='r') as f:   
+        meta = f.meta.loc[gid]
+        index = f.time_index
+        dattr = f.attrs
+
+    #TODO: put into utilities
+    if attributes == None:
+        attributes = list(dattr.keys())
+        try:
+            attributes.remove('meta')
+            attributes.remove('tmy_year_short')
+        except ValueError:
+            pass
+
+    weather_df = pd.DataFrame(index=index, columns=attributes)
+    for dset in attributes:
+        with Outputs(fp, mode='r') as f:   
+            weather_df[dset] = f[dset, :, gid]
+
+    return weather_df, meta.to_dict()
+
+
+def get_NSRDB_fnames(satellite, names, NREL_HPC = False, **_):
     """
     Get a list of NSRDB files for a given satellite and year
 
@@ -137,7 +184,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC = False):
     return nsrdb_fnames, hsds
 
 
-def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=None):
+def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=None, **_):
     """
     Get NSRDB weather data from different satellites and years. 
     Provide either gid or location tuple.
