@@ -104,7 +104,8 @@ def calculate_jsc_from_tau_cp(tau, wafer_thickness, d_base, s_rear, generation, 
         
     Notes
     -----
-    Emitter parameters w, l, d, and s are 
+    Default emitter parameters w, l, d, and s are supplied, but users may wish to experiment to 
+    find the most suitable parameters to model different cell types.
 
     Pros of this approach
         can account for e.g. lighttrapping via the generation profile
@@ -123,19 +124,12 @@ def calculate_jsc_from_tau_cp(tau, wafer_thickness, d_base, s_rear, generation, 
     q = elementary_charge
 
     # Unit conversions:
-    w_depletion = xp*100 #depletion region width, 240 nm in cm
+    w_depletion = xp*100 #depletion region width, nm to cm
 
-    #w_emitter = .36e-4 #emitter thickness, .36 um in cm
     w_emitter = w_emitter*1e-4 #um to cm
-    #l_emitter = 0.5e-4 #diffusion length of the emitter, 0.5 um in cm
     l_emitter = l_emitter*1e-4
-    #d_emitter = 4 #diffusivity of the emitter, 4 cm^2/s
-    #s_emitter = 4.86e5 #front srv, 4.86e5 cm/s
-    #s_emitter = 150 #front srv, 4.86e5 cm/s
 
-    #x_j = w_emitter + w_depletion #junction depth in cm
     w_base = wafer_thickness*1e-4 - w_emitter #width of the base in cm
-    #d_base = 27 #diffusivity in cm^2/s
     tau = tau*1e-6 #us to s
     s_base = s_rear #cm/s
     depth = depth*1e-4 #um to cm
@@ -229,6 +223,9 @@ def calculate_jsc_from_tau_iqe(tau, wafer_thickness, d_base, s_rear, spectrum, a
     
     Notes
     -----
+    Default emitter parameters w, l, d, and s are supplied, but users may wish to experiment to 
+    find the most suitable parameters to model different cell types.
+
     Pros of this approach:
         requires only fundamental inputs: Si absorption and spectrum 
         
@@ -237,7 +234,6 @@ def calculate_jsc_from_tau_iqe(tau, wafer_thickness, d_base, s_rear, spectrum, a
         
     To do:
         accept user inputs for spectrum and absorption, otherwise use photovoltaic library
-        allow user to customize hard-coded assuptions for cell properties below.
         
     References
     ----------
@@ -245,19 +241,12 @@ def calculate_jsc_from_tau_iqe(tau, wafer_thickness, d_base, s_rear, spectrum, a
 
     """
     # Unit conversions:
-    w_depletion = xp*100 #depletion region width, 240 nm in cm
+    w_depletion = xp*100 #depletion region width, nm to cm
 
-    #w_emitter = .36e-4 #emitter thickness, .36 um in cm
     w_emitter = w_emitter*1e-4
-    #l_emitter = 0.5e-4 #diffusion length of the emitter, 0.5 um in cm
     l_emitter = l_emitter*1e-4
-    #d_emitter = 4 #diffusivity of the emitter, 4 cm^2/s
-    #s_emitter = 4.86e5 #front srv, 4.86e5 cm/s
-    #s_emitter = 150 #front srv, 4.86e5 cm/s
 
-    #x_j = w_emitter + w_depletion #junction depth in cm
     w_base = wafer_thickness*1e-4 - w_emitter #width of the base in cm
-    #d_base = 27 #diffusivity in cm^2/s
     tau = tau*1e-6 #us to s
     s_base = s_rear #cm/s
 

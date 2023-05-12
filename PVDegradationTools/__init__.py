@@ -10,6 +10,7 @@ from . import humidity
 from . import standards
 from . import utilities
 from . import collection
+from . import letid
 from . import _version
 
 __version__ = _version.get_versions()['version']

@@ -32,6 +32,34 @@ def get_weather(database, id, **kwargs):
     return weather_df, meta
 
 
+def get_kinetics(name=None):
+    """
+    Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
+
+    Parameters:
+    -----------
+    name : str
+        unique name of kinetic parameter set. If None, returns a list of the possible options.
+
+    Returns:
+    --------
+    parameter_dict : (dict)
+        dictionary of kinetic parameters
+    """
+    absolute_path = os.path.dirname(__file__)
+    relative_path = 'data/kinetic_parameters.json'
+    path = os.path.join(absolute_path, relative_path)
+    with open(path) as f:
+        data = json.load(f)
+
+    if name is None:
+        parameters_list = data.keys()
+        return "Choose a set of kinetic parameters:", [*parameters_list]
+
+    kinetic_parameters = data[name]
+    return kinetic_parameters
+
+
 def get_NSRDB_fnames(satellite, names, NREL_HPC=False):
 
     # satellite - NSRDB satellite
