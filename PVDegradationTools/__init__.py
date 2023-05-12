@@ -4,11 +4,12 @@ import sys
 
 from .main import StressFactors, Degradation, Scenario
 
-if 'gaps' in sys.modules: #Workaround until gaps is on pypi
+if 'gaps' in sys.modules:  # Workaround until gaps is on pypi
     from . import cli
 from . import humidity
 from . import standards
 from . import utilities
+from . import collection
 from . import _version
 
 __version__ = _version.get_versions()['version']
