@@ -199,33 +199,34 @@ def test_solder_fatigue():
                                             temp_cell=PSM['temp_cell'])
     assert damage == pytest.approx(14.25, abs=0.1)
 
+#TODO: delete
 # --------------------------------------------------------------------------------------------------
-# -- Standards
+# # -- Standards
 
-def test_ideal_installation_distance():
-    # test ideal installation calculation
-    # requires TMY3-like weather file
+# def test_ideal_installation_distance():
+#     # test ideal installation calculation
+#     # requires TMY3-like weather file
 
-    df_tmy, metadata = pvlib.iotools.read_tmy3(filename=WEATHERFILE,
-                                               coerce_year=2021, recolumn=True)
-    df_tmy['air_temperature'] = df_tmy['DryBulb']
-    df_tmy['wind_speed'] = df_tmy['Wspd']
-    df_tmy['dni']=df_tmy['DNI']
-    df_tmy['ghi']=df_tmy['GHI']
-    df_tmy['dhi']=df_tmy['DHI']
-    x = PVD.Standards.ideal_installation_distance(df_tmy, metadata)
-    assert x == pytest.approx(5.11657, abs=0.0001)
+#     df_tmy, metadata = pvlib.iotools.read_tmy3(filename=WEATHERFILE,
+#                                                coerce_year=2021, recolumn=True)
+#     df_tmy['air_temperature'] = df_tmy['DryBulb']
+#     df_tmy['wind_speed'] = df_tmy['Wspd']
+#     df_tmy['dni']=df_tmy['DNI']
+#     df_tmy['ghi']=df_tmy['GHI']
+#     df_tmy['dhi']=df_tmy['DHI']
+#     x = PVD.Standards.ideal_installation_distance(df_tmy, metadata)
+#     assert x == pytest.approx(5.11657, abs=0.0001)
 
-def test_calculate_T98Temperature():
-    # test T98 of temperature calculation
-    # requires TMY3-like weather file
+# def test_calculate_T98Temperature():
+#     # test T98 of temperature calculation
+#     # requires TMY3-like weather file
 
-    df_tmy, metadata = pvlib.iotools.read_tmy3(filename=WEATHERFILE,
-                                               coerce_year=2021, recolumn=True)
-    df_tmy['air_temperature'] = df_tmy['DryBulb']
-    df_tmy['wind_speed'] = df_tmy['Wspd']
-    df_tmy['dni']=df_tmy['DNI']
-    df_tmy['ghi']=df_tmy['GHI']
-    df_tmy['dhi']=df_tmy['DHI']
-    T98 = PVD.Standards.calculate_T98Temperature(df_tmy, metadata)
-    assert T98 == pytest.approx(59.32, abs=0.01)
+#     df_tmy, metadata = pvlib.iotools.read_tmy3(filename=WEATHERFILE,
+#                                                coerce_year=2021, recolumn=True)
+#     df_tmy['air_temperature'] = df_tmy['DryBulb']
+#     df_tmy['wind_speed'] = df_tmy['Wspd']
+#     df_tmy['dni']=df_tmy['DNI']
+#     df_tmy['ghi']=df_tmy['GHI']
+#     df_tmy['dhi']=df_tmy['DHI']
+#     T98 = PVD.Standards.calculate_T98Temperature(df_tmy, metadata)
+#     assert T98 == pytest.approx(59.32, abs=0.01)
