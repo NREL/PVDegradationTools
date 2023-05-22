@@ -91,3 +91,8 @@ ENV/
 
 # vscode
 .vscode/
+
+#Demo
+demo/chunk_files/
+demo/logs/
+demo/old

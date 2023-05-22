@@ -7,10 +7,13 @@ from .main import StressFactors, Degradation, Scenario
 if 'gaps' in sys.modules:  # Workaround until gaps is on pypi
     from . import cli
 from . import humidity
+from . import spectral
 from . import standards
+from . import temperature
 from . import utilities
 from . import collection
 from . import letid
+from . import weather
 from . import _version
 
 __version__ = _version.get_versions()['version']
