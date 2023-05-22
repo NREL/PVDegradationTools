@@ -33,19 +33,19 @@ PSM = pd.read_csv(PSM3FILE, header=2)
 # --------------------------------------------------------------------------------------------------
 # -- StressFactors
 
-def test_water_vapor_pressure():
-    # test water vapor pressure
-    # *DEPRECATED*
+# def test_water_vapor_pressure():
+#     # test water vapor pressure
+#     # *DEPRECATED*
 
-    wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
-    assert wvp.__len__() == PSM.__len__()
-    avg_wvp = wvp.mean()
-    assert avg_wvp == pytest.approx(0.54218, abs=0.0001)
+#     wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
+#     assert wvp.__len__() == PSM.__len__()
+#     avg_wvp = wvp.mean()
+#     assert avg_wvp == pytest.approx(0.54218, abs=0.0001)
 
 def test_k():
     # test calculation for constant k
 
-    wvp = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
+    wvp = PVD.StressFactors.psat(PSM['Dew Point'])
     avg_wvp = wvp.mean()
     k = PVD.StressFactors.k(avg_wvp=avg_wvp)
     assert k == pytest.approx(.00096, abs=.000005)
@@ -53,7 +53,7 @@ def test_k():
 def test_edge_seal_width():
     # test for edge_seal_width
 
-    water_vapor_pressure = PVD.StressFactors.water_vapor_pressure(PSM['Dew Point'])
+    water_vapor_pressure = PVD.StressFactors.psat(PSM['Dew Point'])
     avg_wvp = water_vapor_pressure.mean()
     k = PVD.StressFactors.k(avg_wvp=avg_wvp)
     edge_seal_width = PVD.StressFactors.edge_seal_width(k=k)
@@ -62,20 +62,15 @@ def test_edge_seal_width():
 def test_psat():
     # test saturation point
 
-    psat = PVD.StressFactors.psat(PSM['Dew Point'])
-    assert psat.__len__() == PSM.__len__()
-    avg_psat = psat.mean()
-    assert avg_psat == pytest.approx(0.54218, abs=0.0001)
+    psat = PVD.StressFactors.psat(35)
+    assert psat == pytest.approx(5.849871724837016, abs=0.0001), "psat() not working"
 
 def test_rh_surface_outside():
     # test calculation for the RH just outside a module surface
     # requires PSM3 weather file
 
-    rh_surface = PVD.StressFactors.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
-                                                        temp_ambient=PSM['Temperature'],
-                                                        temp_module=PSM['temp_module'])
-    assert rh_surface.__len__() == PSM.__len__()
-    assert rh_surface[17] == pytest.approx(81.99, abs=0.1)
+    rh_surface = PVD.StressFactors.rh_surface_outside(50, 35, 55)
+    assert rh_surface == pytest.approx(18.247746468009066, abs=0.0000001)
 
 def test_rh_front_encap():
     # test calculation for RH of module fronside encapsulant
