@@ -10,3 +10,4 @@ NREL-rex>=0.2.8
 NREL-gaps>=0.3.2
 photovoltaic>=0.1.9
 scipy>=1.10.1
+openpyxl>=3.1.2
