@@ -1,2 +1,2 @@
 [run]
-omit=PVDegradationTools/_version.py
+omit=pvdeg/_version.py

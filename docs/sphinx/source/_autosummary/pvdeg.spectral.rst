@@ -1,7 +1,7 @@
-﻿PVDegradationTools.spectral
-===========================
+﻿pvdeg.spectral
+==============
 
-.. automodule:: PVDegradationTools.spectral
+.. automodule:: pvdeg.spectral
 
    
    

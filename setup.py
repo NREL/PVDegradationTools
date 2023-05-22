@@ -23,7 +23,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='PVDegradationTools',
+    name='pvdeg',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -75,10 +75,10 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     #packages=find_packages(exclude=['contrib', 'docs', 'tests']) + ['data'],
-    packages = ['PVDegradationTools'],
+    packages = ['pvdeg'],
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
-    #py_modules=["PVDegradationTools"],
+    #py_modules=["pvdeg"],
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
@@ -100,7 +100,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        'PVDegradationTools': ['data/722024TYA.pickle'],
+        'pvdeg': ['data/722024TYA.pickle'],
     },
 
     include_package_data=True,
@@ -118,10 +118,10 @@ setup(
     #        'sample=sample:main',
     #    ],
     #},
-    package_dir={"pvd": "PVDegradationTools"},
+    package_dir={"pvdeg": "pvdeg"},
     entry_points={
         "console_scripts": [
-            "pvd=PVDegradationTools.cli:cli",
+            "pvd=pvdeg.cli:cli",
         ]
     },
 )

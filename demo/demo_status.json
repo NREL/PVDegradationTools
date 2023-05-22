@@ -14,7 +14,7 @@
             "l": 0.5,
             "max_workers": null,
             "mount_type": "open_rack_glass_glass",
-            "out_dir": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo",
+            "out_dir": "/home/mspringe/projects/degtools/github/pvdeg/demo",
             "sky_model": "isotropic",
             "tag": "_j0",
             "temp_model": "sapm",
@@ -24,7 +24,7 @@
             "weather_names": "TMY",
             "weather_satellite": "Americas",
             "wind_speed_factor": 1,
-            "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_rel_humidity_j0.h5",
+            "out_file": "/home/mspringe/projects/degtools/github/pvdeg/demo/out_rel_humidity_j0.h5",
             "runtime_seconds": 9.521851,
             "time_end": "21-Apr-2023 13:57:11",
             "total_runtime": "0:00:09"
@@ -42,7 +42,7 @@
             "l": 0.5,
             "max_workers": null,
             "mount_type": "open_rack_glass_glass",
-            "out_dir": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo",
+            "out_dir": "/home/mspringe/projects/degtools/github/pvdeg/demo",
             "sky_model": "isotropic",
             "tag": "_j1",
             "temp_model": "sapm",
@@ -52,7 +52,7 @@
             "weather_names": "TMY",
             "weather_satellite": "Americas",
             "wind_speed_factor": 1,
-            "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_rel_humidity_j1.h5",
+            "out_file": "/home/mspringe/projects/degtools/github/pvdeg/demo/out_rel_humidity_j1.h5",
             "runtime_seconds": 9.398299,
             "time_end": "21-Apr-2023 13:57:11",
             "total_runtime": "0:00:09"
@@ -69,7 +69,7 @@
             "level": 1,
             "max_workers": null,
             "module_type": "glass_polymer",
-            "out_dir": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo",
+            "out_dir": "/home/mspringe/projects/degtools/github/pvdeg/demo",
             "sky_model": "isotropic",
             "tag": "_j0",
             "temp_model": "sapm",
@@ -80,7 +80,7 @@
             "weather_satellite": "Americas",
             "wind_speed_factor": 1.71,
             "x_0": 6.1,
-            "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff_j0.h5",
+            "out_file": "/home/mspringe/projects/degtools/github/pvdeg/demo/out_standoff_j0.h5",
             "runtime_seconds": 8.855118,
             "time_end": "21-Apr-2023 13:46:45",
             "total_runtime": "0:00:08"
@@ -94,7 +94,7 @@
             "level": 1,
             "max_workers": null,
             "module_type": "glass_polymer",
-            "out_dir": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo",
+            "out_dir": "/home/mspringe/projects/degtools/github/pvdeg/demo",
             "sky_model": "isotropic",
             "tag": "_j1",
             "temp_model": "sapm",
@@ -105,7 +105,7 @@
             "weather_satellite": "Americas",
             "wind_speed_factor": 1.71,
             "x_0": 6.1,
-            "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff_j1.h5",
+            "out_file": "/home/mspringe/projects/degtools/github/pvdeg/demo/out_standoff_j1.h5",
             "runtime_seconds": 8.662029,
             "time_end": "21-Apr-2023 13:46:45",
             "total_runtime": "0:00:08"
@@ -119,11 +119,11 @@
             "job_status": "successful",
             "time_submitted": "21-Apr-2023 13:57:18",
             "collect_pattern": [
-                "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_rel_humidity.h5",
-                "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_rel_humidity*.h5"
+                "/home/mspringe/projects/degtools/github/pvdeg/demo/out_rel_humidity.h5",
+                "/home/mspringe/projects/degtools/github/pvdeg/demo/out_rel_humidity*.h5"
             ],
             "datasets": null,
-            "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_rel_humidity.h5",
+            "out_file": "/home/mspringe/projects/degtools/github/pvdeg/demo/out_rel_humidity.h5",
             "purge_chunks": false,
             "runtime_seconds": 2.521077,
             "time_end": "21-Apr-2023 13:57:39",
@@ -139,13 +139,13 @@
             "job_status": "successful",
             "time_submitted": "21-Apr-2023 13:46:50",
             "collect_pattern": [
-                "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5",
-                "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff*.h5"
+                "/home/mspringe/projects/degtools/github/pvdeg/demo/out_standoff.h5",
+                "/home/mspringe/projects/degtools/github/pvdeg/demo/out_standoff*.h5"
             ],
             "datasets": null,
             "purge_chunks": false,
             "time_start": "21-Apr-2023 13:47:12",
-            "out_file": "/home/mspringe/projects/degtools/github/PVDegradationTools/demo/out_standoff.h5",
+            "out_file": "/home/mspringe/projects/degtools/github/pvdeg/demo/out_standoff.h5",
             "runtime_seconds": 1.785692,
             "time_end": "21-Apr-2023 13:47:13",
             "total_runtime": "0:00:01"

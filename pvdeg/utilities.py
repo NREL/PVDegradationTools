@@ -185,7 +185,7 @@ def _get_state(id):
 
 def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
     '''
-    Read a older TMY-like weather file and convert to h5 for use in PVD
+    Read a older TMY-like weather file and convert to h5 for use in pvdeg
 
     TODO: figure out scale_facator and np.int32 for smaller file
           expand for international locations?

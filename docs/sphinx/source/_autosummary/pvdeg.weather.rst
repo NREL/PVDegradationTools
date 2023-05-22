@@ -1,7 +1,7 @@
-﻿PVDegradationTools.weather
-==========================
+﻿pvdeg.weather
+=============
 
-.. automodule:: PVDegradationTools.weather
+.. automodule:: pvdeg.weather
 
    
    

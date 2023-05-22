@@ -2,7 +2,7 @@ import os
 # import numpy as np
 # import pytest
 import pandas as pd
-import PVDegradationTools as PVD
+import pvdeg 
 from rex import Outputs
 
 try:
@@ -35,7 +35,7 @@ def test_load():
     #                'attributes' : ['air_temperature', 'wind_speed', 'dhi', 
     #                                'ghi', 'dni','relative_humidity']}
     
-    # weather_df, meta = PVD.weather.load(weather_db, weather_id, **weather_arg)
+    # weather_df, meta = pvdeg.weather.load(weather_db, weather_id, **weather_arg)
  
     # assert isinstance(meta, dict)
     # assert isinstance(weather_df, pd.DataFrame)
@@ -43,12 +43,12 @@ def test_load():
 
     # #Test with gid on NREL HPC
     # weather_id = 1933572  
-    # weather_df, meta = PVD.weather.load(weather_db, weather_id, **weather_arg)
+    # weather_df, meta = pvdeg.weather.load(weather_db, weather_id, **weather_arg)
     pass
 
 def test_read_file():
     '''
-    test PVD.utilities.read_weather
+    test pvdeg.utilities.read_weather
     
     Requires:
     ---------
@@ -56,7 +56,7 @@ def test_read_file():
     '''
     for type, path in FILES.items():
         if type != 'h5':
-            weather_df, meta = PVD.weather.read_file(file_in=path,
+            weather_df, meta = pvdeg.weather.read_file(file_in=path,
                                                     file_type=type)
             assert isinstance(meta, dict)
             assert isinstance(weather_df, pd.DataFrame)

@@ -1,2 +1,2 @@
 include versioneer.py
-include PVDegradationTools/_version.py
+include pvdeg/_version.py

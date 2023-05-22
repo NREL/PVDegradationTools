@@ -1,7 +1,7 @@
-﻿PVDegradationTools.letid
-========================
+﻿pvdeg.letid
+===========
 
-.. automodule:: PVDegradationTools.letid
+.. automodule:: pvdeg.letid
 
    
    

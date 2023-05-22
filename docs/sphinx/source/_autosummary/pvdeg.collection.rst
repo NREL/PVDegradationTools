@@ -1,7 +1,7 @@
-﻿PVDegradationTools.collection
-=============================
+﻿pvdeg.collection
+================
 
-.. automodule:: PVDegradationTools.collection
+.. automodule:: pvdeg.collection
 
    
    

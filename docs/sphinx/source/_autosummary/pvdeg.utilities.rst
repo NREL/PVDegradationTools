@@ -1,7 +1,7 @@
-﻿PVDegradationTools.utilities
-============================
+﻿pvdeg.utilities
+===============
 
-.. automodule:: PVDegradationTools.utilities
+.. automodule:: pvdeg.utilities
 
    
    

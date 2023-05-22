@@ -2,7 +2,7 @@ import os
 # import numpy as np
 # import pytest
 import pandas as pd
-import PVDegradationTools as PVD
+import pvdeg 
 from rex import Outputs
 
 try:
@@ -29,13 +29,13 @@ def test_write_gids():
 
 def test_convert_tmy():
     '''
-    Test PVD.utilites.convert_tmy
+    Test pvdeg.utilites.convert_tmy
 
     Requires:
     ---------
     tmy3 or tmy-like .csv weather file (WEATHERFILES['tmy3'])
     '''
-    PVD.utilities.convert_tmy(file_in=FILES['tmy3'], file_out=FILES['h5'])
+    pvdeg.utilities.convert_tmy(file_in=FILES['tmy3'], file_out=FILES['h5'])
     with Outputs(FILES['h5'],'r') as f:
         datasets = f.dsets
     assert datasets == DSETS

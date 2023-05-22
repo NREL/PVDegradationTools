@@ -2,7 +2,7 @@ import pytest
 import os
 import pandas as pd
 import numpy as np
-from PVDegradationTools import collection
+from pvdeg import collection
 
 TESTDIR = os.path.dirname(__file__)  # this folder
 GENERATIONFILE = os.path.join(TESTDIR, 'data', r'PVL_GenProfile.xlsx')

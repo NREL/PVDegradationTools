@@ -6,7 +6,7 @@ import pandas as pd
 import os
 from scipy.constants import convert_temperature, elementary_charge, Boltzmann
 from scipy.integrate import simpson
-from PVDegradationTools import collection
+from pvdeg import collection
 
 
 def tau_now(tau_0, tau_deg, n_b):

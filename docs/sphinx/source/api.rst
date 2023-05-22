@@ -4,7 +4,7 @@ API
 ===
 Modules, methods, classes and attributes are explained here.
 
-.. automodule:: PVDegradationTools
+.. automodule:: pvdeg
     :members:
 
 .. autosummary::

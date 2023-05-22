@@ -2,15 +2,15 @@ import os
 import json
 import pytest
 import pandas as pd
-import PVDegradationTools as PVD
+import pvdeg 
 
 #Load weather data
-weather_df = pd.read_pickle(os.path.join(PVD.TEST_DATA_DIR, 'weather_df_year.pkl'))
-with open(os.path.join(PVD.TEST_DATA_DIR, 'meta.json')) as file:
+weather_df = pd.read_pickle(os.path.join(pvdeg.TEST_DATA_DIR, 'weather_df_year.pkl'))
+with open(os.path.join(pvdeg.TEST_DATA_DIR, 'meta.json')) as file:
     meta = json.load(file)
 
 def test_calc_standoff():
-    result_l1 = PVD.standards.calc_standoff(
+    result_l1 = pvdeg.standards.calc_standoff(
         weather_df,
         meta,
         tilt=None,
@@ -22,7 +22,7 @@ def test_calc_standoff():
         x_0=6.1,
         wind_speed_factor=1.71)
     
-    result_l2 = PVD.standards.calc_standoff(
+    result_l2 = pvdeg.standards.calc_standoff(
         weather_df,
         meta,
         tilt=None,

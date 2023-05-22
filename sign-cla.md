@@ -11,10 +11,10 @@ Contributors License Agreement. It's easy and pretty painless!
 2. Make an account on [GitHub](https://github.com/) if you don't already
    have one.
 
-3. File a pull request on this project (the PVDegradationTools Project), 
+3. File a pull request on this project (the pvdeg Project), 
    as [outlined below](#filing-the-pull-request).
 
-4. Email the PVDegradationTools Sourceror, as [outlined below](#sending-the-email).
+4. Email the pvdeg Sourceror, as [outlined below](#sending-the-email).
 
 5. Wait for an Alliance team member to merge your pull request. You may start
    opening pull requests for the project you're contributing to but we will
@@ -82,10 +82,10 @@ That's it!
 Sending the Email
 -----------------
 
-Send an email to PVDegradationTools's official Open Sourceror
+Send an email to pvdeg's official Open Sourceror
 at [silvana.ovaitt@nrel.gov](mailto:silvana.ovaitt@nrel.gov), 
 cc-ing [michael.kempe@nrel.gov](mailto:michael.kempe@nrel.gov),
-with the subject "CLA PVDegradationTools" 
+with the subject "CLA pvdeg" 
 and the following body:
 
 ```

@@ -1,7 +1,7 @@
-﻿PVDegradationTools.temperature
-==============================
+﻿pvdeg.temperature
+=================
 
-.. automodule:: PVDegradationTools.temperature
+.. automodule:: pvdeg.temperature
 
    
    

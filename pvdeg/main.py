@@ -12,8 +12,8 @@ from scipy.constants import convert_temperature
 from scipy.integrate import simpson
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 import os
-from PVDegradationTools import utilities as utils
-import PVDegradationTools as PVD
+from pvdeg import utilities as utils
+import pvdeg 
 import json
 
 class StressFactors:
@@ -1512,7 +1512,7 @@ class Scenario:
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
         material : (str)
             Name of the material desired. For a complete list, see data/materials.json.
-            To add a custom material, see PVDegradationTools.addMaterial (ex: EVA, Tedlar)
+            To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         """
 
         # fetch material parameters (Eas, Ead, So, etc)
@@ -1566,24 +1566,24 @@ class Scenario:
 
     def addFunction(self, func_name=None, func_params=None):
         """
-        Add a PVD function to the scenario pipeline
+        Add a pvdeg function to the scenario pipeline
 
         TODO: list public functions if no func_name given or bad func_name given
 
         Parameters:
         -----------
         func_name : (str)
-            The name of the requested PVD function. Do not include the class.
+            The name of the requested pvdeg function. Do not include the class.
         func_params : (dict)
-            The required parameters to run the requested PVD function
+            The required parameters to run the requested pvdeg function
         
         Returns:
         --------
         func_name : (str)
-            the name of the PVD function requested
+            the name of the pvdeg function requested
         """
 
-        _func, reqs = PVD.Scenario._verify_function(func_name)
+        _func, reqs = pvdeg.Scenario._verify_function(func_name)
         
         if _func == None:
             print(f'FAILED: Requested function "{func_name}" not found')
@@ -1610,7 +1610,7 @@ class Scenario:
         
         TODO: overhaul with futures/slurm
               capture results
-              standardize result format for all of PVD
+              standardize result format for all of pvdeg
 
         Parameters:
         -----------
@@ -1622,14 +1622,14 @@ class Scenario:
         
         for job in self.pipeline:
             args = job['parameters']
-            _func = PVD.Scenario._verify_function(job['job'],args)[0]
+            _func = pvdeg.Scenario._verify_function(job['job'],args)[0]
             result = _func(**args)
 
     def exportScenario(self, file_path=None):
         '''
         Export the scenario dictionaries to a json configuration file
         
-        TODO exporting functions as name string within pipeline. cannot .json dump <PVD.func>
+        TODO exporting functions as name string within pipeline. cannot .json dump <pvdeg.func>
              Need to make sure name is verified > stored > export > import > re-verify > converted.
              This could get messy. Need to streamline the process or make it bullet proof
         
@@ -1675,7 +1675,7 @@ class Scenario:
     
     def _verify_function(func_name):
         """
-        Check all classes in PVD for a function of the name "func_name". Returns a callable function
+        Check all classes in pvdeg for a function of the name "func_name". Returns a callable function
         and list of all function parameters with no default values.
         
         Parameters:
@@ -1686,17 +1686,17 @@ class Scenario:
         Returns:
         --------
         _func : (func)
-            callable instance of named function internal to PVD
+            callable instance of named function internal to pvdeg
         reqs : (list(str))
             list of minimum required paramters to run the requested funciton
         """
         from inspect import signature
         
-        # find the function in PVD
-        class_list = [c for c in dir(PVD) if not c.startswith('_')]
+        # find the function in pvdeg
+        class_list = [c for c in dir(pvdeg) if not c.startswith('_')]
         func_list = []
         for c in class_list:
-            _class = getattr(PVD,c)
+            _class = getattr(pvdeg,c)
             if func_name in dir(_class):
                 _func = getattr(_class,func_name)
         if _func == None:

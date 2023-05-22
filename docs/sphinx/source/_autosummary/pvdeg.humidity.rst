@@ -1,7 +1,7 @@
-﻿PVDegradationTools.humidity
-===========================
+﻿pvdeg.humidity
+==============
 
-.. automodule:: PVDegradationTools.humidity
+.. automodule:: pvdeg.humidity
 
    
    

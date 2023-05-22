@@ -1,5 +1,5 @@
-from PVDegradationTools.standards import run_calc_standoff
-from PVDegradationTools.humidity import run_calc_rel_humidity
+from pvdeg.standards import run_calc_standoff
+from pvdeg.humidity import run_calc_rel_humidity
 from gaps.cli import CLICommandFromFunction, make_cli
 
 commands = [

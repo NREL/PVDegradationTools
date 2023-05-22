@@ -1,7 +1,7 @@
-﻿PVDegradationTools.standards
-============================
+﻿pvdeg.standards
+===============
 
-.. automodule:: PVDegradationTools.standards
+.. automodule:: pvdeg.standards
 
    
    

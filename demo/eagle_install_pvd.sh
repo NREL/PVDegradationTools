@@ -56,7 +56,7 @@ fi
 conda install -c pvlib pvlib
 
 # Clone the necessary repositories
-git clone https://github.com/NREL/PVDegradationTools.git ./$1/pvd
+git clone https://github.com/NREL/pvdeg.git ./$1/pvd
 git clone https://github.com/NREL/gaps.git ./$1/gaps
 git clone https://github.com/NREL/reV.git ./$1/reV
 

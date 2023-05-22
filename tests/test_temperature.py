@@ -2,26 +2,26 @@ import os
 import json
 import pytest
 import pandas as pd
-import PVDegradationTools as PVD
+import pvdeg 
 
 #Load weather data
-weather_df = pd.read_pickle(os.path.join(PVD.TEST_DATA_DIR, 'weather_df_day.pkl'))
-with open(os.path.join(PVD.TEST_DATA_DIR, 'meta.json')) as file:
+weather_df = pd.read_pickle(os.path.join(pvdeg.TEST_DATA_DIR, 'weather_df_day.pkl'))
+with open(os.path.join(pvdeg.TEST_DATA_DIR, 'meta.json')) as file:
     meta = json.load(file)
 
 #Load input dataframes
 solar_position = pd.read_pickle(os.path.join(
-    PVD.TEST_DATA_DIR, 'solar_position_day.pkl'))
+    pvdeg.TEST_DATA_DIR, 'solar_position_day.pkl'))
 
 poa_irradiance = pd.read_pickle(os.path.join(
-    PVD.TEST_DATA_DIR, 'poa_irradiance_day.pkl'))
+    pvdeg.TEST_DATA_DIR, 'poa_irradiance_day.pkl'))
 
 #Load expected results
 expected_module_temp = pd.read_pickle(os.path.join(
-    PVD.TEST_DATA_DIR, 'module_temp_day.pkl'))
+    pvdeg.TEST_DATA_DIR, 'module_temp_day.pkl'))
 
 def test_module():
-    result = PVD.temperature.module(
+    result = pvdeg.temperature.module(
                 weather_df, 
                 poa_irradiance,
                 temp_model='sapm', 
