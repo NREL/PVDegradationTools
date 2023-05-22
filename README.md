@@ -9,7 +9,7 @@
 <tr>
   <td>License</td>
   <td>
-    <a href="https://github.com/NREL/pvdeg/blob/master/LICENSE.md">
+    <a href="https://github.com/NREL/PVDegradationTools/blob/master/LICENSE.md">
     <img src="https://img.shields.io/pypi/l/pvlib.svg" alt="license" />
     </a>
 </td>
@@ -17,8 +17,8 @@
 <tr>
   <td>Documentation</td>
   <td>
-	<a href='https://pvdeg.readthedocs.io/en/latest/?badge=latest'>
-	    <img src='https://readthedocs.org/projects/pvdeg/badge/?version=latest' alt='Documentation Status' />
+	<a href='https://PVDegradationTools.readthedocs.io/en/latest/?badge=latest'>
+	    <img src='https://readthedocs.org/projects/PVDegradationTools/badge/?version=latest' alt='Documentation Status' />
 	</a>
   </td>
 </tr>
@@ -35,9 +35,9 @@ This repository contains functions for calculating degradation of photovoltaic m
 Documentation
 =============
 
-[Tutorials](https://github.com/NREL/pvdeg/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder. 
+[Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder. 
 
-We also have documentation in [ReadTheDocs](https://pvdeg.readthedocs.io) where you can find more details on the API functions.
+We also have documentation in [ReadTheDocs](https://PVDegradationTools.readthedocs.io) where you can find more details on the API functions.
 
 
 Installation
@@ -47,7 +47,7 @@ Relative Humidity and Acceleration Factors for Solar Modules releases may be ins
 
 Install with:
 
-    pip install pvdeg
+    pip install NREL-pvdeg
 
 For developer installation, download the repository, navigate to the folder location and install as:
 
@@ -71,7 +71,7 @@ Getting support
 
 If you suspect that you may have discovered a bug or if you'd like to
 change something about pvdeg, then please make an issue on our
-[GitHub issues page](hhttps://github.com/NREL/pvdeg/issues).
+[GitHub issues page](hhttps://github.com/NREL/PVDegradationTools/issues).
 
 
 Citing
