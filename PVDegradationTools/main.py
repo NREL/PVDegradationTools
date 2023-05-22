@@ -468,7 +468,6 @@ class StressFactors:
         --------  
         RHback_series : pandas series (float)
             Relative Humidity of Backside Solar Module Encapsulant     
-
         """
 
         rh_surface = StressFactors.rh_surface_outside(rh_ambient=rh_ambient,
@@ -508,17 +507,14 @@ class StressFactors:
         Parameters
         ----------
         rh_back_encap : pandas series (float)
-            Relative Humidity of Frontside Solar module Encapsulant. *See rh_back_encap()
+            Relative Humidity of Frontside Solar module Encapsulant. See rh_back_encap().
         rh_surface_outside : pandas series (float)
-            The relative humidity of the surface of a solar module. *See rh_surface_outside()
+            The relative humidity of the surface of a solar module. See rh_surface_outside().
 
         Returns
-        --------
+        -------
         RHbacksheet_series : pandas series (float)
-            Relative Humidity of Backside Backsheet of a Solar Module
-
-        @return rh_Surface     -
-\                             
+            Relative Humidity of Backside Backsheet of a Solar Module                 
         """
 
         RHbacksheet_series = (rh_back_encap + rh_surface_outside)/2
@@ -527,7 +523,8 @@ class StressFactors:
 
     def rh_backsheet(rh_ambient, temp_ambient, temp_module,
                     WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
-        """Function to calculate the Relative Humidity of solar module backsheet as timeseries.
+        """
+        Function to calculate the Relative Humidity of solar module backsheet as timeseries.
         This function uses the same formula as StressFactors.rh_backsheet_from_encap but does
         not require you to independently solve for the backside ecapsulant and surface humidity
         before calculation. 
@@ -803,8 +800,8 @@ class Degradation:
     def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.5, Tf=1.41):
         """
         IWa : Environment Characterization (W/m²)
-        *for one year of degredation the controlled environmnet lamp settings will
-            need to be set to IWa
+        For one year of degredation the controlled environmnet lamp settings will
+        need to be set to IWa.
 
         Parameters
         -----------
@@ -1024,15 +1021,15 @@ class Degradation:
 
         return RHwa
 
+
+    #TODO:   CHECK
+    # STANDARDIZE
     def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
                      RHwa=None, Teq=None, x=0.5, n=1):
         """
-        TODO:   CHECK
-                STANDARDIZE
-
-        Function to calculate IWa, the Environment Characterization (W/m²)
-        *for one year of degredation the controlled environmnet lamp settings will
-            need to be set at IWa
+        Function to calculate IWa, the Environment Characterization (W/m²).
+        For one year of degredation the controlled environmnet lamp settings will
+        need to be set at IWa.
 
         Parameters
         ----------
@@ -1041,8 +1038,7 @@ class Degradation:
         rh_outdoor : pandas series
             Relative Humidity of material of interest
             Acceptable relative humiditys can be calculated
-            from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap()
-                                  rh_surface_outside()
+            from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(), rh_surface_outside()
         temp_cell : pandas series
             Solar module temperature or Cell temperature [°C]
         Ea : float
@@ -1061,7 +1057,6 @@ class Degradation:
         --------
         Iwa : float
             Environment Characterization (W/m²)
-
         """
         if Teq is None:
             Teq = Degradation._T_eq_arrhenius(temp_cell, Ea)

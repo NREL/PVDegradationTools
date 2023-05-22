@@ -144,7 +144,7 @@ htmlhelp_basename = 'PVDegradationToolsdoc'
 
 # A workaround for the responsive tables always having annoying scrollbars.
 def setup(app):
-    app.add_stylesheet("no_scrollbars.css")
+    app.add_css_file("no_scrollbars.css")
     
 """    
 # -- Options for LaTeX output ---------------------------------------------
@@ -188,12 +188,12 @@ latex_documents = [
 # If false, no module index is generated.
 #latex_domain_indices = True
 """
-# extlinks alias
-extlinks = {'issue': ('https://github.com/NREL/PVDegradationTools/issues/%s', 'GH'),
-            'pull': ('https://github.com/NREL/PVDegradationTools/pull/%s', 'GH'),
-            'wiki': ('https://github.com/NREL/PVDegradationTools/wiki/%s', 'wiki '),
-            'doi': ('http://dx.doi.org/%s', 'DOI: '),
-            'ghuser': ('https://github.com/%s', '@')}
+# extlinks alias #TODO: check if those are working
+extlinks = {'issue': ('https://github.com/NREL/PVDegradationTools/issues/%s', '%s. GH'),
+            'pull': ('https://github.com/NREL/PVDegradationTools/pull/%s', '%s. GH'),
+            'wiki': ('https://github.com/NREL/PVDegradationTools/wiki/%s', '%s. wiki '),
+            'doi': ('http://dx.doi.org/%s', '%s. DOI: '),
+            'ghuser': ('https://github.com/%s', '%s. @')}
 """
 # -- Options for manual page output ---------------------------------------
 

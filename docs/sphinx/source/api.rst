@@ -5,20 +5,34 @@ API
 Modules, methods, classes and attributes are explained here.
 
 .. automodule:: PVDegradationTools
+    :members:
 
-.. automodule:: PVDegradationTools.main
+.. autosummary::
+    :toctree: _autosummary
+    :recursive:
 
-Stress Factors 
--------------------
-.. autoclass:: StressFactors
-  :members:
+    main
+    collection
+    humidity
+    letid
+    spectral
+    standards
+    temperature
+    utilities
+    weather
 
-Degradation
--------------------------------
-.. autoclass:: Degradation
-  :members:
+..
+  Stress Factors 
+  -------------------
+  .. autoclass:: StressFactors
+    :members:
 
-Standards
--------------------
-.. autoclass:: Standards
-  :members:
+  Degradation
+  -------------------------------
+  .. autoclass:: Degradation
+    :members:
+
+  Standards
+  -------------------
+  .. autoclass:: Standards
+    :members:
