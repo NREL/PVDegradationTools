@@ -22,6 +22,9 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open("requirements.txt") as f:
+    INSTALL_REQUIREMENTS = f.read().splitlines()
+
 setup(
     name='pvdeg',
 
@@ -84,7 +87,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['numpy'],
+    install_requires=INSTALL_REQUIREMENTS,
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -121,7 +124,7 @@ setup(
     package_dir={"pvdeg": "pvdeg"},
     entry_points={
         "console_scripts": [
-            "pvd=pvdeg.cli:cli",
+            "pvdeg=pvdeg.cli:cli",
         ]
     },
 )

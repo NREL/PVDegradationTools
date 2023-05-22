@@ -13,3 +13,5 @@ scipy>=1.10.1
 openpyxl>=3.1.2
 tqdm>=4.65.0
 matplotlib
+jupyterlab
+notebook
