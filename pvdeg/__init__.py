@@ -4,8 +4,8 @@ import sys
 
 from .main import StressFactors, Degradation, Scenario
 
-if 'gaps' in sys.modules:  # Workaround until gaps is on pypi
-    from . import cli
+
+from . import cli
 from . import humidity
 from . import spectral
 from . import standards

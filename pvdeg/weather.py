@@ -45,9 +45,17 @@ def load(database, id, **kwargs):
 
     if database == 'NSRDB':
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
-    elif database == 'PVGIS':
+    elif database == 'PSM3':
         weather_df, meta = pvlib.iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
-    elif database == 'local':
+        meta['elevation'] = meta['altitude']
+        weather_df['air_temperature'] = weather_df['temp_air']
+    elif database == 'PVGIS':
+        weather_df, _, _, meta = pvlib.iotools.get_pvgis_tmy(latitude=lat, longitude=lon, **kwargs)
+    elif database == 'EPW':
+        weather_df, meta = pvlib.iotools.read_epw(**kwargs)
+    elif database == 'TMY3':
+        weather_df, meta = pvlib.iotools.read_tmy3(**kwargs)
+    elif database == 'h5':
         weather_df, meta = read_h5(gid=gid, **kwargs)
     else:
         raise NameError('Weather database not found.')
