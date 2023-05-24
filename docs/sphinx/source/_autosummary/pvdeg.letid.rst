@@ -16,6 +16,9 @@
       calc_device_params
       calc_dn
       calc_energy_loss
+      calc_injection_outdoors
+      calc_letid_lab
+      calc_letid_outdoors
       calc_ndd
       calc_pmp_loss_from_tau_loss
       calc_regeneration_time

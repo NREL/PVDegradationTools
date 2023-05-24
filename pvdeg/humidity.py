@@ -8,12 +8,50 @@ from numba import jit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
-from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from . import temperature
 from . import spectral
 from . import weather
+
+#TODO: When is dew_yield used?
+@jit(nopython=True, error_model='python')
+def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
+    """
+    Estimates the dew yield in [mm/day].  Calculation taken from:
+    Beysens, "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167
+    (2016) 146-155
+
+    Parameters
+    -----------
+    elevation : int
+        Site elevation [km]
+    dew_point : float
+        Dewpoint temperature in Celsius [°C]
+    dry_bulb : float
+        Air temperature "dry bulb temperature" [°C]
+    wind_speed : float
+        Air or windspeed measure [m/s]
+    n : float
+        Total sky cover(okta)
+        This is a quasi emperical scale from 0 to 8 used in meterology which corresponds to
+        0-sky completely clear, to 8-sky completely cloudy. Does not account for cloud type
+        or thickness.
+
+    Returns
+    -------
+    dew_yield : float
+        Amount of dew yield in [mm/day]
+
+    """
+    wind_speed_cut_off = 4.4
+    dew_yield = (1/12) * (.37 * (1 + (0.204323 * elevation) - (0.0238893 * elevation**2) -
+                            (18.0132 - (1.04963 * elevation**2) + (0.21891 * elevation**2)) * (10**(-3) * dew_point)) *
+                            ((((dew_point + 273.15) / 285)**4)*(1 - (n/8))) +
+                            (0.06 * (dew_point - dry_bulb)) *
+                            (1 + 100 * (1 - np.exp(- (wind_speed / wind_speed_cut_off)**20))))
+
+    return dew_yield
 
 
 def psat(temp):
