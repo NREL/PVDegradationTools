@@ -43,6 +43,8 @@ def load(database, id, **kwargs):
         raise TypeError(
             'Project points needs to be either location tuple (latitude, longitude), or gid integer.')
 
+    #TODO: decide wether to follow NSRDB or pvlib conventions...
+    # e.g. temp_air vs. air_temperature
     if database == 'NSRDB':
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
     elif database == 'PSM3':
