@@ -2,11 +2,10 @@ import pytest
 import os
 import pandas as pd
 import numpy as np
-from pvdeg import collection
+from pvdeg import collection, TEST_DIR, DATA_DIR
 
-TESTDIR = os.path.dirname(__file__)  # this folder
-GENERATIONFILE = os.path.join(TESTDIR, 'data', r'PVL_GenProfile.xlsx')
-generation_df = pd.read_excel(GENERATIONFILE, header=0, engine="openpyxl")
+fgen = os.path.join(DATA_DIR, 'PVL_GenProfile.xlsx')
+generation_df = pd.read_excel(fgen, header=0, engine="openpyxl")
 generation = generation_df['Generation (cm-3s-1)']
 depth = generation_df['Depth (um)']
 
