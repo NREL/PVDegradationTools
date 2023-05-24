@@ -1,18 +1,7 @@
 import logging
-from pathlib import Path
-import sys
 
-#Module directories
-PVDEG_DIR = Path(__file__).parent
-REPO_NAME = __name__
-DATA_DIR = PVDEG_DIR / "data"
-TEST_DIR = PVDEG_DIR.parent / "tests"
-TEST_DATA_DIR = PVDEG_DIR.parent / "tests" / "data"
-MATERIALS_DIR = PVDEG_DIR.parent / "materials"
-
-#TODO: Delete once all functions are split up into separate files
-from .main import StressFactors, Degradation, Scenario
-
+from .config import *
+from .main import StressFactors, Degradation #TODO: Delete once all functions are split up
 from . import cli
 from . import collection
 from . import degradation
@@ -22,7 +11,7 @@ from . import humidity
 from . import letid
 from .scenario import Scenario
 from . import spectral
-from . import standards
+from . import standardspy
 from . import temperature
 from . import utilities
 from . import weather

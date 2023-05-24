@@ -20,7 +20,7 @@ from . import weather
 def eff_gap(T_0, T_inf, level=1, x_0=6.1):
     '''
     Calculate a minimum installation distance for rooftop  mounded PV systems.
-    
+
     Parameters
     ----------
     level : int, optional
@@ -36,7 +36,7 @@ def eff_gap(T_0, T_inf, level=1, x_0=6.1):
 
     References
     ----------
-    M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance 
+    M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     '''
 
@@ -66,7 +66,7 @@ def calc_standoff(
     wind_speed_factor=1):
     '''
     Calculate a minimum standoff distance for roof mounded PV systems.
-    
+
     Parameters
     ----------
     weather_df : pd.DataFrame
@@ -88,7 +88,7 @@ def calc_standoff(
     x0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
     wind_speed_factor : float, optional
-        Wind speed correction factor to account for different wind speed measurement heights 
+        Wind speed correction factor to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
     Returns
     -------
@@ -98,7 +98,7 @@ def calc_standoff(
 
     References
     ----------
-    M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance 
+    M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     '''
     if module_type == 'glass_polymer':
@@ -107,7 +107,7 @@ def calc_standoff(
     elif module_type == 'glass_glass':
         conf_0 = 'close_mount_glass_glass'
         conf_inf = 'open_rack_glass_glass'
-  
+
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
     T_0 = temperature.module(weather_df, poa, temp_model, conf_0, wind_speed_factor)
@@ -118,8 +118,8 @@ def calc_standoff(
 
 
 def run_calc_standoff(
-    project_points, 
-    out_dir, 
+    project_points,
+    out_dir,
     tag,
     #weather_db,
     #weather_satellite,
@@ -145,10 +145,10 @@ def run_calc_standoff(
     #weather_arg['names'] = weather_names
     weather_arg['NREL_HPC'] = True  #TODO: add argument or auto detect
     weather_arg['attributes'] = [
-        'air_temperature', 
-        'wind_speed', 
-        'dhi', 
-        'ghi', 
+        'air_temperature',
+        'wind_speed',
+        'dhi',
+        'ghi',
         'dni',
         'relative_humidity'
         ]
@@ -165,13 +165,13 @@ def run_calc_standoff(
 
     # #TODO: is there a better way to add the meta data?
     # nsrdb_fnames, hsds  = weather.get_NSRDB_fnames(
-    #     weather_arg['satellite'], 
-    #     weather_arg['names'], 
+    #     weather_arg['satellite'],
+    #     weather_arg['names'],
     #     weather_arg['NREL_HPC'])
-    
+
     # with NSRDBX(nsrdb_fnames[0], hsds=hsds) as f:
     #     meta = f.meta[f.meta.index.isin(project_points.gids)]
- 
+
     Outputs.init_h5(
         out_fp,
         all_fields,
@@ -189,24 +189,25 @@ def run_calc_standoff(
             database = point.weather_db
             gid = idx #int(point.gid)
             df_weather_kwargs = point.drop('weather_db', inplace=False).filter(like='weather_')
-            df_weather_kwargs.index = df_weather_kwargs.index.map(lambda arg: arg.lstrip('weather_'))
+            df_weather_kwargs.index = df_weather_kwargs.index.map(
+                lambda arg: arg.lstrip('weather_'))
             weather_kwarg = weather_arg | df_weather_kwargs.to_dict()
 
             weather_df, meta = weather.load(
-                database = database, 
-                id = gid, 
+                database = database,
+                id = gid,
                 #satellite = point.satellite,  #TODO: check input
                 **weather_kwarg)
             future = executor.submit(
                 calc_standoff,
-                weather_df, 
+                weather_df,
                 meta,
-                tilt, 
-                azimuth, 
+                tilt,
+                azimuth,
                 sky_model,
-                temp_model, 
-                module_type, 
-                level, 
+                temp_model,
+                module_type,
+                level,
                 x_0,
                 wind_speed_factor
             )
@@ -217,7 +218,7 @@ def run_calc_standoff(
                 result = future.result()
                 gid = future_to_point.pop(future)
 
-                #ind = project_points.index(gid)  
+                #ind = project_points.index(gid)
                 for dset, data in result.items():
                     out[dset,  idx] = np.array([data])
 
