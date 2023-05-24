@@ -3,6 +3,7 @@ import json
 import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
+from pvdeg import MATERIALS_DIR
 
 
 def gid_downsampling(meta, n):
@@ -34,7 +35,7 @@ def gid_downsampling(meta, n):
 
     return meta_sub, gids_sub
 
-def get_kinetics(name=None):
+def get_kinetics(fname='kinetic_parameters.json', name=None):
     """
     Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
 
@@ -48,12 +49,12 @@ def get_kinetics(name=None):
     parameter_dict : (dict)
         dictionary of kinetic parameters
     """
-    absolute_path = os.path.dirname(__file__)
-    relative_path = 'data/kinetic_parameters.json'
-    path = os.path.join(absolute_path, relative_path)
-    with open(path) as f:
+    fpath = os.path.join(MATERIALS_DIR, fname)
+
+    with open(fpath) as f:
         data = json.load(f)
 
+    #TODO: rewrite to use exception handling
     if name is None:
         parameters_list = data.keys()
         return "Choose a set of kinetic parameters:", [*parameters_list]
@@ -232,7 +233,7 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
                             attrs={'scale_factor': 100},
                             dtype=np.int64)
 
-def _read_material(name):
+def _read_material(name, fname='materials.json'):
     """
     read a material from materials.json and return the parameter dictionary
 
@@ -246,10 +247,12 @@ def _read_material(name):
     mat_dict : (dict)
         dictionary of material parameters
     """
-    root = os.path.realpath(__file__)
-    root = root.split(r'/')[:-1]
-    file = os.path.join('/', *root, 'data', 'materials.json')
-    with open(file) as f:
+    #TODO: test then delete commented code
+    # root = os.path.realpath(__file__)
+    # root = root.split(r'/')[:-1]
+    # file = os.path.join('/', *root, 'data', 'materials.json')
+    fpath = os.path.join(MATERIALS_DIR, fname)
+    with open(fpath) as f:
         data = json.load(f)
 
     if name is None:
@@ -260,7 +263,7 @@ def _read_material(name):
     return mat_dict
 
 
-def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
+def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname='materials.json'):
     '''
     Add a new material to the materials.json database. Check the parameters for specific units.
     If material already exists, parameters will be updated.
@@ -288,10 +291,12 @@ def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian
     fickian : (boolean)
         I have no idea what this means (unused)
     '''
-
-    root = os.path.realpath(__file__)
-    root = root.split(r'/')[:-1]
-    OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
+    
+    #TODO: test then delete commented code
+    # root = os.path.realpath(__file__)
+    # root = root.split(r'/')[:-1]
+    # OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
+    fpath = os.path.join(MATERIALS_DIR, fname)
 
     material_dict = {
         'alias': alias,
@@ -303,11 +308,11 @@ def _add_material(name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian
         'Eap': Eap,
         'Po': Po}
 
-    with open(OUT_FILE) as f:
+    with open(fpath) as f:
         data = json.load(f)
     data.update({name: material_dict})
 
-    with open(OUT_FILE, 'w') as f:
+    with open(fpath, 'w') as f:
         json.dump(data, f, indent=4)
 
 

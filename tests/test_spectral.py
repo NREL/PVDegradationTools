@@ -3,18 +3,19 @@ import json
 import pytest
 import pandas as pd
 import pvdeg 
+from pvdeg import TEST_DATA_DIR
 
 #Load weather data
-weather_df = pd.read_pickle(os.path.join(pvdeg.TEST_DATA_DIR, 'weather_df_day.pkl'))
-with open(os.path.join(pvdeg.TEST_DATA_DIR, 'meta.json')) as file:
+weather_df = pd.read_pickle(os.path.join(TEST_DATA_DIR, 'weather_df_day.pkl'))
+with open(os.path.join(TEST_DATA_DIR, 'meta.json')) as file:
     meta = json.load(file)
 
 #Load expected results
 expected_solar_position = pd.read_pickle(os.path.join(
-    pvdeg.TEST_DATA_DIR, 'solar_position_day.pkl'))
+    TEST_DATA_DIR, 'solar_position_day.pkl'))
 
 expected_poa_irradiance = pd.read_pickle(os.path.join(
-    pvdeg.TEST_DATA_DIR, 'poa_irradiance_day.pkl'))
+    TEST_DATA_DIR, 'poa_irradiance_day.pkl'))
 
 def test_solar_position():
     '''

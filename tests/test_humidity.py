@@ -3,15 +3,16 @@ import json
 import pytest
 import pandas as pd
 import pvdeg 
+from pvdeg import TEST_DATA_DIR
 
 #Load weather data
-weather_df = pd.read_pickle(os.path.join(pvdeg.TEST_DATA_DIR, 'weather_df_day.pkl'))
-with open(os.path.join(pvdeg.TEST_DATA_DIR, 'meta.json')) as file:
+weather_df = pd.read_pickle(os.path.join(TEST_DATA_DIR, 'weather_df_day.pkl'))
+with open(os.path.join(TEST_DATA_DIR, 'meta.json')) as file:
     meta = json.load(file)
 
 #Load expected results
 expected_rel_hum = pd.read_pickle(os.path.join(
-    pvdeg.TEST_DATA_DIR, 'rel_hum_day.pkl'))
+    TEST_DATA_DIR, 'rel_hum_day.pkl'))
 
 def test_calc_rel_humidity():
     '''
