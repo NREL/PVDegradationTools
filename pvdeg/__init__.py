@@ -2,10 +2,11 @@ import logging
 from pathlib import Path
 import sys
 
+#TODO: Delete once all functions are split up into separate files
 from .main import StressFactors, Degradation, Scenario
 
-
 from . import cli
+from . import design
 from . import humidity
 from . import spectral
 from . import standards

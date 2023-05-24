@@ -8,7 +8,6 @@ from numba import jit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
-from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from . import temperature
