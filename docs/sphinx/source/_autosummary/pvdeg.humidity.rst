@@ -15,6 +15,7 @@
    
       Ce_numba
       calc_rel_humidity
+      dew_yield
       psat
       rh_back_encap
       rh_backsheet
