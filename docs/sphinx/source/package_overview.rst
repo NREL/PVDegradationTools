@@ -3,7 +3,7 @@
 Package Overview
 ================
 
-PVDegradationTools provides a python library of common degradation modes for fielded photovoltaics and accelerated testing.
+pvdeg provides a python library of common degradation modes for fielded photovoltaics and accelerated testing.
 It currently offers functions to calculate test-chamber irradiance settings, the humidity of PV materials, the spectral degradation in backsheets, and more. Generally,
 you will only need a .psm3 weather file, which can be retrieved from NREL's `National Solar Radiation Database <https://nsrdb.nrel.gov/>`_ (NSRDB).
 

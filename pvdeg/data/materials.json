@@ -1,0 +1,72 @@
+{
+    "Tedlar": {
+        "alias": "PVF",
+        "Fickian": true,
+        "Ead": 30.48,
+        "Do": 0.0,
+        "Eas": -0.027,
+        "So": 0.000359,
+        "Eap": 30.21,
+        "Po": 441.0
+    },
+    "ST504": {
+        "alias": "PET1",
+        "Fickian": true,
+        "Ead": 47.65,
+        "Do": 0.56,
+        "Eas": -11.5,
+        "So": 8.22e-07,
+        "Eap": 33.98,
+        "Po": 1990.0
+    },
+    "EVA": {
+        "alias": "EVA",
+        "Fickian": true,
+        "Ead": 29.43,
+        "Do": 0.13,
+        "Eas": 32.31,
+        "So": 87.8,
+        "Eap": 61.74,
+        "Po": 97900000000.0
+    },
+    "AAA": {
+        "alias": "AAA",
+        "Fickian": true,
+        "Ead": 37.42,
+        "Do": 24.11,
+        "Eas": -0.95,
+        "So": 7.81e-06,
+        "Eap": 36.47,
+        "Po": 1630000.0
+    },
+    "Helioseal 101": {
+        "alias": "PIB-A",
+        "Fickian": true,
+        "Ead": 34.82,
+        "Do": 0.06,
+        "Eas": -4,
+        "So": 2.62e-05,
+        "Eap": 60.82,
+        "Po": 14400.0
+    },
+    "Helioseal 101 Wet": {
+        "alias": "PIB-A Wet",
+        "Fickian": true,
+        "Ead": 50.76,
+        "Do": 37.24,
+        "Eas": 2.73,
+        "So": 0.00019,
+        "Eap": 53.49,
+        "Po": 61200000.0
+    },
+    "LP03": {
+        "alias": "PIB-B",
+        "Fickian": true,
+        "Ead": 37.51,
+        "Do": 0.12,
+        "Eas": -9.43,
+        "So": 8.07e-07,
+        "Eap": 28.08,
+        "Po": 833.55
+    }
+}

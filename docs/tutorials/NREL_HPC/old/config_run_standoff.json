@@ -1,0 +1,26 @@
+{
+    "execution_control": {
+        "option": "eagle",
+        "allocation": "pvsoiling",
+        "walltime": 1,
+        "memory": null,
+        "nodes": 2,
+        "queue": null,
+        "feature": "--partition=debug",
+        "conda_env": null,
+        "module": null,
+        "sh_script": null,
+        "max_workers": null
+    },
+    "project_points": "./gids_DENVER.csv",
+    "weather_db": "NSRDB",
+    "weather_names": "TMY",
+    "tilt": null,
+    "azimuth": 180,
+    "sky_model": "isotropic",
+    "temp_model": "sapm",
+    "module_type": "glass_polymer",
+    "level": 1,
+    "x_0": 6.1,
+    "wind_speed_factor": 1.71
+}

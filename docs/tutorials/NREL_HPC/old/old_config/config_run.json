@@ -1,0 +1,24 @@
+{
+    "execution_control": {
+        "option": "eagle",
+        "allocation": "pvsoiling",
+        "walltime": 1,
+        "memory": null,
+        "nodes": 2,
+        "queue": null,
+        "feature": "--partition=debug",
+        "conda_env": null,
+        "module": null,
+        "sh_script": null,
+        "max_workers": null
+    },
+    "project_points": "./project_points.csv",
+    "nsrdb_fp": "/datasets/NSRDB/current/nsrdb_tmy-2021.h5",
+    "tilt": null,
+    "azimuth": 180,
+    "sky_model": "isotropic",
+    "temp_model": "sapm",
+    "module_type": "glass_polymer",
+    "level": 0,
+    "x_0": 6.1
+}

@@ -26,7 +26,7 @@
 
 
 
-# PV Degradation Tools
+# PV Degradation Tools (pvdeg)
 
 This repository contains functions for calculating degradation of photovoltaic modules. For example, functions to calculate front and rear relative Humidity, as well as Acceleration Factors. A degradation calculation function is also being developed, considering humidity and spectral irradiances models.
 
@@ -37,7 +37,7 @@ Documentation
 
 [Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder. 
 
-We also have documentation in [ReadTheDocs](https://pvdegradationtools.readthedocs.io) where you can find more details on the API functions.
+We also have documentation in [ReadTheDocs](https://PVDegradationTools.readthedocs.io) where you can find more details on the API functions.
 
 
 Installation
@@ -47,7 +47,7 @@ Relative Humidity and Acceleration Factors for Solar Modules releases may be ins
 
 Install with:
 
-    pip install PVDegradationTools
+    pip install NREL-pvdeg (To be done.)
 
 For developer installation, download the repository, navigate to the folder location and install as:
 
@@ -70,7 +70,7 @@ Getting support
 ===============
 
 If you suspect that you may have discovered a bug or if you'd like to
-change something about PVDegradationTools, then please make an issue on our
+change something about pvdeg, then please make an issue on our
 [GitHub issues page](hhttps://github.com/NREL/PVDegradationTools/issues).
 
 

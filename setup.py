@@ -22,8 +22,11 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open("requirements.txt") as f:
+    INSTALL_REQUIREMENTS = f.read().splitlines()
+
 setup(
-    name='PVDegradationTools',
+    name='pvdeg',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -63,34 +66,28 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
 
     ],
 
     # What does your project relate to?
-    keywords='photovoltaics pv rlative humidity',
+    keywords='photovoltaics pv relative humidity',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     #packages=find_packages(exclude=['contrib', 'docs', 'tests']) + ['data'],
-    packages = ['PVDegradationTools'],
+    packages = ['pvdeg'],
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
-    #py_modules=["PVDegradationTools"],
+    #py_modules=["pvdeg"],
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['matplotlib',
-                       'numpy',
-                      'pandas',
-                      'tqdm >= 4.32.1',
-                      'pvlib',
-                      'numba=0.56.4'
-                      ],
+    install_requires=INSTALL_REQUIREMENTS,
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -106,7 +103,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        'PVDegradationTools': ['data/722024TYA.pickle'],
+        'pvdeg': ['data/722024TYA.pickle'],
     },
 
     include_package_data=True,
@@ -124,4 +121,10 @@ setup(
     #        'sample=sample:main',
     #    ],
     #},
+    package_dir={"pvdeg": "pvdeg"},
+    entry_points={
+        "console_scripts": [
+            "pvdeg=pvdeg.cli:cli",
+        ]
+    },
 )

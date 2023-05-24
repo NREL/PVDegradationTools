@@ -1,0 +1,17 @@
+{
+    "execution_control": {
+        "option": "eagle",
+        "allocation": "pvsoiling",
+        "walltime": 1,
+        "memory": null,
+        "queue": null,
+        "feature": "--partition=debug",
+        "conda_env": null,
+        "module": null,
+        "sh_script": null
+    },
+    "collect_pattern": "PIPELINE",
+    "project_points": "./gids_DENVER.csv",
+    "datasets": null,
+    "purge_chunks": false
+}

@@ -1,0 +1,17 @@
+{
+    "execution_control": {
+        "option": "local",
+        "allocation": "[REQUIRED IF ON HPC]",
+        "walltime": "[REQUIRED IF ON HPC]",
+        "memory": null,
+        "nodes": 1,
+        "queue": null,
+        "feature": null,
+        "conda_env": null,
+        "module": null,
+        "sh_script": null,
+        "max_workers": null
+    },
+    "project_points": "./gids_DENVER.csv",
+    "nsrdb_fp": "/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
+}

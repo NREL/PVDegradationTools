@@ -5,9 +5,9 @@ name: pytest
 
 on:
   push:
-    branches: [ "dev_gaps", "main" ]
+    branches: [ "dev_pvdeg" ]
   pull_request:
-    branches: [ "dev_gaps", "main" ]
+    branches: [ "dev_pvdeg" ]
 
 permissions:
   contents: read
@@ -40,4 +40,4 @@ jobs:
         pytest
     - name: Collect coverage
       run: |
-        pytest --cov=PVDegradationTools tests/
+        pytest --cov=pvdeg tests/

@@ -1,0 +1,14 @@
+{
+    "pipeline": [
+        {
+            "run-standoff": "./config_run_standoff.json"
+        },
+        {
+            "collect-run-standoff": "./config_collect_run_standoff.json"
+        }
+    ],
+    "logging": {
+        "log_file": null,
+        "log_level": "INFO"
+    }
+}
