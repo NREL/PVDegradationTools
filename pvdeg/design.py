@@ -1,3 +1,6 @@
+"""Collection of functions for PV module design considertations.
+"""
+
 import numpy as np
 import pandas as pd
 from numba import jit

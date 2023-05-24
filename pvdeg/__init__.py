@@ -6,14 +6,17 @@ import sys
 from .main import StressFactors, Degradation, Scenario
 
 from . import cli
+from . import collection
+from . import degradation
 from . import design
+from . import fatigue
 from . import humidity
+from . import letid
+from .scenario import Scenario
 from . import spectral
 from . import standards
 from . import temperature
 from . import utilities
-from . import collection
-from . import letid
 from . import weather
 from . import _version
 
