@@ -1,7 +1,10 @@
 import logging
 
 from .config import *
-from .main import StressFactors, Degradation #TODO: Delete once all functions are split up
+from .main import (
+    StressFactors,
+    Degradation,
+)  # TODO: Delete once all functions are split up
 from . import cli
 from . import collection
 from . import degradation
@@ -11,7 +14,7 @@ from . import humidity
 from . import letid
 from .scenario import Scenario
 from . import spectral
-from . import standardspy
+from . import standards
 from . import temperature
 from . import utilities
 from . import weather
