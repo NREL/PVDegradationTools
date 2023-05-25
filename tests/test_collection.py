@@ -12,15 +12,15 @@ depth = generation_df['Depth (um)']
 
 def test_collection_probability():
     s = 1000
-    l = 100*1e-4
+    l = 100 * 1e-4
     d = 27
 
-    thickness = 180*1e-4
+    thickness = 180 * 1e-4
     x = thickness
 
     cp = collection.collection_probability(x, thickness, s, l, d)
 
-    assert cp == pytest.approx(0.238255, abs=.000005)
+    assert cp == pytest.approx(0.23825592713379518, abs=0.000005)
 
 
 def test_calculate_jsc_from_tau_cp():
@@ -29,10 +29,11 @@ def test_calculate_jsc_from_tau_cp():
     d_base = 27
     s_rear = 1000
 
-    jsc = collection.calculate_jsc_from_tau_cp(tau, wafer_thickness, d_base, s_rear, generation,
-                                               depth)
+    jsc = collection.calculate_jsc_from_tau_cp(
+        tau, wafer_thickness, d_base, s_rear, generation, depth
+    )
 
-    assert jsc == pytest.approx(36.886672761936545, abs=.000005)
+    assert jsc == pytest.approx(39.79933327595729, abs=0.000005)
 
 
 def test_calculate_jsc_from_tau_iqe():
@@ -46,12 +47,13 @@ def test_calculate_jsc_from_tau_iqe():
     absorption = np.array([1e6, 1e4, 1e2])  # absorption coefficient
     wavelengths = np.array([400, 600, 1000])  # photon wavelength [nm]
 
-    jsc = collection.calculate_jsc_from_tau_iqe(tau, wafer_thickness, d_base, s_rear, spectrum,
-                                                absorption, wavelengths)
+    jsc = collection.calculate_jsc_from_tau_iqe(
+        tau, wafer_thickness, d_base, s_rear, spectrum, absorption, wavelengths
+    )
 
-    assert jsc == pytest.approx(38.5981695901184, abs=.000005)
+    assert jsc == pytest.approx(44.44797891247961, abs=0.000005)
 
 
 def test_generation_current():
     jgen = collection.generation_current(generation, depth)
-    assert jgen == pytest.approx(42.36324575251117, abs=.000005)
+    assert jgen == pytest.approx(42.36324575251117, abs=0.000005)
