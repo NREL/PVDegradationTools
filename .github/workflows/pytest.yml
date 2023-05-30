@@ -5,9 +5,9 @@ name: pytest
 
 on:
   push:
-    branches: [ "dev_pvdeg" ]
+    branches: [ "main", "dev_pvdeg" ]
   pull_request:
-    branches: [ "dev_pvdeg" ]
+    branches: [ "main", "dev_pvdeg" ]
 
 permissions:
   contents: read
