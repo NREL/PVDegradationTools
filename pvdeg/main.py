@@ -9,7 +9,6 @@ import pandas as pd
 from datetime import date
 from datetime import datetime as dt
 from scipy.constants import convert_temperature
-from scipy.integrate import simpson
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
 import os
 from pvdeg import utilities as utils

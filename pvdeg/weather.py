@@ -13,6 +13,12 @@ def load(database, id, **kwargs):
     Load weather data directly from  NSRDB or through any other PVLIB i/o 
     tools function
 
+    TODO: - I suggest we break weather into 2 groups with separate functions.
+          - 1st function (load) to fetch weather from a database (NSRDB or PVGIS)
+          - 2nd function (read_file) to read a local weather file (psm3, tmy3, epw, h5)
+          - though useful to make 1 general funciton, i think it obscures to many variables for most
+            users
+
     Parameters:
     -----------
     database : (str)
@@ -45,27 +51,19 @@ def load(database, id, **kwargs):
 
     #TODO: decide wether to follow NSRDB or pvlib conventions...
     # e.g. temp_air vs. air_temperature
+    # "map variables" will guarantee PVLIB conventions (automatic in coming update)
     if database == 'NSRDB':
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
-    elif database == 'PSM3':
-        weather_df, meta = pvlib.iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
-        meta['elevation'] = meta['altitude']
-        weather_df['air_temperature'] = weather_df['temp_air']
     elif database == 'PVGIS':
-        weather_df, _, _, meta = pvlib.iotools.get_pvgis_tmy(latitude=lat, longitude=lon, **kwargs)
-    elif database == 'EPW':
-        weather_df, meta = pvlib.iotools.read_epw(**kwargs)
-    elif database == 'TMY3':
-        weather_df, meta = pvlib.iotools.read_tmy3(**kwargs)
-    elif database == 'h5':
-        weather_df, meta = read_h5(gid=gid, **kwargs)
+        weather_df, _, _, meta = pvlib.iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
+                                                             map_variables=True, **kwargs)
     else:
         raise NameError('Weather database not found.')
 
     return weather_df, meta
 
 
-def read_file(file_in, file_type, **_):
+def read_file(file_in, file_type, **kwargs):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
@@ -78,17 +76,19 @@ def read_file(file_in, file_type, **_):
         full file path to the desired weather file
     file_type : (str)
         type of weather file from list below (verified)
-        [psm3, tmy3, epw]
+        [psm3, tmy, epw, h5]
     """
-    if not file_type:
-        file_type = file_in[-4:]
-    read_list = [ i for i in dir(pvlib.iotools) if i.startswith('read') ]
 
-    for func in read_list:
-        if file_type in func:
-            _read_func = getattr(pvlib.iotools,func)
-
-    weather_df, meta = _read_func(file_in)
+    file_type = upper(file_type)
+    
+    if file_type == 'PSM3':
+        weather_df, meta = pvlib.iotools.read_psm3(filename=file_in, map_variables=True)
+    if file_type == 'TMY':
+        weather_df, meta = pvlib.iotools.read_tmy3(filename=file_in)
+    if file_type == 'EPW':
+        weather_df, meta = pvlib.iotools.read_epw(filename=file_in)
+    if file_type == 'H5':
+        weather_df, meta = read_h5(file=file_in, **kwargs)
 
     if not isinstance(meta, dict):
         meta = meta.to_dict()
