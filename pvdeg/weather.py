@@ -8,7 +8,7 @@ import glob
 import pandas as pd
 from rex import NSRDBX, Outputs
 
-def load(database, id, **kwargs):
+def get(database, id, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o 
     tools function
@@ -63,7 +63,7 @@ def load(database, id, **kwargs):
     return weather_df, meta
 
 
-def read_file(file_in, file_type, **kwargs):
+def read(file_in, file_type, **kwargs):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
@@ -79,7 +79,7 @@ def read_file(file_in, file_type, **kwargs):
         [psm3, tmy, epw, h5]
     """
 
-    file_type = upper(file_type)
+    file_type = file_type.upper()
     
     if file_type == 'PSM3':
         weather_df, meta = pvlib.iotools.read_psm3(filename=file_in, map_variables=True)

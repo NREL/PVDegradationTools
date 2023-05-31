@@ -20,7 +20,7 @@ FILES = {'tmy3': os.path.join('data','tmy3_pytest.csv'),
 DSETS = ['air_temperature', 'albedo', 'dew_point', 'dhi', 'dni',
          'ghi', 'meta', 'relative_humidity', 'time_index', 'wind_speed']
 
-def test_load():
+def test_get():
     '''
     Test with (lat,lon) and gid options
     '''
@@ -46,7 +46,7 @@ def test_load():
     # weather_df, meta = pvdeg.weather.load(weather_db, weather_id, **weather_arg)
     pass
 
-def test_read_file():
+def test_read():
     '''
     test pvdeg.utilities.read_weather
     
@@ -56,7 +56,7 @@ def test_read_file():
     '''
     for type, path in FILES.items():
         if type != 'h5':
-            weather_df, meta = pvdeg.weather.read_file(file_in=path,
+            weather_df, meta = pvdeg.weather.read(file_in=path,
                                                     file_type=type)
             assert isinstance(meta, dict)
             assert isinstance(weather_df, pd.DataFrame)
