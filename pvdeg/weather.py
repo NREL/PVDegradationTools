@@ -68,7 +68,6 @@ def read(file_in, file_type, **kwargs):
     Read a locally stored weather file of any PVLIB compatible type
 
     #TODO: add error handling
-          check file types (anything .csv will cause trouble)
 
     Parameters:
     -----------
@@ -76,20 +75,23 @@ def read(file_in, file_type, **kwargs):
         full file path to the desired weather file
     file_type : (str)
         type of weather file from list below (verified)
-        [psm3, tmy, epw, h5]
+        [psm3, tmy3, epw, h5]
     """
 
+    supported = ['psm3','tmy3','epw','h5']
     file_type = file_type.upper()
     
     if file_type == 'PSM3':
         weather_df, meta = pvlib.iotools.read_psm3(filename=file_in, map_variables=True)
-    if file_type == 'TMY':
+    elif file_type == 'TMY3':
         weather_df, meta = pvlib.iotools.read_tmy3(filename=file_in)
-    if file_type == 'EPW':
+    elif file_type == 'EPW':
         weather_df, meta = pvlib.iotools.read_epw(filename=file_in)
-    if file_type == 'H5':
+    elif file_type == 'H5':
         weather_df, meta = read_h5(file=file_in, **kwargs)
-
+    else:
+        print(f'File-Type not supported. supported types:\n{supported}')
+    
     if not isinstance(meta, dict):
         meta = meta.to_dict()
 
