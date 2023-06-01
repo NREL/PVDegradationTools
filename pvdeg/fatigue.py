@@ -137,18 +137,20 @@ def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=
 
     # Boltzmann Constant
     k = .00008617333262145
-    
+
+    #TODO detect sub-hourly time delta -> downsample to hourly
+
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)
-    
+
     temp_max_avg = convert_temperature(temp_max_avg, 'Celsius', 'Kelvin')
-    
+
     num_changes_temp_hist = _times_over_reversal_number(temp_cell, reversal_temp)
 
     damage = C1*(temp_amplitude**n)*(num_changes_temp_hist**b)*np.exp(-(Q/(k*temp_max_avg)))
-    
+
     # Convert pascals to kilopascals
     damage = damage/1000
-    
+
     return damage
 
 #TODO: add gaps functionality

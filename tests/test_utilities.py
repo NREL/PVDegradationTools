@@ -1,6 +1,4 @@
 import os
-# import numpy as np
-# import pytest
 import pandas as pd
 import pvdeg 
 from rex import Outputs

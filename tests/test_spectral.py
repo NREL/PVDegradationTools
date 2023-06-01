@@ -1,21 +1,22 @@
 import os
 import json
-import pytest
 import pandas as pd
 import pvdeg 
 from pvdeg import TEST_DATA_DIR
 
-#Load weather data
-weather_df = pd.read_pickle(os.path.join(TEST_DATA_DIR, 'weather_df_day.pkl'))
+WEATHER = pd.read_csv(os.path.join(TEST_DATA_DIR,r'weather_day_pytest.csv'),
+                      index_col=0, parse_dates=True)
+
 with open(os.path.join(TEST_DATA_DIR, 'meta.json')) as file:
-    meta = json.load(file)
+    META = json.load(file)
 
 #Load expected results
-expected_solar_position = pd.read_pickle(os.path.join(
-    TEST_DATA_DIR, 'solar_position_day.pkl'))
-
-expected_poa_irradiance = pd.read_pickle(os.path.join(
-    TEST_DATA_DIR, 'poa_irradiance_day.pkl'))
+results_expected = pd.read_csv(os.path.join(TEST_DATA_DIR, r'input_day_pytest.csv'),
+                               index_col=0, parse_dates=True)
+solpos = ['apparent_zenith','zenith','apparent_elevation','elevation','azimuth','equation_of_time']
+poa = [col for col in results_expected.columns if 'poa' in col]
+solpos_expected = results_expected[solpos]
+poa_expected = results_expected[poa]
 
 def test_solar_position():
     '''
@@ -25,9 +26,9 @@ def test_solar_position():
     ---------
     weather dataframe and meta dictionary
     '''
-    result = pvdeg.spectral.solar_position(weather_df, meta)
+    result = pvdeg.spectral.solar_position(WEATHER, META)
     pd.testing.assert_frame_equal(result, 
-                                  expected_solar_position, 
+                                  solpos_expected, 
                                   check_dtype=False)
 
 def test_poa_irradiance():
@@ -38,13 +39,13 @@ def test_poa_irradiance():
     ---------
     weather dataframe, meta dictionary, and solar_position dataframe
     '''
-    result = pvdeg.spectral.poa_irradiance(weather_df, 
-                                         meta,
-                                         expected_solar_position,
+    result = pvdeg.spectral.poa_irradiance(WEATHER, 
+                                         META,
+                                         solpos_expected,
                                          tilt=None, 
                                          azimuth=180, 
                                          sky_model='isotropic')
     
     pd.testing.assert_frame_equal(result, 
-                                  expected_poa_irradiance, 
+                                  poa_expected, 
                                   check_dtype=False)

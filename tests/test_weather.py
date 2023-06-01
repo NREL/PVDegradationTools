@@ -1,6 +1,4 @@
 import os
-# import numpy as np
-# import pytest
 import pandas as pd
 import pvdeg 
 from rex import Outputs
@@ -13,7 +11,7 @@ except:
 TESTDIR = os.path.dirname(__file__)  # this folder
 
 FILES = {'tmy3': os.path.join('data','tmy3_pytest.csv'),
-         'psm3': os.path.join('data','psm3_pytest.csv'),
+         'psm3': os.path.join('data','psm3_pytest_old.csv'),
          'epw' : os.path.join('data','epw_pytest.epw'),
          'h5'  : os.path.join('data','h5_pytest.h5')}
 

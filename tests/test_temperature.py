@@ -1,36 +1,32 @@
 import os
-import json
-import pytest
 import pandas as pd
-import pvdeg 
+import pvdeg
 from pvdeg import TEST_DATA_DIR
 
 #Load weather data
-weather_df = pd.read_pickle(os.path.join(TEST_DATA_DIR, 'weather_df_day.pkl'))
-with open(os.path.join(TEST_DATA_DIR, 'meta.json')) as file:
-    meta = json.load(file)
+WEATHER = pd.read_csv(os.path.join(TEST_DATA_DIR,'weather_day_pytest.csv'),
+                      index_col=0, parse_dates=True)
 
 #Load input dataframes
-solar_position = pd.read_pickle(os.path.join(
-    TEST_DATA_DIR, 'solar_position_day.pkl'))
+input_data = pd.read_csv(os.path.join(TEST_DATA_DIR, r'input_day_pytest.csv'),
+                               index_col=0, parse_dates=True)
+poa = [col for col in input_data.columns if 'poa' in col]
+poa = input_data[poa]
 
-poa_irradiance = pd.read_pickle(os.path.join(
-    TEST_DATA_DIR, 'poa_irradiance_day.pkl'))
+# solpos = ['apparent_zenith','zenith','apparent_elevation','elevation','azimuth','equation_of_time']
+# solpos = input_data[solpos]
 
 #Load expected results
-expected_module_temp = pd.read_pickle(os.path.join(
-    TEST_DATA_DIR, 'module_temp_day.pkl'))
+modtemp_expected = input_data['module_temp']
 
 def test_module():
     result = pvdeg.temperature.module(
-                weather_df, 
-                poa_irradiance,
-                temp_model='sapm', 
+                WEATHER,
+                poa,
+                temp_model='sapm',
                 conf='open_rack_glass_polymer',
                 wind_speed_factor=1)
-    
-    pd.testing.assert_series_equal(result, 
-                                   expected_module_temp, 
-                                   check_dtype=False)
 
-
+    pd.testing.assert_series_equal(result,
+                                   modtemp_expected, 
+                                   check_dtype=False, check_names=False)
