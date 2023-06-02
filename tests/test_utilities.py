@@ -15,7 +15,7 @@ FILES = {'tmy3': os.path.join('data','tmy3_pytest.csv'),
                 'epw' : os.path.join('data','epw_pytest.epw'),
                 'h5'  : os.path.join('data','h5_pytest.h5')}
 
-DSETS = ['air_temperature', 'albedo', 'dew_point', 'dhi', 'dni',
+DSETS = ['temp_air', 'albedo', 'dew_point', 'dhi', 'dni',
          'ghi', 'meta', 'relative_humidity', 'time_index', 'wind_speed']
 
 

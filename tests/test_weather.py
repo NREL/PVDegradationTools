@@ -61,6 +61,9 @@ def test_read():
             assert isinstance(weather_df, pd.DataFrame)
             assert len(weather_df) != 0
 
+def test_read_h5():
+    pass
+
 def test_get_NSRDB_fnames():
     pass
 

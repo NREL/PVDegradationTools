@@ -39,7 +39,7 @@ def module(
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
     module_temperature = pvlib.temperature.sapm_module(
         poa_global=poa['poa_global'], 
-        temp_air=weather_df['air_temperature'], 
+        temp_air=weather_df['temp_air'], 
         wind_speed=weather_df['wind_speed']*wind_speed_factor,
         a=parameters['a'],
         b=parameters['b'])

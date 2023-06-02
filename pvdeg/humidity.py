@@ -601,19 +601,19 @@ def calc_rel_humidity(
     
     surface_outside = rh_surface_outside(
         rh_ambient=weather_df['relative_humidity'],
-        temp_ambient=weather_df['air_temperature'],
+        temp_ambient=weather_df['temp_air'],
         temp_module=temp_module)
 
     front_encap = rh_front_encap(
         rh_ambient=weather_df['relative_humidity'], 
-        temp_ambient=weather_df['air_temperature'], 
+        temp_ambient=weather_df['temp_air'], 
         temp_module=temp_module,
         So=So, 
         Eas=Eas)
 
     back_encap = rh_back_encap(
         rh_ambient=weather_df['relative_humidity'],
-        temp_ambient=weather_df['air_temperature'], 
+        temp_ambient=weather_df['temp_air'], 
         temp_module=temp_module, 
         WVTRo=WVTRo,
         EaWVTR=EaWVTR, 
@@ -662,7 +662,7 @@ def run_calc_rel_humidity(
     weather_arg['names'] = weather_names
     weather_arg['NREL_HPC'] = True  #TODO: add argument or auto detect
     weather_arg['attributes'] = [
-        'air_temperature', 
+        'temp_air', 
         'wind_speed', 
         'dhi', 'ghi', 
         'dni','relative_humidity'

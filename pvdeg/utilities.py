@@ -213,7 +213,7 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
         'DNI': 'dni',
         'DHI': 'dhi',
         'GHI': 'ghi',
-        'DryBulb': 'air_temperature',
+        'DryBulb': 'temp_air',
         'DewPoint': 'dew_point',
         'RHum': 'relative_humidity',
         'Wspd': 'wind_speed',

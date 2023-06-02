@@ -51,7 +51,7 @@ def get(database, id, **kwargs):
 
     #TODO: decide wether to follow NSRDB or pvlib conventions...
     # e.g. temp_air vs. air_temperature
-    # "map variables" will guarantee PVLIB conventions (automatic in coming update)
+    # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
     if database == 'NSRDB':
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
     elif database == 'PVGIS':
@@ -248,10 +248,16 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
         except ValueError:
             pass
         
-    weather_df = pd.DataFrame(index=index, columns=attributes)
+    weather_df = pd.DataFrame(index=index)
 
     for dset in attributes:
+        
+        if dset == 'air_temperature':
+            column_name = 'temp_air'
+        else:
+            column_name = dset
+
         with NSRDBX(dattr[dset], hsds=hsds) as f:   
-            weather_df[dset] = f[dset, :, gid]
+            weather_df[column_name] = f[dset, :, gid]
 
     return weather_df, meta.to_dict()

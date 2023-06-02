@@ -39,5 +39,5 @@ def test_psat():
     ---------
     weahter dataframe and meta dictionary
     '''
-    psat_avg = pvdeg.humidity.psat(temp=WEATHER['air_temperature'])[1]
+    psat_avg = pvdeg.humidity.psat(temp=WEATHER['temp_air'])[1]
     assert psat_avg == approx(0.47607, abs=5e-5)
