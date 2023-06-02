@@ -6,7 +6,6 @@ Modules, methods, classes and attributes are explained here.
 
 .. automodule:: pvdeg
     :members:
-    :inherited-members:
 
 .. autosummary::
     :toctree: _autosummary
@@ -22,7 +21,6 @@ Modules, methods, classes and attributes are explained here.
     utilities
     weather
 
-..
     Collection
     -------------------
     .. autoclass:: collection
