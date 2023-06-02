@@ -4,13 +4,12 @@ API
 ===
 Modules, methods, classes and attributes are explained here.
 
-.. automodule:: collection
+.. automodule:: pvdeg
     :members:
 
 .. autosummary::
     :toctree: _autosummary
     :recursive:
-
     main
     collection
     humidity
