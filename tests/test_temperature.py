@@ -18,6 +18,7 @@ poa = input_data[poa]
 
 #Load expected results
 modtemp_expected = input_data['module_temp']
+celltemp_expected = input_data['cell_temp']
 
 def test_module():
     result = pvdeg.temperature.module(
@@ -29,4 +30,12 @@ def test_module():
 
     pd.testing.assert_series_equal(result,
                                    modtemp_expected, 
-                                   check_dtype=False, check_names=False)
+                                   check_dtype=False,
+                                   check_names=False)
+
+def test_cell():
+    result = pvdeg.temperature.cell(WEATHER, poa)
+    pd.testing.assert_series_equal(result,
+                                   celltemp_expected,
+                                   check_dtype=False,
+                                   check_names=False)

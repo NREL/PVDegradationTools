@@ -45,3 +45,32 @@ def module(
         b=parameters['b'])
 
     return module_temperature
+
+def cell(weather_df,
+         poa,
+         temp_model='sapm',
+         conf='open_rack_glass_polymer'):
+    '''
+    Calculate the PV cell temperature using PVLIB
+    Currently this only supports the SAPM temperature model.
+    
+    Parameters:
+    -----------
+    weather_df : (pd.dataframe)
+        Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
+    poa : (dataframe or series)
+        Dataframe or series with minimum requirement of 'poa_global'
+    temp_model : (str, optional)
+        DO NOT CHANGE UNTIL UPDATED
+    conf : (str)
+        The configuration of the PV module architecture and mounting configuration.
+        Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
+        'close_mount_glass_glass', 'insulated_back_glass_polymer'
+    '''
+
+    parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
+    temp_cell = pvlib.temperature.sapm_cell(poa_global=poa['poa_global'],
+                                            temp_air=weather_df['temp_air'],
+                                            wind_speed=weather_df['wind_speed'],
+                                            **parameters)
+    return temp_cell
