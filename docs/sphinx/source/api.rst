@@ -5,7 +5,7 @@ API
 Modules, methods, classes and attributes are explained here.
 
 .. automodule:: pvdeg
-    :members:
+    :members: collection, degradation, design
 
 .. autosummary::
     :toctree: _autosummary
