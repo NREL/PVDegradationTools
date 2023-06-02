@@ -8,7 +8,7 @@ Modules, methods, classes and attributes are explained here.
     :members:
 
 .. autosummary::
-    :toctree: _autosummary
+.. toctree:: _autosummary
     :recursive:
     main
     collection
