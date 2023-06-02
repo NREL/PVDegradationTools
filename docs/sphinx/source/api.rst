@@ -24,7 +24,7 @@ Modules, methods, classes and attributes are explained here.
 ..
   Stress Factors 
   -------------------
-  .. autoclass:: StressFactors
+  .. automodule:: humidity
     :members:
 
   Degradation
