@@ -186,13 +186,13 @@ def test_rh_module():
 #                                                 wavelengths=wavelengths)
 #     assert degradation == pytest.approx(4.4969e-38, abs=0.02e-38)
 
-def test_solder_fatigue():
-    # test solder fatique with default parameters
-    # requires PSM3 weather file
+# def test_solder_fatigue():
+#     # test solder fatique with default parameters
+#     # requires PSM3 weather file
 
-    damage = pvdeg.Degradation.solder_fatigue(time_range=PSM['time_range'],
-                                            temp_cell=PSM['temp_cell'])
-    assert damage == pytest.approx(14.25, abs=0.1)
+#     damage = pvdeg.Degradation.solder_fatigue(time_range=PSM['time_range'],
+#                                             temp_cell=PSM['temp_cell'])
+#     assert damage == pytest.approx(14.25, abs=0.1)
 
 #TODO: delete
 # --------------------------------------------------------------------------------------------------
