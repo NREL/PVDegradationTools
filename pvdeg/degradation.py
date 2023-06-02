@@ -92,17 +92,16 @@ def _acceleration_factor(numerator, denominator):
 
     return chamberAccelerationFactor
 
-def vantHoff_deg(I_chamber, poa_global, temp_cell, temp_chamber, x=0.5, Tf=1.41):
+def vantHoff_deg(poa, temp_cell, I_chamber, temp_chamber, x=0.5, Tf=1.41):
     """
-
     Van 't Hoff Irradiance Degradation
 
     Parameters
     -----------
     I_chamber : float
         Irradiance of Controlled Condition W/m²
-    poa_global : float series
-        Global Plane of Array Irradiance W/m²
+    poa : float series or data frame
+        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
     temp_cell : pandas series
         Solar module temperature or Cell temperature [°C]
     temp_chamber : float
@@ -118,6 +117,12 @@ def vantHoff_deg(I_chamber, poa_global, temp_cell, temp_chamber, x=0.5, Tf=1.41)
         Degradation acceleration factor
 
     """
+
+    if isinstance(poa, pd.DataFrame):
+        poa_global = poa['poa_global']
+    else:
+        poa_global = poa
+
     rateOfDegEnv = _deg_rate_env(poa_global=poa_global,
                                                 temp_cell=temp_cell,
                                                 temp_chamber=temp_chamber,
@@ -158,7 +163,7 @@ def _to_eq_vantHoff(temp_cell, Tf=1.41):
     return Toeq
 
 
-def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.5, Tf=1.41):
+def IwaVantHoff(poa, temp_cell, Teq=None, x=0.5, Tf=1.41):
     """
     IWa : Environment Characterization (W/m²)
     For one year of degredation the controlled environmnet lamp settings will
@@ -166,8 +171,8 @@ def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.5, Tf=1.41):
 
     Parameters
     -----------
-    poa_global : float series
-        Global Plane of Array Irradiance W/m²
+    poa : float series or dataframe
+        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
     temp_cell : float series
         Solar module temperature or Cell temperature [°C]
     Teq : series
@@ -185,6 +190,12 @@ def IwaVantHoff(poa_global, temp_cell, Teq=None, x=0.5, Tf=1.41):
     """
     if Teq is None:
         Teq = _to_eq_vantHoff(temp_cell, Tf)
+    
+    if isinstance(poa, pd.DataFrame):
+        poa_global = poa['poa_global']
+    else:
+        poa_global = poa
+
     toSum = (poa_global ** x) * (Tf ** ((temp_cell - Teq)/10))
     summation = toSum.sum(axis=0, skipna=True)
 
@@ -255,8 +266,8 @@ def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, x, n):
                                             (temp_chamber+273.15)))))
     return arrheniusNumerator
 
-def arrhenius_deg(I_chamber, rh_chamber, temp_chamber, rh_outdoor, poa_global, temp_cell,
-                    Ea, x=0.5, n=1):
+def arrhenius_deg(rh_outdoor, poa, temp_cell, I_chamber, rh_chamber, temp_chamber,
+                  Ea, x=0.5, n=1):
     """
     Calculate the Acceleration Factor between the rate of degredation of a
     modeled environmnet versus a modeled controlled environmnet
@@ -295,18 +306,25 @@ def arrhenius_deg(I_chamber, rh_chamber, temp_chamber, rh_outdoor, poa_global, t
         Degradation acceleration factor
 
     """
+
+    if isinstance(poa, pd.DataFrame):
+        poa_global = poa['poa_global']
+    else:
+        poa_global = poa
+
+
     arrheniusDenominator = _arrhenius_denominator(poa_global=poa_global,
-                                                                rh_outdoor=rh_outdoor,
-                                                                temp_cell=temp_cell,
-                                                                Ea=Ea,
-                                                                x=x,
-                                                                n=n)
+                                                  rh_outdoor=rh_outdoor,
+                                                  temp_cell=temp_cell,
+                                                  Ea=Ea,
+                                                  x=x,
+                                                  n=n)
 
     AvgOfDenominator = arrheniusDenominator.mean()
 
     arrheniusNumerator = _arrhenius_numerator(I_chamber=I_chamber, 
-                                                            rh_chamber=rh_chamber,
-                                                            temp_chamber=temp_chamber, Ea=Ea, x=x, n=n)
+                                              rh_chamber=rh_chamber,
+                                              temp_chamber=temp_chamber, Ea=Ea, x=x, n=n)
 
     accelerationFactor = _acceleration_factor(
         arrheniusNumerator, AvgOfDenominator)
@@ -385,8 +403,8 @@ def _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea, Teq=None, n=1):
 
 #TODO:   CHECK
 # STANDARDIZE
-def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
-                    RHwa=None, Teq=None, x=0.5, n=1):
+def IwaArrhenius(poa, rh_outdoor, temp_cell, Ea,
+                 RHwa=None, Teq=None, x=0.5, n=1):
     """
     Function to calculate IWa, the Environment Characterization (W/m²).
     For one year of degredation the controlled environmnet lamp settings will
@@ -394,8 +412,8 @@ def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
 
     Parameters
     ----------
-    poa_global : float
-        (Global) Plan of Array irradiance (W/m²)
+    poa_global : serioes or dataframe
+        must contain 'poa_global', Global Plan of Array irradiance (W/m²)
     rh_outdoor : pandas series
         Relative Humidity of material of interest
         Acceptable relative humiditys can be calculated
@@ -424,6 +442,11 @@ def IwaArrhenius(poa_global, rh_outdoor, temp_cell, Ea,
 
     if RHwa is None:
         RHwa = _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea)
+
+    if isinstance(poa, pd.DataFrame):
+        poa_global = poa['poa_global']
+    else:
+        poa_global = poa
 
     numerator = poa_global**(x) * rh_outdoor**(n) * \
         np.exp(- (Ea / (0.00831446261815324 * (temp_cell + 273.15))))
