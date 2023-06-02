@@ -26,7 +26,7 @@ INPUTWEATHERSPECTRA = os.path.join('data',r'test_weatherandspectra.csv')
 
 WEATHERFILE = os.path.join('data',r'722740TYA.CSV')
 
-PSM3FILE = os.path.join('data',r'psm3_pytest_old.csv')
+PSM3FILE = os.path.join('data',r'psm3_pytest.csv')
 
 PSM = pd.read_csv(PSM3FILE, header=2)
 
