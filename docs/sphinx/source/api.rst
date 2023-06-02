@@ -22,17 +22,17 @@ Modules, methods, classes and attributes are explained here.
     weather
 
 ..
-  Collection
-  -------------------
-  .. automodule:: collection.py
-    :members:
+Collection
+-------------------
+.. automodule:: collection.py
+:members:
 
-  Degradation
-  -------------------------------
-  .. autoclass:: Degradation
-    :members:
+Degradation
+-------------------------------
+.. autoclass:: Degradation
+:members:
 
-  Standards
-  -------------------
-  .. autoclass:: Standards
-    :members:
+Standards
+-------------------
+.. autoclass:: Standards
+:members:
