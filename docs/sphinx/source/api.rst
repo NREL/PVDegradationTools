@@ -24,7 +24,7 @@ Modules, methods, classes and attributes are explained here.
 ..
 Collection
 -------------------
-.. automodule:: collection.py
+.. automodule:: collection
 :members:
 
 Degradation
