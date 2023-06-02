@@ -38,7 +38,7 @@ def solar_position(
         time = weather_df.index, 
         latitude = meta['latitude'], 
         longitude = meta['longitude'],
-        altitude = meta['elevation'])
+        altitude = meta['altitude'])
 
     return solar_position
 

@@ -54,7 +54,7 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     return dew_yield
 
 
-def psat(temp):
+def psat(temp, average=True):
         """
         Function calculated the water saturation temperature or dew point for a given water vapor
         pressure. Water vapor pressure model created from an emperical fit of ln(Psat) vs
@@ -63,6 +63,13 @@ def psat(temp):
         Calculation created by Michael Kempe, unpublished data.
 
         #TODO:  verify this is consistant with psat in main branch (main is most up to date)
+
+        Parameters:
+        -----------
+        temp : (series, float)
+            The air temperature (dry bulb) in degrees celsius as a time-indexed series
+        average : (boolean, default = True)
+            If true, return both psat serires and average psat (used for certain calcs)
         """
 
         psat = np.exp((3.2575315268E-13 * temp**6) -
@@ -72,8 +79,10 @@ def psat(temp):
                        (4.0316963015E-04 * temp**2) +
                        (7.9836323361E-02 * temp) -
                        (5.6983551678E-1))
-
-        return psat
+        if average:
+            return psat, psat.mean()
+        else:
+            return psat
 
 def rh_surface_outside(rh_ambient, temp_ambient, temp_module):
     """

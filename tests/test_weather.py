@@ -17,6 +17,7 @@ FILES = {'tmy3': os.path.join('data','tmy3_pytest.csv'),
 
 DSETS = ['air_temperature', 'albedo', 'dew_point', 'dhi', 'dni',
          'ghi', 'meta', 'relative_humidity', 'time_index', 'wind_speed']
+META_KEYS = ['']
 
 def test_get():
     '''

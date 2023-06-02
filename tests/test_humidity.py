@@ -1,7 +1,8 @@
 import os
 import json
 import pandas as pd
-import pvdeg 
+import pvdeg
+from pytest import approx
 from pvdeg import TEST_DATA_DIR
 
 #Load weather data
@@ -29,3 +30,14 @@ def test_calc_rel_humidity():
     pd.testing.assert_frame_equal(result, 
                                   rh_expected, 
                                   check_dtype=False)
+
+def test_psat():
+    '''
+    test pvdeg.humidity.psat
+    
+    Requires:
+    ---------
+    weahter dataframe and meta dictionary
+    '''
+    psat_avg = pvdeg.humidity.psat(temp=WEATHER['air_temperature'])[1]
+    assert psat_avg == approx(0.47607, abs=5e-5)
