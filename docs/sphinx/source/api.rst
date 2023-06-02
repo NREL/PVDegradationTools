@@ -22,9 +22,9 @@ Modules, methods, classes and attributes are explained here.
     weather
 
 ..
-  Stress Factors 
+  Collection
   -------------------
-  .. automodule:: humidity
+  .. automodule:: collection.py
     :members:
 
   Degradation
