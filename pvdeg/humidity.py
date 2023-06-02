@@ -104,8 +104,8 @@ def rh_surface_outside(rh_ambient, temp_ambient, temp_module):
 
     """
     rh_Surface = rh_ambient * \
-        (psat(temp_ambient) /
-            psat(temp_module))
+        (psat(temp_ambient)[0] /
+            psat(temp_module)[0])
 
     return rh_Surface
 
