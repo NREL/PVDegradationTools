@@ -24,14 +24,14 @@ Modules, methods, classes and attributes are explained here.
     Collection
     -------------------
     .. autoclass:: collection
-    :members:
+        :members:
 
     Degradation
     -------------------------------
     .. autoclass:: Degradation
-    :members:
+        :members:
 
     Standards
     -------------------
     .. autoclass:: Standards
-    :members:
+        :members:
