@@ -16,7 +16,7 @@ FILES = {'tmy3': os.path.join('data','tmy3_pytest.csv'),
          'h5'  : os.path.join('data','h5_pytest.h5')}
 
 DSETS = ['air_temperature', 'albedo', 'dew_point', 'dhi', 'dni',
-         'ghi', 'meta', 'relative_humidity', 'time_index', 'wind_speed']
+         'ghi', 'relative_humidity', 'time_index', 'wind_speed']
 META_KEYS = ['']
 
 def test_get():
@@ -48,6 +48,8 @@ def test_get():
 def test_read():
     '''
     test pvdeg.utilities.read_weather
+    TODO: enable the final assertion which checks column names. This may require troubleshooting
+    with PVLIB devs. varaible mapping apears inconsistent
     
     Requires:
     ---------
@@ -60,6 +62,7 @@ def test_read():
             assert isinstance(meta, dict)
             assert isinstance(weather_df, pd.DataFrame)
             assert len(weather_df) != 0
+            #assert all(item in weather_df.columns for item in DSETS)
 
 def test_read_h5():
     pass
