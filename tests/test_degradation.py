@@ -8,7 +8,7 @@ from pvdeg import TEST_DATA_DIR
 PSM_FILE = os.path.join(TEST_DATA_DIR,r'psm3_pytest.csv')
 PSM = pd.read_csv(PSM_FILE, header=2)
 
-INPUTWEATHERSPECTRA = os.path.join('data',r'test_weatherandspectra.csv')
+INPUT_SPECTRA = os.path.join(TEST_DATA_DIR,r'spectra_pytest.csv')
 
 def test_vantHoff_deg():
     # test the vantHoff degradation acceleration factor
@@ -55,7 +55,7 @@ def test_degradation():
     # requires TMY3-like weather data
     # requires spectral irradiance data
 
-    data=pd.read_csv(INPUTWEATHERSPECTRA)
+    data=pd.read_csv(INPUT_SPECTRA)
     wavelengths = np.array(range(280,420,20))
     degradation = pvdeg.degradation.degradation(spectra=data['Spectra'], rh_module=data['RH'],
                                                 temp_module=data['Temperature'],
