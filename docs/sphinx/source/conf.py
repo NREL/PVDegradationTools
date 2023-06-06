@@ -47,7 +47,7 @@ pd.show_versions()
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../sphinxext'))
 #sys.path.insert(0, os.path.abspath('../../../'))
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('../../pvdeg'))
 
 
 
@@ -115,6 +115,7 @@ exclude_patterns = ['whatsnew/*', '**.ipynb_checkpoints']
 pygments_style = 'sphinx'
 
 autosummary_generate = True
+autoclass_content = 'both'
 
 
 # -- Options for HTML output -------------------------------------------------
