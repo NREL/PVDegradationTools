@@ -8,21 +8,15 @@ Modules, methods, classes and attributes are explained here.
     :members:
 
 .. autosummary::
-.. toctree:: 
+    :toctree: _autosummary
     :recursive:
-    _autosummary
 
-    Collection
-    -------------------
-    .. autoclass:: collection
-        :members:
-
-    Degradation
-    -------------------------------
-    .. autoclass:: Degradation
-        :members:
-
-    Standards
-    -------------------
-    .. autoclass:: Standards
-        :members:
+    main
+    collection
+    humidity
+    letid
+    spectral
+    standards
+    temperature
+    utilities
+    weather
