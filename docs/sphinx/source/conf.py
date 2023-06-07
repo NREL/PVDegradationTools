@@ -72,7 +72,7 @@ extensions = [
     #'autoapi.extension',
     'sphinx.ext.todo'
 ]
-   
+
 
 
 # Document Python Code
@@ -147,8 +147,8 @@ htmlhelp_basename = 'pvdegdoc'
 # A workaround for the responsive tables always having annoying scrollbars.
 def setup(app):
     app.add_css_file("no_scrollbars.css")
-    
-"""    
+
+"""
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
@@ -191,11 +191,11 @@ latex_documents = [
 #latex_domain_indices = True
 """
 # extlinks alias #TODO: check if those are working
-extlinks = {'issue': ('https://github.com/NREL/pvdeg/issues/%s', 'GH %s'),
-            'pull': ('https://github.com/NREL/pvdeg/pull/%s', 'GH %s'),
-            'wiki': ('https://github.com/NREL/pvdeg/wiki/%s', 'wiki %s'),
-            'doi': ('http://dx.doi.org/%s', 'DOI: %s'),
-            'ghuser': ('https://github.com/%s', '@%s')}
+# extlinks = {'issue': ('https://github.com/NREL/pvdeg/issues/%s', 'GH %s'),
+#             'pull': ('https://github.com/NREL/pvdeg/pull/%s', 'GH %s'),
+#             'wiki': ('https://github.com/NREL/pvdeg/wiki/%s', 'wiki %s'),
+#             'doi': ('http://dx.doi.org/%s', 'DOI: %s'),
+#             'ghuser': ('https://github.com/%s', '@%s')}
 """
 # -- Options for manual page output ---------------------------------------
 
