@@ -3,11 +3,13 @@ Collection of classes and functions to calculate different temperatures.
 """
 
 import pvlib
+import pvdeg
 
 def module(
-    weather_df, 
-    poa,
-    temp_model='sapm', 
+    weather_df,
+    meta,
+    poa=None,
+    temp_model='sapm',
     conf='open_rack_glass_polymer',
     wind_speed_factor=1):
 
@@ -37,6 +39,10 @@ def module(
         The module temperature in degrees Celsius at each time step.
     """
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
+
+    if poa is None:
+        poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
+
     module_temperature = pvlib.temperature.sapm_module(
         poa_global=poa['poa_global'], 
         temp_air=weather_df['temp_air'], 
@@ -47,7 +53,8 @@ def module(
     return module_temperature
 
 def cell(weather_df,
-         poa,
+         meta,
+         poa=None,
          temp_model='sapm',
          conf='open_rack_glass_polymer'):
     '''
@@ -58,7 +65,9 @@ def cell(weather_df,
     -----------
     weather_df : (pd.dataframe)
         Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
-    poa : (dataframe or series)
+    meta : (dict)
+        Weather meta-data dictionary (location info)
+    poa : (dataframe or series, optional)
         Dataframe or series with minimum requirement of 'poa_global'
     temp_model : (str, optional)
         DO NOT CHANGE UNTIL UPDATED
@@ -69,6 +78,10 @@ def cell(weather_df,
     '''
 
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
+
+    if poa is None:
+        poa = pvdeg.spectral.poa_irradiance(weather_df,meta)
+
     temp_cell = pvlib.temperature.sapm_cell(poa_global=poa['poa_global'],
                                             temp_air=weather_df['temp_air'],
                                             wind_speed=weather_df['wind_speed'],
