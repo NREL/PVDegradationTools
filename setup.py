@@ -27,7 +27,7 @@ with open("requirements.txt") as f:
 
 setup(
     name='pvdeg',
-
+    python_requires='>3.8.0',
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
@@ -93,12 +93,12 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     # $ pip install -e .[dev,test]
-    
+
     extras_require={
         #'dev': ['check-manifest'],
         #'test': ['coverage'],
     },
-    
+
     # If there are data files included in your packages that need to be
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.

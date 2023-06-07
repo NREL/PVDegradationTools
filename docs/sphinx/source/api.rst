@@ -1,4 +1,4 @@
-.. _api:
+.. currentmodule:: pvdeg
 
 API
 ===
