@@ -84,7 +84,7 @@ def read(file_in, file_type, **kwargs):
     if file_type in ['PSM3','PSM']:
         weather_df, meta = pvlib.iotools.read_psm3(filename=file_in, map_variables=True)
     elif file_type in ['TMY3','TMY']:
-        weather_df, meta = pvlib.iotools.read_tmy3(filename=file_in)
+        weather_df, meta = pvlib.iotools.read_tmy3(filename=file_in, map_variables=True)
     elif file_type == 'EPW':
         weather_df, meta = pvlib.iotools.read_epw(filename=file_in)
     elif file_type == 'H5':
