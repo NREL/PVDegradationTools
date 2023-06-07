@@ -595,9 +595,15 @@ def calc_rel_humidity(
         relative humidity of the PV backsheet as a time-series   
     """
 
-    solar_position = spectral.solar_position(weather_df, meta)
-    poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
-    temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_speed_factor)
+    #solar_position = spectral.solar_position(weather_df, meta)
+    #poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
+    #temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_speed_factor)
+
+    poa = spectral.poa_irradiance(weather_df=weather_df, meta=meta,
+                                  tilt=tilt, azimuth=azimuth, sky_model=sky_model) 
+    
+    temp_module = temperature.module(weather_df, meta, poa=poa, temp_model=temp_model,
+                                     conf=mount_type, wind_speed_factor=wind_speed_factor)
     
     surface_outside = rh_surface_outside(
         rh_ambient=weather_df['relative_humidity'],
