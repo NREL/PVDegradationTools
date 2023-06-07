@@ -15,4 +15,5 @@ tqdm
 matplotlib
 jupyterlab
 notebook
+sphinx >=6.0.0
 sphinx_rtd_theme

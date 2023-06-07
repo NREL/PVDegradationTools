@@ -13,10 +13,10 @@
 
    .. autosummary::
    
+      get
       get_NSRDB
       get_NSRDB_fnames
-      load
-      read_file
+      read
       read_h5
    
    
