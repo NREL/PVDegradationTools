@@ -34,7 +34,6 @@ extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
-    'm2r2',
 ]
 
 ## Include Python objects as they appear in source files
