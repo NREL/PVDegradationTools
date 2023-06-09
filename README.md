@@ -47,7 +47,7 @@ Relative Humidity and Acceleration Factors for Solar Modules releases may be ins
 
 Install with:
 
-    pip install NREL-pvdeg (To be done.)
+    pip install NREL-pvdeg
 
 For developer installation, download the repository, navigate to the folder location and install as:
 
