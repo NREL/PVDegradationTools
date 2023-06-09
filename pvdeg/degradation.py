@@ -27,7 +27,7 @@ def _deg_rate_env(poa_global, temp_cell, temp_chamber, x, Tf):
     Parameters
     ------------
     poa_global : float
-        (Global) Plan of Array irradiance (W/m²)
+        (Global) Plan of Array irradiance [W/m²]
     temp_cell : float
         Solar module cell temperature [°C]
     temp_chamber : float
@@ -98,12 +98,12 @@ def vantHoff_deg(poa, temp_cell, I_chamber, temp_chamber, x=0.5, Tf=1.41):
 
     Parameters
     -----------
-    I_chamber : float
-        Irradiance of Controlled Condition W/m²
     poa : float series or data frame
-        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
+        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance [W/m²]
     temp_cell : pandas series
         Solar module temperature or Cell temperature [°C]
+    I_chamber : float
+        Irradiance of Controlled Condition [W/m²]
     temp_chamber : float
         Reference temperature [°C] "Chamber Temperature"
     x : float
@@ -165,7 +165,7 @@ def _to_eq_vantHoff(temp_cell, Tf=1.41):
 
 def IwaVantHoff(poa, temp_cell, Teq=None, x=0.5, Tf=1.41):
     """
-    IWa : Environment Characterization (W/m²)
+    IWa : Environment Characterization [W/m²]
     For one year of degredation the controlled environmnet lamp settings will
     need to be set to IWa.
 
@@ -185,7 +185,7 @@ def IwaVantHoff(poa, temp_cell, Teq=None, x=0.5, Tf=1.41):
     Returns
     --------
     Iwa : float
-        Environment Characterization (W/m²)
+        Environment Characterization [W/m²[]
 
     """
     if Teq is None:
@@ -210,7 +210,7 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, x, n):
     Parameters
     ----------
     poa_global : float series
-        (Global) Plan of Array irradiance (W/m²)
+        (Global) Plan of Array irradiance [W/m²]
     x : float
         Fit parameter
     rh_outdoor : pandas series
@@ -242,7 +242,7 @@ def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, x, n):
     Parameters
     ----------
     I_chamber : float
-        Irradiance of Controlled Condition W/m²
+        Irradiance of Controlled Condition [W/m²]
     Rhchamber : float
         Relative Humidity of Controlled Condition [%]
         EXAMPLE: "50 = 50% NOT .5 = 50%"
@@ -275,22 +275,22 @@ def arrhenius_deg(rh_outdoor, poa, temp_cell, I_chamber, rh_chamber, temp_chambe
 
     Parameters
     ----------
-    I_chamber : float
-        Irradiance of Controlled Condition W/m²
-    rh_chamber : float
-        Relative Humidity of Controlled Condition [%].
-        EXAMPLE: "50 = 50% NOT .5 = 50%"
-    temp_chamber : float
-        Reference temperature [°C] "Chamber Temperature"
     rh_outdoor : float series
         Relative Humidity of material of interest
         Acceptable relative humiditys can be calculated
         from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(),
         rh_surface_outside()
-    poa_global : pandas series
-        Global Plane of Array Irradiance W/m²
+    poa : pandas series
+        Global Plane of Array Irradiance [W/m²]
     temp_cell : pandas series
         Solar module temperature or Cell temperature [°C]
+    I_chamber : float
+        Irradiance of Controlled Condition [W/m²]
+    rh_chamber : float
+        Relative Humidity of Controlled Condition [%].
+        EXAMPLE: "50 = 50% NOT .5 = 50%"
+    temp_chamber : float
+        Reference temperature [°C] "Chamber Temperature"
     Ea : float
         Degredation Activation Energy [kJ/mol]
     x : float
@@ -404,14 +404,14 @@ def _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea, Teq=None, n=1):
 def IwaArrhenius(poa, rh_outdoor, temp_cell, Ea,
                  RHwa=None, Teq=None, x=0.5, n=1):
     """
-    Function to calculate IWa, the Environment Characterization (W/m²).
+    Function to calculate IWa, the Environment Characterization [W/m²].
     For one year of degredation the controlled environmnet lamp settings will
     need to be set at IWa.
 
     Parameters
     ----------
     poa_global : serioes or dataframe
-        must contain 'poa_global', Global Plan of Array irradiance (W/m²)
+        must contain 'poa_global', Global Plan of Array irradiance [(]W/m²]
     rh_outdoor : pandas series
         Relative Humidity of material of interest
         Acceptable relative humiditys can be calculated
@@ -433,7 +433,7 @@ def IwaArrhenius(poa, rh_outdoor, temp_cell, Ea,
     Returns
     --------
     Iwa : float
-        Environment Characterization (W/m²)
+        Environment Characterization [W/m²]
     """
     if Teq is None:
         Teq = _T_eq_arrhenius(temp_cell, Ea)
@@ -559,11 +559,11 @@ def degradation(spectra, rh_module, temp_module, wavelengths,
     Parameters
     ----------
     spectra : pd.Series type=Float
-        front or rear irradiance at each wavelength in "wavelengths"
+        front or rear irradiance at each wavelength in "wavelengths" [W/m^2 nm]
     rh_module : pd.Series type=Float
-        module RH, time indexed
+        module RH, time indexed [%]
     temp_module : pd.Series type=Float
-        module temperature, time indexed
+        module temperature, time indexed [C]
     wavelengths : int-array
         integer array (or list) of wavelengths tested w/ uniform delta
         in nanometers [nm]

@@ -66,9 +66,9 @@ def psat(temp, average=True):
 
         Parameters:
         -----------
-        temp : (series, float)
-            The air temperature (dry bulb) in degrees celsius as a time-indexed series
-        average : (boolean, default = True)
+        temp : series, float
+            The air temperature (dry bulb) as a time-indexed series [C]
+        average : boolean, default = True
             If true, return both psat serires and average psat (used for certain calcs)
         """
 
@@ -91,7 +91,7 @@ def rh_surface_outside(rh_ambient, temp_ambient, temp_module):
     Parameters
     ----------
     rh_ambient : float
-        The ambient outdoor environmnet relative humidity expressed as a fraction or as a percent.
+        The ambient outdoor environmnet relative humidity [%].
     temp_ambient : float
         The ambient outdoor environmnet temperature [°C]
     temp_module : float
@@ -125,12 +125,12 @@ def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702,
     Parameters
     ----------
     rh_ambient : pandas series (float)
-        The ambient outdoor environmnet relative humidity in (%)
+        The ambient outdoor environmnet relative humidity in [%]
         EXAMPLE: "50 = 50% NOT .5 = 50%"
     temp_ambient : pandas series (float)
-        The ambient outdoor environmnet temperature in Celsius
+        The ambient outdoor environmnet temperature [C]
     temp_module : pandas series (float)
-        The surface temperature in Celsius of the solar panel module
+        The surface temperature of the solar panel module [C]
     So : float
         Float, Encapsulant solubility prefactor in [g/cm3]
         So = 1.81390702(g/cm3) is the suggested value for EVA.
@@ -242,7 +242,7 @@ def rh_front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.
     Parameters
     ----------
     rh_ambient : series (float)
-        ambient Relative Humidity (%)
+        ambient Relative Humidity [%]
     temp_ambient : series (float)
         ambient outdoor temperature [°C]        
     temp_module : pandas series (float)
@@ -259,7 +259,7 @@ def rh_front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.
     Return
     ------
     RHfront_series : pandas series (float)
-        Relative Humidity of Frontside Solar module Encapsulant
+        Relative Humidity of Frontside Solar module Encapsulant [%]
 
     """
     diffuse_water = _diffusivity_weighted_water(rh_ambient=rh_ambient,
@@ -295,7 +295,7 @@ def _csat(temp_module, So=1.81390702, Eas=16.729):
     Returns
     -------
     Csat : pandas series (float)
-        Saturation of Water Concentration (g/cm³)
+        Saturation of Water Concentration [g/cm³]
 
     """
 
@@ -350,24 +350,24 @@ def Ce_numba(start, temp_module, rh_surface,
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
     rh_Surface : list (float)
-        The relative humidity of the surface of a solar module (%)
+        The relative humidity of the surface of a solar module [%]
         EXAMPLE: "50 = 50% NOT .5 = 50%"
     WVTRo : float
-        Water Vapor Transfer Rate prefactor (g/m2/day).
+        Water Vapor Transfer Rate prefactor [g/m2/day].
         The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
     EaWVTR : float
-        Water Vapor Transfer Rate activation energy (kJ/mol) .
-        It is suggested to use 0.15(mm) thick PET as a default
-        for the backsheet and set EaWVTR=55.0255(kJ/mol)
+        Water Vapor Transfer Rate activation energy [kJ/mol] .
+        It is suggested to use 0.15[mm] thick PET as a default
+        for the backsheet and set EaWVTR=55.0255[kJ/mol]
     So : float
         Encapsulant solubility prefactor in [g/cm3]
         So = 1.81390702(g/cm3) is the suggested value for EVA.
     l : float
-        Thickness of the backside encapsulant (mm).
+        Thickness of the backside encapsulant [mm].
         The suggested value for encapsulat is EVA l=0.5(mm)
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        Eas = 16.729[kJ/mol] is the suggested value for EVA.
 
     Returns
     --------
@@ -406,7 +406,7 @@ def rh_back_encap(rh_ambient, temp_ambient, temp_module,
     Parameters
     -----------
     rh_ambient : pandas series (float)
-        The ambient outdoor environmnet relative humidity in (%)
+        The ambient outdoor environmnet relative humidity in [%]
         EXAMPLE: "50 = 50% NOT .5 = 50%"
     temp_ambient : pandas series (float)
         The ambient outdoor environmnet temperature in Celsius
@@ -414,26 +414,26 @@ def rh_back_encap(rh_ambient, temp_ambient, temp_module,
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
     WVTRo : float
-        Water Vapor Transfer Rate prefactor (g/m2/day).
-        The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
+        Water Vapor Transfer Rate prefactor [g/m2/day].
+        The suggested value for EVA is WVTRo = 7970633554[g/m2/day].
     EaWVTR : float
-        Water Vapor Transfer Rate activation energy (kJ/mol) .
-        It is suggested to use 0.15(mm) thick PET as a default
-        for the backsheet and set EaWVTR=55.0255(kJ/mol)
+        Water Vapor Transfer Rate activation energy [kJ/mol] .
+        It is suggested to use 0.15[mm] thick PET as a default
+        for the backsheet and set EaWVTR=55.0255[kJ/mol]
     So : float
         Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
+        So = 1.81390702[g/cm3] is the suggested value for EVA.
     l : float
-        Thickness of the backside encapsulant (mm).
-        The suggested value for encapsulat is EVA l=0.5(mm)
+        Thickness of the backside encapsulant [mm].
+        The suggested value for encapsulat is EVA l=0.5[mm]
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        Eas = 16.729[kJ/mol] is the suggested value for EVA.
 
     Returns
     --------  
     RHback_series : pandas series (float)
-        Relative Humidity of Backside Solar Module Encapsulant     
+        Relative Humidity of Backside Solar Module Encapsulant [%]
 
     """
 
@@ -480,7 +480,7 @@ def rh_backsheet_from_encap(rh_back_encap, rh_surface_outside):
     Returns
     --------
     RHbacksheet_series : pandas series (float)
-        Relative Humidity of Backside Backsheet of a Solar Module                         
+        Relative Humidity of Backside Backsheet of a Solar Module [%]                    
     """
 
     RHbacksheet_series = (rh_back_encap + rh_surface_outside)/2
@@ -502,26 +502,26 @@ def rh_backsheet(rh_ambient, temp_ambient, temp_module,
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
     WVTRo : float
-        Water Vapor Transfer Rate prefactor (g/m2/day).
-        The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
+        Water Vapor Transfer Rate prefactor [g/m2/day].
+        The suggested value for EVA is WVTRo = 7970633554[g/m2/day].
     EaWVTR : float
-        Water Vapor Transfer Rate activation energy (kJ/mol) .
-        It is suggested to use 0.15(mm) thick PET as a default
-        for the backsheet and set EaWVTR=55.0255(kJ/mol)
+        Water Vapor Transfer Rate activation energy [kJ/mol] .
+        It is suggested to use 0.15[mm] thick PET as a default
+        for the backsheet and set EaWVTR=55.0255[kJ/mol]
     So : float
         Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
+        So = 1.81390702[g/cm3] is the suggested value for EVA.
     l : float
-        Thickness of the backside encapsulant (mm).
-        The suggested value for encapsulat is EVA l=0.5(mm)
+        Thickness of the backside encapsulant [mm].
+        The suggested value for encapsulat is EVA l=0.5[mm]
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        Eas = 16.729[kJ/mol] is the suggested value for EVA.
 
     Returns
     --------
     rh_backsheet : float series or array
-        relative humidity of the PV backsheet as a time-series   
+        relative humidity of the PV backsheet as a time-series [%]
     """
 
     back_encap = rh_back_encap(rh_ambient=rh_ambient,

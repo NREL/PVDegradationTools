@@ -62,9 +62,9 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     Parameters
     ------------
     temp_cell : float series
-        Photovoltaic module cell temperature(Celsius)
+        Photovoltaic module cell temperature [C]
     reversal_temp : float
-        Temperature threshold to cross above and below
+        Temperature threshold to cross above and below [C]
 
     Returns
     --------
@@ -110,9 +110,9 @@ def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=
         Local time of specific site by the hour year-month-day hr:min:sec
         (Example) 2002-01-01 01:00:00
     temp_cell : float series
-        Photovoltaic module cell temperature(Celsius) for every hour of a year
+        Photovoltaic module cell temperature [C] for every hour of a year
     reversal_temp : float
-        Temperature threshold to cross above and below.
+        Temperature threshold to cross above and below [C]
         See the paper for other use cases
     n : float
         fit parameter for daily max temperature amplitude
@@ -126,7 +126,7 @@ def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=
     Returns
     --------
     damage : float series
-        Solder fatigue damage for a time interval depending on time_range (kPa)
+        Solder fatigue damage for a time interval depending on time_range [kPa]
 
     """
 
