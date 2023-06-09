@@ -1,18 +1,23 @@
 .. _whatsnew_0100:
 
-v0.1.0 (26 / 06 / 2020)
+v0.1.0 (06 / 09 / 2023)
 =======================
 
-First official release. Pip Install enabled, as well as versioneer. 
+First official release. 
 
-* Re-structured folders to include Documentation, Versioning and Setup.
 * main.py populated with functions developed
+* Re-structured folders to include Documentation, Versioning and Setup.
 * Development journals and examples moved to tutorials folder
 * Added Sphinx Documentation
 * Added Versioneer
-
+* Tutorials Added
+* pytests for most functions
 
 Contributors
 ~~~~~~~~~~~~
 * Derek Holsapple (:ghuser:`holsappled`)
-* Silvana Ayala (:ghuser:`shirubana`)
+* Silvana Ovaitt (:ghuser:`shirubana`)
+* Matthew Brown (:ghuser:`mcbrown042`)
+* Martin Spring (:ghuser:`martin-springer`)
+* Mike Kempe (:ghuser:`MDKempe`)
+* Joe Karas (:ghuser:`jfkaras`)
