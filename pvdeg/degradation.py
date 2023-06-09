@@ -270,10 +270,8 @@ def arrhenius_deg(rh_outdoor, poa, temp_cell, I_chamber, rh_chamber, temp_chambe
                   Ea, x=0.5, n=1):
     """
     Calculate the Acceleration Factor between the rate of degredation of a
-    modeled environmnet versus a modeled controlled environmnet
-
-    Example: "If the AF=25 then 1 year of Controlled Environment exposure
-                is equal to 25 years in the field"
+    modeled environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1 year
+    of Controlled Environment exposure is equal to 25 years in the field"
 
     Parameters
     ----------

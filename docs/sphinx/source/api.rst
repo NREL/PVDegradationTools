@@ -14,8 +14,10 @@ Modules, methods, classes and attributes are explained here.
     main
     collection
     humidity
+    degradation
     letid
     spectral
+    design
     standards
     temperature
     utilities
