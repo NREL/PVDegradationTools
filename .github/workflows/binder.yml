@@ -1,5 +1,9 @@
 name: Binder
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
 
 #Cache on mybinder.org
 jobs:
