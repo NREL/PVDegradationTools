@@ -9,4 +9,5 @@ REPO_NAME = __name__
 DATA_DIR = PVDEG_DIR / "data"
 TEST_DIR = PVDEG_DIR.parent / "tests"
 TEST_DATA_DIR = PVDEG_DIR.parent / "tests" / "data"
+EXAMPLE_DATA_DIR = PVDEG_DIR.parent / "docs" / "tutorials" / "data"
 MATERIALS_DIR = PVDEG_DIR.parent / "DataLibrary"
