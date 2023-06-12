@@ -6,23 +6,23 @@ import pvdeg
 from pvdeg import TEST_DATA_DIR
 
 PSM_FILE = os.path.join(TEST_DATA_DIR,r'psm3_pytest.csv')
-PSM = pd.read_csv(PSM_FILE, header=2)
+weather_df, meta = pvdeg.weather.read(PSM_FILE,'psm')
 
 INPUT_SPECTRA = os.path.join(TEST_DATA_DIR,r'spectra_pytest.csv')
 
 def test_vantHoff_deg():
     # test the vantHoff degradation acceleration factor
 
-    vantHoff_deg = pvdeg.degradation.vantHoff_deg(I_chamber=1000, poa=PSM['poa_global'],
-                                                temp_cell=PSM['temp_cell'], temp_chamber=60)
-    assert vantHoff_deg == pytest.approx(8.38, abs=.02)
+    vantHoff_deg = pvdeg.degradation.vantHoff_deg(weather_df=weather_df, meta=meta,
+                                                  I_chamber=1000,
+                                                  temp_chamber=60)
+    assert vantHoff_deg == pytest.approx(8.178, abs=.01)
 
 def test_iwa_vantHoff():
     # test the vantHoff equivalent weighted average irradiance
 
-    irr_weighted_avg = pvdeg.degradation.IwaVantHoff(poa=PSM['poa_global'],
-                                                    temp_cell=PSM['temp_cell'])
-    assert irr_weighted_avg == pytest.approx(232.47, abs=0.5)
+    irr_weighted_avg = pvdeg.degradation.IwaVantHoff(weather_df=weather_df, meta=meta)
+    assert irr_weighted_avg == pytest.approx(240.28, abs=0.05)
 
 def test_arrhenius_deg():
     # test the arrhenius degradation acceleration factor
@@ -31,13 +31,20 @@ def test_arrhenius_deg():
     temp_chamber = 60
     I_chamber = 1e3
     Ea = 40
-    rh_surface = pvdeg.humidity.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
-                                                        temp_ambient=PSM['Temperature'],
-                                                        temp_module=PSM['temp_module'])
-    arrhenius_deg = pvdeg.degradation.arrhenius_deg(I_chamber=I_chamber, rh_chamber=rh_chamber,
-                                              rh_outdoor=rh_surface, poa=PSM['poa_global'],
-                                              temp_chamber=temp_chamber, temp_cell=PSM['temp_cell'],
-                                              Ea=Ea)
+    
+    poa = pvdeg.spectral.poa_irradiance(weather_df,meta)
+    temp_module = pvdeg.temperature.module(weather_df,meta,poa=poa)
+
+    rh_surface = pvdeg.humidity.rh_surface_outside(rh_ambient=weather_df['relative_humidity'],
+                                                   temp_ambient=weather_df['temp_air'],
+                                                   temp_module=temp_module)
+    arrhenius_deg = pvdeg.degradation.arrhenius_deg(weather_df=weather_df, meta=meta,
+                                                    I_chamber=I_chamber,
+                                                    rh_chamber=rh_chamber,
+                                                    rh_outdoor=rh_surface,
+                                                    temp_chamber=temp_chamber,
+                                                    Ea=Ea,
+                                                    poa=poa)
     assert arrhenius_deg == pytest.approx(12.804, abs=0.1)
 
 def test_iwa_arrhenius():
@@ -45,10 +52,10 @@ def test_iwa_arrhenius():
     # requires PSM3 weather file
 
     Ea = 40
-    irr_weighted_avg = pvdeg.degradation.IwaArrhenius(poa=PSM['poa_global'],
-                                                  rh_outdoor=PSM['Relative Humidity'],
-                                                  temp_cell=PSM['temp_cell'], Ea=Ea)
-    assert irr_weighted_avg == pytest.approx(194.66, abs=0.1)
+    irr_weighted_avg = pvdeg.degradation.IwaArrhenius(weather_df=weather_df, meta=meta,
+                                                      rh_outdoor=weather_df['relative_humidity'],
+                                                      Ea=Ea)
+    assert irr_weighted_avg == pytest.approx(199.42, abs=0.1)
 
 def test_degradation():
     # test RH, Temp, Spectral Irradiance sensitive degradation
