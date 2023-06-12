@@ -410,8 +410,8 @@ def IwaArrhenius(poa, rh_outdoor, temp_cell, Ea,
 
     Parameters
     ----------
-    poa_global : serioes or dataframe
-        must contain 'poa_global', Global Plan of Array irradiance [(]W/m²]
+    poa : serioes or dataframe
+        must contain 'poa_global', Global Plan of Array irradiance [W/m²]
     rh_outdoor : pandas series
         Relative Humidity of material of interest
         Acceptable relative humiditys can be calculated

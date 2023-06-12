@@ -11,10 +11,10 @@ Modules, methods, classes and attributes are explained here.
     :toctree: _autosummary
     :recursive:
 
-    main
     collection
     humidity
     degradation
+    fatigue
     letid
     spectral
     design
