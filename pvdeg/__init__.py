@@ -1,10 +1,7 @@
 import logging
 
 from .config import *
-from .main import (
-    StressFactors,
-    Degradation,
-)  # TODO: Delete once all functions are split up
+
 from . import cli
 from . import collection
 from . import degradation

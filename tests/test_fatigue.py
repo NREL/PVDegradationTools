@@ -1,16 +1,14 @@
 import os
-import pvdeg
 import pytest
 import pandas as pd
-from pvdeg import TEST_DATA_DIR
+from pvdeg import fatigue, weather, TEST_DATA_DIR
 
-INPUT = pd.read_csv(os.path.join(TEST_DATA_DIR,'weather_year_pytest.csv'),
-                    index_col=0, parse_dates=True)
+PSM_FILE = os.path.join(TEST_DATA_DIR,'psm3_pytest.csv')
+WEATHER, META = weather.read(PSM_FILE, 'psm')
 
 def test_solder_fatigue():
     # test solder fatique with default parameters
     # requires PSM3 weather file
 
-    damage = pvdeg.Degradation.solder_fatigue(time_range=INPUT.index,
-                                            temp_cell=INPUT['temp_cell'])
-    assert damage == pytest.approx(14.25, abs=0.1)
+    damage = fatigue.solder_fatigue(weather_df=WEATHER, meta=META)
+    assert damage == pytest.approx(15.646, abs=0.005)

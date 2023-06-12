@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.constants import convert_temperature
+from . import temperature
 
 def _avg_daily_temp_change(time_range, temp_cell):
     """
@@ -62,9 +63,9 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     Parameters
     ------------
     temp_cell : float series
-        Photovoltaic module cell temperature(Celsius)
+        Photovoltaic module cell temperature [C]
     reversal_temp : float
-        Temperature threshold to cross above and below
+        Temperature threshold to cross above and below [C]
 
     Returns
     --------
@@ -90,7 +91,14 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
 
     return num_changes_temp_hist
 
-def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=405.6, Q=0.12):
+def solder_fatigue(weather_df, meta,
+                   time_range=None,
+                   temp_cell=None,
+                   reversal_temp=54.8,
+                   n=1.9,
+                   b=0.33,
+                   C1=405.6,
+                   Q=0.12):
     """
     Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
     Damage will be returned as the rate of solder fatigue for one year. Based on:
@@ -106,13 +114,18 @@ def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=
     
     Parameters
     ------------
-    time_range : timestamp series
+    weather_df : pd.dataframe
+        Must contain dni, dhi, ghi, temp_air, windspeed, and datetime index
+    meta : dict
+        site location meta-data
+    time_range : timestamp series, optional
         Local time of specific site by the hour year-month-day hr:min:sec
         (Example) 2002-01-01 01:00:00
-    temp_cell : float series
-        Photovoltaic module cell temperature(Celsius) for every hour of a year
-    reversal_temp : float
-        Temperature threshold to cross above and below.
+        If a time range is not give, function will use dt index from weather_df
+    temp_cell : float series, optional
+        Photovoltaic module cell temperature [C] for every hour of a year
+    reversal_temp : float, optional
+        Temperature threshold to cross above and below [C]
         See the paper for other use cases
     n : float
         fit parameter for daily max temperature amplitude
@@ -126,10 +139,13 @@ def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=
     Returns
     --------
     damage : float series
-        Solder fatigue damage for a time interval depending on time_range (kPa)
+        Solder fatigue damage for a time interval depending on time_range [kPa]
 
     """
 
+    # TODO this, and many other functions with temp_cell or temp_module would benefit from an 
+    # optional parameter "conf = 'open_rack_glass_glass' or equivalent"
+    
     # TODO Make this function have more utility.
     # People want to run all the scenarios from the bosco paper.
     # Currently have everything hard coded for hourly calculation
@@ -140,6 +156,12 @@ def solder_fatigue(time_range, temp_cell, reversal_temp=54.8, n=1.9, b=0.33, C1=
 
     #TODO detect sub-hourly time delta -> downsample to hourly
 
+    if time_range is None:
+        time_range = weather_df.index
+    
+    if temp_cell is None:
+        temp_cell = temperature.cell(weather_df, meta)
+    
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)
 
     temp_max_avg = convert_temperature(temp_max_avg, 'Celsius', 'Kelvin')

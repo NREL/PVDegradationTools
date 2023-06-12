@@ -109,9 +109,10 @@ def calc_standoff(
         conf_inf = 'open_rack_glass_glass'
 
     solar_position = spectral.solar_position(weather_df, meta)
-    poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
-    T_0 = temperature.module(weather_df, poa, temp_model, conf_0, wind_speed_factor)
-    T_inf = temperature.module(weather_df, poa, temp_model, conf_inf, wind_speed_factor)
+    poa = spectral.poa_irradiance(weather_df, meta, sol_position=solar_position, tilt=tilt,
+                                  azimuth=azimuth, sky_model=sky_model)
+    T_0 = temperature.module(weather_df, meta, poa, temp_model, conf_0, wind_speed_factor)
+    T_inf = temperature.module(weather_df, meta, poa, temp_model, conf_inf, wind_speed_factor)
     x, T98_0, T98_inf = eff_gap(T_0, T_inf, level, x_0)
 
     return {'x':x, 'T98_0':T98_0, 'T98_inf':T98_inf}

@@ -54,10 +54,10 @@ def edge_seal_width(k, years=25):
 
     Parameters
     ----------
-    k: (float)
+    k: float
         Ingress rate of water through edge seal. [cm/h^0.5]
         Specifically it is the ratio of the breakthrough distance X/t^0.5.
-    years : (integer, default = 25)
+    years : integer, default = 25
         Integer number of years under water ingress
     Returns
     ----------
@@ -78,8 +78,10 @@ def edge_seal_from_dew_pt(dew_pt_temp, years, full_results=False):
     Parameters
     ----------
     dew_pt_temp : float, or float series
-        Dew Point Temperature
-    all_results : boolean
+        Dew Point Temperature [C]
+    years : int
+        Number of years for water ingress
+    full_results : boolean
         If true, returns all calculation steps: psat, avg_psat, k, edge seal width
         If false, returns only edge seal width
 
