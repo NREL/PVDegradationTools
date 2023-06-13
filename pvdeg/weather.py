@@ -13,12 +13,6 @@ def get(database, id, **kwargs):
     Load weather data directly from  NSRDB or through any other PVLIB i/o 
     tools function
 
-    TODO: - I suggest we break weather into 2 groups with separate functions.
-          - 1st function (load) to fetch weather from a database (NSRDB or PVGIS)
-          - 2nd function (read_file) to read a local weather file (psm3, tmy3, epw, h5)
-          - though useful to make 1 general funciton, i think it obscures to many variables for most
-            users
-
     Parameters:
     -----------
     database : (str)
@@ -225,6 +219,12 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
     meta : (dict)
         Dictionary of metadata for the weather data
     """
+    
+    DSET_MAP = {'air_temperature' : 'temp_air',
+                'Relative Humidity' : 'relative_humidity'}
+    
+    META_MAP = {'elevation' : 'altitude'}
+    
     nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
     
     dattr = {}
@@ -252,12 +252,22 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
 
     for dset in attributes:
         
-        if dset == 'air_temperature':
-            column_name = 'temp_air'
+        # switch dset names to pvlib standard
+        if dset in [*DSET_MAP.keys()]:
+            column_name = DSET_MAP[dset]
         else:
             column_name = dset
 
         with NSRDBX(dattr[dset], hsds=hsds) as f:   
             weather_df[column_name] = f[dset, :, gid]
+
+    # switch meta key names to pvlib standard
+    re_idx = []
+    for key in [*meta.index]:
+        if key in META_MAP.keys():
+            re_idx.append(META_MAP[key])
+        else:
+            re_idx.append(key)
+    meta.index = re_idx
 
     return weather_df, meta.to_dict()
