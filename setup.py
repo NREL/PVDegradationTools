@@ -60,7 +60,7 @@ DOCS_REQUIRE = [
 
 TESTS_REQUIRE = [
     'pytest',
-    'pytest-cov'
+    'coverage'
 ]
 
 EXTRAS_REQUIRE = {
