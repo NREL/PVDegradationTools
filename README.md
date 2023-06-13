@@ -55,7 +55,7 @@ For developer installation, download the repository, navigate to the folder loca
 
 Binder
 ======
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/PVDegradationTools/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/PVDegradationTools/main)
 
 License
 =======
