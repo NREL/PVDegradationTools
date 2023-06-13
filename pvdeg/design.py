@@ -12,7 +12,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from . import humidity
 
 
-def k(avg_psat):
+def edge_seal_ingress_rate(avg_psat):
         """
         This function generates a constant k, relating the average moisture ingress rate through a
         specific edge seal, Helioseal 101. Is an emperical estimation the rate of water ingress of
@@ -48,7 +48,9 @@ def k(avg_psat):
 
         return k
 
-def edge_seal_width(k, years=25):
+def edge_seal_width(weather_df, meta,
+                    k=None,
+                    years=25):
     """
     Determine the width of edge seal required for given number of years water ingress.
 
@@ -57,6 +59,7 @@ def edge_seal_width(k, years=25):
     k: float
         Ingress rate of water through edge seal. [cm/h^0.5]
         Specifically it is the ratio of the breakthrough distance X/t^0.5.
+        See the function design.edge_seal_ingress_rate()
     years : integer, default = 25
         Integer number of years under water ingress
     Returns
@@ -65,6 +68,10 @@ def edge_seal_width(k, years=25):
         Width of edge seal required for input number of years water ingress. [cm]
     """
 
+    if k is None:
+         avg_psat = humidity.psat(weather_df['temp_air'])[1]
+         k = edge_seal_ingress_rate(avg_psat)
+    
     width = k * (years * 365.25 * 24)**.5
 
     return width

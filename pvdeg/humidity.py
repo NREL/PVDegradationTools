@@ -58,11 +58,8 @@ def psat(temp, average=True):
         """
         Function calculated the water saturation temperature or dew point for a given water vapor
         pressure. Water vapor pressure model created from an emperical fit of ln(Psat) vs
-        temperature using a 6th order polynomial fit in microsoft Excel. The fit produced
-        R^2=0.999813.
+        temperature using a 6th order polynomial fit. The fit produced R^2=0.999813.
         Calculation created by Michael Kempe, unpublished data.
-
-        #TODO:  verify this is consistant with psat in main branch (main is most up to date)
 
         Parameters:
         -----------
@@ -70,6 +67,12 @@ def psat(temp, average=True):
             The air temperature (dry bulb) as a time-indexed series [C]
         average : boolean, default = True
             If true, return both psat serires and average psat (used for certain calcs)
+        Returns:
+        --------
+        psat : array, float
+            Saturation point
+        avg_psat : float, optional
+            mean saturation point for the series given
         """
 
         psat = np.exp((3.2575315268E-13 * temp**6) -
