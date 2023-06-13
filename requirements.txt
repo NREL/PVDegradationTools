@@ -2,8 +2,6 @@ numpy
 numba
 pandas
 pvlib @ git+https://github.com/pvlib/pvlib-python.git@ef4e31b0caa005c367cb20a6eda4e3b79f963dfe
-pytest
-pytest-cov
 python-dateutil
 pytz
 NREL-rex
@@ -15,4 +13,4 @@ tqdm
 matplotlib
 jupyterlab
 notebook
-sphinx_rtd_theme
+
