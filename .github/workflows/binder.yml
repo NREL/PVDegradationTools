@@ -5,18 +5,7 @@ on:
     branches:
     - main
 
-#Cache on mybinder.org
-# jobs:
-#   Create-MyBinderOrg-Cache:
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: cache binder build on mybinder.org
-#       uses: jupyterhub/repo2docker-action@master
-#       with:
-#         NO_PUSH: true
-#         MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
-
-# Push to dockerhub
+# Push to dockerhub and cache on binder
 jobs:
   binder:
     runs-on: ubuntu-latest
@@ -33,4 +22,9 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKERHUB_NREL_TOKEN }}
         BINDER_CACHE: true
         PUBLIC_REGISTRY_CHECK: true
-        MYBINDERORG_TAG: ${{ github.event.ref }}
+
+    - name: cache binder build on mybinder.org
+      uses: jupyterhub/repo2docker-action@master
+      with:
+        NO_PUSH: true
+        MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
