@@ -1,2 +1,5 @@
 include versioneer.py
 include pvdeg/_version.py
+include pvdeg/data/*
+include docs/tutorials/data/*
+include LICENSE

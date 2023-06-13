@@ -35,7 +35,7 @@ This repository contains functions for calculating degradation of photovoltaic m
 Documentation
 =============
 
-[Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder. 
+[Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/docs/tutorials) on the usage of functions are located in the "docs > Tutorials" folder.
 
 We also have documentation in [ReadTheDocs](https://PVDegradationTools.readthedocs.io) where you can find more details on the API functions.
 
@@ -53,6 +53,9 @@ For developer installation, download the repository, navigate to the folder loca
 
     pip install -e .
 
+Binder
+======
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/PVDegradationTools/HEAD?labpath=docs%2Ftutorials%2F)
 
 License
 =======
@@ -80,6 +83,6 @@ Citing
 If you use this functions in a published work, please cite:
 
 	Holsapple, Derek, Ayala Pelaez, Silvana, Kempe, Michael. "PV Degradation Tools", NREL Github 2020, Software Record SWR-20-71.
-	
-Zenodo reference and OSTI software record information forthcoming. 
+
+Zenodo reference and OSTI software record information forthcoming.
 
