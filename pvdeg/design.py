@@ -56,6 +56,10 @@ def edge_seal_width(weather_df, meta,
 
     Parameters
     ----------
+    weather_df : pd.DataFrame
+        must be datetime indexed and contain at least temp_air
+    meta : dict
+        location meta-data (from weather file)
     k: float
         Ingress rate of water through edge seal. [cm/h^0.5]
         Specifically it is the ratio of the breakthrough distance X/t^0.5.
@@ -77,17 +81,24 @@ def edge_seal_width(weather_df, meta,
     return width
 
 #TODO: Where is dew_pt_temp coming from?
-def edge_seal_from_dew_pt(dew_pt_temp, years, full_results=False):
+def edge_seal_from_dew_pt(weather_df, meta,
+                          dew_pt_temp=None,
+                          years=25,
+                          full_results=False):
     """
     Compute the edge seal width required for 25 year water ingress directly from
     dew pt tempterature.
 
     Parameters
     ----------
+    weather_df : pd.DataFrame
+        must be datetime indexed and contain at least 'temp_air' and 'Dew Point'
+    meta : dict
+        location meta-data (from weather file)
     dew_pt_temp : float, or float series
         Dew Point Temperature [C]
-    years : int
-        Number of years for water ingress
+    years : int, optional
+        Number of years for water ingress. Default = 25
     full_results : boolean
         If true, returns all calculation steps: psat, avg_psat, k, edge seal width
         If false, returns only edge seal width
@@ -107,11 +118,14 @@ def edge_seal_from_dew_pt(dew_pt_temp, years, full_results=False):
         Ingress rate of water vapor
     """
     
+    if dew_pt_temp is None:
+         dew_pt_temp = weather_df['Dew Point']
+
     psat, avg_psat = humidity.psat(dew_pt_temp)
 
     k = .0013 * (avg_psat)**.4933
 
-    width = edge_seal_width(k, years)
+    width = edge_seal_width(weather_df, meta, k, years)
 
     res = {'psat':psat,
            'avg_psat':avg_psat,
