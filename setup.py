@@ -15,6 +15,7 @@ from codecs import open
 from os import path
 
 import versioneer
+from glob import glob
 
 here = path.abspath(path.dirname(__file__))
 
@@ -113,7 +114,7 @@ setup(
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
     #data_files=[('my_data', ['data/data_file'])],
 
-    data_files=[('DataLibrary',['DataLibrary/*.json'])],
+    data_files=[('DataLibrary', glob('DataLibrary/*'))],
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
