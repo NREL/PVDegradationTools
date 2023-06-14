@@ -2,7 +2,7 @@
 Collection of classes and functions to obtain spectral parameters.
 """
 
-import pvlib
+from pvlib import iotools
 import os
 import glob
 import pandas as pd
@@ -49,8 +49,13 @@ def get(database, id, **kwargs):
     if database == 'NSRDB':
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
     elif database == 'PVGIS':
-        weather_df, _, _, meta = pvlib.iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
+        weather_df, _, _, meta = iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
                                                              map_variables=True, **kwargs)
+    elif database == 'PSM3':
+        print('-- WARNING --')
+        print('The API for PSM3 does not currently support relative humidity.')
+        print('The field "relative_humidity" will be missing from this dataframe.')
+        weather_df, meta = iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
     else:
         raise NameError('Weather database not found.')
 
@@ -76,11 +81,11 @@ def read(file_in, file_type, **kwargs):
     file_type = file_type.upper()
     
     if file_type in ['PSM3','PSM']:
-        weather_df, meta = pvlib.iotools.read_psm3(filename=file_in, map_variables=True)
+        weather_df, meta = iotools.read_psm3(filename=file_in, map_variables=True)
     elif file_type in ['TMY3','TMY']:
-        weather_df, meta = pvlib.iotools.read_tmy3(filename=file_in, map_variables=True)
+        weather_df, meta = iotools.read_tmy3(filename=file_in, map_variables=True)
     elif file_type == 'EPW':
-        weather_df, meta = pvlib.iotools.read_epw(filename=file_in)
+        weather_df, meta = iotools.read_epw(filename=file_in)
     elif file_type == 'H5':
         weather_df, meta = read_h5(file=file_in, **kwargs)
     else:
@@ -219,14 +224,14 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-    
+
     DSET_MAP = {'air_temperature' : 'temp_air',
                 'Relative Humidity' : 'relative_humidity'}
-    
+
     META_MAP = {'elevation' : 'altitude'}
-    
+
     nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
-    
+
     dattr = {}
     for i, file in enumerate(nsrdb_fnames):
         with NSRDBX(file, hsds=hsds) as f:
@@ -235,11 +240,11 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
                     gid = f.lat_lon_gid(location)
                 meta = f['meta', gid].iloc[0]
                 index = f.time_index
-            
+
             lattr = f.datasets
             for attr in lattr:
                 dattr[attr] = file
-                
+
     if attributes == None:
         attributes = list(dattr.keys())
         try:
@@ -247,11 +252,11 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
             attributes.remove('tmy_year_short')
         except ValueError:
             pass
-        
+
     weather_df = pd.DataFrame(index=index)
 
     for dset in attributes:
-        
+
         # switch dset names to pvlib standard
         if dset in [*DSET_MAP.keys()]:
             column_name = DSET_MAP[dset]
