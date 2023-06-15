@@ -18,7 +18,7 @@ rh_cols = [col for col in rh_expected.columns if 'RH' in col]
 rh_expected = rh_expected[rh_cols]
 
 
-def test_calc_rel_humidity():
+def test_module():
     '''
     test pvdeg.humidity.calc_rel_humidity
     
@@ -26,7 +26,7 @@ def test_calc_rel_humidity():
     ---------
     weather dataframe and meta dictionary
     '''
-    result = pvdeg.humidity.calc_rel_humidity(WEATHER, META)
+    result = pvdeg.humidity.module(WEATHER, META)
     pd.testing.assert_frame_equal(result, 
                                   rh_expected, 
                                   check_dtype=False)

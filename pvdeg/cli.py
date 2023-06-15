@@ -1,5 +1,5 @@
 from pvdeg.standards import run_calc_standoff
-from pvdeg.humidity import run_calc_rel_humidity
+from pvdeg.humidity import run_module
 from gaps.cli import CLICommandFromFunction, make_cli
 
 commands = [
@@ -10,7 +10,7 @@ commands = [
     ),
     CLICommandFromFunction(
         name="run-rel_humidity", 
-        function=run_calc_rel_humidity, 
+        function=run_module, 
         split_keys=["project_points"]
     ),
 ]

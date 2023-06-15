@@ -87,7 +87,7 @@ def psat(temp, average=True):
         else:
             return psat
 
-def rh_surface_outside(rh_ambient, temp_ambient, temp_module):
+def surface_outside(rh_ambient, temp_ambient, temp_module):
     """
     Function calculates the Relative Humidity of a Solar Panel Surface at module temperature
 
@@ -152,7 +152,7 @@ def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702,
     """
 
     # Get the relative humidity of the surface
-    rh_surface = rh_surface_outside(
+    rh_surface = surface_outside(
         rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
@@ -238,7 +238,7 @@ def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
 
     return diffuse_water
 
-def rh_front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
+def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
     """
     Function returns a diffusivity weighted average Relative Humidity of the module surface.
 
@@ -398,7 +398,7 @@ def Ce_numba(start, temp_module, rh_surface,
 
     return Ce_list
 
-def rh_back_encap(rh_ambient, temp_ambient, temp_module,
+def back_encap(rh_ambient, temp_ambient, temp_module,
                 WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
     """
     rh_back_encap()
@@ -440,7 +440,7 @@ def rh_back_encap(rh_ambient, temp_ambient, temp_module,
 
     """
 
-    rh_surface = rh_surface_outside(rh_ambient=rh_ambient,
+    rh_surface = surface_outside(rh_ambient=rh_ambient,
                                                     temp_ambient=temp_ambient,
                                                     temp_module=temp_module)
 
@@ -468,7 +468,7 @@ def rh_back_encap(rh_ambient, temp_ambient, temp_module,
 
     return RHback_series
 
-def rh_backsheet_from_encap(rh_back_encap, rh_surface_outside):
+def backsheet_from_encap(rh_back_encap, rh_surface_outside):
     """
     Function to calculate the Relative Humidity of solar module backsheet as timeseries.
     Requires the RH of the backside encapsulant and the outside surface of the module.
@@ -490,7 +490,7 @@ def rh_backsheet_from_encap(rh_back_encap, rh_surface_outside):
 
     return RHbacksheet_series
 
-def rh_backsheet(rh_ambient, temp_ambient, temp_module,
+def backsheet(rh_ambient, temp_ambient, temp_module,
                 WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
     """Function to calculate the Relative Humidity of solar module backsheet as timeseries.
 
@@ -527,17 +527,17 @@ def rh_backsheet(rh_ambient, temp_ambient, temp_module,
         relative humidity of the PV backsheet as a time-series [%]
     """
 
-    back_encap = rh_back_encap(rh_ambient=rh_ambient,
-                                                temp_ambient=temp_ambient,
-                                                temp_module=temp_module, WVTRo=WVTRo,
-                                                EaWVTR=EaWVTR, So=So, l=l, Eas=Eas)
-    surface = rh_surface_outside(rh_ambient=rh_ambient,
-                                                temp_ambient=temp_ambient,
-                                                temp_module=temp_module)
+    back_encap = back_encap(rh_ambient=rh_ambient,
+                            temp_ambient=temp_ambient,
+                            temp_module=temp_module, WVTRo=WVTRo,
+                            EaWVTR=EaWVTR, So=So, l=l, Eas=Eas)
+    surface = surface_outside(rh_ambient=rh_ambient,
+                              temp_ambient=temp_ambient,
+                              temp_module=temp_module)
     backsheet = (back_encap + surface)/2
     return backsheet
 
-def calc_rel_humidity(
+def module(
     weather_df,
     meta,
     tilt=None,
@@ -608,19 +608,19 @@ def calc_rel_humidity(
     temp_module = temperature.module(weather_df, meta, poa=poa, temp_model=temp_model,
                                      conf=mount_type, wind_speed_factor=wind_speed_factor)
     
-    surface_outside = rh_surface_outside(
+    rh_surface_outside = surface_outside(
         rh_ambient=weather_df['relative_humidity'],
         temp_ambient=weather_df['temp_air'],
         temp_module=temp_module)
 
-    front_encap = rh_front_encap(
+    rh_front_encap = front_encap(
         rh_ambient=weather_df['relative_humidity'], 
         temp_ambient=weather_df['temp_air'], 
         temp_module=temp_module,
         So=So, 
         Eas=Eas)
 
-    back_encap = rh_back_encap(
+    rh_back_encap = back_encap(
         rh_ambient=weather_df['relative_humidity'],
         temp_ambient=weather_df['temp_air'], 
         temp_module=temp_module, 
@@ -630,19 +630,19 @@ def calc_rel_humidity(
         l=l, 
         Eas=Eas)
 
-    backsheet = rh_backsheet_from_encap(
-        rh_back_encap=back_encap,
-        rh_surface_outside=surface_outside)
+    rh_backsheet = backsheet_from_encap(
+        rh_back_encap=rh_back_encap,
+        rh_surface_outside=rh_surface_outside)
 
-    data = {'RH_surface_outside': surface_outside,
-            'RH_front_encap': front_encap,
-            'RH_back_encap': back_encap,
-            'RH_backsheet': backsheet}
+    data = {'RH_surface_outside': rh_surface_outside,
+            'RH_front_encap': rh_front_encap,
+            'RH_back_encap': rh_back_encap,
+            'RH_backsheet': rh_backsheet}
     results = pd.DataFrame(data=data)
     return results
 
 
-def run_calc_rel_humidity(
+def run_module(
     project_points, 
     out_dir, 
     tag,
@@ -718,7 +718,7 @@ def run_calc_rel_humidity(
                 id = gid, 
                 **weather_arg)
             future = executor.submit(
-                calc_rel_humidity,
+                module,
                 weather_df, 
                 meta,
                 tilt,
