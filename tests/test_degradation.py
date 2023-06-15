@@ -35,9 +35,9 @@ def test_arrhenius_deg():
     poa = pvdeg.spectral.poa_irradiance(weather_df,meta)
     temp_module = pvdeg.temperature.module(weather_df,meta,poa=poa)
 
-    rh_surface = pvdeg.humidity.rh_surface_outside(rh_ambient=weather_df['relative_humidity'],
-                                                   temp_ambient=weather_df['temp_air'],
-                                                   temp_module=temp_module)
+    rh_surface = pvdeg.humidity.surface_outside(rh_ambient=weather_df['relative_humidity'],
+                                                temp_ambient=weather_df['temp_air'],
+                                                temp_module=temp_module)
     arrhenius_deg = pvdeg.degradation.arrhenius_deg(weather_df=weather_df, meta=meta,
                                                     I_chamber=I_chamber,
                                                     rh_chamber=rh_chamber,
