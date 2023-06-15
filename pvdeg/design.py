@@ -1,14 +1,6 @@
 """Collection of functions for PV module design considertations.
 """
 
-import numpy as np
-import pandas as pd
-from numba import jit
-from rex import NSRDBX
-from rex import Outputs
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, as_completed
-
 from . import humidity
 
 
@@ -50,14 +42,16 @@ def edge_seal_ingress_rate(avg_psat):
 
 def edge_seal_width(weather_df, meta,
                     k=None,
-                    years=25):
+                    years=25,
+                    from_dew_point=False,
+                    full_results=False):
     """
     Determine the width of edge seal required for given number of years water ingress.
 
     Parameters
     ----------
     weather_df : pd.DataFrame
-        must be datetime indexed and contain at least temp_air
+        must be datetime indexed and contain at least temp_air, Dew Point
     meta : dict
         location meta-data (from weather file)
     k: float
@@ -66,76 +60,35 @@ def edge_seal_width(weather_df, meta,
         See the function design.edge_seal_ingress_rate()
     years : integer, default = 25
         Integer number of years under water ingress
+    from_dew_point : boolean, optional
+        If true, will compute the edge seal width from Dew Point instead of dry bulb air temp
+    full_results : boolean, optional
+        If true, will return all sub-steps (psat, psat_avg, ingress rate, edge_seal_width)
     Returns
     ----------
     width : float 
         Width of edge seal required for input number of years water ingress. [cm]
     """
 
+    if from_dew_point:
+        temp_col = 'Dew Point'
+    else:
+        temp_col = 'temp_air'
+    
     if k is None:
-         avg_psat = humidity.psat(weather_df['temp_air'])[1]
-         k = edge_seal_ingress_rate(avg_psat)
+        psat, avg_psat = humidity.psat(weather_df[temp_col])
+        k = edge_seal_ingress_rate(avg_psat)
     
     width = k * (years * 365.25 * 24)**.5
 
-    return width
-
-#TODO: Where is dew_pt_temp coming from?
-def edge_seal_from_dew_pt(weather_df, meta,
-                          dew_pt_temp=None,
-                          years=25,
-                          full_results=False):
-    """
-    Compute the edge seal width required for 25 year water ingress directly from
-    dew pt tempterature.
-
-    Parameters
-    ----------
-    weather_df : pd.DataFrame
-        must be datetime indexed and contain at least 'temp_air' and 'Dew Point'
-    meta : dict
-        location meta-data (from weather file)
-    dew_pt_temp : float, or float series
-        Dew Point Temperature [C]
-    years : int, optional
-        Number of years for water ingress. Default = 25
-    full_results : boolean
-        If true, returns all calculation steps: psat, avg_psat, k, edge seal width
-        If false, returns only edge seal width
-
-    Returns
-    ----------
-    edge_seal_width: float
-        Width of edge seal [mm] required for 25 year water ingress
-
-    Optional Returns
-    ----------
-    psat : series
-        Hourly saturation point
-    avg_psat : float
-        Average saturation point over sample times
-    k : float
-        Ingress rate of water vapor
-    """
-    
-    if dew_pt_temp is None:
-         dew_pt_temp = weather_df['Dew Point']
-
-    psat, avg_psat = humidity.psat(dew_pt_temp)
-
-    k = .0013 * (avg_psat)**.4933
-
-    width = edge_seal_width(weather_df, meta, k, years)
-
     res = {'psat':psat,
-           'avg_psat':avg_psat,
-           'k':k,
-           'edge_seal_width':width}
+            'avg_psat':avg_psat,
+            'k':k,
+            'edge_seal_width':width}
 
     if full_results:
         return res
     else:
         return width
-
 
 #TODO: Include gaps functionality
