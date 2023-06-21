@@ -7,6 +7,7 @@ import os
 import glob
 import pandas as pd
 from rex import NSRDBX, Outputs
+from pvdeg import humidity
 
 def get(database, id, **kwargs):
     """
@@ -52,13 +53,14 @@ def get(database, id, **kwargs):
         weather_df, _, _, meta = iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
                                                              map_variables=True, **kwargs)
     elif database == 'PSM3':
-        print('-- WARNING --')
-        print('The API for PSM3 does not currently support relative humidity.')
-        print('The field "relative_humidity" will be missing from this dataframe.')
         weather_df, meta = iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
     else:
         raise NameError('Weather database not found.')
 
+    if 'relative_humidity' not in weather_df.columns:
+        print('Column "relative_humidity" not found in DataFrame. Calculating...')
+        weather_df = humidity._ambient(weather_df)
+    
     return weather_df, meta
 
 
