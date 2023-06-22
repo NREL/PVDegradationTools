@@ -53,14 +53,31 @@ For developer installation, download the repository, navigate to the folder loca
 
     pip install -e .
 
-Binder
-======
+
+Learning
+========
+
+### Google Colaboratory
+To run these tutorials in [Google Colaboratory](https://colab.research.google.com/)
+you can click the button below:
+
+<a target="_blank" href="https://colab.research.google.com/github/shirubana/Approaches2BifacialPerformanceMonitoring/blob/main/1%20-%20ORGANIZED%20Generating%20InputFile%20Combinations.ipynb">
+<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
+
+
+### Binder
+
+To run these tutorials in Binder, you cna click here:
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/PVDegradationTools/main)
+
+It takes a minute to load the environment.
+
 
 License
 =======
 
-BSD 3-clause
+[BSD 3-clause](https://github.com/NREL/PVDegradationTools/blob/main/LICENSE.md)
 
 
 Contributing

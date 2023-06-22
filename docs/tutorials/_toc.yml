@@ -1,0 +1,15 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: 1 - Basics, Humidity, Design.ipynb
+chapters:
+- file: 1 - Basics, Humidity, Design.ipynb
+- file: 2 - Degradation.ipynb
+- file: 3 - Spectral Degradation.ipynb
+- file: 4 - Standards
+- file: B-O LID - Accelerated Test
+- file: LETID - Accelerated Test
+- file: LETID - Outdoor LETID
+- file: LETID - Outdoor Scenario Based on Accelerated Test Result
+- file: LETID - LETID - Passivated Wafer
