@@ -4,12 +4,12 @@
 format: jb-book
 root: intro
 chapters:
-- file: 1 - Basics, Humidity, Design.ipynb
-- file: 2 - Degradation.ipynb
-- file: 3 - Spectral Degradation.ipynb
-- file: 4 - Standards
-- file: B-O LID - Accelerated Test
-- file: LETID - Accelerated Test
-- file: LETID - Outdoor LETID
-- file: LETID - Outdoor Scenario Based on Accelerated Test Result
-- file: LETID - LETID - Passivated Wafer
+- file: tutorials/1 - Basics, Humidity, Design.ipynb
+- file: tutorials/2 - Degradation.ipynb
+- file: tutorials/3 - Spectral Degradation.ipynb
+- file: tutorials/4 - Standards
+- file: tutorials/B-O LID - Accelerated Test
+- file: tutorials/LETID - Accelerated Test
+- file: tutorials/LETID - Outdoor LETID
+- file: tutorials/LETID - Outdoor Scenario Based on Accelerated Test Result
+- file: tutorials/LETID - LETID - Passivated Wafer
