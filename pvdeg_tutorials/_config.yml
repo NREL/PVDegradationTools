@@ -3,7 +3,7 @@
 
 title: PVDEG Tutorials
 author: Matthew Brown, Silvana Ovaitt
-logo: logo.png
+logo: PVD_logo.png
 
 # Force re-execution of notebooks on each build.
 # See https://jupyterbook.org/content/execute.html
