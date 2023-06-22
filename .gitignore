@@ -65,6 +65,9 @@ instance/
 # Sphinx documentation
 docs/sphinx/_build/
 
+# tutorial jupyter-book
+pvdeg_tutorials/_build/
+
 # PyBuilder
 target/
 
