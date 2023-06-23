@@ -21,8 +21,8 @@ bibtex_bibfiles:
 
 # Information about where the book exists on the web
 repository:
-  url: https://github.com/NREL/PVDegradationTools/pvdeg_tutorials
-    #path_to_book: docs  # Optional path to your book, relative to the repository root
+  url: https://github.com/NREL/PVDegradationTools
+  path_to_book: pvdeg_tutorials  # Optional path to your book, relative to the repository root
   branch: main
 
 # Add GitHub buttons to your book
