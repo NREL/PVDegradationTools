@@ -153,7 +153,7 @@ const thebe_selector_output = ".output, .cell_output"
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="../intro.html">
-                    Welcome the PVDEG Tutorials
+                    Welcome to the PVDEG Tutorials
                 </a>
             </li>
         </ul>
@@ -454,7 +454,11 @@ In a well-passivated wafer, carrier injection (<span class="math notranslate noh
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">letid</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">utilities</span><span class="p">,</span> <span class="n">DATA_DIR</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+
+<span class="c1"># !pip install -r https://raw.githubusercontent.com/NREL/PVDegradationTools/main/requirements.txt</span>
+
+<span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">letid</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">utilities</span><span class="p">,</span> <span class="n">DATA_DIR</span>
 
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -857,26 +861,44 @@ Assuming literature experiments were carried out on cells, this requires using t
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">35</span>
-<span class="g g-Whitespace">     </span><span class="mi">32</span> <span class="n">dN_Bdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">x_ba</span> <span class="o">+</span> <span class="n">k_BC</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_B</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">33</span> <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
-<span class="ne">---&gt; </span><span class="mi">35</span> <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
-<span class="g g-Whitespace">     </span><span class="mi">37</span> <span class="c1"># assign new defect state percentages</span>
-<span class="g g-Whitespace">     </span><span class="mi">38</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">13</span><span class="p">],</span> <span class="n">line</span> <span class="mi">1</span>
+<span class="ne">----&gt; </span><span class="mi">1</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span>     
+<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="c1"># first row tau has already been assigned</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span>         <span class="k">pass</span>
 
-<span class="nn">File ~\Anaconda3\envs\steve\lib\site-packages\pandas\core\indexing.py:2413,</span> in <span class="ni">_AtIndexer.__getitem__</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2412</span> <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-<span class="ne">-&gt; </span><span class="mi">2413</span>     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes_are_unique</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">2414</span>         <span class="c1"># GH#33041 fall back to .loc</span>
-<span class="g g-Whitespace">   </span><span class="mi">2415</span>         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">is_scalar</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">key</span><span class="p">):</span>
-<span class="g g-Whitespace">   </span><span class="mi">2416</span>             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid call for scalar access (getting)!&quot;</span><span class="p">)</span>
+<span class="nn">File ~\Anaconda3\envs\steve\lib\site-packages\pandas\core\frame.py:1400,</span> in <span class="ni">DataFrame.iterrows</span><span class="nt">(self)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1398</span> <span class="n">using_cow</span> <span class="o">=</span> <span class="n">using_copy_on_write</span><span class="p">()</span>
+<span class="g g-Whitespace">   </span><span class="mi">1399</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+<span class="ne">-&gt; </span><span class="mi">1400</span>     <span class="n">s</span> <span class="o">=</span> <span class="n">klass</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">k</span><span class="p">)</span><span class="o">.</span><span class="n">__finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1401</span>     <span class="k">if</span> <span class="n">using_cow</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mgr</span><span class="o">.</span><span class="n">is_single_block</span><span class="p">:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1402</span>         <span class="n">s</span><span class="o">.</span><span class="n">_mgr</span><span class="o">.</span><span class="n">add_references</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mgr</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
 
-<span class="nn">File ~\Anaconda3\envs\steve\lib\site-packages\pandas\core\indexing.py:2410,</span> in <span class="ni">_AtIndexer._axes_are_unique</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2406</span> <span class="nd">@property</span>
-<span class="g g-Whitespace">   </span><span class="mi">2407</span> <span class="k">def</span> <span class="nf">_axes_are_unique</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="g g-Whitespace">   </span><span class="mi">2408</span>     <span class="c1"># Only relevant for self.ndim == 2</span>
-<span class="g g-Whitespace">   </span><span class="mi">2409</span>     <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span>
-<span class="ne">-&gt; </span><span class="mi">2410</span>     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">is_unique</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">is_unique</span>
+<span class="nn">File ~\Anaconda3\envs\steve\lib\site-packages\pandas\core\series.py:509,</span> in <span class="ni">Series.__init__</span><span class="nt">(self, data, index, dtype, name, copy, fastpath)</span>
+<span class="g g-Whitespace">    </span><span class="mi">507</span>         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">508</span> <span class="k">else</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">509</span>     <span class="n">data</span> <span class="o">=</span> <span class="n">sanitize_array</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">copy</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">511</span>     <span class="n">manager</span> <span class="o">=</span> <span class="n">get_option</span><span class="p">(</span><span class="s2">&quot;mode.data_manager&quot;</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">512</span>     <span class="k">if</span> <span class="n">manager</span> <span class="o">==</span> <span class="s2">&quot;block&quot;</span><span class="p">:</span>
+
+<span class="nn">File ~\Anaconda3\envs\steve\lib\site-packages\pandas\core\construction.py:519,</span> in <span class="ni">sanitize_array</span><span class="nt">(data, index, dtype, copy, allow_2d)</span>
+<span class="g g-Whitespace">    </span><span class="mi">494</span> <span class="k">def</span> <span class="nf">sanitize_array</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">495</span>     <span class="n">data</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">496</span>     <span class="n">index</span><span class="p">:</span> <span class="n">Index</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">500</span>     <span class="n">allow_2d</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">501</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArrayLike</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">502</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">503</span><span class="sd">     Sanitize input data to an ndarray or ExtensionArray, copy if specified,</span>
+<span class="g g-Whitespace">    </span><span class="mi">504</span><span class="sd">     coerce to the dtype if specified.</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">517</span><span class="sd">     np.ndarray or ExtensionArray</span>
+<span class="g g-Whitespace">    </span><span class="mi">518</span><span class="sd">     &quot;&quot;&quot;</span>
+<span class="ne">--&gt; </span><span class="mi">519</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ma</span><span class="o">.</span><span class="n">MaskedArray</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">520</span>         <span class="n">data</span> <span class="o">=</span> <span class="n">sanitize_masked_array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">522</span>     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">PandasDtype</span><span class="p">):</span>
+<span class="g g-Whitespace">    </span><span class="mi">523</span>         <span class="c1"># Avoid ending up with a PandasArray</span>
 
 <span class="ne">KeyboardInterrupt</span>: 
 </pre></div>
