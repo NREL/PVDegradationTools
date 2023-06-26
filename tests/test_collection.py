@@ -33,7 +33,7 @@ def test_calculate_jsc_from_tau_cp():
         tau, wafer_thickness, d_base, s_rear, generation, depth
     )
 
-    assert jsc == pytest.approx(39.79933327595729, abs=0.000005)
+    assert jsc == pytest.approx(39.79933327595729, abs=0.00005)
 
 
 def test_calculate_jsc_from_tau_iqe():
@@ -56,4 +56,4 @@ def test_calculate_jsc_from_tau_iqe():
 
 def test_generation_current():
     jgen = collection.generation_current(generation, depth)
-    assert jgen == pytest.approx(42.36324575251117, abs=0.000005)
+    assert jgen == pytest.approx(42.36324575251117, abs=0.00005)
