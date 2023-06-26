@@ -33,7 +33,7 @@ def test_calculate_jsc_from_tau_cp():
         tau, wafer_thickness, d_base, s_rear, generation, depth
     )
 
-    assert jsc == pytest.appriox(39.79670015, abs=5e-5)
+    assert jsc == pytest.approx(39.79670015, abs=5e-5)
     #assert jsc == pytest.approx(39.796733327595729, abs=0.00005)
 
 
