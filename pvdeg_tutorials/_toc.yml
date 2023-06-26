@@ -4,10 +4,12 @@
 format: jb-book
 root: intro
 chapters:
-- file: tutorials/1 - Basics, Humidity, Design.ipynb
-- file: tutorials/2 - Degradation.ipynb
-- file: tutorials/3 - Spectral Degradation.ipynb
+- file: tutorials/1 - Basics, Humidity, Design
+- file: tutorials/2 - Degradation
+- file: tutorials/3 - Spectral Degradation
 - file: tutorials/4 - Standards
+- file: tutorials/5 - Weather Database Acess
+- file: tutorials/ASTM Live Demo
 - file: tutorials/B-O LID - Accelerated Test
 - file: tutorials/LETID - Accelerated Test
 - file: tutorials/LETID - Outdoor LETID
