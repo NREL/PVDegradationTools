@@ -161,6 +161,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4%20-%20Standards.html">4 - Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
@@ -544,11 +545,16 @@ document.write(`
 </section>
 <section id="nsrdb-api">
 <h2>2. NSRDB - API<a class="headerlink" href="#nsrdb-api" title="Permalink to this heading">#</a></h2>
-<p>As of now, this method does not work for calculations which require relative humidity.</p>
 <p>To access the NREL NSRDB, you will need an API key. Key’s are free, but require you to set up an account. Without an API key, you can use a demonstration API which is severely limited. To set up an account and get your API key, visit <a class="reference external" href="https://developer.nrel.gov/signup/">https://developer.nrel.gov/signup/</a></p>
 <p>Key Notes:</p>
 <ul class="simple">
 <li><p>set <code class="docutils literal notranslate"><span class="pre">attributes</span> <span class="pre">=</span> <span class="pre">[]</span></code> to return all possible attributes (weather fields)</p></li>
+<li><p>There are 2 major methods with the API</p>
+<ul>
+<li><p>names = ‘tmy’ : generate a TMY-like weather dataframe. This will calculate the relative humidity from temperature and dew point.</p></li>
+<li><p>names = ‘2019’ : collect a weather dataframe including measured relative humidity.</p></li>
+</ul>
+</li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -558,7 +564,7 @@ document.write(`
 
 <span class="n">weather_db</span> <span class="o">=</span> <span class="s1">&#39;PSM3&#39;</span>
 <span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">39.741931</span><span class="p">,</span> <span class="o">-</span><span class="mf">105.169891</span><span class="p">)</span>
-<span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;api_key&#39;</span><span class="p">:</span> <span class="n">API_KEY</span><span class="p">,</span>
+<span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;api_key&#39;</span><span class="p">:</span> <span class="s1">&#39;DEMO_KEY&#39;</span><span class="p">,</span>
                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;user@mail.com&#39;</span><span class="p">,</span>
                <span class="s1">&#39;names&#39;</span> <span class="p">:</span> <span class="s1">&#39;tmy&#39;</span><span class="p">,</span>
                <span class="s1">&#39;attributes&#39;</span> <span class="p">:</span> <span class="p">[],</span> 
