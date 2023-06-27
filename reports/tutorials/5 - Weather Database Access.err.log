@@ -1,68 +1,65 @@
 Traceback (most recent call last):
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\site-packages\jupyter_cache\executors\utils.py", line 58, in single_nb_execution
+  File "C:\Users\sayala\AppData\Roaming\Python\Python39\site-packages\jupyter_cache\executors\utils.py", line 58, in single_nb_execution
     executenb(
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\site-packages\nbclient\client.py", line 1305, in execute
+  File "C:\ProgramData\Anaconda3\lib\site-packages\nbclient\client.py", line 1204, in execute
     return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\site-packages\jupyter_core\utils\__init__.py", line 166, in wrapped
-    return loop.run_until_complete(inner)
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\asyncio\base_events.py", line 616, in run_until_complete
+  File "C:\ProgramData\Anaconda3\lib\site-packages\nbclient\util.py", line 84, in wrapped
+    return just_run(coro(*args, **kwargs))
+  File "C:\ProgramData\Anaconda3\lib\site-packages\nbclient\util.py", line 62, in just_run
+    return loop.run_until_complete(coro)
+  File "C:\ProgramData\Anaconda3\lib\asyncio\base_events.py", line 647, in run_until_complete
     return future.result()
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\site-packages\nbclient\client.py", line 705, in async_execute
+  File "C:\ProgramData\Anaconda3\lib\site-packages\nbclient\client.py", line 663, in async_execute
     await self.async_execute_cell(
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\site-packages\nbclient\client.py", line 1058, in async_execute_cell
+  File "C:\ProgramData\Anaconda3\lib\site-packages\nbclient\client.py", line 965, in async_execute_cell
     await self._check_raise_for_error(cell, cell_index, exec_reply)
-  File "C:\Users\mbrown2\Anaconda3\envs\steve\lib\site-packages\nbclient\client.py", line 914, in _check_raise_for_error
+  File "C:\ProgramData\Anaconda3\lib\site-packages\nbclient\client.py", line 862, in _check_raise_for_error
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-#Get weather data
+# Get weather data
 weather_db = 'NSRDB'
 weather_id = (39.741931, -105.169891)
-#weather_id = 1933572  
-weather_arg = {'satellite' : 'GOES', 
-               'names' : 2021, 
-               'NREL_HPC' : True,
-               'attributes' : ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni','relative_humidity']}
+#weather_id = 1933572
+weather_arg = {'satellite': 'GOES',
+               'names': 2021,
+               'NREL_HPC': True,
+               'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
 
 weather_df, meta = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
-------------------
 
+------------------
 
 [1;31m---------------------------------------------------------------------------[0m
 [1;31mFileNotFoundError[0m                         Traceback (most recent call last)
-Cell [1;32mIn[2], line 10[0m
-[0;32m      4[0m [38;5;66;03m#weather_id = 1933572  [39;00m
-[0;32m      5[0m weather_arg [38;5;241m=[39m {[38;5;124m'[39m[38;5;124msatellite[39m[38;5;124m'[39m : [38;5;124m'[39m[38;5;124mGOES[39m[38;5;124m'[39m, 
-[0;32m      6[0m                [38;5;124m'[39m[38;5;124mnames[39m[38;5;124m'[39m : [38;5;241m2021[39m, 
-[0;32m      7[0m                [38;5;124m'[39m[38;5;124mNREL_HPC[39m[38;5;124m'[39m : [38;5;28;01mTrue[39;00m,
-[0;32m      8[0m                [38;5;124m'[39m[38;5;124mattributes[39m[38;5;124m'[39m : [[38;5;124m'[39m[38;5;124mair_temperature[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mwind_speed[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mdhi[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mghi[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124mdni[39m[38;5;124m'[39m,[38;5;124m'[39m[38;5;124mrelative_humidity[39m[38;5;124m'[39m]}
-[1;32m---> 10[0m weather_df, meta [38;5;241m=[39m [43mpvdeg[49m[38;5;241;43m.[39;49m[43mweather[49m[38;5;241;43m.[39;49m[43mget[49m[43m([49m[43mweather_db[49m[43m,[49m[43m [49m[43mweather_id[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mweather_arg[49m[43m)[49m
+[1;32m~\AppData\Local\Temp\1\ipykernel_28596\1678303396.py[0m in [0;36m<module>[1;34m[0m
+[0;32m      8[0m                'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
+[0;32m      9[0m [1;33m[0m[0m
+[1;32m---> 10[1;33m [0mweather_df[0m[1;33m,[0m [0mmeta[0m [1;33m=[0m [0mpvdeg[0m[1;33m.[0m[0mweather[0m[1;33m.[0m[0mget[0m[1;33m([0m[0mweather_db[0m[1;33m,[0m [0mweather_id[0m[1;33m,[0m [1;33m**[0m[0mweather_arg[0m[1;33m)[0m[1;33m[0m[1;33m[0m[0m
+[0m
+[1;32mc:\users\sayala\documents\github\pvdegtool\pvdegradationtools\pvdeg\weather.py[0m in [0;36mget[1;34m(database, id, **kwargs)[0m
+[0;32m     52[0m     [1;31m# "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"[0m[1;33m[0m[1;33m[0m[0m
+[0;32m     53[0m     [1;32mif[0m [0mdatabase[0m [1;33m==[0m [1;34m'NSRDB'[0m[1;33m:[0m[1;33m[0m[1;33m[0m[0m
+[1;32m---> 54[1;33m         [0mweather_df[0m[1;33m,[0m [0mmeta[0m [1;33m=[0m [0mget_NSRDB[0m[1;33m([0m[0mgid[0m[1;33m=[0m[0mgid[0m[1;33m,[0m [0mlocation[0m[1;33m=[0m[0mlocation[0m[1;33m,[0m [1;33m**[0m[0mkwargs[0m[1;33m)[0m[1;33m[0m[1;33m[0m[0m
+[0m[0;32m     55[0m     [1;32melif[0m [0mdatabase[0m [1;33m==[0m [1;34m'PVGIS'[0m[1;33m:[0m[1;33m[0m[1;33m[0m[0m
+[0;32m     56[0m         weather_df, _, meta, _ = iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
 
-File [1;32mc:\users\mbrown2\documents\github\pvdegradationtools\pvdeg\weather.py:51[0m, in [0;36mget[1;34m(database, id, **kwargs)[0m
-[0;32m     47[0m [38;5;66;03m#TODO: decide wether to follow NSRDB or pvlib conventions...[39;00m
-[0;32m     48[0m [38;5;66;03m# e.g. temp_air vs. air_temperature[39;00m
-[0;32m     49[0m [38;5;66;03m# "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"[39;00m
-[0;32m     50[0m [38;5;28;01mif[39;00m database [38;5;241m==[39m [38;5;124m'[39m[38;5;124mNSRDB[39m[38;5;124m'[39m:
-[1;32m---> 51[0m     weather_df, meta [38;5;241m=[39m [43mget_NSRDB[49m[43m([49m[43mgid[49m[38;5;241;43m=[39;49m[43mgid[49m[43m,[49m[43m [49m[43mlocation[49m[38;5;241;43m=[39;49m[43mlocation[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
-[0;32m     52[0m [38;5;28;01melif[39;00m database [38;5;241m==[39m [38;5;124m'[39m[38;5;124mPVGIS[39m[38;5;124m'[39m:
-[0;32m     53[0m     weather_df, _, _, meta [38;5;241m=[39m iotools[38;5;241m.[39mget_pvgis_tmy(latitude[38;5;241m=[39mlat, longitude[38;5;241m=[39mlon,
-[0;32m     54[0m                                                          map_variables[38;5;241m=[39m[38;5;28;01mTrue[39;00m, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[1;32mc:\users\sayala\documents\github\pvdegtool\pvdegradationtools\pvdeg\weather.py[0m in [0;36mget_NSRDB[1;34m(satellite, names, NREL_HPC, gid, location, attributes, **_)[0m
+[0;32m    242[0m     [0mMETA_MAP[0m [1;33m=[0m [1;33m{[0m[1;34m'elevation'[0m [1;33m:[0m [1;34m'altitude'[0m[1;33m}[0m[1;33m[0m[1;33m[0m[0m
+[0;32m    243[0m [1;33m[0m[0m
+[1;32m--> 244[1;33m     [0mnsrdb_fnames[0m[1;33m,[0m [0mhsds[0m [1;33m=[0m [0mget_NSRDB_fnames[0m[1;33m([0m[0msatellite[0m[1;33m,[0m [0mnames[0m[1;33m,[0m [0mNREL_HPC[0m[1;33m)[0m[1;33m[0m[1;33m[0m[0m
+[0m[0;32m    245[0m [1;33m[0m[0m
+[0;32m    246[0m     [0mdattr[0m [1;33m=[0m [1;33m{[0m[1;33m}[0m[1;33m[0m[1;33m[0m[0m
 
-File [1;32mc:\users\mbrown2\documents\github\pvdegradationtools\pvdeg\weather.py:235[0m, in [0;36mget_NSRDB[1;34m(satellite, names, NREL_HPC, gid, location, attributes, **_)[0m
-[0;32m    230[0m DSET_MAP [38;5;241m=[39m {[38;5;124m'[39m[38;5;124mair_temperature[39m[38;5;124m'[39m : [38;5;124m'[39m[38;5;124mtemp_air[39m[38;5;124m'[39m,
-[0;32m    231[0m             [38;5;124m'[39m[38;5;124mRelative Humidity[39m[38;5;124m'[39m : [38;5;124m'[39m[38;5;124mrelative_humidity[39m[38;5;124m'[39m}
-[0;32m    233[0m META_MAP [38;5;241m=[39m {[38;5;124m'[39m[38;5;124melevation[39m[38;5;124m'[39m : [38;5;124m'[39m[38;5;124maltitude[39m[38;5;124m'[39m}
-[1;32m--> 235[0m nsrdb_fnames, hsds [38;5;241m=[39m [43mget_NSRDB_fnames[49m[43m([49m[43msatellite[49m[43m,[49m[43m [49m[43mnames[49m[43m,[49m[43m [49m[43mNREL_HPC[49m[43m)[49m
-[0;32m    237[0m dattr [38;5;241m=[39m {}
-[0;32m    238[0m [38;5;28;01mfor[39;00m i, file [38;5;129;01min[39;00m [38;5;28menumerate[39m(nsrdb_fnames):
-
-File [1;32mc:\users\mbrown2\documents\github\pvdegradationtools\pvdeg\weather.py:194[0m, in [0;36mget_NSRDB_fnames[1;34m(satellite, names, NREL_HPC, **_)[0m
-[0;32m    191[0m     nsrdb_fnames [38;5;241m=[39m glob[38;5;241m.[39mglob(nsrdb_fp)
-[0;32m    193[0m [38;5;28;01mif[39;00m [38;5;28mlen[39m(nsrdb_fnames) [38;5;241m==[39m [38;5;241m0[39m:
-[1;32m--> 194[0m     [38;5;28;01mraise[39;00m [38;5;167;01mFileNotFoundError[39;00m(
-[0;32m    195[0m         [38;5;124m"[39m[38;5;124mCouldn[39m[38;5;124m'[39m[38;5;124mt find NSRDB input files! [39m[38;5;130;01m\n[39;00m[38;5;124mSearched for: [39m[38;5;124m'[39m[38;5;132;01m{}[39;00m[38;5;124m'[39m[38;5;124m"[39m[38;5;241m.[39mformat(nsrdb_fp))
-[0;32m    197[0m [38;5;28;01mreturn[39;00m nsrdb_fnames, hsds
+[1;32mc:\users\sayala\documents\github\pvdegtool\pvdegradationtools\pvdeg\weather.py[0m in [0;36mget_NSRDB_fnames[1;34m(satellite, names, NREL_HPC, **_)[0m
+[0;32m    201[0m [1;33m[0m[0m
+[0;32m    202[0m     [1;32mif[0m [0mlen[0m[1;33m([0m[0mnsrdb_fnames[0m[1;33m)[0m [1;33m==[0m [1;36m0[0m[1;33m:[0m[1;33m[0m[1;33m[0m[0m
+[1;32m--> 203[1;33m         raise FileNotFoundError(
+[0m[0;32m    204[0m             "Couldn't find NSRDB input files! \nSearched for: '{}'".format(nsrdb_fp))
+[0;32m    205[0m [1;33m[0m[0m
 
 [1;31mFileNotFoundError[0m: Couldn't find NSRDB input files! 
+Searched for: '/datasets/NSRDB/full_disc\*_2021.h5'
+FileNotFoundError: Couldn't find NSRDB input files! 
 Searched for: '/datasets/NSRDB/full_disc\*_2021.h5'
 

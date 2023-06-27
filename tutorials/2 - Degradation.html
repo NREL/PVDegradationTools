@@ -163,6 +163,7 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">2 - Degradation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4%20-%20Standards.html">4 - Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5%20-%20Weather%20Database%20Access.html">5 - Weather Database Access</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
@@ -547,7 +548,7 @@ $<span class="math notranslate nohighlight">\( I_{WA} = [ \frac{ \Sigma (I_{outd
 <span class="c1"># arrhenius activation energy (kj/mol)</span>
 <span class="n">Ea</span> <span class="o">=</span> <span class="mi">40</span>
 
-<span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">rh_surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+<span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
                                                <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
                                                <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_module</span><span class="p">)</span>
 
@@ -565,31 +566,6 @@ $<span class="math notranslate nohighlight">\( I_{WA} = [ \frac{ \Sigma (I_{outd
                                                     <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
                                                     <span class="n">temp_cell</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">,</span>
                                                     <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">6</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1"># arrhenius activation energy (kj/mol)</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">Ea</span> <span class="o">=</span> <span class="mi">40</span>
-<span class="ne">----&gt; </span><span class="mi">6</span> <span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">rh_surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span>                                                <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>                                                <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_module</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">10</span> <span class="n">arrhenius_deg</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">arrhenius_deg</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">11</span>                                                 <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">rh_surface</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">12</span>                                                 <span class="n">I_chamber</span><span class="o">=</span><span class="n">I_chamber</span><span class="p">,</span>
-   <span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">16</span>                                                 <span class="n">temp_cell</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span>                                                 <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="n">irr_weighted_avg_a</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">IwaArrhenius</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">20</span>                                                     <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">,</span> 
-<span class="g g-Whitespace">     </span><span class="mi">21</span>                                                     <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
-<span class="g g-Whitespace">     </span><span class="mi">22</span>                                                     <span class="n">temp_cell</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">23</span>                                                     <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
-
-<span class="ne">AttributeError</span>: module &#39;pvdeg.humidity&#39; has no attribute &#39;rh_surface_outside&#39;
 </pre></div>
 </div>
 </div>
@@ -619,7 +595,7 @@ $<span class="math notranslate nohighlight">\( I_{WA} = [ \frac{ \Sigma (I_{outd
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">rh_surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
                                                <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
                                                <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_module</span><span class="p">)</span>
 
@@ -657,11 +633,15 @@ We want the solder fatigue estimated over the month of June for a roof mounted g
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">time_range</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="mi">6</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># select the month of June</span>
+<span class="n">time_range</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="mi">6</span><span class="p">]</span>
 
+<span class="c1"># calculate cell temperature over our selected date-time range.</span>
+<span class="c1"># specify the module configuration</span>
 <span class="n">temp_cell</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_range</span><span class="p">],</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
                                    <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span>
                                    <span class="n">conf</span><span class="o">=</span><span class="s1">&#39;insulated_back_glass_polymer&#39;</span><span class="p">)</span>
+
 
 <span class="n">fatigue</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">fatigue</span><span class="o">.</span><span class="n">solder_fatigue</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
                                        <span class="n">time_range</span> <span class="o">=</span> <span class="n">time_range</span><span class="p">,</span>

@@ -163,6 +163,8 @@ const thebe_selector_output = ".output, .cell_output"
 <li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4%20-%20Standards.html">4 - Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="5%20-%20Weather%20Database%20Access.html">5 - Weather Database Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
 <li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">LETID - Outdoor Environments</a></li>
@@ -491,27 +493,22 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">4</span>
-<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># load weather and location data, use pvlib read_psm3 function with map_variables = True</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="n">sam_file</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;example data\psm3.csv&#39;</span>
-<span class="ne">----&gt; </span><span class="mi">4</span> <span class="n">weather</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvlib</span><span class="o">.</span><span class="n">iotools</span><span class="o">.</span><span class="n">read_psm3</span><span class="p">(</span><span class="n">sam_file</span><span class="p">,</span> <span class="n">map_variables</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="c1">#weather, meta = pvlib.iotools.read_psm3(sam_file)</span>
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span>---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+~\AppData\Local\Temp\1\ipykernel_27320\416425688.py in &lt;module&gt;
+      2 
+      3 sam_file = r&#39;example data\psm3.csv&#39;
+----&gt; 4 weather, meta = pvlib.iotools.read_psm3(sam_file, map_variables = True)
+      5 #weather, meta = pvlib.iotools.read_psm3(sam_file)
 
-<span class="nn">File ~\Documents\GitHub\pvlib\pvlib\iotools\psm3.py:412,</span> in <span class="ni">read_psm3</span><span class="nt">(filename, map_variables)</span>
-<span class="g g-Whitespace">    </span><span class="mi">375</span> <span class="k">def</span> <span class="nf">read_psm3</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">map_variables</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="g g-Whitespace">    </span><span class="mi">376</span><span class="w">     </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">377</span><span class="sd">     Read an NSRDB PSM3 weather file (formatted as SAM CSV). The NSRDB</span>
-<span class="g g-Whitespace">    </span><span class="mi">378</span><span class="sd">     is described in [1]_ and the SAM CSV format is described in [2]_.</span>
-<span class="sd">   (...)</span>
-<span class="g g-Whitespace">    </span><span class="mi">410</span><span class="sd">        &lt;https://web.archive.org/web/20170207203107/https://sam.nrel.gov/sites/default/files/content/documents/pdf/wfcsv.pdf&gt;`_</span>
-<span class="g g-Whitespace">    </span><span class="mi">411</span><span class="sd">     &quot;&quot;&quot;</span>
-<span class="ne">--&gt; </span><span class="mi">412</span>     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fbuf</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">413</span>         <span class="n">content</span> <span class="o">=</span> <span class="n">parse_psm3</span><span class="p">(</span><span class="n">fbuf</span><span class="p">,</span> <span class="n">map_variables</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">414</span>     <span class="k">return</span> <span class="n">content</span>
+~\AppData\Roaming\Python\Python39\site-packages\pvlib\iotools\psm3.py in read_psm3(filename, map_variables)
+    410        &lt;https://web.archive.org/web/20170207203107/https://sam.nrel.gov/sites/default/files/content/documents/pdf/wfcsv.pdf&gt;`_
+    411     &quot;&quot;&quot;
+--&gt; 412     with open(str(filename), &#39;r&#39;) as fbuf:
+    413         content = parse_psm3(fbuf, map_variables)
+    414     return content
 
-<span class="ne">FileNotFoundError</span>: [Errno 2] No such file or directory: &#39;example data\\psm3.csv&#39;
+FileNotFoundError: [Errno 2] No such file or directory: &#39;example data\\psm3.csv&#39;
 </pre></div>
 </div>
 </div>

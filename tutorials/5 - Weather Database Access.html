@@ -435,7 +435,7 @@ document.write(`
 <p><strong>Requirements:</strong></p>
 <ul class="simple">
 <li><p>Internet access</p></li>
-<li><p>NSRDB API key. API keys are free and can be requested in about 5 minutes. To get your own key, visit <a class="reference external" href="https://developer.nrel.gov/signup/">https://developer.nrel.gov/signup/</a></p></li>
+<li><p>NSRDB API key. API keys are free. You can request and obtain an API key in about 5 minutes. To get your own key, visit <a class="reference external" href="https://developer.nrel.gov/signup/">https://developer.nrel.gov/signup/</a></p></li>
 <li><p>Step <strong>1.</strong> is for Eagle HPC users. You will need an account with NREL’s Eagle computer for this method.</p></li>
 </ul>
 <p><strong>Objectives:</strong></p>
@@ -446,7 +446,7 @@ document.write(`
 <li><p>Single Location via the PVGIS public database</p></li>
 </ol>
 <p><strong>Background:</strong></p>
-<p>This journal will demonstrate all existing built-in methods for directly accessing public weather databases. Some methods are restriced to certain user groups. For general users, see methods <strong>2</strong> and <strong>3</strong>. For users with an active Eagle HPC account, you may use methods <strong>1</strong>, <strong>2</strong>, and <strong>3</strong>.</p>
+<p>This journal will demonstrate all existing built-in methods for directly accessing public weather databases. Some methods are restriced to certain user groups. For general users, see methods <strong>2</strong> and <strong>3</strong>. For users with an active Eagle HPC account, you may use method <strong>1</strong> as well as <strong>2</strong> and <strong>3</strong>.</p>
 <p>For all users and all steps: This journal will run significantly longer than other tutorials and have significant internet traffic as you fetch large datasets.</p>
 <p>This example demonstrates the calculation of a minimum standoff distance necessary for roof-mounted PV modules to ensure that the <span class="math notranslate nohighlight">\(T_{98}\)</span> operational temperature remains under 70°C, in which case the more rigorous thermal stability testing requirements of IEC TS 63126 would not needed to be considered. We use data from [Fuentes, 1987] to model the approximate exponential decay in temperature, <span class="math notranslate nohighlight">\(T(X)\)</span>, with increasing standoff distance, <span class="math notranslate nohighlight">\(X\)</span>, as,</p>
 <div class="math notranslate nohighlight">
@@ -475,14 +475,14 @@ document.write(`
 <p>Next, we want to select a satellite, named dataset (year of data), and what weather attributes we want to fetch. For further options, see the documentation for <code class="docutils literal notranslate"><span class="pre">pvdeg.weather.get</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Get weather data</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get weather data</span>
 <span class="n">weather_db</span> <span class="o">=</span> <span class="s1">&#39;NSRDB&#39;</span>
 <span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">39.741931</span><span class="p">,</span> <span class="o">-</span><span class="mf">105.169891</span><span class="p">)</span>
-<span class="c1">#weather_id = 1933572  </span>
-<span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;satellite&#39;</span> <span class="p">:</span> <span class="s1">&#39;GOES&#39;</span><span class="p">,</span> 
-               <span class="s1">&#39;names&#39;</span> <span class="p">:</span> <span class="mi">2021</span><span class="p">,</span> 
-               <span class="s1">&#39;NREL_HPC&#39;</span> <span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-               <span class="s1">&#39;attributes&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;wind_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;dhi&#39;</span><span class="p">,</span> <span class="s1">&#39;ghi&#39;</span><span class="p">,</span> <span class="s1">&#39;dni&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">]}</span>
+<span class="c1">#weather_id = 1933572</span>
+<span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;satellite&#39;</span><span class="p">:</span> <span class="s1">&#39;GOES&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="mi">2021</span><span class="p">,</span>
+               <span class="s1">&#39;NREL_HPC&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;wind_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;dhi&#39;</span><span class="p">,</span> <span class="s1">&#39;ghi&#39;</span><span class="p">,</span> <span class="s1">&#39;dni&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_humidity&#39;</span><span class="p">]}</span>
 
 <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">,</span> <span class="o">**</span><span class="n">weather_arg</span><span class="p">)</span>
 </pre></div>
@@ -491,38 +491,31 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
 <span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">10</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1">#weather_id = 1933572  </span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;satellite&#39;</span> <span class="p">:</span> <span class="s1">&#39;GOES&#39;</span><span class="p">,</span> 
-<span class="g g-Whitespace">      </span><span class="mi">6</span>                <span class="s1">&#39;names&#39;</span> <span class="p">:</span> <span class="mi">2021</span><span class="p">,</span> 
-<span class="g g-Whitespace">      </span><span class="mi">7</span>                <span class="s1">&#39;NREL_HPC&#39;</span> <span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">8</span>                <span class="s1">&#39;attributes&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;wind_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;dhi&#39;</span><span class="p">,</span> <span class="s1">&#39;ghi&#39;</span><span class="p">,</span> <span class="s1">&#39;dni&#39;</span><span class="p">,</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">]}</span>
+<span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Local</span>\<span class="n">Temp</span>\<span class="mi">1</span>\<span class="n">ipykernel_28596</span>\<span class="mf">1678303396.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span>                <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;air_temperature&#39;</span><span class="p">,</span> <span class="s1">&#39;wind_speed&#39;</span><span class="p">,</span> <span class="s1">&#39;dhi&#39;</span><span class="p">,</span> <span class="s1">&#39;ghi&#39;</span><span class="p">,</span> <span class="s1">&#39;dni&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_humidity&#39;</span><span class="p">]}</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> 
 <span class="ne">---&gt; </span><span class="mi">10</span> <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">,</span> <span class="o">**</span><span class="n">weather_arg</span><span class="p">)</span>
 
-<span class="nn">File c:\users\mbrown2\documents\github\pvdegradationtools\pvdeg\weather.py:51,</span> in <span class="ni">get</span><span class="nt">(database, id, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">47</span> <span class="c1">#TODO: decide wether to follow NSRDB or pvlib conventions...</span>
-<span class="g g-Whitespace">     </span><span class="mi">48</span> <span class="c1"># e.g. temp_air vs. air_temperature</span>
-<span class="g g-Whitespace">     </span><span class="mi">49</span> <span class="c1"># &quot;map variables&quot; will guarantee PVLIB conventions (automatic in coming update) which is &quot;temp_air&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">50</span> <span class="k">if</span> <span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;NSRDB&#39;</span><span class="p">:</span>
-<span class="ne">---&gt; </span><span class="mi">51</span>     <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">get_NSRDB</span><span class="p">(</span><span class="n">gid</span><span class="o">=</span><span class="n">gid</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">52</span> <span class="k">elif</span> <span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;PVGIS&#39;</span><span class="p">:</span>
-<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="n">weather_df</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">iotools</span><span class="o">.</span><span class="n">get_pvgis_tmy</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span>
-<span class="g g-Whitespace">     </span><span class="mi">54</span>                                                          <span class="n">map_variables</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="nn">c:\users\sayala\documents\github\pvdegtool\pvdegradationtools\pvdeg\weather.py</span> in <span class="ni">get</span><span class="nt">(database, id, **kwargs)</span>
+<span class="g g-Whitespace">     </span><span class="mi">52</span>     <span class="c1"># &quot;map variables&quot; will guarantee PVLIB conventions (automatic in coming update) which is &quot;temp_air&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">53</span>     <span class="k">if</span> <span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;NSRDB&#39;</span><span class="p">:</span>
+<span class="ne">---&gt; </span><span class="mi">54</span>         <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">get_NSRDB</span><span class="p">(</span><span class="n">gid</span><span class="o">=</span><span class="n">gid</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">55</span>     <span class="k">elif</span> <span class="n">database</span> <span class="o">==</span> <span class="s1">&#39;PVGIS&#39;</span><span class="p">:</span>
+<span class="g g-Whitespace">     </span><span class="mi">56</span>         <span class="n">weather_df</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">iotools</span><span class="o">.</span><span class="n">get_pvgis_tmy</span><span class="p">(</span><span class="n">latitude</span><span class="o">=</span><span class="n">lat</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="n">lon</span><span class="p">,</span>
 
-<span class="nn">File c:\users\mbrown2\documents\github\pvdegradationtools\pvdeg\weather.py:235,</span> in <span class="ni">get_NSRDB</span><span class="nt">(satellite, names, NREL_HPC, gid, location, attributes, **_)</span>
-<span class="g g-Whitespace">    </span><span class="mi">230</span> <span class="n">DSET_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;air_temperature&#39;</span> <span class="p">:</span> <span class="s1">&#39;temp_air&#39;</span><span class="p">,</span>
-<span class="g g-Whitespace">    </span><span class="mi">231</span>             <span class="s1">&#39;Relative Humidity&#39;</span> <span class="p">:</span> <span class="s1">&#39;relative_humidity&#39;</span><span class="p">}</span>
-<span class="g g-Whitespace">    </span><span class="mi">233</span> <span class="n">META_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elevation&#39;</span> <span class="p">:</span> <span class="s1">&#39;altitude&#39;</span><span class="p">}</span>
-<span class="ne">--&gt; </span><span class="mi">235</span> <span class="n">nsrdb_fnames</span><span class="p">,</span> <span class="n">hsds</span> <span class="o">=</span> <span class="n">get_NSRDB_fnames</span><span class="p">(</span><span class="n">satellite</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">NREL_HPC</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">237</span> <span class="n">dattr</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="g g-Whitespace">    </span><span class="mi">238</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">file</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nsrdb_fnames</span><span class="p">):</span>
+<span class="nn">c:\users\sayala\documents\github\pvdegtool\pvdegradationtools\pvdeg\weather.py</span> in <span class="ni">get_NSRDB</span><span class="nt">(satellite, names, NREL_HPC, gid, location, attributes, **_)</span>
+<span class="g g-Whitespace">    </span><span class="mi">242</span>     <span class="n">META_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elevation&#39;</span> <span class="p">:</span> <span class="s1">&#39;altitude&#39;</span><span class="p">}</span>
+<span class="g g-Whitespace">    </span><span class="mi">243</span> 
+<span class="ne">--&gt; </span><span class="mi">244</span>     <span class="n">nsrdb_fnames</span><span class="p">,</span> <span class="n">hsds</span> <span class="o">=</span> <span class="n">get_NSRDB_fnames</span><span class="p">(</span><span class="n">satellite</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">NREL_HPC</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">245</span> 
+<span class="g g-Whitespace">    </span><span class="mi">246</span>     <span class="n">dattr</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="nn">File c:\users\mbrown2\documents\github\pvdegradationtools\pvdeg\weather.py:194,</span> in <span class="ni">get_NSRDB_fnames</span><span class="nt">(satellite, names, NREL_HPC, **_)</span>
-<span class="g g-Whitespace">    </span><span class="mi">191</span>     <span class="n">nsrdb_fnames</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">nsrdb_fp</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">193</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nsrdb_fnames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-<span class="ne">--&gt; </span><span class="mi">194</span>     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
-<span class="g g-Whitespace">    </span><span class="mi">195</span>         <span class="s2">&quot;Couldn&#39;t find NSRDB input files! </span><span class="se">\n</span><span class="s2">Searched for: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nsrdb_fp</span><span class="p">))</span>
-<span class="g g-Whitespace">    </span><span class="mi">197</span> <span class="k">return</span> <span class="n">nsrdb_fnames</span><span class="p">,</span> <span class="n">hsds</span>
+<span class="nn">c:\users\sayala\documents\github\pvdegtool\pvdegradationtools\pvdeg\weather.py</span> in <span class="ni">get_NSRDB_fnames</span><span class="nt">(satellite, names, NREL_HPC, **_)</span>
+<span class="g g-Whitespace">    </span><span class="mi">201</span> 
+<span class="g g-Whitespace">    </span><span class="mi">202</span>     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nsrdb_fnames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+<span class="ne">--&gt; </span><span class="mi">203</span>         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">204</span>             <span class="s2">&quot;Couldn&#39;t find NSRDB input files! </span><span class="se">\n</span><span class="s2">Searched for: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nsrdb_fp</span><span class="p">))</span>
+<span class="g g-Whitespace">    </span><span class="mi">205</span> 
 
 <span class="ne">FileNotFoundError</span>: Couldn&#39;t find NSRDB input files! 
 <span class="n">Searched</span> <span class="k">for</span><span class="p">:</span> <span class="s1">&#39;/datasets/NSRDB/full_disc\*_2021.h5&#39;</span>
@@ -534,8 +527,8 @@ document.write(`
 <p>Lets verify the weather data we fetched by running a familiar calculation; standoff distance.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">calc_standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span> 
-                    <span class="n">module_type</span><span class="o">=</span><span class="s1">&#39;glass_polymer&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">calc_standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span>
+                                    <span class="n">module_type</span><span class="o">=</span><span class="s1">&#39;glass_polymer&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -550,30 +543,30 @@ document.write(`
 <li><p>set <code class="docutils literal notranslate"><span class="pre">attributes</span> <span class="pre">=</span> <span class="pre">[]</span></code> to return all possible attributes (weather fields)</p></li>
 <li><p>There are 2 major methods with the API</p>
 <ul>
-<li><p>names = ‘tmy’ : generate a TMY-like weather dataframe. This will calculate the relative humidity from temperature and dew point.</p></li>
+<li><p>names = ‘tmy’ : generate a TMY-like weather dataframe aggregate. This will calculate the relative humidity from temperature and dew point.</p></li>
 <li><p>names = ‘2019’ : collect a weather dataframe including measured relative humidity.</p></li>
 </ul>
 </li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">API_KEY</span> <span class="o">=</span> <span class="s1">&#39;your_api_key_here&#39;</span> 
-<span class="c1"># The example API key here is for demonstation and is rate-limited per IP. </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">API_KEY</span> <span class="o">=</span> <span class="s1">&#39;your_api_key_here&#39;</span>
+<span class="c1"># The example API key here is for demonstation and is rate-limited per IP.</span>
 <span class="c1"># To get your own API key, visit https://developer.nrel.gov/signup/</span>
 
 <span class="n">weather_db</span> <span class="o">=</span> <span class="s1">&#39;PSM3&#39;</span>
 <span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">39.741931</span><span class="p">,</span> <span class="o">-</span><span class="mf">105.169891</span><span class="p">)</span>
 <span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;api_key&#39;</span><span class="p">:</span> <span class="s1">&#39;DEMO_KEY&#39;</span><span class="p">,</span>
                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;user@mail.com&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;names&#39;</span> <span class="p">:</span> <span class="s1">&#39;tmy&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;attributes&#39;</span> <span class="p">:</span> <span class="p">[],</span> 
+               <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="s1">&#39;tmy&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[],</span>
                <span class="s1">&#39;map_variables&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
 <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">,</span> <span class="o">**</span><span class="n">weather_arg</span><span class="p">)</span>
 
-<span class="c1">#Perform calculation</span>
-<span class="n">res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">calc_standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span> 
-                    <span class="n">module_type</span><span class="o">=</span><span class="s1">&#39;glass_polymer&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.1</span><span class="p">)</span>
+<span class="c1"># Perform calculation</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">calc_standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span>
+                                    <span class="n">module_type</span><span class="o">=</span><span class="s1">&#39;glass_polymer&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -581,37 +574,6 @@ document.write(`
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Column &quot;relative_humidity&quot; not found in DataFrame. Calculating...
 {&#39;x&#39;: 2.0063800910065974, &#39;T98_0&#39;: 77.85091991839371, &#39;T98_inf&#39;: 49.84149463751572}
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;Source&#39;: &#39;NSRDB&#39;,
- &#39;Location ID&#39;: &#39;145809&#39;,
- &#39;City&#39;: &#39;-&#39;,
- &#39;State&#39;: &#39;-&#39;,
- &#39;Country&#39;: &#39;-&#39;,
- &#39;Time Zone&#39;: -7,
- &#39;Local Time Zone&#39;: -7,
- &#39;Dew Point Units&#39;: &#39;c&#39;,
- &#39;DHI Units&#39;: &#39;w/m2&#39;,
- &#39;DNI Units&#39;: &#39;w/m2&#39;,
- &#39;GHI Units&#39;: &#39;w/m2&#39;,
- &#39;Temperature Units&#39;: &#39;c&#39;,
- &#39;Pressure Units&#39;: &#39;mbar&#39;,
- &#39;Wind Direction Units&#39;: &#39;Degrees&#39;,
- &#39;Wind Speed Units&#39;: &#39;m/s&#39;,
- &#39;Surface Albedo Units&#39;: &#39;N/A&#39;,
- &#39;Version&#39;: &#39;3.2.0&#39;,
- &#39;latitude&#39;: 39.73,
- &#39;longitude&#39;: -105.18,
- &#39;altitude&#39;: 1820}
 </pre></div>
 </div>
 </div>
@@ -627,13 +589,18 @@ document.write(`
 <span class="c1">#weather_id = (48.667, 15.885)</span>
 <span class="c1">#weather_arg = {&#39;map_variables&#39;: True}</span>
 
-<span class="c1">#TMY</span>
+<span class="c1"># TMY</span>
 <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">)</span>
 
-<span class="c1">#Perform calculation</span>
-<span class="c1"># res = pvdeg.standards.calc_standoff(weather_df, meta, tilt=None, azimuth=180, sky_model=&#39;isotropic&#39;, temp_model=&#39;sapm&#39;, </span>
-<span class="c1">#                     module_type=&#39;glass_polymer&#39;, level=1, x_0=6.1)</span>
-<span class="c1"># print(res)</span>
+<span class="c1"># Perform calculation</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">calc_standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span>
+                                    <span class="n">module_type</span><span class="o">=</span><span class="s1">&#39;glass_polymer&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;x&#39;: 2.009865008105706, &#39;T98_0&#39;: 77.60387767516511, &#39;T98_inf&#39;: 50.51554003554856}
 </pre></div>
 </div>
 </div>

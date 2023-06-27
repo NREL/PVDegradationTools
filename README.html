@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>3 - Spectral Degradation &#8212; PVDEG Tutorials</title>
+    <title>TUTORIALS for PV Degradation Tools (pvdeg) &#8212; PVDEG Tutorials</title>
   
   
   
@@ -61,11 +61,9 @@ const thebe_selector_input = "pre"
 const thebe_selector_output = ".output, .cell_output"
 </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '3 - Spectral Degradation';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'README';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="4 - Standards" href="4%20-%20Standards.html" />
-    <link rel="prev" title="2 - Degradation" href="2%20-%20Degradation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -141,8 +139,8 @@ const thebe_selector_output = ".output, .cell_output"
       
     
     
-    <img src="_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="_static/PVD_logo.png" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="_static/PVD_logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -152,25 +150,22 @@ const thebe_selector_output = ".output, .cell_output"
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="intro.html">
-                    Welcome the PVDEG Tutorials
+                    Welcome to the PVDEG Tutorials
                 </a>
             </li>
         </ul>
-        <ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="1%20-%20Basics%2C%20Humidity%2C%20Design.html">1 - Basics, Humidity, Design</a></li>
-<li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">3 - Spectral Degradation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="4%20-%20Standards.html">4 - Standards</a></li>
-<li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">Example: Boron-oxygen light-induced degradation (B-O LID) progression in accelerated tests</a></li>
-
-<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">Example: LETID progression in accelerated tests</a></li>
-
-
-<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">Example: LETID progression in outdoor environments</a></li>
-
-
-<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">Example: Using a test result to model LETID progression in outdoor environments</a></li>
-
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="tutorials/1%20-%20Basics%2C%20Humidity%2C%20Design.html">1 - Basics, Humidity, Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/2%20-%20Degradation.html">2 - Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/4%20-%20Standards.html">4 - Standards</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/5%20-%20Weather%20Database%20Access.html">5 - Weather Database Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">LETID - Outdoor Scenario Based on Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/LETID%20-%20Passivated%20Wafer.html">LETID - Passivated Wafer</a></li>
 </ul>
 
     </div>
@@ -217,55 +212,6 @@ const thebe_selector_output = ".output, .cell_output"
 
 
 
-<div class="dropdown dropdown-launch-buttons">
-  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
-    <i class="fas fa-rocket"></i>
-  </button>
-  <ul class="dropdown-menu">
-      
-      
-      
-      <li><a href="https://colab.research.google.com/github/PVDegradationTools/pvdeg_tutorials/blob/main/3 - Spectral Degradation.ipynb" target="_blank"
-   class="btn btn-sm dropdown-item"
-   title="Launch onColab"
-   data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  
-    <img src="_static/images/logo_colab.png">
-  </span>
-<span class="btn__text-container">Colab</span>
-</a>
-</li>
-      
-      
-      
-      
-      <li>
-<button onclick="initThebeSBT()"
-  class="btn btn-sm btn-launch-thebe dropdown-item"
-  title="Launch Thebe"
-  data-bs-placement="left" data-bs-toggle="tooltip"
->
-  
-
-<span class="btn__icon-container">
-  <i class="fas fa-play"></i>
-  </span>
-<span class="btn__text-container">Live Code</span>
-</button>
-</li>
-      
-  </ul>
-</div>
-
-
-
-
-
-
 <div class="dropdown dropdown-source-buttons">
   <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
     <i class="fab fa-github"></i>
@@ -274,7 +220,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/NREL/PVDegradationTools/pvdeg_tutorials" target="_blank"
+      <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
    class="btn btn-sm btn-source-repository-button dropdown-item"
    title="Source repository"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -291,7 +237,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="https://github.com/NREL/PVDegradationTools/pvdeg_tutorials/issues/new?title=Issue%20on%20page%20%2F3 - Spectral Degradation.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2FREADME.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -321,7 +267,7 @@ const thebe_selector_output = ".output, .cell_output"
       
       
       
-      <li><a href="_sources/3 - Spectral Degradation.ipynb" target="_blank"
+      <li><a href="_sources/README.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -331,7 +277,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.ipynb</span>
+<span class="btn__text-container">.md</span>
 </a>
 </li>
       
@@ -403,7 +349,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>3 - Spectral Degradation</h1>
+    <h1>TUTORIALS for PV Degradation Tools (pvdeg)</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -413,11 +359,15 @@ document.write(`
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-in-spectral-irradiance-data">1. Read in spectral irradiance data</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-degradation">2. Calculate Degradation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">TUTORIALS for PV Degradation Tools (pvdeg)</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#jupyter-book">Jupyter Book</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#binder">Binder</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#locally">Locally</a></li>
 </ul>
 </li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
 </ul>
+
             </nav>
         </div>
     </div>
@@ -428,140 +378,55 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="spectral-degradation">
-<h1>3 - Spectral Degradation<a class="headerlink" href="#spectral-degradation" title="Permalink to this heading">#</a></h1>
-<hr class="docutils" />
-<p>Matthew Brown</p>
-<p>2022.12.29</p>
-<hr class="docutils" />
-<p><strong>Requirements:</strong></p>
-<ul class="simple">
-<li><p>spectral irradiance (measured or simulated)</p></li>
-<li><p>wavelengths of spectral irradiance data</p></li>
-<li><p>module RH</p></li>
-<li><p>module temperature</p></li>
-</ul>
-<p><strong>Objectives:</strong></p>
-<ol class="arabic simple">
-<li><p>Read in spectral irradiance</p></li>
-<li><p>Calculate spectral degradation</p></li>
+  <img src="PVD_logo.png" width="400">
+<section class="tex2jax_ignore mathjax_ignore" id="tutorials-for-pv-degradation-tools-pvdeg">
+<h1>TUTORIALS for PV Degradation Tools (pvdeg)<a class="headerlink" href="#tutorials-for-pv-degradation-tools-pvdeg" title="Permalink to this heading">#</a></h1>
+<section id="jupyter-book">
+<h2>Jupyter Book<a class="headerlink" href="#jupyter-book" title="Permalink to this heading">#</a></h2>
+<p>For in depth Tutorials you can run online, see our <a class="reference external" href="https://nrel.github.io/PVDegradationTools/intro.html">jupyter-book</a>
+Clicking on the rocket-icon on the top allows you to launch the journals on <a class="reference external" href="https://colab.research.google.com/">Google Colaboratory</a> for interactive mode.
+Just uncomment the first line <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">...</span></code>  to install the environment on each journal if you follow this mode.</p>
+</section>
+<section id="binder">
+<h2>Binder<a class="headerlink" href="#binder" title="Permalink to this heading">#</a></h2>
+<p>To run these tutorials in Binder, you can click here:
+<a class="reference external" href="https://mybinder.org/v2/gh/NREL/PVDegradationTools/main"><img alt="Binder" src="https://mybinder.org/badge_logo.svg" /></a>
+It takes a minute to load the environment.</p>
+</section>
+<section id="locally">
+<h2>Locally<a class="headerlink" href="#locally" title="Permalink to this heading">#</a></h2>
+<p>You can also run the tutorial locally with
+<a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a> by following thes
+steps:</p>
+<ol class="arabic">
+<li><p>Install <a class="reference external" href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a>.</p></li>
+<li><p>Clone the repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">NREL</span><span class="o">/</span><span class="n">PVDegradationTools</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</li>
+<li><p>Create the environment and install the requirements. The repository includes
+a <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> file that contains a list the packages needed to run
+this tutorial. To install them using conda run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">pvdeg</span> <span class="n">jupyter</span> <span class="o">-</span><span class="n">c</span> <span class="n">pvlib</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">pvdeg</span>
+</pre></div>
+</div>
+<p>or you can install it with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pvdeg</span></code> as explained in the installation instructions into the environment.</p>
+</li>
+<li><p>Start a Jupyter session:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">jupyter</span> <span class="n">notebook</span>
+</pre></div>
+</div>
+</li>
+<li><p>Use the file explorer in Jupyter lab to browse to <code class="docutils literal notranslate"><span class="pre">tutorials</span></code>
+and start the first Tutorial.</p></li>
 </ol>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pvdeg</span> 
-<span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
-</pre></div>
-</div>
-</div>
-</div>
-<section id="read-in-spectral-irradiance-data">
-<h2>1. Read in spectral irradiance data<a class="headerlink" href="#read-in-spectral-irradiance-data" title="Permalink to this heading">#</a></h2>
-<p>Spectral degradation has 4 main requirements:</p>
-<ul class="simple">
-<li><p>Spectral Irradiance [W/m^2 nm]</p></li>
-<li><p>Wavelength [nm]</p></li>
-<li><p>Module Relative Humidity [%]</p></li>
-<li><p>Module Temperature [C]</p></li>
-</ul>
-<p>For more advanced scenarios, you may want to calculate the degradation of a particular layer within the module. Below, we are using <em>backside</em> irradiance and therefore a slightly different temperature and humidity have been calculated. To calculate degradation on the backside, we used <code class="docutils literal notranslate"><span class="pre">pvdeg.humidity.rh_backsheet</span></code>. For the the front side, you should use <code class="docutils literal notranslate"><span class="pre">pvdeg.humidity.rh_surface_outside</span></code> or <code class="docutils literal notranslate"><span class="pre">rh_front_encap</span></code></p>
-<p>For this tutorial we are using pre-generated data from a ray-tracing simulation. To calculate the degradation rate, we will need the wavelengths used in the simulation.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wavelengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">280</span><span class="p">,</span><span class="mi">420</span><span class="p">,</span><span class="mi">20</span><span class="p">))</span>
-
-<span class="n">SPECTRA</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span><span class="s1">&#39;spectra.csv&#39;</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">SPECTRA</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Spectra</th>
-      <th>Temperature</th>
-      <th>RH</th>
-    </tr>
-    <tr>
-      <th>timestamp</th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2021-03-09 10:00:00</th>
-      <td>[0.6892146677599185, 0.40215646494410884, 0.67...</td>
-      <td>45</td>
-      <td>59</td>
-    </tr>
-    <tr>
-      <th>2021-03-09 11:00:00</th>
-      <td>[0.15575709102178648, 0.5464374649246564, 0.68...</td>
-      <td>44</td>
-      <td>56</td>
-    </tr>
-    <tr>
-      <th>2021-03-09 12:00:00</th>
-      <td>[0.22782105874481207, 0.9056495270031296, 0.26...</td>
-      <td>59</td>
-      <td>39</td>
-    </tr>
-    <tr>
-      <th>2021-03-09 13:00:00</th>
-      <td>[0.3741943134512433, 0.035830980984344674, 0.4...</td>
-      <td>44</td>
-      <td>13</td>
-    </tr>
-    <tr>
-      <th>2021-03-09 14:00:00</th>
-      <td>[0.40321187996337626, 0.6473167864022122, 0.69...</td>
-      <td>25</td>
-      <td>39</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<section id="calculate-degradation">
-<h3>2. Calculate Degradation<a class="headerlink" href="#calculate-degradation" title="Permalink to this heading">#</a></h3>
-<p>The spectral degradation function has several optional paramters. For more information, refer to the documentation. Below is a function call with the minimum required information.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">degradation</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">degradation</span><span class="p">(</span><span class="n">spectra</span><span class="o">=</span><span class="n">SPECTRA</span><span class="p">[</span><span class="s1">&#39;Spectra&#39;</span><span class="p">],</span>
-                                            <span class="n">rh_module</span><span class="o">=</span><span class="n">SPECTRA</span><span class="p">[</span><span class="s1">&#39;RH&#39;</span><span class="p">],</span>
-                                            <span class="n">temp_module</span><span class="o">=</span><span class="n">SPECTRA</span><span class="p">[</span><span class="s1">&#39;Temperature&#39;</span><span class="p">],</span>
-                                            <span class="n">wavelengths</span><span class="o">=</span><span class="n">wavelengths</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removing brackets from spectral irradiance data
-</pre></div>
-</div>
-</div>
-</div>
 </section>
 </section>
+<section class="tex2jax_ignore mathjax_ignore" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">#</a></h1>
+<p>We also have documentation in <a class="reference external" href="https://PVDegradationTools.readthedocs.io">ReadTheDocs</a> where you can find more details on the API functions.</p>
 </section>
 
     <script type="text/x-thebe-config">
@@ -595,24 +460,6 @@ document.write(`
   
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
-    <a class="left-prev"
-       href="2%20-%20Degradation.html"
-       title="previous page">
-      <i class="fa-solid fa-angle-left"></i>
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">2 - Degradation</p>
-      </div>
-    </a>
-    <a class="right-next"
-       href="4%20-%20Standards.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">4 - Standards</p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div></div>
   
 </div>
@@ -631,11 +478,15 @@ document.write(`
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-in-spectral-irradiance-data">1. Read in spectral irradiance data</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-degradation">2. Calculate Degradation</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">TUTORIALS for PV Degradation Tools (pvdeg)</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#jupyter-book">Jupyter Book</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#binder">Binder</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#locally">Locally</a></li>
 </ul>
 </li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
 </ul>
+
   </nav></div>
 
 </div></div>
