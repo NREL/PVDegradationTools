@@ -1,4 +1,4 @@
-<img src="pvdeg_tutorials/PVD_logo.png" width="400">
+<img src="pvdeg_tutorials/PVD_logo.png" width="100">
 
 <table>
 <tr>
@@ -38,7 +38,8 @@ Tutorials
 
 ### Jupyter Book
 
-For in depth Tutorials you can run online, see our [jupyter-book](https://nrel.github.io/PVDegradationTools/intro.html)
+For in depth Tutorials you can run online, see our [jupyter-book](https://nrel.github.io/PVDegradationTools/intro.html) [![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://nrel.github.io/PVDegradationTools/intro.html)
+
 Clicking on the rocket-icon on the top allows you to launch the journals on [Google Colaboratory](https://colab.research.google.com/) for interactive mode.
 Just uncomment the first line `pip install ...`  to install the environment on each journal if you follow this mode.
 
