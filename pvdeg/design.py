@@ -43,8 +43,7 @@ def edge_seal_ingress_rate(avg_psat):
 def edge_seal_width(weather_df, meta,
                     k=None,
                     years=25,
-                    from_dew_point=False,
-                    full_results=False):
+                    from_dew_point=False):
     """
     Determine the width of edge seal required for given number of years water ingress.
 
@@ -62,8 +61,7 @@ def edge_seal_width(weather_df, meta,
         Integer number of years under water ingress
     from_dew_point : boolean, optional
         If true, will compute the edge seal width from Dew Point instead of dry bulb air temp
-    full_results : boolean, optional
-        If true, will return all sub-steps (psat, psat_avg, ingress rate, edge_seal_width)
+
     Returns
     ----------
     width : float 
@@ -81,14 +79,6 @@ def edge_seal_width(weather_df, meta,
     
     width = k * (years * 365.25 * 24)**.5
 
-    res = {'psat':psat,
-            'avg_psat':avg_psat,
-            'k':k,
-            'edge_seal_width':width}
-
-    if full_results:
-        return res
-    else:
-        return width
+    return width
 
 #TODO: Include gaps functionality

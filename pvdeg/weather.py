@@ -32,6 +32,9 @@ def get(database, id, **kwargs):
     meta : (dict)
         Dictionary of metadata for the weather data
     """
+    
+    META_MAP = {'elevation' : 'altitude'}
+
     if type(id) is tuple:
         location = id
         gid = None
@@ -50,8 +53,9 @@ def get(database, id, **kwargs):
     if database == 'NSRDB':
         weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
     elif database == 'PVGIS':
-        weather_df, _, _, meta = iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
+        weather_df, _, meta, _ = iotools.get_pvgis_tmy(latitude=lat, longitude=lon,
                                                              map_variables=True, **kwargs)
+        meta = meta['location']
     elif database == 'PSM3':
         weather_df, meta = iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
     else:
@@ -60,6 +64,11 @@ def get(database, id, **kwargs):
     if 'relative_humidity' not in weather_df.columns:
         print('Column "relative_humidity" not found in DataFrame. Calculating...')
         weather_df = humidity._ambient(weather_df)
+    
+    # map meta-names as needed
+    for key in [*meta.keys()]:
+        if key in META_MAP.keys():
+                meta[META_MAP[key]] = meta.pop(key)
     
     return weather_df, meta
 
