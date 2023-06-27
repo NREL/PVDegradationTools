@@ -1,18 +1,18 @@
 .. image:: ../../../pvdeg_tutorials/PVD_logo.png
-  :width: 400
+  :width: 100
 
 Welcome to pvdeg!
 ==============================================================
 
 This PVDegradation Tools Model is a first-of-its-kind detailed spatio-temporal 
-modeling assessment tool that empowers users to calcualte various PV degradation
-modes, with various PV technology and materials databases.
+modeling assessment tool that empowers users to calculate various PV degradation
+modes, for different PV technologies and materials in its database.
 
-NREL developed the pvdeg model to help PV Researchers, Module manufacturers, 
+NREL is developing the pvdeg model to help PV Researchers, Module manufacturers, 
 and other PV stakeholders assess different materials and technologies for 
-different degradation modes in all locations through the world. Available as 
+different degradation modes in all locations throughout the world. Available as 
 open source, the PVDegradation model currently supports PV energy calculations 
-for water vapor pressure, ingres rate, edge seal widht, Van Hofft Irradiance 
+for water vapor pressure, ingress rate, edge seal width, Van Hofft Irradiance 
 Degradation, Weighted Average Irradiance, Arrehnius Acceleration Factor, 
 relative humidity in the outside, front and back encapsulant and backsheet,
 spectral degradation, and solder fatigue. More functions for standards and 
@@ -21,7 +21,7 @@ other degradation profiles are in the works.
 The source code for pvdeg is hosted on `github
 <https://github.com/NREL/pvdeg>`_.
 
-Tutorials to learn how to use and experiment with the variuos functionalities 
+Tutorials to learn how to use and experiment with the various functionalities 
 are available for running interactively through Google Collab at
 `PVDeg JupyterBook<https://nrel.github.io/PVDegradationTools/intro.html>`.
 
@@ -45,7 +45,7 @@ Citing PVDegradation Tools
 ==========================
 
 If you use this calculator in a published work, please cite:
-    
+
 
 Please also cite the DOI corresponding to the specific version that you used. 
 DOIs are listed at Zenodo.org
