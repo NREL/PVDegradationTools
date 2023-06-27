@@ -1,3 +1,5 @@
+<img src="pvdeg_tutorials/PVD_logo.png" width="400">
+
 <table>
 <tr>
   <td>Version</td>
@@ -31,18 +33,60 @@
 This repository contains functions for calculating degradation of photovoltaic modules. For example, functions to calculate front and rear relative Humidity, as well as Acceleration Factors. A degradation calculation function is also being developed, considering humidity and spectral irradiances models.
 
 
-
 Tutorials
 =========
 
+### Jupyter Book
+
 For in depth Tutorials you can run online, see our [jupyter-book](https://nrel.github.io/PVDegradationTools/intro.html)
+Clicking on the rocket-icon on the top allows you to launch the journals on [Google Colaboratory](https://colab.research.google.com/) for interactive mode.
+Just uncomment the first line `pip install ...`  to install the environment on each journal if you follow this mode.
+
+### Binder
+
+To run these tutorials in Binder, you can click here:
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/PVDegradationTools/main)
+It takes a minute to load the environment.
+
+### Locally
+
+You can also run the tutorial locally with
+[miniconda](https://docs.conda.io/en/latest/miniconda.html) by following thes
+steps:
+
+1. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html).
+
+1. Clone the repository:
+
+   ```
+   git clone https://github.com/NREL/PVDegradationTools.git
+   ```
+
+1. Create the environment and install the requirements. The repository includes
+   a `requirements.txt` file that contains a list the packages needed to run
+   this tutorial. To install them using conda run:
+
+   ```
+   conda create -n pvdeg jupyter -c pvlib --file requirements.txt
+   conda activate pvdeg
+   ```
+
+   or you can install it with `pip install pvdeg` as explained in the installation instructions into the environment.
+
+1. Start a Jupyter session:
+
+   ```
+   jupyter notebook
+   ```
+
+1. Use the file explorer in Jupyter lab to browse to `tutorials`
+   and start the first Tutorial.
+
 
 Documentation
 =============
 
-[Tutorials](https://github.com/NREL/PVDegradationTools/tree/main/pvdeg_tutorials) on the usage of functions are located in the "docs > Tutorials" folder.
-
-We also have documentation in [ReadTheDocs](https://PVDegradationTools.readthedocs.io) where you can find more details on the API functions.
+Documentation is available in [ReadTheDocs](https://PVDegradationTools.readthedocs.io) where you can find more details on the API functions.
 
 
 Installation
@@ -57,26 +101,6 @@ Install with:
 For developer installation, download the repository, navigate to the folder location and install as:
 
     pip install -e .
-
-
-Learning
-========
-
-### Google Colaboratory
-To run these tutorials in [Google Colaboratory](https://colab.research.google.com/)
-you can click the button below:
-
-<a target="_blank" href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/docs/tutorials/1%20-%20Basics%2C%20Humidity%2C%20Design.ipynb">
-<img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
-</a>
-
-
-### Binder
-
-To run these tutorials in Binder, you cna click here:
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/NREL/PVDegradationTools/main)
-
-It takes a minute to load the environment.
 
 
 License
@@ -107,4 +131,3 @@ If you use this functions in a published work, please cite:
 	Holsapple, Derek, Ayala Pelaez, Silvana, Kempe, Michael. "PV Degradation Tools", NREL Github 2020, Software Record SWR-20-71.
 
 Zenodo reference and OSTI software record information forthcoming.
-
