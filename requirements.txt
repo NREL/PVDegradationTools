@@ -4,8 +4,6 @@ pandas
 pvlib
 python-dateutil
 pytz
-NREL-rex
-NREL-gaps
 photovoltaic
 scipy
 openpyxl
