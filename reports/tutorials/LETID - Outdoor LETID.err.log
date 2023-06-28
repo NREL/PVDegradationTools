@@ -26,7 +26,7 @@ weather, meta = pvlib.iotools.read_psm3(sam_file, map_variables = True)
 
 [1;31m---------------------------------------------------------------------------[0m
 [1;31mFileNotFoundError[0m                         Traceback (most recent call last)
-[1;32m~\AppData\Local\Temp\1\ipykernel_27320\416425688.py[0m in [0;36m<module>[1;34m[0m
+[1;32m~\AppData\Local\Temp\1\ipykernel_16552\416425688.py[0m in [0;36m<module>[1;34m[0m
 [0;32m      2[0m [1;33m[0m[0m
 [0;32m      3[0m [0msam_file[0m [1;33m=[0m [1;34mr'example data\psm3.csv'[0m[1;33m[0m[1;33m[0m[0m
 [1;32m----> 4[1;33m [0mweather[0m[1;33m,[0m [0mmeta[0m [1;33m=[0m [0mpvlib[0m[1;33m.[0m[0miotools[0m[1;33m.[0m[0mread_psm3[0m[1;33m([0m[0msam_file[0m[1;33m,[0m [0mmap_variables[0m [1;33m=[0m [1;32mTrue[0m[1;33m)[0m[1;33m[0m[1;33m[0m[0m

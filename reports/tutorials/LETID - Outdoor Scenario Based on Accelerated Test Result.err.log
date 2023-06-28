@@ -26,7 +26,7 @@ df
 
 [1;31m---------------------------------------------------------------------------[0m
 [1;31mFileNotFoundError[0m                         Traceback (most recent call last)
-[1;32m~\AppData\Local\Temp\1\ipykernel_2176\2231216230.py[0m in [0;36m<module>[1;34m[0m
+[1;32m~\AppData\Local\Temp\1\ipykernel_9092\2231216230.py[0m in [0;36m<module>[1;34m[0m
 [1;32m----> 1[1;33m [0mdf[0m [1;33m=[0m [0mpd[0m[1;33m.[0m[0mread_csv[0m[1;33m([0m[1;34m'example data/module test data.csv'[0m[1;33m)[0m[1;33m[0m[1;33m[0m[0m
 [0m[0;32m      2[0m [0mdf[0m[1;33m[[0m[1;34m'cell Voc'[0m[1;33m][0m [1;33m=[0m [0mdf[0m[1;33m[[0m[1;34m'Voc'[0m[1;33m][0m[1;33m/[0m[1;36m48[0m[1;33m[0m[1;33m[0m[0m
 [0;32m      3[0m [0mdf[0m[1;33m[[0m[1;34m'Jsc'[0m[1;33m][0m [1;33m=[0m [0mdf[0m[1;33m[[0m[1;34m'Isc'[0m[1;33m][0m[1;33m/[0m[0mcell_area[0m[1;33m*[0m[1;36m1000[0m[1;33m[0m[1;33m[0m[0m
