@@ -2,13 +2,6 @@
 
 <table>
 <tr>
-  <td>Version</td>
-  <td>
-  <a href="https://zenodo.org/badge/latestdoi/248347431"> FORTHCOMING </a>
-</td>
-</tr>
-
-<tr>
   <td>License</td>
   <td>
     <a href="https://github.com/NREL/PVDegradationTools/blob/master/LICENSE.md">
