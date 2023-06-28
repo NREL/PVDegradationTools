@@ -8,6 +8,7 @@ photovoltaic
 scipy
 openpyxl
 tqdm
+NREL-rex
 matplotlib
 jupyterlab
 notebook
