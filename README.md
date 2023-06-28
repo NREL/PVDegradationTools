@@ -1,12 +1,6 @@
 <img src="pvdeg_tutorials/PVD_logo.png" width="100">
 
 <table>
-<tr>
-  <td>Version</td>
-  <td>
-  <a href="https://zenodo.org/badge/latestdoi/248347431"> v0.1.0 </a>
-</td>
-</tr>
 
 <tr>
   <td>License</td>
