@@ -19,7 +19,7 @@
 <tr>
   <td>Publications</td>
   <td>
-	[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088403.svg)](https://doi.org/10.5281/zenodo.8088403)
+<a href="https://doi.org/10.5281/zenodo.8088403"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.8088403.svg" alt="DOI"></a>
   </td>
 </tr>
 <tr>
