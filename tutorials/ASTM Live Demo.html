@@ -570,150 +570,60 @@ document.write(`
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
-<span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Local</span>\<span class="n">Temp</span>\<span class="mi">1</span>\<span class="n">ipykernel_7300</span>\<span class="mf">1015268728.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-<span class="ne">----&gt; </span><span class="mi">1</span> <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvlib</span><span class="o">.</span><span class="n">iotools</span><span class="o">.</span><span class="n">get_psm3</span><span class="p">(</span>
-<span class="g g-Whitespace">      </span><span class="mi">2</span>     <span class="n">latitude</span><span class="o">=</span><span class="mf">33.4484</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=-</span><span class="mf">112.0740</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">3</span>     <span class="n">api_key</span><span class="o">=</span><span class="n">NREL_API_KEY</span><span class="p">,</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span>     <span class="n">email</span><span class="o">=</span><span class="s1">&#39;silvana.ovaitt@nrel.gov&#39;</span><span class="p">,</span>  <span class="c1"># &lt;-- any email works here fine</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span>     <span class="n">names</span><span class="o">=</span><span class="s1">&#39;2020&#39;</span><span class="p">,</span>
-
-<span class="nn">~\AppData\Roaming\Python\Python39\site-packages\pvlib\iotools\psm3.py</span> in <span class="ni">get_psm3</span><span class="nt">(latitude, longitude, api_key, email, names, interval, attributes, leap_day, full_name, affiliation, url, map_variables, timeout)</span>
-<span class="g g-Whitespace">    </span><span class="mi">213</span>             <span class="n">url</span> <span class="o">=</span> <span class="n">PSM_URL</span>
-<span class="g g-Whitespace">    </span><span class="mi">214</span> 
-<span class="ne">--&gt; </span><span class="mi">215</span>     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">216</span>     <span class="k">if</span> <span class="ow">not</span> <span class="n">response</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
-<span class="g g-Whitespace">    </span><span class="mi">217</span>         <span class="c1"># if the API key is rejected, then the response status will be 403</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\api.py</span> in <span class="ni">get</span><span class="nt">(url, params, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">71</span>     <span class="s2">&quot;&quot;&quot;</span>
-<span class="g g-Whitespace">     </span><span class="mi">72</span><span class="s2"> </span>
-<span class="ne">---&gt; </span><span class="mi">73</span><span class="s2">     return request(&quot;get&quot;, url, params=params, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">74</span><span class="s2"> </span>
-<span class="g g-Whitespace">     </span><span class="mi">75</span><span class="s2"> </span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\api.py</span> in <span class="ni">request</span><span class="nt">(method, url, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">57</span><span class="s2">     # cases, and look like a memory leak in others.</span>
-<span class="g g-Whitespace">     </span><span class="mi">58</span><span class="s2">     with sessions.Session() as session:</span>
-<span class="ne">---&gt; </span><span class="mi">59</span><span class="s2">         return session.request(method=method, url=url, **kwargs)</span>
-<span class="g g-Whitespace">     </span><span class="mi">60</span><span class="s2"> </span>
-<span class="g g-Whitespace">     </span><span class="mi">61</span><span class="s2"> </span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\sessions.py</span> in <span class="ni">request</span><span class="nt">(self, method, url, params, data, headers, cookies, files, auth, timeout, allow_redirects, proxies, hooks, stream, verify, cert, json)</span>
-<span class="g g-Whitespace">    </span><span class="mi">585</span><span class="s2">         }</span>
-<span class="g g-Whitespace">    </span><span class="mi">586</span><span class="s2">         send_kwargs.update(settings)</span>
-<span class="ne">--&gt; </span><span class="mi">587</span><span class="s2">         resp = self.send(prep, **send_kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">588</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">589</span><span class="s2">         return resp</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\sessions.py</span> in <span class="ni">send</span><span class="nt">(self, request, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">721</span><span class="s2">             # Redirect resolving generator.</span>
-<span class="g g-Whitespace">    </span><span class="mi">722</span><span class="s2">             gen = self.resolve_redirects(r, request, **kwargs)</span>
-<span class="ne">--&gt; </span><span class="mi">723</span><span class="s2">             history = [resp for resp in gen]</span>
-<span class="g g-Whitespace">    </span><span class="mi">724</span><span class="s2">         else:</span>
-<span class="g g-Whitespace">    </span><span class="mi">725</span><span class="s2">             history = []</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\sessions.py</span> in <span class="ni">&lt;listcomp&gt;</span><span class="nt">(.0)</span>
-<span class="g g-Whitespace">    </span><span class="mi">721</span><span class="s2">             # Redirect resolving generator.</span>
-<span class="g g-Whitespace">    </span><span class="mi">722</span><span class="s2">             gen = self.resolve_redirects(r, request, **kwargs)</span>
-<span class="ne">--&gt; </span><span class="mi">723</span><span class="s2">             history = [resp for resp in gen]</span>
-<span class="g g-Whitespace">    </span><span class="mi">724</span><span class="s2">         else:</span>
-<span class="g g-Whitespace">    </span><span class="mi">725</span><span class="s2">             history = []</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\sessions.py</span> in <span class="ni">resolve_redirects</span><span class="nt">(self, resp, req, stream, timeout, verify, cert, proxies, yield_requests, **adapter_kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">264</span><span class="s2">             else:</span>
-<span class="g g-Whitespace">    </span><span class="mi">265</span><span class="s2"> </span>
-<span class="ne">--&gt; </span><span class="mi">266</span><span class="s2">                 resp = self.send(</span>
-<span class="g g-Whitespace">    </span><span class="mi">267</span><span class="s2">                     req,</span>
-<span class="g g-Whitespace">    </span><span class="mi">268</span><span class="s2">                     stream=stream,</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\sessions.py</span> in <span class="ni">send</span><span class="nt">(self, request, **kwargs)</span>
-<span class="g g-Whitespace">    </span><span class="mi">743</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">744</span><span class="s2">         if not stream:</span>
-<span class="ne">--&gt; </span><span class="mi">745</span><span class="s2">             r.content</span>
-<span class="g g-Whitespace">    </span><span class="mi">746</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">747</span><span class="s2">         return r</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\models.py</span> in <span class="ni">content</span><span class="nt">(self)</span>
-<span class="g g-Whitespace">    </span><span class="mi">897</span><span class="s2">                 self._content = None</span>
-<span class="g g-Whitespace">    </span><span class="mi">898</span><span class="s2">             else:</span>
-<span class="ne">--&gt; </span><span class="mi">899</span><span class="s2">                 self._content = b&quot;&quot;.join(self.iter_content(CONTENT_CHUNK_SIZE)) or b&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">900</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">901</span><span class="s2">         self._content_consumed = True</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\requests\models.py</span> in <span class="ni">generate</span><span class="nt">()</span>
-<span class="g g-Whitespace">    </span><span class="mi">814</span><span class="s2">             if hasattr(self.raw, &quot;stream&quot;):</span>
-<span class="g g-Whitespace">    </span><span class="mi">815</span><span class="s2">                 try:</span>
-<span class="ne">--&gt; </span><span class="mi">816</span><span class="s2">                     yield from self.raw.stream(chunk_size, decode_content=True)</span>
-<span class="g g-Whitespace">    </span><span class="mi">817</span><span class="s2">                 except ProtocolError as e:</span>
-<span class="g g-Whitespace">    </span><span class="mi">818</span><span class="s2">                     raise ChunkedEncodingError(e)</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\urllib3\response.py</span> in <span class="ni">stream</span><span class="nt">(self, amt, decode_content)</span>
-<span class="g g-Whitespace">    </span><span class="mi">625</span><span class="s2">         else:</span>
-<span class="g g-Whitespace">    </span><span class="mi">626</span><span class="s2">             while not is_fp_closed(self._fp):</span>
-<span class="ne">--&gt; </span><span class="mi">627</span><span class="s2">                 data = self.read(amt=amt, decode_content=decode_content)</span>
-<span class="g g-Whitespace">    </span><span class="mi">628</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">629</span><span class="s2">                 if data:</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\urllib3\response.py</span> in <span class="ni">read</span><span class="nt">(self, amt, decode_content, cache_content)</span>
-<span class="g g-Whitespace">    </span><span class="mi">564</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">565</span><span class="s2">         with self._error_catcher():</span>
-<span class="ne">--&gt; </span><span class="mi">566</span><span class="s2">             data = self._fp_read(amt) if not fp_closed else b&quot;&quot;</span>
-<span class="g g-Whitespace">    </span><span class="mi">567</span><span class="s2">             if amt is None:</span>
-<span class="g g-Whitespace">    </span><span class="mi">568</span><span class="s2">                 flush_decoder = True</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\site-packages\urllib3\response.py</span> in <span class="ni">_fp_read</span><span class="nt">(self, amt)</span>
-<span class="g g-Whitespace">    </span><span class="mi">530</span><span class="s2">         else:</span>
-<span class="g g-Whitespace">    </span><span class="mi">531</span><span class="s2">             # StringIO doesn&#39;t like amt=None</span>
-<span class="ne">--&gt; </span><span class="mi">532</span><span class="s2">             return self._fp.read(amt) if amt is not None else self._fp.read()</span>
-<span class="g g-Whitespace">    </span><span class="mi">533</span><span class="s2"> </span>
-<span class="g g-Whitespace">    </span><span class="mi">534</span><span class="s2">     def read(self, amt=None, decode_content=None, cache_content=False):</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\http\client.py</span> in <span class="ni">read</span><span class="nt">(self, amt)</span>
-<span class="g g-Whitespace">    </span><span class="mi">461</span><span class="s2">             # Amount is given, implement using readinto</span>
-<span class="g g-Whitespace">    </span><span class="mi">462</span><span class="s2">             b = bytearray(amt)</span>
-<span class="ne">--&gt; </span><span class="mi">463</span><span class="s2">             n = self.readinto(b)</span>
-<span class="g g-Whitespace">    </span><span class="mi">464</span><span class="s2">             return memoryview(b)[:n].tobytes()</span>
-<span class="g g-Whitespace">    </span><span class="mi">465</span><span class="s2">         else:</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\http\client.py</span> in <span class="ni">readinto</span><span class="nt">(self, b)</span>
-<span class="g g-Whitespace">    </span><span class="mi">505</span><span class="s2">         # connection, and the user is reading more bytes than will be provided</span>
-<span class="g g-Whitespace">    </span><span class="mi">506</span><span class="s2">         # (for example, reading in 1k chunks)</span>
-<span class="ne">--&gt; </span><span class="mi">507</span><span class="s2">         n = self.fp.readinto(b)</span>
-<span class="g g-Whitespace">    </span><span class="mi">508</span><span class="s2">         if not n and b:</span>
-<span class="g g-Whitespace">    </span><span class="mi">509</span><span class="s2">             # Ideally, we would raise IncompleteRead if the content-length</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\socket.py</span> in <span class="ni">readinto</span><span class="nt">(self, b)</span>
-<span class="g g-Whitespace">    </span><span class="mi">702</span><span class="s2">         while True:</span>
-<span class="g g-Whitespace">    </span><span class="mi">703</span><span class="s2">             try:</span>
-<span class="ne">--&gt; </span><span class="mi">704</span><span class="s2">                 return self._sock.recv_into(b)</span>
-<span class="g g-Whitespace">    </span><span class="mi">705</span><span class="s2">             except timeout:</span>
-<span class="g g-Whitespace">    </span><span class="mi">706</span><span class="s2">                 self._timeout_occurred = True</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\ssl.py</span> in <span class="ni">recv_into</span><span class="nt">(self, buffer, nbytes, flags)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1240</span><span class="s2">                   &quot;non-zero flags not allowed in calls to recv_into() on </span><span class="si">%s</span><span class="s2">&quot; %</span>
-<span class="g g-Whitespace">   </span><span class="mi">1241</span><span class="s2">                   self.__class__)</span>
-<span class="ne">-&gt; </span><span class="mi">1242</span><span class="s2">             return self.read(nbytes, buffer)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1243</span><span class="s2">         else:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1244</span><span class="s2">             return super().recv_into(buffer, nbytes, flags)</span>
-
-<span class="nn">C:\ProgramData\Anaconda3\lib\ssl.py</span> in <span class="ni">read</span><span class="nt">(self, len, buffer)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1098</span><span class="s2">         try:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1099</span><span class="s2">             if buffer is not None:</span>
-<span class="ne">-&gt; </span><span class="mi">1100</span><span class="s2">                 return self._sslobj.read(len, buffer)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1101</span><span class="s2">             else:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1102</span><span class="s2">                 return self._sslobj.read(len)</span>
-
-<span class="ne">KeyboardInterrupt</span>: 
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">meta</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;Source&#39;: &#39;NSRDB&#39;,
+ &#39;Location ID&#39;: &#39;323705&#39;,
+ &#39;City&#39;: &#39;-&#39;,
+ &#39;State&#39;: &#39;-&#39;,
+ &#39;Country&#39;: &#39;-&#39;,
+ &#39;Time Zone&#39;: -7,
+ &#39;Local Time Zone&#39;: -7,
+ &#39;Clearsky DHI Units&#39;: &#39;w/m2&#39;,
+ &#39;Clearsky DNI Units&#39;: &#39;w/m2&#39;,
+ &#39;Clearsky GHI Units&#39;: &#39;w/m2&#39;,
+ &#39;Dew Point Units&#39;: &#39;c&#39;,
+ &#39;DHI Units&#39;: &#39;w/m2&#39;,
+ &#39;DNI Units&#39;: &#39;w/m2&#39;,
+ &#39;GHI Units&#39;: &#39;w/m2&#39;,
+ &#39;Solar Zenith Angle Units&#39;: &#39;Degree&#39;,
+ &#39;Temperature Units&#39;: &#39;c&#39;,
+ &#39;Pressure Units&#39;: &#39;mbar&#39;,
+ &#39;Relative Humidity Units&#39;: &#39;%&#39;,
+ &#39;Precipitable Water Units&#39;: &#39;cm&#39;,
+ &#39;Wind Direction Units&#39;: &#39;Degrees&#39;,
+ &#39;Wind Speed Units&#39;: &#39;m/s&#39;,
+ &#39;Cloud Type -15&#39;: &#39;N/A&#39;,
+ &#39;Cloud Type 0&#39;: &#39;Clear&#39;,
+ &#39;Cloud Type 1&#39;: &#39;Probably Clear&#39;,
+ &#39;Cloud Type 2&#39;: &#39;Fog&#39;,
+ &#39;Cloud Type 3&#39;: &#39;Water&#39;,
+ &#39;Cloud Type 4&#39;: &#39;Super-Cooled Water&#39;,
+ &#39;Cloud Type 5&#39;: &#39;Mixed&#39;,
+ &#39;Cloud Type 6&#39;: &#39;Opaque Ice&#39;,
+ &#39;Cloud Type 7&#39;: &#39;Cirrus&#39;,
+ &#39;Cloud Type 8&#39;: &#39;Overlapping&#39;,
+ &#39;Cloud Type 9&#39;: &#39;Overshooting&#39;,
+ &#39;Cloud Type 10&#39;: &#39;Unknown&#39;,
+ &#39;Cloud Type 11&#39;: &#39;Dust&#39;,
+ &#39;Cloud Type 12&#39;: &#39;Smoke&#39;,
+ &#39;Fill Flag 0&#39;: &#39;N/A&#39;,
+ &#39;Fill Flag 1&#39;: &#39;Missing Image&#39;,
+ &#39;Fill Flag 2&#39;: &#39;Low Irradiance&#39;,
+ &#39;Fill Flag 3&#39;: &#39;Exceeds Clearsky&#39;,
+ &#39;Fill Flag 4&#39;: &#39;Missing CLoud Properties&#39;,
+ &#39;Fill Flag 5&#39;: &#39;Rayleigh Violation&#39;,
+ &#39;Surface Albedo Units&#39;: &#39;N/A&#39;,
+ &#39;Version&#39;: &#39;v3.2.2&#39;,
+ &#39;latitude&#39;: 33.45,
+ &#39;longitude&#39;: -112.06,
+ &#39;altitude&#39;: 334}
 </pre></div>
 </div>
 </div>
@@ -724,6 +634,173 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Year</th>
+      <th>Month</th>
+      <th>Day</th>
+      <th>Hour</th>
+      <th>Minute</th>
+      <th>temp_air</th>
+      <th>dhi_clear</th>
+      <th>dni_clear</th>
+      <th>ghi_clear</th>
+      <th>Cloud Type</th>
+      <th>...</th>
+      <th>ghi</th>
+      <th>relative_humidity</th>
+      <th>solar_zenith</th>
+      <th>albedo</th>
+      <th>pressure</th>
+      <th>precipitable_water</th>
+      <th>wind_direction</th>
+      <th>wind_speed</th>
+      <th>Global Horizontal UV Irradiance (280-400nm)</th>
+      <th>Global Horizontal UV Irradiance (295-385nm)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2020-01-01 00:30:00-07:00</th>
+      <td>2020</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>30</td>
+      <td>4.9</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>69.51</td>
+      <td>169.57</td>
+      <td>0.16</td>
+      <td>974.0</td>
+      <td>1.1</td>
+      <td>54.0</td>
+      <td>2.3</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2020-01-01 01:30:00-07:00</th>
+      <td>2020</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>4.6</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>68.55</td>
+      <td>163.46</td>
+      <td>0.16</td>
+      <td>973.0</td>
+      <td>1.1</td>
+      <td>59.0</td>
+      <td>2.2</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2020-01-01 02:30:00-07:00</th>
+      <td>2020</td>
+      <td>1</td>
+      <td>1</td>
+      <td>2</td>
+      <td>30</td>
+      <td>4.3</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>68.50</td>
+      <td>152.03</td>
+      <td>0.16</td>
+      <td>973.0</td>
+      <td>1.1</td>
+      <td>64.0</td>
+      <td>2.1</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2020-01-01 03:30:00-07:00</th>
+      <td>2020</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>30</td>
+      <td>4.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>69.10</td>
+      <td>139.67</td>
+      <td>0.16</td>
+      <td>973.0</td>
+      <td>1.1</td>
+      <td>68.0</td>
+      <td>1.9</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>2020-01-01 04:30:00-07:00</th>
+      <td>2020</td>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>30</td>
+      <td>3.8</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>69.46</td>
+      <td>127.17</td>
+      <td>0.16</td>
+      <td>973.0</td>
+      <td>1.1</td>
+      <td>72.0</td>
+      <td>1.7</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 24 columns</p>
+</div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -738,6 +815,9 @@ document.write(`
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Temperature $\degree$C&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ac084646d15990889dcd2453552e192a0b45c4987bb90ff10cb7156a089d55d8.png" src="../_images/ac084646d15990889dcd2453552e192a0b45c4987bb90ff10cb7156a089d55d8.png" />
 </div>
 </div>
 </section>
@@ -754,6 +834,11 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimum installation distance:&quot;</span><span class="p">,</span> <span class="n">standoff</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Minimum installation distance: 10.055513384986186
 </pre></div>
 </div>
 </div>
@@ -789,6 +874,11 @@ document.write(`
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Minimum installation distance:&quot;</span><span class="p">,</span> <span class="n">standoff</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Minimum installation distance: 3.760911305699953
 </pre></div>
 </div>
 </div>
