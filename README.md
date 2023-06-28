@@ -17,6 +17,12 @@
 </td>
 </tr>
 <tr>
+  <td>Publications</td>
+  <td>
+	[![DOI](https://zenodo.org/badge/269187539.svg)](https://zenodo.org/badge/latestdoi/269187539)
+  </td>
+</tr>
+<tr>
   <td>Documentation</td>
   <td>
 	<a href='https://pvdegradationtools.readthedocs.io/en/latest/?badge=latest'>
@@ -131,4 +137,6 @@ If you use this functions in a published work, please cite:
 
 	Holsapple, Derek, Ayala Pelaez, Silvana, Kempe, Michael. "PV Degradation Tools", NREL Github 2020, Software Record SWR-20-71.
 
-Zenodo reference and OSTI software record information forthcoming.
+And/or the specific release from Zenodo:
+
+	Ovaitt, Silvana, Brown, Matt, Springer, Martin, Karas, Joe, Holsapple, Derek, Kempe, Michael. (2023). NREL/PVDegradationTools: v0.1.0 official release (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.8088403
