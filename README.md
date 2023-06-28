@@ -1,7 +1,6 @@
 <img src="pvdeg_tutorials/PVD_logo.png" width="100">
 
 <table>
-
 <tr>
   <td>License</td>
   <td>
@@ -13,7 +12,7 @@
 <tr>
   <td>Publications</td>
   <td>
-<a href="https://doi.org/10.5281/zenodo.8088403"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.8088403.svg" alt="DOI"></a>
+	[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088403.svg)](https://doi.org/10.5281/zenodo.8088403)
   </td>
 </tr>
 <tr>
