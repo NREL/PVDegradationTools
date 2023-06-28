@@ -1,0 +1,14 @@
+numpy
+numba
+pandas
+pvlib
+python-dateutil
+pytz
+photovoltaic
+scipy
+openpyxl
+tqdm
+matplotlib
+jupyterlab
+notebook
+
