@@ -33,7 +33,7 @@ steps:
    this tutorial. To install them using conda run:
 
    ```
-   conda create -n pvdeg jupyter -c pvlib --file requirements.txt
+   conda create -n pvdeg jupyter -c conda-forge --file requirements.txt
    conda activate pvdeg
    ```
 
