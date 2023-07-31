@@ -11,4 +11,5 @@ tqdm
 matplotlib
 jupyterlab
 notebook
+NREL-rex
 
