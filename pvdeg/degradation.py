@@ -15,7 +15,7 @@ from . import weather
 
 #TODO: Clean up all those functions and add gaps functionality
 
-def _deg_rate_env(poa_global, temp_cell, temp_chamber, x, Tf):
+def _deg_rate_env(poa_global, temp_cell, temp_chamber, p, Tf):
     """
     Helper function. Find the rate of degradation kenetics using the Fischer model.
     Degradation kentics model interpolated 50 coatings with respect to
@@ -32,7 +32,7 @@ def _deg_rate_env(poa_global, temp_cell, temp_chamber, x, Tf):
         Solar module cell temperature [°C]
     temp_chamber : float
         Reference temperature [°C] "Chamber Temperature"
-    x : float
+    p : float
         Fit parameter
     Tf : float
         Multiplier for the increase in degradation
@@ -44,9 +44,9 @@ def _deg_rate_env(poa_global, temp_cell, temp_chamber, x, Tf):
         rate of Degradation (NEED TO ADD METRIC)
 
     """
-    return poa_global**(x) * Tf ** ((temp_cell - temp_chamber)/10)
+    return poa_global**(p) * Tf ** ((temp_cell - temp_chamber)/10)
 
-def _deg_rate_chamber(I_chamber, x):
+def _deg_rate_chamber(I_chamber, p):
     """
     Helper function. Find the rate of degradation kenetics of a simulated chamber. Mike Kempe's
     calculation of the rate of degradation inside a accelerated degradation chamber.
@@ -57,7 +57,7 @@ def _deg_rate_chamber(I_chamber, x):
     ----------
     I_chamber : float
         Irradiance of Controlled Condition W/m²
-    x : float
+    p : float
         Fit parameter
 
     Returns
@@ -65,7 +65,7 @@ def _deg_rate_chamber(I_chamber, x):
     chamberdegradationrate : float
         Degradation rate of chamber
     """
-    chamberdegradationrate = I_chamber ** (x)
+    chamberdegradationrate = I_chamber ** (p)
 
     return chamberdegradationrate
 
@@ -97,7 +97,7 @@ def vantHoff_deg(weather_df, meta,
                  temp_chamber,
                  poa=None,
                  temp_cell=None,
-                 x=0.5,
+                 p=0.5,
                  Tf=1.41):
     """
     Van 't Hoff Irradiance Degradation
@@ -117,7 +117,7 @@ def vantHoff_deg(weather_df, meta,
     temp_cell : pandas series, optional
         Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
         be generated using the default paramters of pvdeg.temperature.cell
-    x : float
+    p : float
         fit parameter
     Tf : float
         Multiplier for the increase in degradation for every 10[°C] temperature increase
@@ -143,12 +143,12 @@ def vantHoff_deg(weather_df, meta,
     rateOfDegEnv = _deg_rate_env(poa_global=poa_global,
                                  temp_cell=temp_cell,
                                  temp_chamber=temp_chamber,
-                                 x=x,
+                                 p=p,
                                  Tf=Tf)
     #sumOfDegEnv = rateOfDegEnv.sum(axis = 0, skipna = True)
     avgOfDegEnv = rateOfDegEnv.mean()
 
-    rateOfDegChamber = _deg_rate_chamber(I_chamber, x)
+    rateOfDegChamber = _deg_rate_chamber(I_chamber, p)
 
     accelerationFactor = _acceleration_factor(
         rateOfDegChamber, avgOfDegEnv)
@@ -184,7 +184,7 @@ def IwaVantHoff(weather_df, meta,
                 poa=None,
                 temp_cell=None,
                 Teq=None,
-                x=0.5,
+                p=0.5,
                 Tf=1.41):
     """
     IWa : Environment Characterization [W/m²]
@@ -203,7 +203,7 @@ def IwaVantHoff(weather_df, meta,
         Solar module temperature or Cell temperature [°C]
     Teq : series
         VantHoff equivalent temperature [°C]
-    x : float
+    p : float
         Fit parameter
     Tf : float
         Multiplier for the increase in degradation for every 10[°C] temperature increase
@@ -229,14 +229,14 @@ def IwaVantHoff(weather_df, meta,
     else:
         poa_global = poa
 
-    toSum = (poa_global ** x) * (Tf ** ((temp_cell - Teq)/10))
+    toSum = (poa_global ** p) * (Tf ** ((temp_cell - Teq)/10))
     summation = toSum.sum(axis=0, skipna=True)
 
-    Iwa = (summation / len(poa_global)) ** (1 / x)
+    Iwa = (summation / len(poa_global)) ** (1 / p)
 
     return Iwa
 
-def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, x, n):
+def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, p, n):
     """
     Helper function. Calculates the rate of degredation of the Environmnet
 
@@ -244,7 +244,7 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, x, n):
     ----------
     poa_global : float series
         (Global) Plan of Array irradiance [W/m²]
-    x : float
+    p : float
         Fit parameter
     rh_outdoor : pandas series
         Relative Humidity of material of interest. Acceptable relative
@@ -263,12 +263,12 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, x, n):
         Degradation rate of environment
     """
 
-    environmentDegradationRate = poa_global**(x) * rh_outdoor**(
+    environmentDegradationRate = poa_global**(p) * rh_outdoor**(
         n) * np.exp(- (Ea / (0.00831446261815324 * (temp_cell + 273.15))))
 
     return environmentDegradationRate
 
-def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, x, n):
+def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, p, n):
     """
     Helper function. Find the rate of degradation of a simulated chamber.
 
@@ -283,7 +283,7 @@ def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, x, n):
         Reference temperature [°C] "Chamber Temperature"
     Ea : float
         Degredation Activation Energy [kJ/mol]
-    x : float
+    p : float
         Fit parameter
     n : float
         Fit parameter for relative humidity
@@ -294,7 +294,7 @@ def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, x, n):
         Degradation rate of the chamber
     """
 
-    arrheniusNumerator = (I_chamber ** (x) * rh_chamber ** (n) *
+    arrheniusNumerator = (I_chamber ** (p) * rh_chamber ** (n) *
                             np.exp(- (Ea / (0.00831446261815324 *
                                             (temp_chamber+273.15)))))
     return arrheniusNumerator
@@ -307,7 +307,7 @@ def arrhenius_deg(weather_df, meta,
                   temp_chamber,
                   poa=None,
                   temp_cell=None,
-                  x=0.5,
+                  p=0.5,
                   n=1):
     """
     Calculate the Acceleration Factor between the rate of degredation of a
@@ -334,15 +334,18 @@ def arrhenius_deg(weather_df, meta,
         Reference temperature [°C] "Chamber Temperature"
     Ea : float
         Degredation Activation Energy [kJ/mol]
+        if Ea=0 is used there will be not dependence on temperature and degradation will proceed according to the amount of light and humidity.
     poa : pd.dataframe, optional
         Global Plane of Array Irradiance [W/m²]
     temp_cell : pd.series, optional
         Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
         be generated using the default parameters from pvdeg.temperature.cell
-    x : float
+    p : float
         Fit parameter
+        When p=0 the dependence on light will be ignored and degradation will happen both day an night. As a caution or a feature, a very small value of p (e.g. p=0.0001) will provide very little degradation dependence on irradiance, but degradation will only be accounted for during daylight. i.e. averages will be computed over half of the time only.
     n : float
         Fit parameter for relative humidity
+        When n=0 the degradation rate will not be dependent on humidity.
 
     Returns
     --------
@@ -367,14 +370,14 @@ def arrhenius_deg(weather_df, meta,
                                                   rh_outdoor=rh_outdoor,
                                                   temp_cell=temp_cell,
                                                   Ea=Ea,
-                                                  x=x,
+                                                  p=p,
                                                   n=n)
 
     AvgOfDenominator = arrheniusDenominator.mean()
 
     arrheniusNumerator = _arrhenius_numerator(I_chamber=I_chamber, 
                                               rh_chamber=rh_chamber,
-                                              temp_chamber=temp_chamber, Ea=Ea, x=x, n=n)
+                                              temp_chamber=temp_chamber, Ea=Ea, p=p, n=n)
 
     accelerationFactor = _acceleration_factor(
         arrheniusNumerator, AvgOfDenominator)
@@ -460,7 +463,7 @@ def IwaArrhenius(weather_df, meta,
                  temp_cell=None,
                  RHwa=None,
                  Teq=None,
-                 x=0.5,
+                 p=0.5,
                  n=1):
     """
     Function to calculate IWa, the Environment Characterization [W/m²].
@@ -488,7 +491,7 @@ def IwaArrhenius(weather_df, meta,
     Teq : float, optional
         Temperature equivalent (Celsius) required
         for the settings of the controlled environment
-    x : float
+    p : float
         Fit parameter
     n : float
         Fit parameter for relative humidity
@@ -515,14 +518,14 @@ def IwaArrhenius(weather_df, meta,
     else:
         poa_global = poa
 
-    numerator = poa_global**(x) * rh_outdoor**(n) * \
+    numerator = poa_global**(p) * rh_outdoor**(n) * \
         np.exp(- (Ea / (0.00831446261815324 * (temp_cell + 273.15))))
     sumOfNumerator = numerator.sum(axis=0, skipna=True)
 
     denominator = (len(numerator)) * ((RHwa)**n) * \
         (np.exp(- (Ea / (0.00831446261815324 * (Teq + 273.15)))))
 
-    IWa = (sumOfNumerator / denominator)**(1/x)
+    IWa = (sumOfNumerator / denominator)**(1/p)
 
     return IWa
 
@@ -619,7 +622,7 @@ def _gJtoMJ(gJ):
     return MJ
 
 def degradation(spectra, rh_module, temp_module, wavelengths,
-                Ea=40.0, n=1.0, x=0.5, C2=0.07, C=1.0):
+                Ea=40.0, n=1.0, p=0.5, C2=0.07, C=1.0):
     '''
     Compute degredation as double integral of Arrhenius (Activation
     Energy, RH, Temperature) and spectral (wavelength, irradiance)
@@ -640,7 +643,7 @@ def degradation(spectra, rh_module, temp_module, wavelengths,
         Arrhenius activation energy. The default is 40. [kJ/mol]
     n : float
         Fit paramter for RH sensitivity. The default is 1.
-    x : float
+    p : float
         Fit parameter for irradiance sensitivity. Typically
         0.6 +- 0.22
     C2 : float
@@ -683,7 +686,7 @@ def degradation(spectra, rh_module, temp_module, wavelengths,
     sensitivitywavelengths = np.exp(-C2*wavelengths)
     irr = irr*sensitivitywavelengths
     irr *= np.array(wav_bin)
-    irr = irr**x
+    irr = irr**p
     data = pd.DataFrame(index=spectra.index)
     data['G_integral'] = irr.sum(axis=1)
 
