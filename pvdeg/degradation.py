@@ -15,7 +15,7 @@ from . import weather
 
 #TODO: Clean up all those functions and add gaps functionality
 
-def _deg_rate_env(poa_global, temp_cell, temp_chamber, p, Tf):
+def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
     """
     Helper function. Find the rate of degradation kenetics using the Fischer model.
     Degradation kentics model interpolated 50 coatings with respect to
@@ -28,8 +28,8 @@ def _deg_rate_env(poa_global, temp_cell, temp_chamber, p, Tf):
     ------------
     poa_global : float
         (Global) Plan of Array irradiance [W/m²]
-    temp_cell : float
-        Solar module cell temperature [°C]
+    temp : float
+        Solar module temperature [°C]
     temp_chamber : float
         Reference temperature [°C] "Chamber Temperature"
     p : float
@@ -44,7 +44,7 @@ def _deg_rate_env(poa_global, temp_cell, temp_chamber, p, Tf):
         rate of Degradation (NEED TO ADD METRIC)
 
     """
-    return poa_global**(p) * Tf ** ((temp_cell - temp_chamber)/10)
+    return poa_global**(p) * Tf ** ((temp - temp_chamber)/10)
 
 def _deg_rate_chamber(I_chamber, p):
     """
@@ -96,7 +96,7 @@ def vantHoff_deg(weather_df, meta,
                  I_chamber,
                  temp_chamber,
                  poa=None,
-                 temp_cell=None,
+                 temp=None,
                  p=0.5,
                  Tf=1.41):
     """
@@ -114,7 +114,7 @@ def vantHoff_deg(weather_df, meta,
         Reference temperature [°C] "Chamber Temperature"
     poa : series or data frame, optional
         dataframe containing 'poa_global', Global Plane of Array Irradiance [W/m²]
-    temp_cell : pandas series, optional
+    temp : pandas series, optional
         Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
         be generated using the default paramters of pvdeg.temperature.cell
     p : float
@@ -135,13 +135,13 @@ def vantHoff_deg(weather_df, meta,
     if isinstance(poa, pd.DataFrame):
         poa_global = poa['poa_global']
     
-    if temp_cell is None:
-        temp_cell = temperature.cell(weather_df=weather_df,
+    if temp is None:
+        temp = temperature.cell(weather_df=weather_df,
                                      meta=meta,
                                      poa=poa)
 
     rateOfDegEnv = _deg_rate_env(poa_global=poa_global,
-                                 temp_cell=temp_cell,
+                                 temp=temp,
                                  temp_chamber=temp_chamber,
                                  p=p,
                                  Tf=Tf)
@@ -155,16 +155,16 @@ def vantHoff_deg(weather_df, meta,
 
     return accelerationFactor
 
-def _to_eq_vantHoff(temp_cell, Tf=1.41):
+def _to_eq_vantHoff(temp, Tf=1.41):
     """
     Function to obtain the Vant Hoff temperature equivalent [°C]
 
     Parameters
     ----------
     Tf : float
-        Multiplier for the increase in degradation for every 10[°C] temperature increase
-    temp_cell : pandas series
-        Solar module temperature or Cell temperature [°C]
+        Multiplier for the increase in degradation for every 10[°C] temperature increase. Default value of 1.41.
+    temp : pandas series
+        Solar module surface or Cell temperature [°C]
 
     Returns
     -------
@@ -172,17 +172,18 @@ def _to_eq_vantHoff(temp_cell, Tf=1.41):
         Vant Hoff temperature equivalent [°C]
 
     """
-    toSum = Tf ** (temp_cell / 10)
+
+    toSum = Tf ** (temp / 10)
     summation = toSum.sum(axis=0, skipna=True)
 
-    Toeq = (10 / np.log(Tf)) * np.log(summation / len(temp_cell))
+    Toeq = (10 / np.log(Tf)) * np.log(summation / len(temp))
 
     return Toeq
 
 
 def IwaVantHoff(weather_df, meta,
                 poa=None,
-                temp_cell=None,
+                temp=None,
                 Teq=None,
                 p=0.5,
                 Tf=1.41):
@@ -199,7 +200,7 @@ def IwaVantHoff(weather_df, meta,
         Location meta-data containing at least latitude, longitude, altitude
     poa : float series or dataframe
         Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
-    temp_cell : float series
+    temp : float series
         Solar module temperature or Cell temperature [°C]
     Teq : series
         VantHoff equivalent temperature [°C]
@@ -214,29 +215,28 @@ def IwaVantHoff(weather_df, meta,
         Environment Characterization [W/m²[]
 
     """
-    
     if poa is None:
         poa = spectral.poa_irradiance(weather_df,meta)
     
-    if temp_cell is None:
-        temp_cell = temperature.cell(weather_df,meta,poa)
+    if temp is None:
+        temp = temperature.cell(weather_df,meta,poa)
     
     if Teq is None:
-        Teq = _to_eq_vantHoff(temp_cell, Tf)
+        Teq = _to_eq_vantHoff(temp, Tf)
     
     if isinstance(poa, pd.DataFrame):
         poa_global = poa['poa_global']
     else:
         poa_global = poa
 
-    toSum = (poa_global ** p) * (Tf ** ((temp_cell - Teq)/10))
+    toSum = (poa_global ** p) * (Tf ** ((temp - Teq)/10))
     summation = toSum.sum(axis=0, skipna=True)
 
     Iwa = (summation / len(poa_global)) ** (1 / p)
 
     return Iwa
 
-def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, p, n):
+def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
     """
     Helper function. Calculates the rate of degredation of the Environmnet
 
@@ -252,7 +252,7 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, p, n):
         rh_back_encap(); rh_front_encap();  rh_surface_outside()
     n : float
         Fit parameter for relative humidity
-    temp_cell : pandas series
+    temp : pandas series
         Solar module temperature or Cell temperature [°C]
     Ea : float
         Degredation Activation Energy [kJ/mol]
@@ -264,7 +264,7 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp_cell, Ea, p, n):
     """
 
     environmentDegradationRate = poa_global**(p) * rh_outdoor**(
-        n) * np.exp(- (Ea / (0.00831446261815324 * (temp_cell + 273.15))))
+        n) * np.exp(- (Ea / (0.00831446261815324 * (temp + 273.15))))
 
     return environmentDegradationRate
 
@@ -306,7 +306,7 @@ def arrhenius_deg(weather_df, meta,
                   Ea,
                   temp_chamber,
                   poa=None,
-                  temp_cell=None,
+                  temp=None,
                   p=0.5,
                   n=1):
     """
@@ -337,7 +337,7 @@ def arrhenius_deg(weather_df, meta,
         if Ea=0 is used there will be not dependence on temperature and degradation will proceed according to the amount of light and humidity.
     poa : pd.dataframe, optional
         Global Plane of Array Irradiance [W/m²]
-    temp_cell : pd.series, optional
+    temp : pd.series, optional
         Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
         be generated using the default parameters from pvdeg.temperature.cell
     p : float
@@ -357,8 +357,8 @@ def arrhenius_deg(weather_df, meta,
     if poa is None:
         poa = spectral.poa_irradiance(weather_df,meta)
     
-    if temp_cell is None:
-        temp_cell = temperature.cell(weather_df,meta,poa)
+    if temp is None:
+        temp = temperature.cell(weather_df,meta,poa)
 
     if isinstance(poa, pd.DataFrame):
         poa_global = poa['poa_global']
@@ -368,7 +368,7 @@ def arrhenius_deg(weather_df, meta,
 
     arrheniusDenominator = _arrhenius_denominator(poa_global=poa_global,
                                                   rh_outdoor=rh_outdoor,
-                                                  temp_cell=temp_cell,
+                                                  temp=temp,
                                                   Ea=Ea,
                                                   p=p,
                                                   n=n)
@@ -384,14 +384,14 @@ def arrhenius_deg(weather_df, meta,
 
     return accelerationFactor
 
-def _T_eq_arrhenius(temp_cell, Ea):
+def _T_eq_arrhenius(temp, Ea):
     """
     Get the Temperature equivalent required for the settings of the controlled environment
     Calculation is used in determining Arrhenius Environmental Characterization
 
     Parameters
     -----------
-    temp_cell : pandas series
+    temp : pandas series
         Solar module temperature or Cell temperature [°C]
     Ea : float
         Degredation Activation Energy [kJ/mol]
@@ -405,15 +405,15 @@ def _T_eq_arrhenius(temp_cell, Ea):
     """
 
     summationFrame = np.exp(- (Ea /
-                                (0.00831446261815324 * (temp_cell + 273.15))))
+                                (0.00831446261815324 * (temp + 273.15))))
     sumForTeq = summationFrame.sum(axis=0, skipna=True)
-    Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(temp_cell))))
+    Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(temp))))
     # Convert to celsius
     Teq = Teq - 273.15
 
     return Teq
 
-def _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea, Teq=None, n=1):
+def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
     """
     NOTE
 
@@ -426,7 +426,7 @@ def _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea, Teq=None, n=1):
         Relative Humidity of material of interest. Acceptable relative
         humiditys can be calculated from the below functions:
         rh_backsheet(), rh_back_encap(), rh_front_encap(), rh_surface_outside()
-    temp_cell : pandas series
+    temp : pandas series
         solar module temperature or Cell temperature [°C]
     Ea : float
         Degredation Activation Energy [kJ/mol]
@@ -443,10 +443,10 @@ def _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea, Teq=None, n=1):
     """
 
     if Teq is None:
-        Teq = _T_eq_arrhenius(temp_cell, Ea)
+        Teq = _T_eq_arrhenius(temp, Ea)
 
     summationFrame = (rh_outdoor ** n) * np.exp(- (Ea /
-                                                    (0.00831446261815324 * (temp_cell + 273.15))))
+                                                    (0.00831446261815324 * (temp + 273.15))))
     sumForRHwa = summationFrame.sum(axis=0, skipna=True)
     RHwa = (sumForRHwa / (len(summationFrame) * np.exp(- (Ea /
                                             (0.00831446261815324 * (Teq + 273.15)))))) ** (1/n)
@@ -460,7 +460,7 @@ def IwaArrhenius(weather_df, meta,
                  rh_outdoor,
                  Ea,
                  poa=None,
-                 temp_cell=None,
+                 temp=None,
                  RHwa=None,
                  Teq=None,
                  p=0.5,
@@ -484,7 +484,7 @@ def IwaArrhenius(weather_df, meta,
         Degradation Activation Energy [kJ/mol]
     poa : pd.dataframe, optional
         must contain 'poa_global', Global Plan of Array irradiance [W/m²]
-    temp_cell : pd.series, optional
+    temp : pd.series, optional
         Solar module temperature or Cell temperature [°C]
     RHwa : float, optional
         Relative Humidity Weighted Average [%]
@@ -504,14 +504,14 @@ def IwaArrhenius(weather_df, meta,
     if poa is None:
         poa = spectral.poa_irradiance(weather_df,meta)
     
-    if temp_cell is None:
-        temp_cell = temperature.cell(weather_df,meta,poa)
+    if temp is None:
+        temp = temperature.cell(weather_df,meta,poa)
     
     if Teq is None:
-        Teq = _T_eq_arrhenius(temp_cell, Ea)
+        Teq = _T_eq_arrhenius(temp, Ea)
 
     if RHwa is None:
-        RHwa = _RH_wa_arrhenius(rh_outdoor, temp_cell, Ea)
+        RHwa = _RH_wa_arrhenius(rh_outdoor, temp, Ea)
 
     if isinstance(poa, pd.DataFrame):
         poa_global = poa['poa_global']
@@ -519,7 +519,7 @@ def IwaArrhenius(weather_df, meta,
         poa_global = poa
 
     numerator = poa_global**(p) * rh_outdoor**(n) * \
-        np.exp(- (Ea / (0.00831446261815324 * (temp_cell + 273.15))))
+        np.exp(- (Ea / (0.00831446261815324 * (temp + 273.15))))
     sumOfNumerator = numerator.sum(axis=0, skipna=True)
 
     denominator = (len(numerator)) * ((RHwa)**n) * \
