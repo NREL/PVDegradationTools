@@ -100,7 +100,7 @@ def vantHoff_deg(weather_df, meta,
                  p=0.5,
                  Tf=1.41):
     """
-    Van 't Hoff Irradiance Degradation
+    Van't Hoff Irradiance Degradation
 
     Parameters
     -----------
