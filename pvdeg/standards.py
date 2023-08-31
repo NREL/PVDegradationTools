@@ -19,14 +19,18 @@ from . import weather
 
 def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
     '''
-    Calculate a minimum installation distance for rooftop  mounded PV systems.
+    Calculate a minimum installation standoff distance for rooftop mounded PV systems for 
+    a given levl according to IEC TS 63126 or the standoff to achieve a given 98ᵗʰ percentile 
+    temperature. If the given T₉₈ is that for a specific system, then it is a calculation of 
+    the effective gap of that system. The 98th percentile calculations for T_0 and T_inf are 
+    also calculated.
 
     Parameters
     ----------
     level : int, optional
-        Options 1, or 2. Specifies T98 temperature boundary for level 1 or level 2 according to IEC TS 63216.
+        Options 1, or 2. Specifies T₉₈ temperature boundary for level 1 or level 2 according to IEC TS 63216.
     T98 : float, optional
-        Instead of the level the T98 temperature can be specified directly (overwrites level).
+        Instead of the level the T₉₈ temperature can be specified directly (overwrites level).
     x0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
 
@@ -64,6 +68,8 @@ def calc_standoff(
     sky_model='isotropic',
     temp_model='sapm',
     module_type='glass_polymer', # self.module
+    conf_0= 'insulated_back_glass_polymer',
+    conf_inf= 'open_rack_glass_polymer',
     level=1,
     x_0=6.1,
     wind_speed_factor=1):
@@ -83,9 +89,13 @@ def calc_standoff(
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
-        Options: 'sapm', 'pvsyst', 'faiman', 'sandia'.
+        Options: 'sapm'.  'pvsyst' and 'faiman' will be added later.
     module_type : str, optional
         Options: 'glass_polymer', 'glass_glass'.
+    conf_0 : str, optional
+        Default: 'insulated_back_glass_polymer'
+    conf_inf : str, optional
+        Default: 'open_rack_glass_polymer'
     level : int, optional
         Options 1, or 2. Temperature level 1 or level 2 according to IEC TS 63216.
     x0 : float, optional
@@ -93,10 +103,11 @@ def calc_standoff(
     wind_speed_factor : float, optional
         Wind speed correction factor to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRD uses calculations at 2m (i.e module height)
     Returns
     -------
     x : float
-        Minimum installation distance in centimeter per IEC TS 63126.
+        Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
         Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
 
     References
@@ -104,12 +115,6 @@ def calc_standoff(
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     '''
-    if module_type == 'glass_polymer':
-        conf_0 = 'insulated_back_glass_polymer'
-        conf_inf = 'open_rack_glass_polymer'
-    elif module_type == 'glass_glass':
-        conf_0 = 'close_mount_glass_glass'
-        conf_inf = 'open_rack_glass_glass'
 
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(weather_df, meta, sol_position=solar_position, tilt=tilt,
