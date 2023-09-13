@@ -12,4 +12,8 @@ matplotlib
 jupyterlab
 notebook
 NREL-rex
-
+pytables
+xarray
+netCDF4
+h5py
+h5netcdf
