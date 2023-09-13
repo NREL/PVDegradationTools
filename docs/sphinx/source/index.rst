@@ -1,5 +1,5 @@
 .. image:: ../../../pvdeg_tutorials/pvdeg_logo.png
-  :width: 100
+  :width: 200
 
 Welcome to pvdeg!
 ==============================================================
