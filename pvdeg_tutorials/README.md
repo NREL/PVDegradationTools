@@ -1,4 +1,4 @@
-<img src="PVD_logo.png" width="400">
+<img src="PVD_logo.png" width="100">
 
 # TUTORIALS for PV Degradation Tools (pvdeg)
 
@@ -33,7 +33,7 @@ steps:
    this tutorial. To install them using conda run:
 
    ```
-   conda create -n pvdeg jupyter -c pvlib --file requirements.txt
+   conda create -n pvdeg jupyter -c conda-forge --file requirements.txt
    conda activate pvdeg
    ```
 

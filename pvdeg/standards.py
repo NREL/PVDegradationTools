@@ -17,14 +17,16 @@ from . import spectral
 from . import utilities
 from . import weather
 
-def eff_gap(T_0, T_inf, level=1, x_0=6.1):
+def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
     '''
     Calculate a minimum installation distance for rooftop  mounded PV systems.
 
     Parameters
     ----------
     level : int, optional
-        Options 1, or 2. Temperature level 1 or level 2 according to IEC TS 63216.
+        Options 1, or 2. Specifies T98 temperature boundary for level 1 or level 2 according to IEC TS 63216.
+    T98 : float, optional
+        Instead of the level the T98 temperature can be specified directly (overwrites level).
     x0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
 
@@ -40,10 +42,11 @@ def eff_gap(T_0, T_inf, level=1, x_0=6.1):
     to IEC TS 63126, PVSC Proceedings 2023
     '''
 
-    if level == 1:
-        T98 = 70
-    elif level == 2:
-        T98 = 80
+    if T98 is None:
+        if level == 1:
+            T98 = 70
+        elif level == 2:
+            T98 = 80
 
     T98_0 = T_0.quantile(q=0.98, interpolation='linear')
     T98_inf = T_inf.quantile(q=0.98, interpolation='linear')

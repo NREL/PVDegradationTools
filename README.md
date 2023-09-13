@@ -1,13 +1,6 @@
-<img src="pvdeg_tutorials/PVD_logo.png" width="400">
+<img src="pvdeg_tutorials/PVD_logo.png" width="100">
 
 <table>
-<tr>
-  <td>Version</td>
-  <td>
-  <a href="https://zenodo.org/badge/latestdoi/248347431"> FORTHCOMING </a>
-</td>
-</tr>
-
 <tr>
   <td>License</td>
   <td>
@@ -15,6 +8,12 @@
     <img src="https://img.shields.io/pypi/l/pvlib.svg" alt="license" />
     </a>
 </td>
+</tr>
+<tr>
+  <td>Publications</td>
+  <td>
+	[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088403.svg)](https://doi.org/10.5281/zenodo.8088403)
+  </td>
 </tr>
 <tr>
   <td>Documentation</td>
@@ -38,7 +37,8 @@ Tutorials
 
 ### Jupyter Book
 
-For in depth Tutorials you can run online, see our [jupyter-book](https://nrel.github.io/PVDegradationTools/intro.html)
+For in depth Tutorials you can run online, see our [jupyter-book](https://nrel.github.io/PVDegradationTools/intro.html) [![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://nrel.github.io/PVDegradationTools/intro.html)
+
 Clicking on the rocket-icon on the top allows you to launch the journals on [Google Colaboratory](https://colab.research.google.com/) for interactive mode.
 Just uncomment the first line `pip install ...`  to install the environment on each journal if you follow this mode.
 
@@ -130,4 +130,6 @@ If you use this functions in a published work, please cite:
 
 	Holsapple, Derek, Ayala Pelaez, Silvana, Kempe, Michael. "PV Degradation Tools", NREL Github 2020, Software Record SWR-20-71.
 
-Zenodo reference and OSTI software record information forthcoming.
+And/or the specific release from Zenodo:
+
+	Ovaitt, Silvana, Brown, Matt, Springer, Martin, Karas, Joe, Holsapple, Derek, Kempe, Michael. (2023). NREL/PVDegradationTools: v0.1.0 official release (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.8088403

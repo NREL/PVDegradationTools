@@ -1,11 +1,9 @@
 numpy
 numba
 pandas
-pvlib @ git+https://github.com/pvlib/pvlib-python.git@ef4e31b0caa005c367cb20a6eda4e3b79f963dfe
+pvlib
 python-dateutil
 pytz
-NREL-rex
-NREL-gaps
 photovoltaic
 scipy
 openpyxl
@@ -13,4 +11,5 @@ tqdm
 matplotlib
 jupyterlab
 notebook
+NREL-rex
 

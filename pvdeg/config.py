@@ -16,6 +16,5 @@ DATA_LIBRARY = PVDEG_DIR.parent / "DataLibrary"
 if not os.path.isdir(DATA_LIBRARY):
     DATA_LIBRARY = os.path.join(sys.prefix, 'DataLibrary')
     if not os.path.isdir(DATA_LIBRARY):
-        raise FileNotFoundError(
-            f"DataLibrary not found in {DATA_LIBRARY} or {PVDEG_DIR.parent}.")
+        print("DataLibrary not found in {DATA_LIBRARY} or {PVDEG_DIR.parent}.")
 
