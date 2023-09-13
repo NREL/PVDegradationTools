@@ -51,20 +51,25 @@ def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
     T98_0 = T_0.quantile(q=0.98, interpolation='linear')
     T98_inf = T_inf.quantile(q=0.98, interpolation='linear')
 
-    x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+    try:
+        x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+    except RuntimeWarning as e:
+        x = np.nan
 
     return x, T98_0, T98_inf
 
 
 def calc_standoff(
-    weather_df,
-    meta,
+    weather_df=None,
+    meta=None,
+    weather_kwarg=None,
     tilt=None,
     azimuth=180,
     sky_model='isotropic',
     temp_model='sapm',
     module_type='glass_polymer', # self.module
     level=1,
+    T98=None,
     x_0=6.1,
     wind_speed_factor=1):
     '''
@@ -104,6 +109,11 @@ def calc_standoff(
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     '''
+
+    if weather_df is None:
+        weather_df, meta = weather.get(
+            **weather_kwarg)
+
     if module_type == 'glass_polymer':
         conf_0 = 'insulated_back_glass_polymer'
         conf_inf = 'open_rack_glass_polymer'
@@ -116,7 +126,7 @@ def calc_standoff(
                                   azimuth=azimuth, sky_model=sky_model)
     T_0 = temperature.module(weather_df, meta, poa, temp_model, conf_0, wind_speed_factor)
     T_inf = temperature.module(weather_df, meta, poa, temp_model, conf_inf, wind_speed_factor)
-    x, T98_0, T98_inf = eff_gap(T_0, T_inf, level, x_0)
+    x, T98_0, T98_inf = eff_gap(T_0, T_inf, level=level, T98=T98, x_0=x_0)
 
     return {'x':x, 'T98_0':T98_0, 'T98_inf':T98_inf}
 
@@ -135,6 +145,7 @@ def run_calc_standoff(
     temp_model='sapm',
     module_type='glass_polymer',
     level=1,
+    T98=None,
     x_0=6.1,
     wind_speed_factor=1
 ):
@@ -142,7 +153,6 @@ def run_calc_standoff(
     """
     parallelization utilizing gaps     #TODO: write docstring
     """
-
     #inputs
     weather_arg = {}
     #weather_arg['satellite'] = weather_satellite
@@ -186,7 +196,6 @@ def run_calc_standoff(
         #meta=meta.reset_index()
         meta=project_points.df
     )
-
     future_to_point = {}
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         for idx, point in project_points.df.iterrows():
@@ -196,24 +205,23 @@ def run_calc_standoff(
             df_weather_kwargs.index = df_weather_kwargs.index.map(
                 lambda arg: arg.lstrip('weather_'))
             weather_kwarg = weather_arg | df_weather_kwargs.to_dict()
+            weather_kwarg['database'] = database
+            weather_kwarg['id'] = gid
 
-            weather_df, meta = weather.load(
-                database = database,
-                id = gid,
-                #satellite = point.satellite,  #TODO: check input
-                **weather_kwarg)
             future = executor.submit(
                 calc_standoff,
-                weather_df,
-                meta,
-                tilt,
-                azimuth,
-                sky_model,
-                temp_model,
-                module_type,
-                level,
-                x_0,
-                wind_speed_factor
+                weather_df=None,
+                meta=None,
+                weather_kwarg=weather_kwarg,
+                tilt=tilt,
+                azimuth=azimuth,
+                sky_model=sky_model,
+                temp_model=temp_model,
+                module_type=module_type,
+                level=level,
+                T98=T98,
+                x_0=x_0,
+                wind_speed_factor=wind_speed_factor
             )
             future_to_point[future] = gid
 
