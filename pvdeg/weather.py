@@ -11,7 +11,7 @@ from pvdeg import humidity
 
 def get(database, id, **kwargs):
     """
-    Load weather data directly from  NSRDB or through any other PVLIB i/o 
+    Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function
 
     Parameters:
@@ -21,7 +21,7 @@ def get(database, id, **kwargs):
     id : (int or tuple)
         If NSRDB, id is the gid for the desired location
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
-    **kwargs : 
+    **kwargs :
         Additional keyword arguments to pass to the get_weather function
         (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
 
@@ -32,7 +32,7 @@ def get(database, id, **kwargs):
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-    
+
     META_MAP = {'elevation' : 'altitude'}
 
     if type(id) is tuple:
@@ -58,18 +58,22 @@ def get(database, id, **kwargs):
         meta = meta['location']
     elif database == 'PSM3':
         weather_df, meta = iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
+    elif database == 'local':
+        fp = kwargs.pop('file')
+        fn, fext = os.path.splitext(fp)
+        weather_df, meta = read(gid=gid, file_in=fp, file_type=fext[1:], **kwargs)
     else:
         raise NameError('Weather database not found.')
 
     if 'relative_humidity' not in weather_df.columns:
         print('Column "relative_humidity" not found in DataFrame. Calculating...')
         weather_df = humidity._ambient(weather_df)
-    
+
     # map meta-names as needed
     for key in [*meta.keys()]:
         if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
-    
+
     return weather_df, meta
 
 
@@ -90,7 +94,7 @@ def read(file_in, file_type, **kwargs):
 
     supported = ['psm3','tmy3','epw','h5']
     file_type = file_type.upper()
-    
+
     if file_type in ['PSM3','PSM']:
         weather_df, meta = iotools.read_psm3(filename=file_in, map_variables=True)
     elif file_type in ['TMY3','TMY']:
@@ -101,7 +105,7 @@ def read(file_in, file_type, **kwargs):
         weather_df, meta = read_h5(file=file_in, **kwargs)
     else:
         print(f'File-Type not recognized. supported types:\n{supported}')
-    
+
     if not isinstance(meta, dict):
         meta = meta.to_dict()
 
@@ -111,7 +115,7 @@ def read(file_in, file_type, **kwargs):
 def read_h5(gid, file, attributes=None, **_):
     """
     Read a locally stored h5 weather file that follows NSRDB conventions.
-    
+
     Parameters:
     -----------
     file_path : (str)
@@ -129,9 +133,13 @@ def read_h5(gid, file, attributes=None, **_):
         Dictionary of metadata for the weather data
     """
 
-    fp = os.path.join(os.path.dirname(__file__), file)
+    if os.path.dirname(file):
+        fp = file
+    else:
+        fp = os.path.join(os.path.dirname(__file__),
+                          os.path.basename(file))
 
-    with Outputs(fp, mode='r') as f:   
+    with Outputs(fp, mode='r') as f:
         meta = f.meta.loc[gid]
         index = f.time_index
         dattr = f.attrs
@@ -147,7 +155,7 @@ def read_h5(gid, file, attributes=None, **_):
 
     weather_df = pd.DataFrame(index=index, columns=attributes)
     for dset in attributes:
-        with Outputs(fp, mode='r') as f:   
+        with Outputs(fp, mode='r') as f:
             weather_df[dset] = f[dset, :, gid]
 
     return weather_df, meta.to_dict()
@@ -191,24 +199,24 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC = False, **_):
     else:
         hpc_fp = '/nrel/nsrdb/'
         hsds = True
-        
-    if type(names) == int:
-        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(names))
+
+    if type(names) in [int, float]:
+        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(int(names)))
         nsrdb_fnames = glob.glob(nsrdb_fp)
     else:
         nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}*.h5'.format(names.lower()))
         nsrdb_fnames = glob.glob(nsrdb_fp)
-        
+
     if len(nsrdb_fnames) == 0:
         raise FileNotFoundError(
             "Couldn't find NSRDB input files! \nSearched for: '{}'".format(nsrdb_fp))
-    
+
     return nsrdb_fnames, hsds
 
 
 def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=None, **_):
     """
-    Get NSRDB weather data from different satellites and years. 
+    Get NSRDB weather data from different satellites and years.
     Provide either gid or location tuple.
 
     Parameters:
@@ -274,7 +282,7 @@ def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, attributes=No
         else:
             column_name = dset
 
-        with NSRDBX(dattr[dset], hsds=hsds) as f:   
+        with NSRDBX(dattr[dset], hsds=hsds) as f:
             weather_df[column_name] = f[dset, :, gid]
 
     # switch meta key names to pvlib standard
