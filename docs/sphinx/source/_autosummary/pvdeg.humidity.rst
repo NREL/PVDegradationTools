@@ -14,15 +14,15 @@
    .. autosummary::
    
       Ce_numba
-      calc_rel_humidity
+      back_encap
+      backsheet
+      backsheet_from_encap
       dew_yield
+      front_encap
+      module
       psat
-      rh_back_encap
-      rh_backsheet
-      rh_backsheet_from_encap
-      rh_front_encap
-      rh_surface_outside
-      run_calc_rel_humidity
+      run_module
+      surface_outside
    
    
 

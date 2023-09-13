@@ -1,4 +1,4 @@
-<img src="pvdeg_tutorials/PVD_logo.png" width="100">
+<img src="pvdeg_tutorials/pvdeg_logo.png" width="100">
 
 <table>
 <tr>
@@ -12,7 +12,7 @@
 <tr>
   <td>Publications</td>
   <td>
-	[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088403.svg)](https://doi.org/10.5281/zenodo.8088403)
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088578.svg)](https://doi.org/10.5281/zenodo.8088578)
   </td>
 </tr>
 <tr>

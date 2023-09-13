@@ -13,9 +13,8 @@
 
    .. autosummary::
    
-      edge_seal_from_dew_pt
+      edge_seal_ingress_rate
       edge_seal_width
-      k
    
    
 
