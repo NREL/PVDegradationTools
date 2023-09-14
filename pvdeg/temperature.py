@@ -14,24 +14,22 @@ def module(
     wind_speed_factor=1):
 
     """
-    Calculate module temperature based on weather data from the National Solar Radiation 
-    Database (NSRDB) for a given location (gid).
+    Calculate module surface temperature using pvlib.
     
     Parameters
     ----------
-    nsrdb_file : str
-        The file path to the NSRDB file.
-    gid : int
-        The geographical location ID in the NSRDB file.
+    weather_df : (pd.dataframe)
+        Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
     poa : pandas.DataFrame
          Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse', 
          'poa_sky_diffuse', 'poa_ground_diffuse'.
     temp_model : str, optional
-        The temperature model to use, 'sapm' from pvlib by default.
+        The temperature model to use, Sandia Array Performance Model 'sapm' from pvlib by default.
     conf : str, optional
         The configuration of the PV module architecture and mounting configuration.
-        Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
-        'close_mount_glass_glass', 'insulated_back_glass_polymer'
+        Options: 
+            'sapm': 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
+                    'close_mount_glass_glass', 'insulated_back_glass_polymer'
     
     Returns
     -------
@@ -74,7 +72,7 @@ def cell(weather_df,
     conf : (str)
         The configuration of the PV module architecture and mounting configuration.
         Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
-        'close_mount_glass_glass', 'insulated_back_glass_polymer'
+                 'close_mount_glass_glass', 'insulated_back_glass_polymer'
     '''
 
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
