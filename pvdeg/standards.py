@@ -19,10 +19,10 @@ from . import weather
 
 def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
     '''
-    Calculate a minimum installation standoff distance for rooftop mounded PV systems for 
-    a given levl according to IEC TS 63126 or the standoff to achieve a given 98ᵗʰ percentile 
-    temperature. If the given T₉₈ is that for a specific system, then it is a calculation of 
-    the effective gap of that system. The 98th percentile calculations for T_0 and T_inf are 
+    Calculate a minimum installation standoff distance for rooftop mounded PV systems for
+    a given levl according to IEC TS 63126 or the standoff to achieve a given 98ᵗʰ percentile
+    temperature. If the given T₉₈ is that for a specific system, then it is a calculation of
+    the effective gap of that system. The 98th percentile calculations for T_0 and T_inf are
     also calculated.
 
     Parameters
@@ -55,14 +55,18 @@ def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
     T98_0 = T_0.quantile(q=0.98, interpolation='linear')
     T98_inf = T_inf.quantile(q=0.98, interpolation='linear')
 
-    x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+    try:
+        x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+    except RuntimeWarning as e:
+        x = np.nan
 
     return x, T98_0, T98_inf
 
 
 def calc_standoff(
-    weather_df,
-    meta,
+    weather_df=None,
+    meta=None,
+    weather_kwarg=None,
     tilt=None,
     azimuth=180,
     sky_model='isotropic',
@@ -71,6 +75,7 @@ def calc_standoff(
     conf_0= 'insulated_back_glass_polymer',
     conf_inf= 'open_rack_glass_polymer',
     level=1,
+    T98=None,
     x_0=6.1,
     wind_speed_factor=1):
     '''
@@ -116,12 +121,23 @@ def calc_standoff(
     to IEC TS 63126, PVSC Proceedings 2023
     '''
 
+    if weather_df is None:
+        weather_df, meta = weather.get(
+            **weather_kwarg)
+
+    if module_type == 'glass_polymer':
+        conf_0 = 'insulated_back_glass_polymer'
+        conf_inf = 'open_rack_glass_polymer'
+    elif module_type == 'glass_glass':
+        conf_0 = 'close_mount_glass_glass'
+        conf_inf = 'open_rack_glass_glass'
+
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(weather_df, meta, sol_position=solar_position, tilt=tilt,
                                   azimuth=azimuth, sky_model=sky_model)
     T_0 = temperature.module(weather_df, meta, poa, temp_model, conf_0, wind_speed_factor)
     T_inf = temperature.module(weather_df, meta, poa, temp_model, conf_inf, wind_speed_factor)
-    x, T98_0, T98_inf = eff_gap(T_0, T_inf, level, x_0)
+    x, T98_0, T98_inf = eff_gap(T_0, T_inf, level=level, T98=T98, x_0=x_0)
 
     return {'x':x, 'T98_0':T98_0, 'T98_inf':T98_inf}
 
@@ -140,6 +156,7 @@ def run_calc_standoff(
     temp_model='sapm',
     module_type='glass_polymer',
     level=1,
+    T98=None,
     x_0=6.1,
     wind_speed_factor=1
 ):
@@ -201,24 +218,23 @@ def run_calc_standoff(
             df_weather_kwargs.index = df_weather_kwargs.index.map(
                 lambda arg: arg.lstrip('weather_'))
             weather_kwarg = weather_arg | df_weather_kwargs.to_dict()
+            weather_kwarg['database'] = database
+            weather_kwarg['id'] = gid
 
-            weather_df, meta = weather.load(
-                database = database,
-                id = gid,
-                #satellite = point.satellite,  #TODO: check input
-                **weather_kwarg)
             future = executor.submit(
                 calc_standoff,
-                weather_df,
-                meta,
-                tilt,
-                azimuth,
-                sky_model,
-                temp_model,
-                module_type,
-                level,
-                x_0,
-                wind_speed_factor
+                weather_df=None,
+                meta=None,
+                weather_kwarg=weather_kwarg,
+                tilt=tilt,
+                azimuth=azimuth,
+                sky_model=sky_model,
+                temp_model=temp_model,
+                module_type=module_type,
+                level=level,
+                T98=T98,
+                x_0=x_0,
+                wind_speed_factor=wind_speed_factor
             )
             future_to_point[future] = gid
 
