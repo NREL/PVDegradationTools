@@ -30,11 +30,29 @@ def gid_downsampling(meta, n):
 
     gids_sub = meta[
         (meta['longitude'].isin(lon_sub)) & (meta['latitude'].isin(lat_sub))
-    ].index
+    ].index.values
 
     meta_sub = meta.loc[gids_sub]
 
     return meta_sub, gids_sub
+
+
+def meta_as_dict(rec):
+    """
+    Turn a numpy recarray record into a dict.
+
+    Parameters:
+    -----------
+    rec : (np.recarray)
+        numpy structured array with labels as dtypes
+
+    Returns:
+    --------
+     : (dict)
+        dictionary of numpy structured array
+    """
+
+    return {name:rec[name].item() for name in rec.dtype.names}
 
 
 def get_kinetics(name=None, fname='kinetic_parameters.json'):
