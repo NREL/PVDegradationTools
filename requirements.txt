@@ -1,6 +1,8 @@
 numpy
 numba
 pandas
+dask
+dask-jobqueue
 pvlib
 python-dateutil
 pytz
