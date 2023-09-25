@@ -60,6 +60,10 @@ def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
         x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
     except RuntimeWarning as e:
         x = np.nan
+    try:
+        x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+    except RuntimeWarning as e:
+        x = np.nan
 
     return x, T98_0, T98_inf
 
@@ -76,6 +80,7 @@ def standoff(
     conf_0= 'insulated_back_glass_polymer',
     conf_inf= 'open_rack_glass_polymer',
     level=1,
+    T98=None,
     T98=None,
     x_0=6.1,
     wind_speed_factor=1):

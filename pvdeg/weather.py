@@ -16,6 +16,7 @@ import xarray as xr
 def get(database, id=None, geospatial=False, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
+    Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function
 
     Parameters:
@@ -41,6 +42,7 @@ def get(database, id=None, geospatial=False, **kwargs):
     meta : (dict)
         Dictionary of metadata for the weather data
     """
+
 
     META_MAP = {'elevation' : 'altitude'}
 
@@ -118,6 +120,7 @@ def read(file_in, file_type, **kwargs):
     supported = ['psm3','tmy3','epw','h5']
     file_type = file_type.upper()
 
+
     if file_type in ['PSM3','PSM']:
         weather_df, meta = iotools.read_psm3(filename=file_in, map_variables=True)
     elif file_type in ['TMY3','TMY']:
@@ -129,6 +132,7 @@ def read(file_in, file_type, **kwargs):
     else:
         print(f'File-Type not recognized. supported types:\n{supported}')
 
+
     if not isinstance(meta, dict):
         meta = meta.to_dict()
 
@@ -138,6 +142,7 @@ def read(file_in, file_type, **kwargs):
 def read_h5(gid, file, attributes=None, **_):
     """
     Read a locally stored h5 weather file that follows NSRDB conventions.
+
 
     Parameters:
     -----------
@@ -161,7 +166,13 @@ def read_h5(gid, file, attributes=None, **_):
     else:
         fp = os.path.join(os.path.dirname(__file__),
                           os.path.basename(file))
+    if os.path.dirname(file):
+        fp = file
+    else:
+        fp = os.path.join(os.path.dirname(__file__),
+                          os.path.basename(file))
 
+    with Outputs(fp, mode='r') as f:
     with Outputs(fp, mode='r') as f:
         meta = f.meta.loc[gid]
         index = f.time_index
@@ -178,6 +189,7 @@ def read_h5(gid, file, attributes=None, **_):
 
     weather_df = pd.DataFrame(index=index, columns=attributes)
     for dset in attributes:
+        with Outputs(fp, mode='r') as f:
         with Outputs(fp, mode='r') as f:
             weather_df[dset] = f[dset, :, gid]
 
@@ -300,20 +312,26 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC = False, **_):
 
     if type(names) in [int, float]:
         nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(int(names)))
+
+    if type(names) in [int, float]:
+        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(int(names)))
         nsrdb_fnames = glob.glob(nsrdb_fp)
     else:
         nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}*.h5'.format(names.lower()))
         nsrdb_fnames = glob.glob(nsrdb_fp)
 
+
     if len(nsrdb_fnames) == 0:
         raise FileNotFoundError(
             "Couldn't find NSRDB input files! \nSearched for: '{}'".format(nsrdb_fp))
+
 
     return nsrdb_fnames, hsds
 
 
 def get_NSRDB(satellite, names, NREL_HPC, gid=None, location=None, geospatial=False, attributes=None, **_):
     """
+    Get NSRDB weather data from different satellites and years.
     Get NSRDB weather data from different satellites and years.
     Provide either gid or location tuple.
 
