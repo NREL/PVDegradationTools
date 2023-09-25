@@ -159,6 +159,7 @@ def standoff(
 
     df_res = pd.DataFrame.from_dict(res, orient='index').T
 
+
     return df_res
 
 
