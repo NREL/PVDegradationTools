@@ -173,7 +173,6 @@ def read_h5(gid, file, attributes=None, **_):
                           os.path.basename(file))
 
     with Outputs(fp, mode='r') as f:
-    with Outputs(fp, mode='r') as f:
         meta = f.meta.loc[gid]
         index = f.time_index
         dattr = f.attrs
@@ -189,7 +188,6 @@ def read_h5(gid, file, attributes=None, **_):
 
     weather_df = pd.DataFrame(index=index, columns=attributes)
     for dset in attributes:
-        with Outputs(fp, mode='r') as f:
         with Outputs(fp, mode='r') as f:
             weather_df[dset] = f[dset, :, gid]
 

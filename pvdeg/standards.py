@@ -81,7 +81,6 @@ def standoff(
     conf_inf= 'open_rack_glass_polymer',
     level=1,
     T98=None,
-    T98=None,
     x_0=6.1,
     wind_speed_factor=1):
     '''
