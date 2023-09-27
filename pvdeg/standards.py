@@ -152,9 +152,7 @@ def standoff(
 
     res = {'x': x,
            'T98_0': T98_0,
-           'T98_inf': T98_inf,
-           'latitude': meta['latitude'],
-           'longitude': meta['longitude']}
+           'T98_inf': T98_inf}
 
     df_res = pd.DataFrame.from_dict(res, orient='index').T
 

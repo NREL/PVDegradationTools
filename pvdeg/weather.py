@@ -264,6 +264,10 @@ def ini_h5_geospatial(fps):
 
     ds = xr.merge(dss)
     ds = xr.decode_cf(ds)
+
+    # Rechunk time axis
+    ds = ds.chunk(chunks={'time': -1, 'gid': ds.chunks['gid']})
+
     weather_ds = ds
 
     return weather_ds, meta_df
@@ -307,9 +311,6 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC = False, **_):
     else:
         hpc_fp = '/nrel/nsrdb/'
         hsds = True
-
-    if type(names) in [int, float]:
-        nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(int(names)))
 
     if type(names) in [int, float]:
         nsrdb_fp = os.path.join(hpc_fp, sat_map[satellite], '*_{}.h5'.format(int(names)))

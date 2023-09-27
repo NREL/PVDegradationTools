@@ -10,6 +10,10 @@ import dask.array as da
 import pandas as pd
 from dask.distributed import Client, LocalCluster
 
+import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.io.shapereader as shpreader
+
 
 def start_dask(hpc=None):
     """
@@ -97,7 +101,6 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     """
 
     df_weather = ds_gid.to_dataframe()
-
     df_res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
     ds_res = xr.Dataset.from_dataframe(df_res)
 
@@ -170,14 +173,15 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
 
     stacked = weather_ds.map_blocks(calc_block, kwargs=kwargs, template=template).compute()
 
-    lats = stacked.latitude.values.flatten()
-    lons = stacked.longitude.values.flatten()
-    #stacked = stacked.drop(['gid'])
-    stacked = stacked.drop_vars(['latitude', 'longitude'])
-    stacked.coords['gid'] = pd.MultiIndex.from_arrays([lats, lons], names=['latitude', 'longitude'])
+    # lats = stacked.latitude.values.flatten()
+    # lons = stacked.longitude.values.flatten()
+    stacked = stacked.drop(['gid'])
+    # stacked = stacked.drop_vars(['latitude', 'longitude'])
+    stacked.coords['gid'] = pd.MultiIndex.from_arrays([
+        meta_df['latitude'], meta_df['longitude']],
+        names=['latitude', 'longitude'])
 
-    res = stacked.unstack('gid', sparse=True)
-
+    res = stacked.unstack('gid') #, sparse=True
     return res
 
 
@@ -210,7 +214,7 @@ def output_template(ds_gids, shapes, attrs=dict(), add_dims=dict()):
     output_template = xr.Dataset(
         data_vars = {var: (dim, da.empty([dims_size[d] for d in dim])
                            ) for var, dim in shapes.items()},
-        coords = {'gid': ds_gids['gid']},
+        coords = {dim: ds_gids[dim] for dim in dims},
         attrs = attrs
     ).chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
@@ -227,16 +231,16 @@ def template_parameters(func):
         Dictionary of variable names and their associated dimensions.
     attrs : dict
         Dictionary of attributes for each variable (e.g. units).
+    add_dims : dict
+        Dictionary of dimensions to add to the output template.
     """
 
     if func == standards.standoff:
 
         shapes = {'x':        ('gid',),
-                'T98_inf':  ('gid',),
-                'T98_0':    ('gid',),
-                'latitude': ('gid',),
-                'longitude':('gid',),
-                }
+                  'T98_inf':  ('gid',),
+                  'T98_0':    ('gid',),
+                  }
 
         attrs = {'x' :      {'units': 'cm'},
                 'T98_0' :   {'units': 'Celsius'},
@@ -264,3 +268,44 @@ def template_parameters(func):
                   'add_dims': add_dims}
 
     return parameters
+
+
+def plot_USA(xr_res,
+             cmap='viridis',
+             vmin=None,
+             vmax=None,
+             title=None,
+             cb_title=None,
+             fp=None):
+
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1],
+                      projection=ccrs.LambertConformal(),
+                      frameon=False)
+    ax.patch.set_visible(False)
+    ax.set_extent([-120, -74, 22, 50], ccrs.Geodetic())
+
+    shapename = 'admin_1_states_provinces_lakes'
+    states_shp = shpreader.natural_earth(
+        resolution='110m', category='cultural', name=shapename)
+    ax.add_geometries(
+        shpreader.Reader(states_shp).geometries(),
+        ccrs.PlateCarree(), facecolor='w', edgecolor='gray')
+
+    cm = xr_res.plot(transform=ccrs.PlateCarree(),
+                zorder=10,
+                add_colorbar=False,
+                cmap=cmap,
+                vmin=vmin,
+                vmax=vmax,
+                subplot_kws={"projection": ccrs.LambertConformal(
+                central_longitude=-95, central_latitude=45)})
+
+    cb = plt.colorbar(cm, shrink=0.5)
+    cb.set_label(cb_title)
+    ax.set_title(title)
+
+    if fp is not None:
+        plt.savefig(fp, dpi=600)
+
+    return fig, ax
