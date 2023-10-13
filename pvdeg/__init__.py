@@ -7,6 +7,7 @@ from . import collection
 from . import degradation
 from . import design
 from . import fatigue
+from . import geospatial
 from . import humidity
 from . import letid
 from .scenario import Scenario
