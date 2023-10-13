@@ -48,18 +48,14 @@ def test_standoff():
 
     expected_result_l1 = {'x': 2.3835484140461736,
                           'T98_0': 79.03006155479213,
-                          'T98_inf': 51.11191792458173,
-                          'latitude': META['latitude'],
-                          'longitude': META['longitude']}
+                          'T98_inf': 51.11191792458173}
 
     df_expected_result_l1 = pd.DataFrame.from_dict(
         expected_result_l1, orient='index').T
 
     expected_result_l2 = {'x': -0.20832926385165268,
                           'T98_0': 79.03006155479213,
-                          'T98_inf': 51.11191792458173,
-                          'latitude': META['latitude'],
-                          'longitude': META['longitude']}
+                          'T98_inf': 51.11191792458173}
 
     df_expected_result_l2 = pd.DataFrame.from_dict(
         expected_result_l2, orient='index').T
