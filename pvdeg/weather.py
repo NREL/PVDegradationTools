@@ -44,7 +44,8 @@ def get(database, id=None, geospatial=False, **kwargs):
     """
 
 
-    META_MAP = {'elevation' : 'altitude'}
+    META_MAP = {'elevation' : 'altitude',
+                'Local Time Zone' : 'timezone'}
 
     if type(id) is tuple:
         location = id
@@ -117,6 +118,9 @@ def read(file_in, file_type, **kwargs):
         [psm3, tmy3, epw, h5]
     """
 
+    META_MAP = {'elevation' : 'altitude',
+            'Local Time Zone' : 'timezone'}
+
     supported = ['psm3','tmy3','epw','h5']
     file_type = file_type.upper()
 
@@ -135,6 +139,11 @@ def read(file_in, file_type, **kwargs):
 
     if not isinstance(meta, dict):
         meta = meta.to_dict()
+
+    # map meta-names as needed
+    for key in [*meta.keys()]:
+        if key in META_MAP.keys():
+                meta[META_MAP[key]] = meta.pop(key)
 
     return weather_df, meta
 
@@ -306,7 +315,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC = False, **_):
                'Americas' : 'current'}
 
     if NREL_HPC:
-        hpc_fp = '/datasets/NSRDB/'
+        hpc_fp = '/kfs2/pdatasets/NSRDB/'
         hsds = False
     else:
         hpc_fp = '/nrel/nsrdb/'

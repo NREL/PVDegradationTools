@@ -102,3 +102,6 @@ demo/logs/
 demo/old
 
 TEMP/
+
+# Slurm log files
+slurm-*.out
