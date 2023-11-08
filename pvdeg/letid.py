@@ -986,7 +986,7 @@ def calc_letid_outdoors(
     # Set up system, run pvlib.modelchain, and get the results we need: cell temp and injection
     lat = float(meta["latitude"])
     lon = float(meta["longitude"])
-    tz = meta["Local Time Zone"]
+    tz = meta["timezone"]
     elevation = meta["altitude"]
 
     if tilt is None:
@@ -1030,7 +1030,7 @@ def calc_letid_outdoors(
         {"Temperature": temperature, "Injection": injection}
     )  # create a DataFrame with cell temperature and injection
     timesteps.reset_index(inplace=True)  # reset the index so datetime is a column.
-    timesteps.rename(columns={"index": "Datetime"}, inplace=True)
+    timesteps.rename(columns={"index": "time"}, inplace=True)
     timesteps.reset_index(inplace=True, drop=True)
 
     # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
@@ -1139,7 +1139,7 @@ def calc_letid_outdoors(
             dN_Cdt = (k_BC * n_B * x_bc) - (k_CB * n_C)
 
             t_step = (
-                timesteps.at[index, "Datetime"] - timesteps.at[index - 1, "Datetime"]
+                timesteps.at[index, "time"] - timesteps.at[index - 1, "time"]
             ).total_seconds()
 
             # assign new defect state percentages
@@ -1155,6 +1155,8 @@ def calc_letid_outdoors(
 
     timesteps["tau"] = tau_now(tau_0, tau_deg, timesteps["NB"])
     timesteps = calc_device_params(timesteps, cell_area)
+
+    timesteps.set_index('time', inplace=True)
 
     return timesteps
 
