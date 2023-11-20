@@ -4,6 +4,7 @@ Collection of classes and functions for geospatial analysis.
 
 from . import standards
 from . import humidity
+from . import letid
 
 import xarray as xr
 import dask.array as da
@@ -39,20 +40,17 @@ def start_dask(hpc=None):
 
     .. code-block:: python
 
-        hpc = {'manager': 'slurm',
-               'n_jobs': 1,  # Max number of nodes used for parallel processing
-               'cores': 36,
-               'memory': '96GB',
-               'queue': 'debug',
-               'account': 'pvsoiling',
-               'walltime': '01:00:00',
-               'interface': 'ib0',
-               'processes': 18,
-               'local_directory': '/tmp/scratch',
-               'shared_temp_directory': '/scratch/mspringe',
-               'job_extra_directives': ['-o ./logs/slurm-%j.out'],
-               'silence_logs': 'error',
-               'death_timeout': '60',}
+        kestrel = {
+            'manager': 'slurm',
+            'n_jobs': 1,  # Max number of nodes used for parallel processing
+            'cores': 104,
+            'memory': '256GB',
+            'account': 'pvsoiling',
+            'walltime': '4:00:00',
+            'processes': 52,
+            'local_directory': '/tmp/scratch',
+            'job_extra_directives': ['-o ./logs/slurm-%j.out'],
+            'death_timeout': 600,}
 
     Returns
     -------
@@ -131,11 +129,14 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
         Dataset with results for a block of gids.
     """
 
-    res = weather_ds_block.groupby('gid').map(lambda ds_gid: calc_gid(
-        ds_gid=ds_gid,
-        meta_gid=future_meta_df.loc[ds_gid['gid'].values].to_dict(),
-        func=func,
-        **func_kwargs))
+    res = weather_ds_block.groupby('gid').map(
+        lambda ds_gid: calc_gid(
+            ds_gid=ds_gid,
+            meta_gid=future_meta_df.loc[ds_gid['gid'].values].to_dict(),
+            func=func,
+            **func_kwargs,
+        )
+    )
     return res
 
 
@@ -166,22 +167,22 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
         param = template_parameters(func)
         template = output_template(weather_ds, **param)
 
-    #future_meta_df = client.scatter(meta_df)
-    kwargs = {'func': func,
-              'future_meta_df': meta_df,
-              'func_kwargs': func_kwargs}
+    # future_meta_df = client.scatter(meta_df)
+    kwargs = {'func': func, 'future_meta_df': meta_df, 'func_kwargs': func_kwargs}
 
-    stacked = weather_ds.map_blocks(calc_block, kwargs=kwargs, template=template).compute()
+    stacked = weather_ds.map_blocks(
+        calc_block, kwargs=kwargs, template=template
+    ).compute()
 
     # lats = stacked.latitude.values.flatten()
     # lons = stacked.longitude.values.flatten()
     stacked = stacked.drop(['gid'])
     # stacked = stacked.drop_vars(['latitude', 'longitude'])
-    stacked.coords['gid'] = pd.MultiIndex.from_arrays([
-        meta_df['latitude'], meta_df['longitude']],
-        names=['latitude', 'longitude'])
+    stacked.coords['gid'] = pd.MultiIndex.from_arrays(
+        [meta_df['latitude'], meta_df['longitude']], names=['latitude', 'longitude']
+    )
 
-    res = stacked.unstack('gid') #, sparse=True
+    res = stacked.unstack('gid')  # , sparse=True
     return res
 
 
@@ -209,13 +210,15 @@ def output_template(ds_gids, shapes, attrs=dict(), add_dims=dict()):
         Template for output data.
     """
     dims = set([d for dim in shapes.values() for d in dim])
-    dims_size  = dict(ds_gids.dims) | add_dims
+    dims_size = dict(ds_gids.dims) | add_dims
 
     output_template = xr.Dataset(
-        data_vars = {var: (dim, da.empty([dims_size[d] for d in dim])
-                           ) for var, dim in shapes.items()},
-        coords = {dim: ds_gids[dim] for dim in dims},
-        attrs = attrs
+        data_vars={
+            var: (dim, da.empty([dims_size[d] for d in dim]))
+            for var, dim in shapes.items()
+        },
+        coords={dim: ds_gids[dim] for dim in dims},
+        attrs=attrs,
     ).chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
     return output_template
@@ -236,25 +239,45 @@ def template_parameters(func):
     """
 
     if func == standards.standoff:
+        shapes = {
+            'x': ('gid',),
+            'T98_inf': ('gid',),
+            'T98_0': ('gid',),
+        }
 
-        shapes = {'x':        ('gid',),
-                  'T98_inf':  ('gid',),
-                  'T98_0':    ('gid',),
-                  }
-
-        attrs = {'x' :      {'units': 'cm'},
-                'T98_0' :   {'units': 'Celsius'},
-                'T98_inf' : {'units': 'Celsius'}}
+        attrs = {
+            'x': {'units': 'cm'},
+            'T98_0': {'units': 'Celsius'},
+            'T98_inf': {'units': 'Celsius'},
+        }
 
         add_dims = {}
 
     elif func == humidity.module:
+        shapes = {
+            'RH_surface_outside': ('gid', 'time'),
+            'RH_front_encap': ('gid', 'time'),
+            'RH_back_encap': ('gid', 'time'),
+            'RH_backsheet': ('gid', 'time'),
+        }
 
-        shapes = {'RH_surface_outside': ('gid', 'time'),
-                  'RH_front_encap':     ('gid', 'time'),
-                  'RH_back_encap':      ('gid', 'time'),
-                  'RH_backsheet':       ('gid', 'time'),
-                 }
+        attrs = {}
+
+        add_dims = {}
+
+    elif func == letid.calc_letid_outdoors:
+        shapes = {'Temperature': ('gid', 'time'),
+                  'Injection': ('gid', 'time'),
+                  'NA': ('gid', 'time'),
+                  'NB': ('gid', 'time'),
+                  'NC': ('gid', 'time'),
+                  'tau': ('gid', 'time'),
+                  'Jsc': ('gid', 'time'),
+                  'Voc': ('gid', 'time'),
+                  'Isc': ('gid', 'time'),
+                  'FF': ('gid', 'time'),
+                  'Pmp': ('gid', 'time'),
+                  'Pmp_norm': ('gid', 'time')}
 
         attrs = {}
 
@@ -263,43 +286,43 @@ def template_parameters(func):
     else:
         raise ValueError(f"No preset output template for function {func}.")
 
-    parameters = {'shapes': shapes,
-                  'attrs': attrs,
-                  'add_dims': add_dims}
+    parameters = {'shapes': shapes, 'attrs': attrs, 'add_dims': add_dims}
 
     return parameters
 
 
-def plot_USA(xr_res,
-             cmap='viridis',
-             vmin=None,
-             vmax=None,
-             title=None,
-             cb_title=None,
-             fp=None):
-
+def plot_USA(
+    xr_res, cmap='viridis', vmin=None, vmax=None, title=None, cb_title=None, fp=None
+):
     fig = plt.figure()
-    ax = fig.add_axes([0, 0, 1, 1],
-                      projection=ccrs.LambertConformal(),
-                      frameon=False)
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
     ax.patch.set_visible(False)
     ax.set_extent([-120, -74, 22, 50], ccrs.Geodetic())
 
     shapename = 'admin_1_states_provinces_lakes'
     states_shp = shpreader.natural_earth(
-        resolution='110m', category='cultural', name=shapename)
+        resolution='110m', category='cultural', name=shapename
+    )
     ax.add_geometries(
         shpreader.Reader(states_shp).geometries(),
-        ccrs.PlateCarree(), facecolor='w', edgecolor='gray')
+        ccrs.PlateCarree(),
+        facecolor='w',
+        edgecolor='gray',
+    )
 
-    cm = xr_res.plot(transform=ccrs.PlateCarree(),
-                zorder=10,
-                add_colorbar=False,
-                cmap=cmap,
-                vmin=vmin,
-                vmax=vmax,
-                subplot_kws={"projection": ccrs.LambertConformal(
-                central_longitude=-95, central_latitude=45)})
+    cm = xr_res.plot(
+        transform=ccrs.PlateCarree(),
+        zorder=10,
+        add_colorbar=False,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        subplot_kws={
+            "projection": ccrs.LambertConformal(
+                central_longitude=-95, central_latitude=45
+            )
+        },
+    )
 
     cb = plt.colorbar(cm, shrink=0.5)
     cb.set_label(cb_title)
