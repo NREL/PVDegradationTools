@@ -27,10 +27,10 @@ def _avg_daily_temp_change(time_range, temp_cell):
         Average of Daily Maximum Temperature for 1-year (Celsius)
 
     """
-    
+
     if time_range.dtype == 'object':
         time_range = pd.to_datetime(time_range)
-    
+
     # Setup frame for vector processing
     timeAndTemp_df = pd.DataFrame(columns=['Cell Temperature'])
     timeAndTemp_df['Cell Temperature'] = temp_cell
@@ -111,7 +111,7 @@ def solder_fatigue(weather_df, meta,
     This function uses the default values for 60-min input intervals from Table 4 of the above
     paper. For other use cases, please refer to the paper for recommended values of C1 and
     the reversal temperature.
-    
+
     Parameters
     ------------
     weather_df : pd.dataframe
@@ -143,9 +143,9 @@ def solder_fatigue(weather_df, meta,
 
     """
 
-    # TODO this, and many other functions with temp_cell or temp_module would benefit from an 
+    # TODO this, and many other functions with temp_cell or temp_module would benefit from an
     # optional parameter "conf = 'open_rack_glass_glass' or equivalent"
-    
+
     # TODO Make this function have more utility.
     # People want to run all the scenarios from the bosco paper.
     # Currently have everything hard coded for hourly calculation
@@ -158,10 +158,10 @@ def solder_fatigue(weather_df, meta,
 
     if time_range is None:
         time_range = weather_df.index
-    
+
     if temp_cell is None:
         temp_cell = temperature.cell(weather_df, meta)
-    
+
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)
 
     temp_max_avg = convert_temperature(temp_max_avg, 'Celsius', 'Kelvin')

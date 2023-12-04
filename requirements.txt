@@ -1,6 +1,8 @@
 numpy
 numba
 pandas
+dask
+dask-jobqueue
 pvlib
 python-dateutil
 pytz
@@ -12,4 +14,9 @@ matplotlib
 jupyterlab
 notebook
 NREL-rex
-
+tables
+xarray
+netCDF4
+h5py
+h5netcdf
+cartopy
