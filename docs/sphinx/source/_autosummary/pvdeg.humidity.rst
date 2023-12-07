@@ -3,16 +3,16 @@
 
 .. automodule:: pvdeg.humidity
 
-   
-   
-   
 
-   
-   
+
+
+
+
+
    .. rubric:: Functions
 
    .. autosummary::
-   
+
       Ce_numba
       back_encap
       backsheet
@@ -23,16 +23,3 @@
       psat
       run_module
       surface_outside
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

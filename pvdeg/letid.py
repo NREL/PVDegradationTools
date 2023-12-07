@@ -1156,7 +1156,7 @@ def calc_letid_outdoors(
     timesteps["tau"] = tau_now(tau_0, tau_deg, timesteps["NB"])
     timesteps = calc_device_params(timesteps, cell_area)
 
-    timesteps.set_index('time', inplace=True)
+    timesteps.set_index("time", inplace=True)
 
     return timesteps
 

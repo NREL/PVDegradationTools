@@ -11,15 +11,17 @@ from rex import Outputs
 from pathlib import Path
 from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
-#from gaps import ProjectPoints
+
+# from gaps import ProjectPoints
 
 from . import temperature
 from . import spectral
 from . import utilities
 from . import weather
 
+
 def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
-    '''
+    """
     Calculate a minimum installation standoff distance for rooftop mounded PV systems for
     a given levl according to IEC TS 63126 or the standoff to achieve a given 98ᵗʰ percentile
     temperature. If the given T₉₈ is that for a specific system, then it is a calculation of
@@ -45,7 +47,7 @@ def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
     ----------
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
-    '''
+    """
 
     if T98 is None:
         if level == 1:
@@ -53,15 +55,15 @@ def eff_gap(T_0, T_inf, level=1, T98=None, x_0=6.1):
         elif level == 2:
             T98 = 80
 
-    T98_0 = T_0.quantile(q=0.98, interpolation='linear')
-    T98_inf = T_inf.quantile(q=0.98, interpolation='linear')
+    T98_0 = T_0.quantile(q=0.98, interpolation="linear")
+    T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     try:
-        x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+        x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
     except RuntimeWarning as e:
         x = np.nan
     try:
-        x = -x_0 * np.log(1-(T98_0-T98)/(T98_0-T98_inf))
+        x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
     except RuntimeWarning as e:
         x = np.nan
 
@@ -74,16 +76,17 @@ def standoff(
     weather_kwarg=None,
     tilt=None,
     azimuth=180,
-    sky_model='isotropic',
-    temp_model='sapm',
-    module_type='glass_polymer', # self.module
-    conf_0= 'insulated_back_glass_polymer',
-    conf_inf= 'open_rack_glass_polymer',
+    sky_model="isotropic",
+    temp_model="sapm",
+    module_type="glass_polymer",  # self.module
+    conf_0="insulated_back_glass_polymer",
+    conf_inf="open_rack_glass_polymer",
     level=1,
     T98=None,
     x_0=6.1,
-    wind_speed_factor=1):
-    '''
+    wind_speed_factor=1,
+):
+    """
     Calculate a minimum standoff distance for roof mounded PV systems.
 
     Parameters
@@ -124,41 +127,47 @@ def standoff(
     ----------
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
-    '''
+    """
 
-    parameters = ['temp_air', 'wind_speed', 'dhi', 'ghi', 'dni']
+    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
         weather_df = weather_df[parameters].compute()
-        weather_df.set_index('time', inplace=True)
+        weather_df.set_index("time", inplace=True)
     elif isinstance(weather_df, pd.DataFrame):
         weather_df = weather_df[parameters]
     elif weather_df is None:
         weather_df, meta = weather.get(**weather_kwarg)
 
-    if module_type == 'glass_polymer':
-        conf_0 = 'insulated_back_glass_polymer'
-        conf_inf = 'open_rack_glass_polymer'
-    elif module_type == 'glass_glass':
-        conf_0 = 'close_mount_glass_glass'
-        conf_inf = 'open_rack_glass_glass'
+    if module_type == "glass_polymer":
+        conf_0 = "insulated_back_glass_polymer"
+        conf_inf = "open_rack_glass_polymer"
+    elif module_type == "glass_glass":
+        conf_0 = "close_mount_glass_glass"
+        conf_inf = "open_rack_glass_glass"
 
     solar_position = spectral.solar_position(weather_df, meta)
-    poa = spectral.poa_irradiance(weather_df, meta, sol_position=solar_position, tilt=tilt,
-                                  azimuth=azimuth, sky_model=sky_model)
-    T_0 = temperature.module(weather_df, meta, poa, temp_model, conf_0, wind_speed_factor)
-    T_inf = temperature.module(weather_df, meta, poa, temp_model, conf_inf, wind_speed_factor)
+    poa = spectral.poa_irradiance(
+        weather_df,
+        meta,
+        sol_position=solar_position,
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+    )
+    T_0 = temperature.module(
+        weather_df, meta, poa, temp_model, conf_0, wind_speed_factor
+    )
+    T_inf = temperature.module(
+        weather_df, meta, poa, temp_model, conf_inf, wind_speed_factor
+    )
     x, T98_0, T98_inf = eff_gap(T_0, T_inf, level=level, T98=T98, x_0=x_0)
 
-    res = {'x': x,
-           'T98_0': T98_0,
-           'T98_inf': T98_inf}
+    res = {"x": x, "T98_0": T98_0, "T98_inf": T98_inf}
 
-    df_res = pd.DataFrame.from_dict(res, orient='index').T
-
+    df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
-
 
 
 # def run_calc_standoff(

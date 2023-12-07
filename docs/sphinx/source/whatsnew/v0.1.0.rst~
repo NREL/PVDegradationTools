@@ -3,7 +3,7 @@
 v0.1.0 (26 / 06 / 2020)
 =======================
 
-First official release. Pip Install enabled, as well as versioneer. 
+First official release. Pip Install enabled, as well as versioneer.
 
 * Re-structured folders to include Documentation, Versioning and Setup.
 * main.py populated with functions developed

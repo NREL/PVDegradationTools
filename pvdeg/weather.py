@@ -45,7 +45,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
     """
 
-    META_MAP = {'elevation': 'altitude', 'Local Time Zone': 'timezone'}
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
 
     if type(id) is tuple:
         location = id
@@ -58,30 +58,30 @@ def get(database, id=None, geospatial=False, **kwargs):
     elif id is None:
         if not geospatial:
             raise TypeError(
-                'Specify location via tuple (latitude, longitude), or gid integer.'
+                "Specify location via tuple (latitude, longitude), or gid integer."
             )
 
     if not geospatial:
         # TODO: decide wether to follow NSRDB or pvlib conventions...
         # e.g. temp_air vs. air_temperature
         # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
-        if database == 'NSRDB':
+        if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
-        elif database == 'PVGIS':
+        elif database == "PVGIS":
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
                 latitude=lat, longitude=lon, map_variables=True, **kwargs
             )
-            meta = meta['location']
-        elif database == 'PSM3':
+            meta = meta["location"]
+        elif database == "PSM3":
             weather_df, meta = iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
-        elif database == 'local':
-            fp = kwargs.pop('file')
+        elif database == "local":
+            fp = kwargs.pop("file")
             fn, fext = os.path.splitext(fp)
             weather_df, meta = read(gid=gid, file_in=fp, file_type=fext[1:], **kwargs)
         else:
-            raise NameError('Weather database not found.')
+            raise NameError("Weather database not found.")
 
-        if 'relative_humidity' not in weather_df.columns:
+        if "relative_humidity" not in weather_df.columns:
             print('Column "relative_humidity" not found in DataFrame. Calculating...')
             weather_df = humidity._ambient(weather_df)
 
@@ -93,13 +93,13 @@ def get(database, id=None, geospatial=False, **kwargs):
         return weather_df, meta
 
     elif geospatial:
-        if database == 'NSRDB':
+        if database == "NSRDB":
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
-        elif database == 'local':
-            fp = kwargs.pop('file')
+        elif database == "local":
+            fp = kwargs.pop("file")
             weather_ds, meta_df = ini_h5_geospatial(fp)
         else:
-            raise NameError(f'Geospatial analysis not implemented for {database}.')
+            raise NameError(f"Geospatial analysis not implemented for {database}.")
 
         return weather_ds, meta_df
 
@@ -119,23 +119,23 @@ def read(file_in, file_type, **kwargs):
         [psm3, tmy3, epw, h5]
     """
 
-    META_MAP = {'elevation': 'altitude', 'Local Time Zone': 'timezone'}
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
 
-    supported = ['psm3', 'tmy3', 'epw', 'h5']
+    supported = ["psm3", "tmy3", "epw", "h5"]
     file_type = file_type.upper()
 
-    if file_type in ['PSM3', 'PSM']:
+    if file_type in ["PSM3", "PSM"]:
         weather_df, meta = iotools.read_psm3(filename=file_in, map_variables=True)
-    elif file_type in ['TMY3', 'TMY']:
+    elif file_type in ["TMY3", "TMY"]:
         weather_df, meta = iotools.read_tmy3(
             filename=file_in
         )  # map variable not worki - check pvlib for map_variables
-    elif file_type == 'EPW':
+    elif file_type == "EPW":
         weather_df, meta = iotools.read_epw(filename=file_in)
-    elif file_type == 'H5':
+    elif file_type == "H5":
         weather_df, meta = read_h5(file=file_in, **kwargs)
     else:
-        print(f'File-Type not recognized. supported types:\n{supported}')
+        print(f"File-Type not recognized. supported types:\n{supported}")
 
     if not isinstance(meta, dict):
         meta = meta.to_dict()
@@ -179,7 +179,7 @@ def read_h5(gid, file, attributes=None, **_):
     else:
         fp = os.path.join(os.path.dirname(__file__), os.path.basename(file))
 
-    with Outputs(fp, mode='r') as f:
+    with Outputs(fp, mode="r") as f:
         meta = f.meta.loc[gid]
         index = f.time_index
         dattr = f.attrs
@@ -188,14 +188,14 @@ def read_h5(gid, file, attributes=None, **_):
     if attributes == None:
         attributes = list(dattr.keys())
         try:
-            attributes.remove('meta')
-            attributes.remove('tmy_year_short')
+            attributes.remove("meta")
+            attributes.remove("tmy_year_short")
         except ValueError:
             pass
 
     weather_df = pd.DataFrame(index=index, columns=attributes)
     for dset in attributes:
-        with Outputs(fp, mode='r') as f:
+        with Outputs(fp, mode="r") as f:
             weather_df[dset] = f[dset, :, gid]
 
     return weather_df, meta.to_dict()
@@ -224,9 +224,9 @@ def ini_h5_geospatial(fps):
     """
     dss = []
     for i, fp in enumerate(fps):
-        hf = h5py.File(fp, 'r')
+        hf = h5py.File(fp, "r")
         attr = list(hf)
-        attr_to_read = [elem for elem in attr if elem not in ['meta', 'time_index']]
+        attr_to_read = [elem for elem in attr if elem not in ["meta", "time_index"]]
 
         chunks = []
         shapes = []
@@ -237,40 +237,40 @@ def ini_h5_geospatial(fps):
         shapes = min(set(shapes))
 
         if i == 0:
-            time_index = pd.to_datetime(hf['time_index'][...].astype(str)).values
-            meta_df = pd.read_hdf(fp, key='meta')
-            coords = {'gid': meta_df.index.values, 'time': time_index}
-            coords_len = {'time': time_index.shape[0], 'gid': meta_df.shape[0]}
+            time_index = pd.to_datetime(hf["time_index"][...].astype(str)).values
+            meta_df = pd.read_hdf(fp, key="meta")
+            coords = {"gid": meta_df.index.values, "time": time_index}
+            coords_len = {"time": time_index.shape[0], "gid": meta_df.shape[0]}
 
         ds = xr.open_dataset(
             fp,
-            engine='h5netcdf',
-            phony_dims='sort',
-            chunks={'phony_dim_0': chunks[0], 'phony_dim_1': chunks[1]},
-            drop_variables=['time_index', 'meta'],
+            engine="h5netcdf",
+            phony_dims="sort",
+            chunks={"phony_dim_0": chunks[0], "phony_dim_1": chunks[1]},
+            drop_variables=["time_index", "meta"],
             mask_and_scale=False,
             decode_cf=True,
         )
 
         for var in ds.data_vars:
-            if hasattr(getattr(ds, var), 'psm_scale_factor'):
+            if hasattr(getattr(ds, var), "psm_scale_factor"):
                 scale_factor = 1 / ds[var].psm_scale_factor
-                getattr(ds, var).attrs['scale_factor'] = scale_factor
+                getattr(ds, var).attrs["scale_factor"] = scale_factor
 
         if tuple(coords_len.values()) == (
-            ds.dims['phony_dim_0'],
-            ds.dims['phony_dim_1'],
+            ds.dims["phony_dim_0"],
+            ds.dims["phony_dim_1"],
         ):
-            rename = {'phony_dim_0': 'time', 'phony_dim_1': 'gid'}
+            rename = {"phony_dim_0": "time", "phony_dim_1": "gid"}
         elif tuple(coords_len.values()) == (
-            ds.dims['phony_dim_1'],
-            ds.dims['phony_dim_0'],
+            ds.dims["phony_dim_1"],
+            ds.dims["phony_dim_0"],
         ):
-            rename = {'phony_dim_0': 'gid', 'phony_dim_1': 'time'}
+            rename = {"phony_dim_0": "gid", "phony_dim_1": "time"}
         else:
-            raise ValueError('Dimensions do not match')
+            raise ValueError("Dimensions do not match")
         ds = ds.rename(
-            {'phony_dim_0': rename['phony_dim_0'], 'phony_dim_1': rename['phony_dim_1']}
+            {"phony_dim_0": rename["phony_dim_0"], "phony_dim_1": rename["phony_dim_1"]}
         )
         ds = ds.assign_coords(coords)
 
@@ -284,7 +284,7 @@ def ini_h5_geospatial(fps):
     ds = xr.decode_cf(ds)
 
     # Rechunk time axis
-    ds = ds.chunk(chunks={'time': -1, 'gid': ds.chunks['gid']})
+    ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
 
@@ -317,29 +317,29 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
     """
 
     sat_map = {
-        'GOES': 'full_disc',
-        'METEOSAT': 'meteosat',
-        'Himawari': 'himawari',
-        'SUNY': 'india',
-        'CONUS': 'conus',
-        'Americas': 'current',
+        "GOES": "full_disc",
+        "METEOSAT": "meteosat",
+        "Himawari": "himawari",
+        "SUNY": "india",
+        "CONUS": "conus",
+        "Americas": "current",
     }
 
     if NREL_HPC:
-        hpc_fp = '/kfs2/pdatasets/NSRDB/'
+        hpc_fp = "/kfs2/pdatasets/NSRDB/"
         hsds = False
     else:
-        hpc_fp = '/nrel/nsrdb/'
+        hpc_fp = "/nrel/nsrdb/"
         hsds = True
 
     if type(names) in [int, float]:
         nsrdb_fp = os.path.join(
-            hpc_fp, sat_map[satellite], '*_{}.h5'.format(int(names))
+            hpc_fp, sat_map[satellite], "*_{}.h5".format(int(names))
         )
         nsrdb_fnames = glob.glob(nsrdb_fp)
     else:
         nsrdb_fp = os.path.join(
-            hpc_fp, sat_map[satellite], '*_{}*.h5'.format(names.lower())
+            hpc_fp, sat_map[satellite], "*_{}*.h5".format(names.lower())
         )
         nsrdb_fnames = glob.glob(nsrdb_fp)
 
@@ -391,9 +391,9 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-    DSET_MAP = {'air_temperature': 'temp_air', 'Relative Humidity': 'relative_humidity'}
+    DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
-    META_MAP = {'elevation': 'altitude'}
+    META_MAP = {"elevation": "altitude"}
 
     if not geospatial:
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
@@ -404,7 +404,7 @@ def get_NSRDB(
                 if i == 0:
                     if gid == None:  # TODO: add exception handling
                         gid = f.lat_lon_gid(location)
-                    meta = f['meta', gid].iloc[0]
+                    meta = f["meta", gid].iloc[0]
                     index = f.time_index
 
                 lattr = f.datasets
@@ -414,8 +414,8 @@ def get_NSRDB(
         if attributes == None:
             attributes = list(dattr.keys())
             try:
-                attributes.remove('meta')
-                attributes.remove('tmy_year_short')
+                attributes.remove("meta")
+                attributes.remove("tmy_year_short")
             except ValueError:
                 pass
 
@@ -489,7 +489,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
     """
 
     if len(time_series) % 8760 != 0:
-        raise ValueError('Length of time_series must be a multiple of 8760')
+        raise ValueError("Length of time_series must be a multiple of 8760")
 
     tz = time_series.index.tz
     time_series = time_series.tz_localize(
@@ -517,7 +517,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                                     year=year, month=2, day=29, minute=start.minute
                                 ),
                                 end=datetime.datetime(year=year, month=3, day=1),
-                                freq='H',
+                                freq="H",
                             ),
                             columns=time_series.columns,
                         ),
@@ -549,7 +549,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                                     year=year, month=2, day=29, minute=start.minute
                                 ),
                                 end=datetime.datetime(year=year, month=3, day=1),
-                                freq='H',
+                                freq="H",
                             ),
                             columns=time_series.columns,
                         ),
@@ -573,7 +573,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
 
 
 def is_leap_year(year):
-    '''Returns True if year is a leap year'''
+    """Returns True if year is a leap year"""
     if year % 4 != 0:
         return False
     elif year % 100 != 0:

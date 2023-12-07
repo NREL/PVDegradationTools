@@ -25,11 +25,11 @@ def gid_downsampling(meta, n):
         List of GIDs for the downsampled NSRDB meta data
     """
 
-    lon_sub = sorted(meta['longitude'].unique())[0 : -1 : max(1, 2 * n)]
-    lat_sub = sorted(meta['latitude'].unique())[0 : -1 : max(1, 2 * n)]
+    lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
+    lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
 
     gids_sub = meta[
-        (meta['longitude'].isin(lon_sub)) & (meta['latitude'].isin(lat_sub))
+        (meta["longitude"].isin(lon_sub)) & (meta["latitude"].isin(lat_sub))
     ].index.values
 
     meta_sub = meta.loc[gids_sub]
@@ -52,10 +52,10 @@ def meta_as_dict(rec):
         dictionary of numpy structured array
     """
 
-    return {name:rec[name].item() for name in rec.dtype.names}
+    return {name: rec[name].item() for name in rec.dtype.names}
 
 
-def get_kinetics(name=None, fname='kinetic_parameters.json'):
+def get_kinetics(name=None, fname="kinetic_parameters.json"):
     """
     Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
 
@@ -85,11 +85,11 @@ def get_kinetics(name=None, fname='kinetic_parameters.json'):
 
 def write_gids(
     nsrdb_fp,
-    region='Colorado',
-    region_col='state',
+    region="Colorado",
+    region_col="state",
     lat_long=None,
     gids=None,
-    out_fn='gids',
+    out_fn="gids",
 ):
     """
     Generate a .CSV file containing the GIDs for the spatial test range.
@@ -125,8 +125,8 @@ def write_gids(
             else:
                 gids = f.region_gids(region=region, region_col=region_col)
 
-    file_out = f'{out_fn}.csv'
-    df_gids = pd.DataFrame(gids, columns=['gid'])
+    file_out = f"{out_fn}.csv"
+    df_gids = pd.DataFrame(gids, columns=["gid"])
     df_gids.to_csv(file_out, index=False)
 
     return file_out
@@ -147,70 +147,70 @@ def _get_state(id):
         full name of US state (example: Colorado, Arizona, Maryland)
     """
     state_dict = {
-        'AK': 'Alaska',
-        'AL': 'Alabama',
-        'AR': 'Arkansas',
-        'AS': 'American Samoa',
-        'AZ': 'Arizona',
-        'CA': 'California',
-        'CO': 'Colorado',
-        'CT': 'Connecticut',
-        'DC': 'District of Columbia',
-        'DE': 'Delaware',
-        'FL': 'Florida',
-        'GA': 'Georgia',
-        'GU': 'Guam',
-        'HI': 'Hawaii',
-        'IA': 'Iowa',
-        'ID': 'Idaho',
-        'IL': 'Illinois',
-        'IN': 'Indiana',
-        'KS': 'Kansas',
-        'KY': 'Kentucky',
-        'LA': 'Louisiana',
-        'MA': 'Massachusetts',
-        'MD': 'Maryland',
-        'ME': 'Maine',
-        'MI': 'Michigan',
-        'MN': 'Minnesota',
-        'MO': 'Missouri',
-        'MP': 'Northern Mariana Islands',
-        'MS': 'Mississippi',
-        'MT': 'Montana',
-        'NA': 'National',
-        'NC': 'North Carolina',
-        'ND': 'North Dakota',
-        'NE': 'Nebraska',
-        'NH': 'New Hampshire',
-        'NJ': 'New Jersey',
-        'NM': 'New Mexico',
-        'NV': 'Nevada',
-        'NY': 'New York',
-        'OH': 'Ohio',
-        'OK': 'Oklahoma',
-        'OR': 'Oregon',
-        'PA': 'Pennsylvania',
-        'PR': 'Puerto Rico',
-        'RI': 'Rhode Island',
-        'SC': 'South Carolina',
-        'SD': 'South Dakota',
-        'TN': 'Tennessee',
-        'TX': 'Texas',
-        'UT': 'Utah',
-        'VA': 'Virginia',
-        'VI': 'Virgin Islands',
-        'VT': 'Vermont',
-        'WA': 'Washington',
-        'WI': 'Wisconsin',
-        'WV': 'West Virginia',
-        'WY': 'Wyoming',
+        "AK": "Alaska",
+        "AL": "Alabama",
+        "AR": "Arkansas",
+        "AS": "American Samoa",
+        "AZ": "Arizona",
+        "CA": "California",
+        "CO": "Colorado",
+        "CT": "Connecticut",
+        "DC": "District of Columbia",
+        "DE": "Delaware",
+        "FL": "Florida",
+        "GA": "Georgia",
+        "GU": "Guam",
+        "HI": "Hawaii",
+        "IA": "Iowa",
+        "ID": "Idaho",
+        "IL": "Illinois",
+        "IN": "Indiana",
+        "KS": "Kansas",
+        "KY": "Kentucky",
+        "LA": "Louisiana",
+        "MA": "Massachusetts",
+        "MD": "Maryland",
+        "ME": "Maine",
+        "MI": "Michigan",
+        "MN": "Minnesota",
+        "MO": "Missouri",
+        "MP": "Northern Mariana Islands",
+        "MS": "Mississippi",
+        "MT": "Montana",
+        "NA": "National",
+        "NC": "North Carolina",
+        "ND": "North Dakota",
+        "NE": "Nebraska",
+        "NH": "New Hampshire",
+        "NJ": "New Jersey",
+        "NM": "New Mexico",
+        "NV": "Nevada",
+        "NY": "New York",
+        "OH": "Ohio",
+        "OK": "Oklahoma",
+        "OR": "Oregon",
+        "PA": "Pennsylvania",
+        "PR": "Puerto Rico",
+        "RI": "Rhode Island",
+        "SC": "South Carolina",
+        "SD": "South Dakota",
+        "TN": "Tennessee",
+        "TX": "Texas",
+        "UT": "Utah",
+        "VA": "Virginia",
+        "VI": "Virgin Islands",
+        "VT": "Vermont",
+        "WA": "Washington",
+        "WI": "Wisconsin",
+        "WV": "West Virginia",
+        "WY": "Wyoming",
     }
     state_name = state_dict[id]
     return state_name
 
 
-def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
-    '''
+def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
+    """
     Read a older TMY-like weather file and convert to h5 for use in pvdeg
 
     TODO: figure out scale_facator and np.int32 for smaller file
@@ -222,20 +222,20 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
         full file path to existing weather file
     file_out : (str, path_obj)
         full file path and name of file to create.
-    '''
+    """
     from pvlib import iotools
 
     src_data, src_meta = iotools.tmy.read_tmy3(file_in, coerce_year=2023)
 
     save_cols = {
-        'DNI': 'dni',
-        'DHI': 'dhi',
-        'GHI': 'ghi',
-        'DryBulb': 'temp_air',
-        'DewPoint': 'dew_point',
-        'RHum': 'relative_humidity',
-        'Wspd': 'wind_speed',
-        'Alb': 'albedo',
+        "DNI": "dni",
+        "DHI": "dhi",
+        "GHI": "ghi",
+        "DryBulb": "temp_air",
+        "DewPoint": "dew_point",
+        "RHum": "relative_humidity",
+        "Wspd": "wind_speed",
+        "Alb": "albedo",
     }
 
     df_new = src_data[save_cols.keys()].copy()
@@ -243,16 +243,16 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
     time_index = df_new.index
 
     meta = {
-        'latitude': [src_meta['latitude']],
-        'longitude': [src_meta['longitude']],
-        'elevation': [src_meta['altitude']],
-        'timezone': [src_meta['TZ']],
-        'country': ['United States'],
-        'state': [_get_state(src_meta['State'])],
+        "latitude": [src_meta["latitude"]],
+        "longitude": [src_meta["longitude"]],
+        "elevation": [src_meta["altitude"]],
+        "timezone": [src_meta["TZ"]],
+        "country": ["United States"],
+        "state": [_get_state(src_meta["State"])],
     }
     meta = pd.DataFrame(meta)
 
-    with Outputs(file_out, 'w') as f:
+    with Outputs(file_out, "w") as f:
         f.meta = meta
         f.time_index = time_index
 
@@ -261,12 +261,12 @@ def convert_tmy(file_in, file_out='h5_from_tmy.h5'):
             h5_file=file_out,
             dset_name=col,
             dset_data=df_new[col].values,
-            attrs={'scale_factor': 100},
+            attrs={"scale_factor": 100},
             dtype=np.int64,
         )
 
 
-def _read_material(name, fname='materials.json'):
+def _read_material(name, fname="materials.json"):
     """
     read a material from materials.json and return the parameter dictionary
 
@@ -306,9 +306,9 @@ def _add_material(
     Eap=None,
     Po=None,
     fickian=True,
-    fname='materials.json',
+    fname="materials.json",
 ):
-    '''
+    """
     Add a new material to the materials.json database. Check the parameters for specific units.
     If material already exists, parameters will be updated.
 
@@ -334,7 +334,7 @@ def _add_material(
         Permeability Prefactor [g*mm/m^2/day] (unused)
     fickian : (boolean)
         I have no idea what this means (unused)
-    '''
+    """
 
     # TODO: test then delete commented code
     # root = os.path.realpath(__file__)
@@ -343,21 +343,21 @@ def _add_material(
     fpath = os.path.join(DATA_LIBRARY, fname)
 
     material_dict = {
-        'alias': alias,
-        'Fickian': fickian,
-        'Ead': Ead,
-        'Do': Do,
-        'Eas': Eas,
-        'So': So,
-        'Eap': Eap,
-        'Po': Po,
+        "alias": alias,
+        "Fickian": fickian,
+        "Ead": Ead,
+        "Do": Do,
+        "Eas": Eas,
+        "So": So,
+        "Eap": Eap,
+        "Po": Po,
     }
 
     with open(fpath) as f:
         data = json.load(f)
     data.update({name: material_dict})
 
-    with open(fpath, 'w') as f:
+    with open(fpath, "w") as f:
         json.dump(data, f, indent=4)
 
 
@@ -380,11 +380,11 @@ def quantile_df(file, q):
     """
 
     with Outputs(file, mode="r") as out:
-        res = out['meta'][['latitude', 'longitude']]
+        res = out["meta"][["latitude", "longitude"]]
         for key in out.attrs.keys():
-            if key not in ['meta', 'time_index']:
+            if key not in ["meta", "time_index"]:
                 for i, cor in res.iterrows():
-                    quantile = np.quantile(out[key, :, i], q=q, interpolation='linear')
+                    quantile = np.quantile(out[key, :, i], q=q, interpolation="linear")
                     res.loc[i, key] = quantile
     return res
 
@@ -407,10 +407,10 @@ def ts_gid_df(file, gid):
     """
 
     with Outputs(file, mode="r") as out:
-        res = pd.DataFrame(index=out['time_index'])
-        meta = out['meta'][['latitude', 'longitude']]
+        res = pd.DataFrame(index=out["time_index"])
+        meta = out["meta"][["latitude", "longitude"]]
         for key in out.attrs.keys():
-            if key not in ['meta', 'time_index']:
+            if key not in ["meta", "time_index"]:
                 res[key] = out[key, :, gid]
                 res.gid = gid
                 res.lat = meta.latitude[gid]

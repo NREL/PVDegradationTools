@@ -4,10 +4,11 @@ from datetime import date
 from datetime import datetime as dt
 import os
 from pvdeg import utilities as utils
-import pvdeg 
+import pvdeg
 import json
 
-#TODO: add functions...
+# TODO: add functions...
+
 
 class Scenario:
     """
@@ -16,8 +17,16 @@ class Scenario:
     Scenario Name, Path, Geographic Location, Module Type, Racking Type
     """
 
-    def __init__(self, name=None, path=None, gids=None, modules=[], pipeline=[],
-                 hpc=False, file=None) -> None:
+    def __init__(
+        self,
+        name=None,
+        path=None,
+        gids=None,
+        modules=[],
+        pipeline=[],
+        hpc=False,
+        file=None,
+    ) -> None:
         """
         Initialize the degradation scenario object.
 
@@ -38,16 +47,16 @@ class Scenario:
             Full file path to a pre-generated Scenario object. If specified, all other parameters
             will be ignored and taken from the .json file.
         """
-        
+
         if file is not None:
-            with open(file,'r') as f:
+            with open(file, "r") as f:
                 data = json.load()
-            name = data['name']
-            path = data['path']
-            modules = data['modules']
-            gids = data['gids']
-            pipeline = data['pipeline']
-        
+            name = data["name"]
+            path = data["path"]
+            modules = data["modules"]
+            gids = data["gids"]
+            pipeline = data["pipeline"]
+
         self.name = name
         self.path = path
         self.modules = modules
@@ -61,13 +70,14 @@ class Scenario:
         self.name = name
 
         if path is None:
-            self.path = os.path.join(os.getcwd(),f'pvd_job_{self.name}')
+            self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
             if not os.path.exists(self.path):
                 os.makedirs(self.path)
         os.chdir(self.path)
-    
-    def addLocation(self, weather_fp=None, region=None, region_col='state',
-                    lat_long=None, gids=None):
+
+    def addLocation(
+        self, weather_fp=None, region=None, region_col="state", lat_long=None, gids=None
+    ):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
         Scenario dictionary. This can be done in three ways: Pass (region, region_col) for gid list,
@@ -84,30 +94,36 @@ class Scenario:
         lat : (tuple - float)
             latitute and longitude of a single location
         """
-        
+
         if self.gids is not None:
-            print('Scenario already has designated project points.\nNothing has been added.')
+            print(
+                "Scenario already has designated project points.\nNothing has been added."
+            )
             print(self.gids)
             return
 
         if not weather_fp:
-            weather_fp = r'/datasets/NSRDB/current/nsrdb_tmy-2021.h5'
-        
-        file_name = f'gids_{self.name}'
-        gids_path = utils.write_gids(weather_fp,
-                                     region=region,
-                                     region_col=region_col,
-                                     lat_long=lat_long,
-                                     gids=gids,
-                                     out_fn=file_name)
-       
+            weather_fp = r"/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
+
+        file_name = f"gids_{self.name}"
+        gids_path = utils.write_gids(
+            weather_fp,
+            region=region,
+            region_col=region_col,
+            lat_long=lat_long,
+            gids=gids,
+            out_fn=file_name,
+        )
+
         self.gids = gids_path
-        print(f'Location Added - {self.gids}')
-    
-    def addModule(self,
-                  module_name,
-                  racking='open_rack_glass_polymer', #move ?? split RACKING_CONSTRUCTION
-                  material='EVA'):
+        print(f"Location Added - {self.gids}")
+
+    def addModule(
+        self,
+        module_name,
+        racking="open_rack_glass_polymer",  # move ?? split RACKING_CONSTRUCTION
+        material="EVA",
+    ):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
         the given scenario.
@@ -130,47 +146,57 @@ class Scenario:
         try:
             mat_params = utils._read_material(name=material)
         except:
-            print('Material Not Found - No module added to scenario.')
-            print('If you need to add a custom material, use .add_material()')
+            print("Material Not Found - No module added to scenario.")
+            print("If you need to add a custom material, use .add_material()")
             return
 
         # remove module if found in instance list
         for i in range(self.modules.__len__()):
-            if self.modules[i]['module_name'] == module_name:
+            if self.modules[i]["module_name"] == module_name:
                 print(f'WARNING - Module already found by name "{module_name}"')
-                print('Module will be replaced with new instance.')
+                print("Module will be replaced with new instance.")
                 self.modules.pop(i)
-        
+
         # generate temperature model params
         # TODO: move to temperature based functions
         # temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
-            
+
         # add the module and parameters
-        self.modules.append({'module_name':module_name,
-                             'material_params':mat_params})
+        self.modules.append({"module_name": module_name, "material_params": mat_params})
         print(f'Module "{module_name}" added.')
 
-    def add_material(self,name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True):
+    def add_material(
+        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True
+    ):
         """
         add a new material type to master list
         """
-        utils._add_material(name=name, alias=alias,
-                            Ead=Ead, Eas=Eas, So=So,
-                            Do=Do, Eap=Eap, Po=Po, fickian=fickian)
-        print('Material has been added.')
-        print('To add the material as a module in your current scene, run .addModule()')
+        utils._add_material(
+            name=name,
+            alias=alias,
+            Ead=Ead,
+            Eas=Eas,
+            So=So,
+            Do=Do,
+            Eap=Eap,
+            Po=Po,
+            fickian=fickian,
+        )
+        print("Material has been added.")
+        print("To add the material as a module in your current scene, run .addModule()")
 
     def viewScenario(self):
-        '''
+        """
         Print all scenario information currently stored
-        '''
+        """
 
         import pprint
-        pp = pprint.PrettyPrinter(indent=4,sort_dicts=False)
-        print(f'Name : {self.name}')
-        print(f'pipeline: {self.pipeline}')
-        print(f'gid file : {self.gids}')
-        print('test modules :')
+
+        pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
+        print(f"Name : {self.name}")
+        print(f"pipeline: {self.pipeline}")
+        print(f"gid file : {self.gids}")
+        print("test modules :")
         for mod in self.modules:
             pp.pprint(mod)
         return
@@ -187,7 +213,7 @@ class Scenario:
             The name of the requested pvdeg function. Do not include the class.
         func_params : (dict)
             The required parameters to run the requested pvdeg function
-        
+
         Returns:
         --------
         func_name : (str)
@@ -195,30 +221,31 @@ class Scenario:
         """
 
         _func, reqs = pvdeg.Scenario._verify_function(func_name)
-        
+
         if _func == None:
             print(f'FAILED: Requested function "{func_name}" not found')
-            print('Function has not been added to pipeline.')
+            print("Function has not been added to pipeline.")
             return None
-        
-        if not all( x in func_params for x in reqs):
-            print(f'FAILED: Requestion function {func_name} did not receive enough parameters')
-            print(f'Requestion function: \n {_func} \n ---')
-            print(f'Required Parameters: \n {reqs} \n ---')
-            print('Function has not been added to pipeline.')
+
+        if not all(x in func_params for x in reqs):
+            print(
+                f"FAILED: Requestion function {func_name} did not receive enough parameters"
+            )
+            print(f"Requestion function: \n {_func} \n ---")
+            print(f"Required Parameters: \n {reqs} \n ---")
+            print("Function has not been added to pipeline.")
             return None
 
         # add the function and arguments to pipeline
-        job_dict = {'job':func_name,
-                    'params':func_params}                
-        
+        job_dict = {"job": func_name, "params": func_params}
+
         self.pipeline.append(job_dict)
         return func_name
-    
+
     def runJob(self, job=None):
-        '''
+        """
         Run a named function on the scenario object
-        
+
         TODO: overhaul with futures/slurm
               capture results
               standardize result format for all of pvdeg
@@ -226,74 +253,76 @@ class Scenario:
         Parameters:
         -----------
         job : (str, default=None)
-        '''
+        """
         if self.hpc:
             # do something else
             pass
-        
+
         for job in self.pipeline:
-            args = job['parameters']
-            _func = pvdeg.Scenario._verify_function(job['job'],args)[0]
+            args = job["parameters"]
+            _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
             result = _func(**args)
 
     def exportScenario(self, file_path=None):
-        '''
+        """
         Export the scenario dictionaries to a json configuration file
-        
+
         TODO exporting functions as name string within pipeline. cannot .json dump <pvdeg.func>
              Need to make sure name is verified > stored > export > import > re-verify > converted.
              This could get messy. Need to streamline the process or make it bullet proof
-        
+
         Parameters:
         -----------
         file_path : (str, default = None)
             Desired file path to save the scenario.json file
-        '''
-        
+        """
+
         if not file_path:
             file_path = self.path
-        file_name = f'config_{self.name}.json'
-        out_file = os.path.join(file_path,file_name) 
+        file_name = f"config_{self.name}.json"
+        out_file = os.path.join(file_path, file_name)
 
-        scene_dict = {'name': self.name,
-                      'path': self.path,
-                      'pipeline': self.pipeline,
-                      'gid_file': self.gids,
-                      'test_modules': self.modules}
-        
-        with open(out_file, 'w') as f:
+        scene_dict = {
+            "name": self.name,
+            "path": self.path,
+            "pipeline": self.pipeline,
+            "gid_file": self.gids,
+            "test_modules": self.modules,
+        }
+
+        with open(out_file, "w") as f:
             json.dump(scene_dict, f, indent=4)
-        print(f'{file_name} exported')
-    
+        print(f"{file_name} exported")
+
     def importScenario(self, file_path=None):
         """
         Import scenario dictionaries from an existing 'scenario.json' file
         """
-        
-        with open(file_path,'r') as f:
+
+        with open(file_path, "r") as f:
             data = json.load()
-        name = data['name']
-        path = data['path']
-        modules = data['modules']
-        gids = data['gids']
-        pipeline = data['pipeline']
+        name = data["name"]
+        path = data["path"]
+        modules = data["modules"]
+        gids = data["gids"]
+        pipeline = data["pipeline"]
 
         self.name = name
         self.path = path
         self.modules = modules
         self.gids = gids
         self.pipeline = pipeline
-    
+
     def _verify_function(func_name):
         """
         Check all classes in pvdeg for a function of the name "func_name". Returns a callable function
         and list of all function parameters with no default values.
-        
+
         Parameters:
         -----------
         func_name : (str)
             Name of the desired function. Only returns for 1:1 matches
-        
+
         Returns:
         --------
         _func : (func)
@@ -302,16 +331,16 @@ class Scenario:
             list of minimum required paramters to run the requested funciton
         """
         from inspect import signature
-        
+
         # find the function in pvdeg
-        class_list = [c for c in dir(pvdeg) if not c.startswith('_')]
+        class_list = [c for c in dir(pvdeg) if not c.startswith("_")]
         func_list = []
         for c in class_list:
-            _class = getattr(pvdeg,c)
+            _class = getattr(pvdeg, c)
             if func_name in dir(_class):
-                _func = getattr(_class,func_name)
+                _func = getattr(_class, func_name)
         if _func == None:
-            return (None,None)
+            return (None, None)
 
         # check if necessary parameters given
         reqs_all = signature(_func).parameters
@@ -319,5 +348,5 @@ class Scenario:
         for param in reqs_all:
             if reqs_all[param].default == reqs_all[param].empty:
                 reqs.append(param)
-        
-        return(_func, reqs)
+
+        return (_func, reqs)

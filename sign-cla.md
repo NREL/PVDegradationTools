@@ -1,7 +1,7 @@
 Sign the CLA
 =============
 
-This page is the step-by-step guide to signing the Alliance's 
+This page is the step-by-step guide to signing the Alliance's
 Contributors License Agreement. It's easy and pretty painless!
 
 1. First and foremost, read [the current version of the
@@ -11,7 +11,7 @@ Contributors License Agreement. It's easy and pretty painless!
 2. Make an account on [GitHub](https://github.com/) if you don't already
    have one.
 
-3. File a pull request on this project (the pvdeg Project), 
+3. File a pull request on this project (the pvdeg Project),
    as [outlined below](#filing-the-pull-request).
 
 4. Email the pvdeg Sourceror, as [outlined below](#sending-the-email).
@@ -83,9 +83,9 @@ Sending the Email
 -----------------
 
 Send an email to pvdeg's official Open Sourceror
-at [silvana.ovaitt@nrel.gov](mailto:silvana.ovaitt@nrel.gov), 
+at [silvana.ovaitt@nrel.gov](mailto:silvana.ovaitt@nrel.gov),
 cc-ing [michael.kempe@nrel.gov](mailto:michael.kempe@nrel.gov),
-with the subject "CLA pvdeg" 
+with the subject "CLA pvdeg"
 and the following body:
 
 ```
@@ -102,4 +102,3 @@ Replace the bracketed text as follows:
 
 * `[your name]` with your name.
 * `[your github userid]` with your GitHub userid.
-

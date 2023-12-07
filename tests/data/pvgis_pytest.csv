@@ -14,13 +14,13 @@
 #Output from the climate database Solargis v2.2.16
 #
 #Solar radiation data
-#Description: data calculated from Meteosat MSG and MFG satellite data ((c) 2021 EUMETSAT) and from atmospheric data ((c) 2021 ECMWF, NOAA and NASA) by Solargis method 
+#Description: data calculated from Meteosat MSG and MFG satellite data ((c) 2021 EUMETSAT) and from atmospheric data ((c) 2021 ECMWF, NOAA and NASA) by Solargis method
 #Summarization type: hourly
 #Summarization period: 01/01/1994 - 31/03/2021
 #Spatial resolution: 250 m
 #
 #Meteorological data
-#Description: spatially disaggregated from CFSv2 and GFS ((c) 2021 NOAA) and ERA5 ((c) 2021 ECMWF) by Solargis method 
+#Description: spatially disaggregated from CFSv2 and GFS ((c) 2021 NOAA) and ERA5 ((c) 2021 ECMWF) by Solargis method
 #Summarization type: hourly
 #Summarization period: 01/01/1994 - 31/03/2021
 #Spatial resolution: temperature 1 km, other meteorological parameters 33 km to 55 km
