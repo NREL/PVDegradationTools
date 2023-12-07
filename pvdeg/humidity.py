@@ -16,7 +16,7 @@ from . import weather
 
 
 def _ambient(weather_df):
-    '''
+    """
     Calculate ambient relative humidity from dry bulb air temperature and dew point
 
     references:
@@ -37,20 +37,21 @@ def _ambient(weather_df):
     weather_df : pd.DataFrame
         identical datetime-indexed dataframe with addional column 'relative_humidity' containing
         ambient relative humidity [%]
-    '''
-    temp_air = weather_df['temp_air']
-    dew_point = weather_df['Dew Point']
+    """
+    temp_air = weather_df["temp_air"]
+    dew_point = weather_df["Dew Point"]
 
-    num = np.exp( 17.625*dew_point / (243.04 + dew_point) )
-    den = np.exp( 17.625*temp_air / (243.04 + temp_air) )
+    num = np.exp(17.625 * dew_point / (243.04 + dew_point))
+    den = np.exp(17.625 * temp_air / (243.04 + temp_air))
     rh_ambient = 100 * num / den
 
-    weather_df['relative_humidity'] = rh_ambient
+    weather_df["relative_humidity"] = rh_ambient
 
     return weather_df
 
-#TODO: When is dew_yield used?
-@jit(nopython=True, error_model='python')
+
+# TODO: When is dew_yield used?
+@jit(nopython=True, error_model="python")
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """
     Estimates the dew yield in [mm/day].  Calculation taken from:
@@ -80,47 +81,58 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
 
     """
     wind_speed_cut_off = 4.4
-    dew_yield = (1/12) * (.37 * (1 + (0.204323 * elevation) - (0.0238893 * elevation**2) -
-                            (18.0132 - (1.04963 * elevation**2) + (0.21891 * elevation**2)) * (10**(-3) * dew_point)) *
-                            ((((dew_point + 273.15) / 285)**4)*(1 - (n/8))) +
-                            (0.06 * (dew_point - dry_bulb)) *
-                            (1 + 100 * (1 - np.exp(- (wind_speed / wind_speed_cut_off)**20))))
+    dew_yield = (1 / 12) * (
+        0.37
+        * (
+            1
+            + (0.204323 * elevation)
+            - (0.0238893 * elevation**2)
+            - (18.0132 - (1.04963 * elevation**2) + (0.21891 * elevation**2))
+            * (10 ** (-3) * dew_point)
+        )
+        * ((((dew_point + 273.15) / 285) ** 4) * (1 - (n / 8)))
+        + (0.06 * (dew_point - dry_bulb))
+        * (1 + 100 * (1 - np.exp(-((wind_speed / wind_speed_cut_off) ** 20))))
+    )
 
     return dew_yield
 
 
 def psat(temp, average=True):
-        """
-        Function calculated the water saturation temperature or dew point for a given water vapor
-        pressure. Water vapor pressure model created from an emperical fit of ln(Psat) vs
-        temperature using a 6th order polynomial fit. The fit produced R^2=0.999813.
-        Calculation created by Michael Kempe, unpublished data.
+    """
+    Function calculated the water saturation temperature or dew point for a given water vapor
+    pressure. Water vapor pressure model created from an emperical fit of ln(Psat) vs
+    temperature using a 6th order polynomial fit. The fit produced R^2=0.999813.
+    Calculation created by Michael Kempe, unpublished data.
 
-        Parameters:
-        -----------
-        temp : series, float
-            The air temperature (dry bulb) as a time-indexed series [C]
-        average : boolean, default = True
-            If true, return both psat serires and average psat (used for certain calcs)
-        Returns:
-        --------
-        psat : array, float
-            Saturation point
-        avg_psat : float, optional
-            mean saturation point for the series given
-        """
+    Parameters:
+    -----------
+    temp : series, float
+        The air temperature (dry bulb) as a time-indexed series [C]
+    average : boolean, default = True
+        If true, return both psat serires and average psat (used for certain calcs)
+    Returns:
+    --------
+    psat : array, float
+        Saturation point
+    avg_psat : float, optional
+        mean saturation point for the series given
+    """
 
-        psat = np.exp((3.2575315268E-13 * temp**6) -
-                       (1.5680734584E-10 * temp**5) +
-                       (2.2213041913E-08 * temp**4) +
-                       (2.3720766595E-7 * temp**3) -
-                       (4.0316963015E-04 * temp**2) +
-                       (7.9836323361E-02 * temp) -
-                       (5.6983551678E-1))
-        if average:
-            return psat, psat.mean()
-        else:
-            return psat
+    psat = np.exp(
+        (3.2575315268e-13 * temp**6)
+        - (1.5680734584e-10 * temp**5)
+        + (2.2213041913e-08 * temp**4)
+        + (2.3720766595e-7 * temp**3)
+        - (4.0316963015e-04 * temp**2)
+        + (7.9836323361e-02 * temp)
+        - (5.6983551678e-1)
+    )
+    if average:
+        return psat, psat.mean()
+    else:
+        return psat
+
 
 def surface_outside(rh_ambient, temp_ambient, temp_module):
     """
@@ -141,9 +153,7 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
         The relative humidity of the surface of a solar module as a fraction or percent depending on input.
 
     """
-    rh_Surface = rh_ambient * \
-        (psat(temp_ambient)[0] /
-            psat(temp_module)[0])
+    rh_Surface = rh_ambient * (psat(temp_ambient)[0] / psat(temp_module)[0])
 
     return rh_Surface
 
@@ -151,7 +161,10 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
     # Front Encapsulant RH
     ###########
 
-def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14):
+
+def _diffusivity_numerator(
+    rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
+):
     """
     Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
     This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
@@ -187,15 +200,18 @@ def _diffusivity_numerator(rh_ambient, temp_ambient, temp_module, So=1.81390702,
     """
 
     # Get the relative humidity of the surface
-    rh_surface = surface_outside(
-        rh_ambient, temp_ambient, temp_module)
+    rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
-    diff_numerator = So * np.exp(- (Eas / (0.00831446261815324 * (temp_module + 273.15))))\
-                            * rh_surface * \
-                            np.exp(- (Ead / (0.00831446261815324 * (temp_module + 273.15))))
+    diff_numerator = (
+        So
+        * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15))))
+        * rh_surface
+        * np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
+    )
 
     return diff_numerator
+
 
 def _diffusivity_denominator(temp_module, Ead=38.14):
     """
@@ -221,13 +237,13 @@ def _diffusivity_denominator(temp_module, Ead=38.14):
 
     """
 
-    diff_denominator = np.exp(- (Ead /
-                                (0.00831446261815324 * (temp_module + 273.15))))
+    diff_denominator = np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
     return diff_denominator
 
 
-def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
-                                So=1.81390702,  Eas=16.729, Ead=38.14):
+def _diffusivity_weighted_water(
+    rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
+):
     """
     Calculation is used in determining a weighted average water content at the surface of a module.
     It is used as a constant water content that is equivalent to the time varying one with respect to moisture ingress.
@@ -261,7 +277,8 @@ def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
     """
 
     numerator = _diffusivity_numerator(
-        rh_ambient, temp_ambient, temp_module, So,  Eas, Ead)
+        rh_ambient, temp_ambient, temp_module, So, Eas, Ead
+    )
     # get the summation of the numerator
     numerator = numerator.sum(axis=0, skipna=True)
 
@@ -269,9 +286,10 @@ def _diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module,
     # get the summation of the denominator
     denominator = denominator.sum(axis=0, skipna=True)
 
-    diffuse_water = (numerator / denominator)/100
+    diffuse_water = (numerator / denominator) / 100
 
     return diffuse_water
+
 
 def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
     """
@@ -300,18 +318,21 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729
         Relative Humidity of Frontside Solar module Encapsulant [%]
 
     """
-    diffuse_water = _diffusivity_weighted_water(rh_ambient=rh_ambient,
-                                                                temp_ambient=temp_ambient,
-                                                                temp_module=temp_module)
+    diffuse_water = _diffusivity_weighted_water(
+        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
+    )
 
-    RHfront_series = (diffuse_water / (So * np.exp(- (Eas / (0.00831446261815324 *
-                                                    (temp_module + 273.15)))))) * 100
+    RHfront_series = (
+        diffuse_water
+        / (So * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15)))))
+    ) * 100
 
     return RHfront_series
 
     ###########
     # Back Encapsulant Relative Humidity
     ###########
+
 
 def _csat(temp_module, So=1.81390702, Eas=16.729):
     """
@@ -338,10 +359,10 @@ def _csat(temp_module, So=1.81390702, Eas=16.729):
     """
 
     # Saturation of water concentration
-    Csat = So * \
-        np.exp(- (Eas / (0.00831446261815324 * (273.15 + temp_module))))
+    Csat = So * np.exp(-(Eas / (0.00831446261815324 * (273.15 + temp_module))))
 
     return Csat
+
 
 def _ceq(Csat, rh_SurfaceOutside):
     """
@@ -362,13 +383,22 @@ def _ceq(Csat, rh_SurfaceOutside):
 
     """
 
-    Ceq = Csat * (rh_SurfaceOutside/100)
+    Ceq = Csat * (rh_SurfaceOutside / 100)
 
     return Ceq
 
+
 @jit(nopython=True)
-def Ce_numba(start, temp_module, rh_surface,
-                WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
+def Ce_numba(
+    start,
+    temp_module,
+    rh_surface,
+    WVTRo=7970633554,
+    EaWVTR=55.0255,
+    So=1.81390702,
+    l=0.5,
+    Eas=16.729,
+):
     """
     Calculation is used in determining Relative Humidity of Backside Solar
     Module Encapsulant. This function returns a numpy array of the Concentration of water in the
@@ -418,23 +448,52 @@ def Ce_numba(start, temp_module, rh_surface,
     Ce_list = np.zeros(dataPoints)
 
     for i in range(0, len(rh_surface)):
-
         if i == 0:
             # Ce = Initial start of concentration of water
             Ce = start
         else:
-            Ce = Ce_list[i-1]
+            Ce = Ce_list[i - 1]
 
-        Ce = Ce + ((WVTRo/100/100/24 * np.exp(-((EaWVTR) / (0.00831446261815324 * (temp_module[i] + 273.15))))) /
-                    (So * l/10 * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))) *
-                    (rh_surface[i]/100 * So * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15)))) - Ce))
+        Ce = Ce + (
+            (
+                WVTRo
+                / 100
+                / 100
+                / 24
+                * np.exp(
+                    -((EaWVTR) / (0.00831446261815324 * (temp_module[i] + 273.15)))
+                )
+            )
+            / (
+                So
+                * l
+                / 10
+                * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
+            )
+            * (
+                rh_surface[i]
+                / 100
+                * So
+                * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
+                - Ce
+            )
+        )
 
         Ce_list[i] = Ce
 
     return Ce_list
 
-def back_encap(rh_ambient, temp_ambient, temp_module,
-                WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
+
+def back_encap(
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    WVTRo=7970633554,
+    EaWVTR=55.0255,
+    So=1.81390702,
+    l=0.5,
+    Eas=16.729,
+):
     """
     rh_back_encap()
 
@@ -475,12 +534,11 @@ def back_encap(rh_ambient, temp_ambient, temp_module,
 
     """
 
-    rh_surface = surface_outside(rh_ambient=rh_ambient,
-                                                    temp_ambient=temp_ambient,
-                                                    temp_module=temp_module)
+    rh_surface = surface_outside(
+        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
+    )
 
-    Csat = _csat(
-        temp_module=temp_module, So=So, Eas=Eas)
+    Csat = _csat(temp_module=temp_module, So=So, Eas=Eas)
     Ceq = _ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
     start = Ceq[0]
@@ -488,20 +546,23 @@ def back_encap(rh_ambient, temp_ambient, temp_module,
     # Need to convert these series to numpy arrays for numba function
     temp_module_numba = temp_module.to_numpy()
     rh_surface_numba = rh_surface.to_numpy()
-    Ce_nparray = Ce_numba(start=start,
-                                            temp_module=temp_module_numba,
-                                            rh_surface=rh_surface_numba,
-                                            WVTRo=WVTRo,
-                                            EaWVTR=EaWVTR,
-                                            So=So,
-                                            l=l,
-                                            Eas=Eas)
+    Ce_nparray = Ce_numba(
+        start=start,
+        temp_module=temp_module_numba,
+        rh_surface=rh_surface_numba,
+        WVTRo=WVTRo,
+        EaWVTR=EaWVTR,
+        So=So,
+        l=l,
+        Eas=Eas,
+    )
 
-    #RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) /
+    # RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) /
     #                   (0.00831446261815324 * (temp_module + 273.15))  )) ))
     RHback_series = 100 * (Ce_nparray / Csat)
 
     return RHback_series
+
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
     """
@@ -521,12 +582,21 @@ def backsheet_from_encap(rh_back_encap, rh_surface_outside):
         Relative Humidity of Backside Backsheet of a Solar Module [%]
     """
 
-    RHbacksheet_series = (rh_back_encap + rh_surface_outside)/2
+    RHbacksheet_series = (rh_back_encap + rh_surface_outside) / 2
 
     return RHbacksheet_series
 
-def backsheet(rh_ambient, temp_ambient, temp_module,
-                WVTRo=7970633554, EaWVTR=55.0255, So=1.81390702, l=0.5, Eas=16.729):
+
+def backsheet(
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    WVTRo=7970633554,
+    EaWVTR=55.0255,
+    So=1.81390702,
+    l=0.5,
+    Eas=16.729,
+):
     """Function to calculate the Relative Humidity of solar module backsheet as timeseries.
 
     Parameters
@@ -562,30 +632,38 @@ def backsheet(rh_ambient, temp_ambient, temp_module,
         relative humidity of the PV backsheet as a time-series [%]
     """
 
-    RHback_series = back_encap(rh_ambient=rh_ambient,
-                            temp_ambient=temp_ambient,
-                            temp_module=temp_module, WVTRo=WVTRo,
-                            EaWVTR=EaWVTR, So=So, l=l, Eas=Eas)
-    surface = surface_outside(rh_ambient=rh_ambient,
-                              temp_ambient=temp_ambient,
-                              temp_module=temp_module)
-    backsheet = (RHback_series + surface)/2
+    RHback_series = back_encap(
+        rh_ambient=rh_ambient,
+        temp_ambient=temp_ambient,
+        temp_module=temp_module,
+        WVTRo=WVTRo,
+        EaWVTR=EaWVTR,
+        So=So,
+        l=l,
+        Eas=Eas,
+    )
+    surface = surface_outside(
+        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
+    )
+    backsheet = (RHback_series + surface) / 2
     return backsheet
+
 
 def module(
     weather_df,
     meta,
     tilt=None,
     azimuth=180,
-    sky_model='isotropic',
-    temp_model='sapm',
-    mount_type='open_rack_glass_glass',
+    sky_model="isotropic",
+    temp_model="sapm",
+    mount_type="open_rack_glass_glass",
     WVTRo=7970633554,
     EaWVTR=55.0255,
     So=1.81390702,
     l=0.5,
     Eas=16.729,
-    wind_speed_factor=1):
+    wind_speed_factor=1,
+):
     """Calculate the Relative Humidity of solar module backsheet from timeseries data.
 
     Parameters
@@ -633,51 +711,64 @@ def module(
         relative humidity of the PV backsheet as a time-series
     """
 
-    #solar_position = spectral.solar_position(weather_df, meta)
-    #poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
-    #temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_speed_factor)
+    # solar_position = spectral.solar_position(weather_df, meta)
+    # poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
+    # temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_speed_factor)
 
-    poa = spectral.poa_irradiance(weather_df=weather_df, meta=meta,
-                                  tilt=tilt, azimuth=azimuth, sky_model=sky_model)
+    poa = spectral.poa_irradiance(
+        weather_df=weather_df,
+        meta=meta,
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+    )
 
-    temp_module = temperature.module(weather_df, meta, poa=poa, temp_model=temp_model,
-                                     conf=mount_type, wind_speed_factor=wind_speed_factor)
+    temp_module = temperature.module(
+        weather_df,
+        meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=mount_type,
+        wind_speed_factor=wind_speed_factor,
+    )
 
     rh_surface_outside = surface_outside(
-        rh_ambient=weather_df['relative_humidity'],
-        temp_ambient=weather_df['temp_air'],
-        temp_module=temp_module)
+        rh_ambient=weather_df["relative_humidity"],
+        temp_ambient=weather_df["temp_air"],
+        temp_module=temp_module,
+    )
 
     rh_front_encap = front_encap(
-        rh_ambient=weather_df['relative_humidity'],
-        temp_ambient=weather_df['temp_air'],
+        rh_ambient=weather_df["relative_humidity"],
+        temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
         So=So,
-        Eas=Eas)
+        Eas=Eas,
+    )
 
     rh_back_encap = back_encap(
-        rh_ambient=weather_df['relative_humidity'],
-        temp_ambient=weather_df['temp_air'],
+        rh_ambient=weather_df["relative_humidity"],
+        temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
         WVTRo=WVTRo,
         EaWVTR=EaWVTR,
         So=So,
         l=l,
-        Eas=Eas)
+        Eas=Eas,
+    )
 
     rh_backsheet = backsheet_from_encap(
-        rh_back_encap=rh_back_encap,
-        rh_surface_outside=rh_surface_outside)
+        rh_back_encap=rh_back_encap, rh_surface_outside=rh_surface_outside
+    )
 
-    data = {'RH_surface_outside': rh_surface_outside,
-            'RH_front_encap': rh_front_encap,
-            'RH_back_encap': rh_back_encap,
-            'RH_backsheet': rh_backsheet}
+    data = {
+        "RH_surface_outside": rh_surface_outside,
+        "RH_front_encap": rh_front_encap,
+        "RH_back_encap": rh_back_encap,
+        "RH_backsheet": rh_backsheet,
+    }
     results = pd.DataFrame(data=data)
     return results
-
-
-
 
 
 # def run_module(

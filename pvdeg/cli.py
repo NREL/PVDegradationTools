@@ -4,14 +4,10 @@ from gaps.cli import CLICommandFromFunction, make_cli
 
 commands = [
     CLICommandFromFunction(
-        name="run-standoff", 
-        function=run_calc_standoff, 
-        split_keys=["project_points"]
+        name="run-standoff", function=run_calc_standoff, split_keys=["project_points"]
     ),
     CLICommandFromFunction(
-        name="run-rel_humidity", 
-        function=run_module, 
-        split_keys=["project_points"]
+        name="run-rel_humidity", function=run_module, split_keys=["project_points"]
     ),
 ]
 cli = make_cli(commands)

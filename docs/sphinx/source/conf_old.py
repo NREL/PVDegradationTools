@@ -40,16 +40,15 @@ MOCK_MODULES = []
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 """
 import pandas as pd
+
 pd.show_versions()
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../sphinxext'))
-#sys.path.insert(0, os.path.abspath('../../../'))
-sys.path.insert(0, os.path.abspath('../../pvdeg'))
-
-
+sys.path.insert(0, os.path.abspath("../sphinxext"))
+# sys.path.insert(0, os.path.abspath('../../../'))
+sys.path.insert(0, os.path.abspath("../../pvdeg"))
 
 
 # -- General configuration ---------------------------------------------------
@@ -58,48 +57,47 @@ sys.path.insert(0, os.path.abspath('../../pvdeg'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.autosummary',
-#    'IPython.sphinxext.ipython_directive',
-#    'IPython.sphinxext.ipython_console_highlighting',
-    'sphinx.ext.doctest',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    #    'IPython.sphinxext.ipython_directive',
+    #    'IPython.sphinxext.ipython_console_highlighting',
+    "sphinx.ext.doctest",
     #'autoapi.extension',
-    'sphinx.ext.todo'
+    "sphinx.ext.todo",
 ]
 
 
-
 # Document Python Code
-#autodoc_mock_imports = ['bs4', 'requests']
-#autoapi_type = 'python'
-#autoapi_dirs = '../../../pvdeg'
+# autodoc_mock_imports = ['bs4', 'requests']
+# autoapi_type = 'python'
+# autoapi_dirs = '../../../pvdeg'
 
 napoleon_use_rtype = False  # group rtype on same line together with return
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+# source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # General information about the project.
-project = 'PV Degradation Tools'
-copyright = '2023, NREL'
-author = 'Mike Kempe'
-release = '0.1.0'
-version = '0.1.0'
+project = "PV Degradation Tools"
+copyright = "2023, NREL"
+author = "Mike Kempe"
+release = "0.1.0"
+version = "0.1.0"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -109,13 +107,13 @@ version = '0.1.0'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['whatsnew/*', '**.ipynb_checkpoints']
+exclude_patterns = ["whatsnew/*", "**.ipynb_checkpoints"]
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 autosummary_generate = True
-autoclass_content = 'both'
+autoclass_content = "both"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -124,29 +122,32 @@ autoclass_content = 'both'
 # a list of builtin themes.
 # on_rtd is whether we are on readthedocs.org
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
 
 if not on_rtd:  # only import and set the theme if we're building docs locally
     import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
+
+    html_theme = "sphinx_rtd_theme"
     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 else:
-    html_theme = 'default'
+    html_theme = "default"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 html_show_copyright = True
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pvdegdoc'
+htmlhelp_basename = "pvdegdoc"
+
 
 # A workaround for the responsive tables always having annoying scrollbars.
 def setup(app):
     app.add_css_file("no_scrollbars.css")
+
 
 """
 # -- Options for LaTeX output ---------------------------------------------

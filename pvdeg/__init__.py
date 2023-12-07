@@ -2,7 +2,7 @@ import logging
 
 from .config import *
 
-#from . import cli
+# from . import cli
 from . import collection
 from . import degradation
 from . import design

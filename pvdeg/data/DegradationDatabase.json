@@ -249,8 +249,8 @@
         "B_2": {            Value: 76.22,            STDEV: 0.135            Units: "kJ/mol"        },
         "B_3": {            Value: -0.005,            STDEV: 0.012            Units: "1/%"        },
         "A": {            Value: 0.073,            STDEV: 0.02        },
-        "Corr-B_1-B_2": 0.985, 
-        "Corr-B_1-B_3": 0.216, 
+        "Corr-B_1-B_2": 0.985,
+        "Corr-B_1-B_3": 0.216,
         "Corr-B_2-B_3": 0.0452,    },
     "D017": {
         "DataEntryPerson": "Weston Wall",

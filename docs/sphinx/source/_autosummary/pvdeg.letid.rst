@@ -3,16 +3,16 @@
 
 .. automodule:: pvdeg.letid
 
-   
-   
-   
 
-   
-   
+
+
+
+
+
    .. rubric:: Functions
 
    .. autosummary::
-   
+
       calc_device_params
       calc_dn
       calc_energy_loss
@@ -30,16 +30,3 @@
       j0_gray
       k_ij
       tau_now
-   
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

@@ -13,7 +13,8 @@ from . import temperature
 from . import spectral
 from . import weather
 
-#TODO: Clean up all those functions and add gaps functionality
+# TODO: Clean up all those functions and add gaps functionality
+
 
 def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
     """
@@ -44,7 +45,8 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
         rate of Degradation (NEED TO ADD METRIC)
 
     """
-    return poa_global**(p) * Tf ** ((temp - temp_chamber)/10)
+    return poa_global ** (p) * Tf ** ((temp - temp_chamber) / 10)
+
 
 def _deg_rate_chamber(I_chamber, p):
     """
@@ -69,6 +71,7 @@ def _deg_rate_chamber(I_chamber, p):
 
     return chamberdegradationrate
 
+
 def _acceleration_factor(numerator, denominator):
     """
     Helper Function. Find the acceleration factor
@@ -88,17 +91,14 @@ def _acceleration_factor(numerator, denominator):
         Acceleration Factor of chamber (NEED TO ADD METRIC)
     """
 
-    chamberAccelerationFactor = (numerator / denominator)
+    chamberAccelerationFactor = numerator / denominator
 
     return chamberAccelerationFactor
 
-def vantHoff_deg(weather_df, meta,
-                 I_chamber,
-                 temp_chamber,
-                 poa=None,
-                 temp=None,
-                 p=0.5,
-                 Tf=1.41):
+
+def vantHoff_deg(
+    weather_df, meta, I_chamber, temp_chamber, poa=None, temp=None, p=0.5, Tf=1.41
+):
     """
     Van't Hoff Irradiance Degradation
 
@@ -130,30 +130,26 @@ def vantHoff_deg(weather_df, meta,
     """
 
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df,meta)
+        poa = spectral.poa_irradiance(weather_df, meta)
 
     if isinstance(poa, pd.DataFrame):
-        poa_global = poa['poa_global']
-    
-    if temp is None:
-        temp = temperature.cell(weather_df=weather_df,
-                                     meta=meta,
-                                     poa=poa)
+        poa_global = poa["poa_global"]
 
-    rateOfDegEnv = _deg_rate_env(poa_global=poa_global,
-                                 temp=temp,
-                                 temp_chamber=temp_chamber,
-                                 p=p,
-                                 Tf=Tf)
-    #sumOfDegEnv = rateOfDegEnv.sum(axis = 0, skipna = True)
+    if temp is None:
+        temp = temperature.cell(weather_df=weather_df, meta=meta, poa=poa)
+
+    rateOfDegEnv = _deg_rate_env(
+        poa_global=poa_global, temp=temp, temp_chamber=temp_chamber, p=p, Tf=Tf
+    )
+    # sumOfDegEnv = rateOfDegEnv.sum(axis = 0, skipna = True)
     avgOfDegEnv = rateOfDegEnv.mean()
 
     rateOfDegChamber = _deg_rate_chamber(I_chamber, p)
 
-    accelerationFactor = _acceleration_factor(
-        rateOfDegChamber, avgOfDegEnv)
+    accelerationFactor = _acceleration_factor(rateOfDegChamber, avgOfDegEnv)
 
     return accelerationFactor
+
 
 def _to_eq_vantHoff(temp, Tf=1.41):
     """
@@ -181,12 +177,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-def IwaVantHoff(weather_df, meta,
-                poa=None,
-                temp=None,
-                Teq=None,
-                p=0.5,
-                Tf=1.41):
+def IwaVantHoff(weather_df, meta, poa=None, temp=None, Teq=None, p=0.5, Tf=1.41):
     """
     IWa : Environment Characterization [W/m²]
     For one year of degredation the controlled environmnet lamp settings will
@@ -216,25 +207,26 @@ def IwaVantHoff(weather_df, meta,
 
     """
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df,meta)
-    
+        poa = spectral.poa_irradiance(weather_df, meta)
+
     if temp is None:
-        temp = temperature.cell(weather_df,meta,poa)
-    
+        temp = temperature.cell(weather_df, meta, poa)
+
     if Teq is None:
         Teq = _to_eq_vantHoff(temp, Tf)
-    
+
     if isinstance(poa, pd.DataFrame):
-        poa_global = poa['poa_global']
+        poa_global = poa["poa_global"]
     else:
         poa_global = poa
 
-    toSum = (poa_global ** p) * (Tf ** ((temp - Teq)/10))
+    toSum = (poa_global**p) * (Tf ** ((temp - Teq) / 10))
     summation = toSum.sum(axis=0, skipna=True)
 
     Iwa = (summation / len(poa_global)) ** (1 / p)
 
     return Iwa
+
 
 def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
     """
@@ -263,12 +255,16 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
         Degradation rate of environment
     """
 
-    environmentDegradationRate = poa_global**(p) * rh_outdoor**(
-        n) * np.exp(- (Ea / (0.00831446261815324 * (temp + 273.15))))
+    environmentDegradationRate = (
+        poa_global ** (p)
+        * rh_outdoor ** (n)
+        * np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
+    )
 
     return environmentDegradationRate
 
-def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, p, n):
+
+def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
     """
     Helper function. Find the rate of degradation of a simulated chamber.
 
@@ -294,21 +290,27 @@ def _arrhenius_numerator(I_chamber, rh_chamber,  temp_chamber, Ea, p, n):
         Degradation rate of the chamber
     """
 
-    arrheniusNumerator = (I_chamber ** (p) * rh_chamber ** (n) *
-                            np.exp(- (Ea / (0.00831446261815324 *
-                                            (temp_chamber+273.15)))))
+    arrheniusNumerator = (
+        I_chamber ** (p)
+        * rh_chamber ** (n)
+        * np.exp(-(Ea / (0.00831446261815324 * (temp_chamber + 273.15))))
+    )
     return arrheniusNumerator
 
-def arrhenius_deg(weather_df, meta,
-                  rh_outdoor,
-                  I_chamber,
-                  rh_chamber,
-                  Ea,
-                  temp_chamber,
-                  poa=None,
-                  temp=None,
-                  p=0.5,
-                  n=1):
+
+def arrhenius_deg(
+    weather_df,
+    meta,
+    rh_outdoor,
+    I_chamber,
+    rh_chamber,
+    Ea,
+    temp_chamber,
+    poa=None,
+    temp=None,
+    p=0.5,
+    n=1,
+):
     """
     Calculate the Acceleration Factor between the rate of degredation of a
     modeled environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1 year
@@ -355,34 +357,35 @@ def arrhenius_deg(weather_df, meta,
     """
 
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df,meta)
-    
+        poa = spectral.poa_irradiance(weather_df, meta)
+
     if temp is None:
-        temp = temperature.cell(weather_df,meta,poa)
+        temp = temperature.cell(weather_df, meta, poa)
 
     if isinstance(poa, pd.DataFrame):
-        poa_global = poa['poa_global']
+        poa_global = poa["poa_global"]
     else:
         poa_global = poa
 
-
-    arrheniusDenominator = _arrhenius_denominator(poa_global=poa_global,
-                                                  rh_outdoor=rh_outdoor,
-                                                  temp=temp,
-                                                  Ea=Ea,
-                                                  p=p,
-                                                  n=n)
+    arrheniusDenominator = _arrhenius_denominator(
+        poa_global=poa_global, rh_outdoor=rh_outdoor, temp=temp, Ea=Ea, p=p, n=n
+    )
 
     AvgOfDenominator = arrheniusDenominator.mean()
 
-    arrheniusNumerator = _arrhenius_numerator(I_chamber=I_chamber, 
-                                              rh_chamber=rh_chamber,
-                                              temp_chamber=temp_chamber, Ea=Ea, p=p, n=n)
+    arrheniusNumerator = _arrhenius_numerator(
+        I_chamber=I_chamber,
+        rh_chamber=rh_chamber,
+        temp_chamber=temp_chamber,
+        Ea=Ea,
+        p=p,
+        n=n,
+    )
 
-    accelerationFactor = _acceleration_factor(
-        arrheniusNumerator, AvgOfDenominator)
+    accelerationFactor = _acceleration_factor(arrheniusNumerator, AvgOfDenominator)
 
     return accelerationFactor
+
 
 def _T_eq_arrhenius(temp, Ea):
     """
@@ -404,14 +407,14 @@ def _T_eq_arrhenius(temp, Ea):
 
     """
 
-    summationFrame = np.exp(- (Ea /
-                                (0.00831446261815324 * (temp + 273.15))))
+    summationFrame = np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
     sumForTeq = summationFrame.sum(axis=0, skipna=True)
     Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(temp))))
     # Convert to celsius
     Teq = Teq - 273.15
 
     return Teq
+
 
 def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
     """
@@ -445,26 +448,32 @@ def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
     if Teq is None:
         Teq = _T_eq_arrhenius(temp, Ea)
 
-    summationFrame = (rh_outdoor ** n) * np.exp(- (Ea /
-                                                    (0.00831446261815324 * (temp + 273.15))))
+    summationFrame = (rh_outdoor**n) * np.exp(
+        -(Ea / (0.00831446261815324 * (temp + 273.15)))
+    )
     sumForRHwa = summationFrame.sum(axis=0, skipna=True)
-    RHwa = (sumForRHwa / (len(summationFrame) * np.exp(- (Ea /
-                                            (0.00831446261815324 * (Teq + 273.15)))))) ** (1/n)
+    RHwa = (
+        sumForRHwa
+        / (len(summationFrame) * np.exp(-(Ea / (0.00831446261815324 * (Teq + 273.15)))))
+    ) ** (1 / n)
 
     return RHwa
 
 
-#TODO:   CHECK
+# TODO:   CHECK
 # STANDARDIZE
-def IwaArrhenius(weather_df, meta,
-                 rh_outdoor,
-                 Ea,
-                 poa=None,
-                 temp=None,
-                 RHwa=None,
-                 Teq=None,
-                 p=0.5,
-                 n=1):
+def IwaArrhenius(
+    weather_df,
+    meta,
+    rh_outdoor,
+    Ea,
+    poa=None,
+    temp=None,
+    RHwa=None,
+    Teq=None,
+    p=0.5,
+    n=1,
+):
     """
     Function to calculate IWa, the Environment Characterization [W/m²].
     For one year of degredation the controlled environmnet lamp settings will
@@ -475,7 +484,7 @@ def IwaArrhenius(weather_df, meta,
     weather_df : pd.dataframe
         Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
-        Location meta-data containing at least latitude, longitude, altitude    
+        Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.series
         Relative Humidity of material of interest
         Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(), rh_front_encap(),
@@ -502,11 +511,11 @@ def IwaArrhenius(weather_df, meta,
         Environment Characterization [W/m²]
     """
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df,meta)
-    
+        poa = spectral.poa_irradiance(weather_df, meta)
+
     if temp is None:
-        temp = temperature.cell(weather_df,meta,poa)
-    
+        temp = temperature.cell(weather_df, meta, poa)
+
     if Teq is None:
         Teq = _T_eq_arrhenius(temp, Ea)
 
@@ -514,24 +523,32 @@ def IwaArrhenius(weather_df, meta,
         RHwa = _RH_wa_arrhenius(rh_outdoor, temp, Ea)
 
     if isinstance(poa, pd.DataFrame):
-        poa_global = poa['poa_global']
+        poa_global = poa["poa_global"]
     else:
         poa_global = poa
 
-    numerator = poa_global**(p) * rh_outdoor**(n) * \
-        np.exp(- (Ea / (0.00831446261815324 * (temp + 273.15))))
+    numerator = (
+        poa_global ** (p)
+        * rh_outdoor ** (n)
+        * np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
+    )
     sumOfNumerator = numerator.sum(axis=0, skipna=True)
 
-    denominator = (len(numerator)) * ((RHwa)**n) * \
-        (np.exp(- (Ea / (0.00831446261815324 * (Teq + 273.15)))))
+    denominator = (
+        (len(numerator))
+        * ((RHwa) ** n)
+        * (np.exp(-(Ea / (0.00831446261815324 * (Teq + 273.15)))))
+    )
 
-    IWa = (sumOfNumerator / denominator)**(1/p)
+    IWa = (sumOfNumerator / denominator) ** (1 / p)
 
     return IWa
+
 
 ############
 # Misc. Functions for Energy Calcs
 ############
+
 
 def _rh_Above85(rh):
     """
@@ -558,6 +575,7 @@ def _rh_Above85(rh):
 
     return rhabove85
 
+
 def _hoursRH_Above85(df):
     """
     Helper Function. Count the number of hours relative humidity is above 85%.
@@ -577,6 +595,7 @@ def _hoursRH_Above85(df):
     numhoursabove85 = booleanDf.sum()
 
     return numhoursabove85
+
 
 def _whToGJ(wh):
     """
@@ -600,6 +619,7 @@ def _whToGJ(wh):
 
     return gj
 
+
 def _gJtoMJ(gJ):
     """
     NOTE: unused, remove?
@@ -621,9 +641,11 @@ def _gJtoMJ(gJ):
 
     return MJ
 
-def degradation(spectra, rh_module, temp_module, wavelengths,
-                Ea=40.0, n=1.0, p=0.5, C2=0.07, C=1.0):
-    '''
+
+def degradation(
+    spectra, rh_module, temp_module, wavelengths, Ea=40.0, n=1.0, p=0.5, C2=0.07, C=1.0
+):
+    """
     Compute degredation as double integral of Arrhenius (Activation
     Energy, RH, Temperature) and spectral (wavelength, irradiance)
     functions over wavelength and time.
@@ -658,7 +680,7 @@ def degradation(spectra, rh_module, temp_module, wavelengths,
     degradation : float
         Total degredation factor over time and wavelength.
 
-    '''
+    """
     # --- TO DO ---
     # unpack input-dataframe
     # spectra = df['spectra']
@@ -678,26 +700,25 @@ def degradation(spectra, rh_module, temp_module, wavelengths,
     except:
         # TODO: Fix this except it works on some cases, veto it by cases
         print("Removing brackets from spectral irradiance data")
-        #irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
-        irr = spectra.str.strip('[]').str.split(
-            ',', expand=True).astype(float)
+        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
         irr.columns = wavelengths
 
-    sensitivitywavelengths = np.exp(-C2*wavelengths)
-    irr = irr*sensitivitywavelengths
+    sensitivitywavelengths = np.exp(-C2 * wavelengths)
+    irr = irr * sensitivitywavelengths
     irr *= np.array(wav_bin)
     irr = irr**p
     data = pd.DataFrame(index=spectra.index)
-    data['G_integral'] = irr.sum(axis=1)
+    data["G_integral"] = irr.sum(axis=1)
 
-    EApR = -Ea/R
-    C4 = np.exp(EApR/temp_module)
+    EApR = -Ea / R
+    C4 = np.exp(EApR / temp_module)
 
     RHn = rh_module**n
-    data['Arr_integrand'] = C4*RHn
+    data["Arr_integrand"] = C4 * RHn
 
-    data['dD'] = data['G_integral']*data['Arr_integrand']
+    data["dD"] = data["G_integral"] * data["Arr_integrand"]
 
-    degradation = C*data['dD'].sum(axis=0)
+    degradation = C * data["dD"].sum(axis=0)
 
     return degradation

@@ -4,10 +4,10 @@ import pandas as pd
 import numpy as np
 from pvdeg import collection, TEST_DIR, DATA_DIR
 
-fgen = os.path.join(DATA_DIR, 'PVL_GenProfile.xlsx')
+fgen = os.path.join(DATA_DIR, "PVL_GenProfile.xlsx")
 generation_df = pd.read_excel(fgen, header=0, engine="openpyxl")
-generation = generation_df['Generation (cm-3s-1)']
-depth = generation_df['Depth (um)']
+generation = generation_df["Generation (cm-3s-1)"]
+depth = generation_df["Depth (um)"]
 
 
 def test_collection_probability():
@@ -34,7 +34,7 @@ def test_calculate_jsc_from_tau_cp():
     )
 
     assert jsc == pytest.approx(39.79670015, abs=5e-2)
-    #assert jsc == pytest.approx(39.796733327595729, abs=0.00005)
+    # assert jsc == pytest.approx(39.796733327595729, abs=0.00005)
 
 
 def test_calculate_jsc_from_tau_iqe():
@@ -58,4 +58,4 @@ def test_calculate_jsc_from_tau_iqe():
 def test_generation_current():
     jgen = collection.generation_current(generation, depth)
     assert jgen == pytest.approx(42.36089737, abs=5e-2)
-    #assert jgen == pytest.approx(42.36324575251117, abs=0.00005)
+    # assert jgen == pytest.approx(42.36324575251117, abs=0.00005)
