@@ -64,7 +64,7 @@ TESTS_REQUIRE = [
 ]
 
 EXTRAS_REQUIRE = {
-    'doc': DOCS_REQUIRE,
+    'docs': DOCS_REQUIRE,
     'test': TESTS_REQUIRE,
 }
 
