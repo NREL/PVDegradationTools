@@ -54,8 +54,9 @@ SETUP_REQUIRES = [
 ]
 
 DOCS_REQUIRE = [
-    'sphinx',
-    'sphinx_rtd_theme'
+    'sphinx>=7.2.6',
+    'sphinx_rtd_theme>=2.0.0',
+    'readthedocs-sphinx-search>=0.3.1'
 ]
 
 TESTS_REQUIRE = [
@@ -64,7 +65,7 @@ TESTS_REQUIRE = [
 ]
 
 EXTRAS_REQUIRE = {
-    'doc': DOCS_REQUIRE,
+    'docs': DOCS_REQUIRE,
     'test': TESTS_REQUIRE,
 }
 

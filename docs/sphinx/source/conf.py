@@ -19,7 +19,9 @@ sys.path.insert(0, os.path.abspath('../../..'))
 
 project = 'pvdeg'
 copyright = '2023, NREL'
-author = 'Mike Kempe'
+author = 'Alliance for Sustainable Energy, LLC'
+
+import pvdeg
 
 
 # -- General configuration ---------------------------------------------------
