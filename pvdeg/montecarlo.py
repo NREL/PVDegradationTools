@@ -2,21 +2,16 @@
 """
 
 ### TODO:
-# Create way to take other statistical input samples (mean, stdev)
 # generate correlated samples
 # implement existing pvdeg calculation functions
 # calculate using ↑
 # output in suitable format (dataframe?)
-
 
 import numpy as np
 import pandas as pd
 from numba import njit
 from scipy.linalg import cholesky
 from scipy import stats
-
-# from . import spectral
-# from . import temperature
 
 """corrlation class
 stores modeling constants and corresponding correlation coefficient to access at runtime
@@ -111,6 +106,32 @@ def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
 
 # we already have list of correlation coefficients, 
 # unpack them
-def _createStats(corr : list[Corr], stats : dict[str, dict[str, float]]) -> pd.DataFrame:
+def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
+    """
+    helper function. Unpacks mean and standard deviation for modeling constants into a DataFrame
 
-    return
+    Parameters
+    ----------
+    stats : dict[str, dict[str, float]]
+        contains mean and standard deviation for each modeling constant
+        example of one mc:  {'Ea' : {'mean' : 62.08, 'stdev' : 7.3858 }}
+    
+    Returns
+    ----------
+    stats_df : pd.DataFrame
+        contains unpacked means and standard deviations from dictionary
+    """
+
+    for mc in stats:
+        if 'mean' not in stats[mc] or 'stdev' not in stats[mc]:
+            raise ValueError(f"Missing 'mean' or 'stdev' for modeling constant")
+
+    modeling_constants = list(stats.keys())
+    mc_mean = [stats[mc]['mean'] for mc in modeling_constants]
+    mc_stdev = [stats[mc]['stdev'] for mc in modeling_constants]
+    
+    idx = ['mean', 'stdev']
+
+    stats_df = pd.DataFrame({'mean' : mc_mean, 'stdev' : mc_stdev}, index=modeling_constants)
+
+    return stats_df
