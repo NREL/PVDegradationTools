@@ -21,7 +21,7 @@ from scipy import stats
 """corrlation class
 stores modeling constants and corresponding correlation coefficient to access at runtime
 """
-class Corr:
+class Corr:     # could be made into a dataclass
     """modeling constants"""
     mc_1 = ''
     mc_2 = ''
@@ -34,7 +34,7 @@ class Corr:
         self.mc_2 = mc_2_string
         self.correlation = corr
     
-    def getModelingConstants(self)->list[str]:
+    def getModelingConstants(self)->list[str, str]:
         """
         Helper method. Returns modeling constants in string form.
 
@@ -45,7 +45,7 @@ class Corr:
 
         Returns
         ----------
-        modeling_constants : list[str]
+        modeling_constants : list[str, str]
             Both modeling constants in string from from their corresponding correlation coefficient object
         """
 
@@ -103,3 +103,14 @@ def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
 
     # identity_df should be renamed more appropriately 
     return identity_df
+
+# statistical data capture,
+# mean and stdev
+# for simplicity sake
+# this should happen before creating the correlation matrix
+
+# we already have list of correlation coefficients, 
+# unpack them
+def _createStats(corr : list[Corr], stats : dict[str, dict[str, float]]) -> pd.DataFrame:
+
+    return
