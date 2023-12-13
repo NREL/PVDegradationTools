@@ -2,7 +2,6 @@
 """
 
 ### TODO:
-# Finish symmetric matrix
 # Create way to take other statistical input samples (mean, stdev)
 # generate correlated samples
 # implement existing pvdeg calculation functions
@@ -18,10 +17,6 @@ from scipy import stats
 
 # from . import spectral
 # from . import temperature
-
-# should not be like this
-# class ArugmentError(Exception):
-#     pass
 
 """corrlation class
 stores modeling constants and corresponding correlation coefficient to access at runtime
@@ -39,9 +34,23 @@ class Corr:
         self.mc_2 = mc_2_string
         self.correlation = corr
     
-    def getModelingConstants(self)->list:
-        """ADD DOC"""
-        return [self.mc_1, self.mc_2]
+    def getModelingConstants(self)->list[str]:
+        """
+        Helper method. Returns modeling constants in string form.
+
+        Parameters
+        ----------
+        self : Corr
+            Reference to self
+
+        Returns
+        ----------
+        modeling_constants : list[str]
+            Both modeling constants in string from from their corresponding correlation coefficient object
+        """
+
+        modeling_constants = [self.mc_1, self.mc_2]
+        return modeling_constants
 
 def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
     """
