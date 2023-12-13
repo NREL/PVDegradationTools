@@ -135,3 +135,43 @@ def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
     stats_df = pd.DataFrame({'mean' : mc_mean, 'stdev' : mc_stdev}, index=modeling_constants)
 
     return stats_df
+
+def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, float]], n : int) -> np.ndarray:
+    # CURRENTLY NO COLUMN NAMES BUT THEY SHOULD COME IN THE SAME ORDER AS THE ENTRIES IN THE MATRIX
+    # need to add some parsing function to make sure columns of the _symettric/decop matricies line up
+    # currently in testing code they do but assuming they didnt we would run into problems
+    """
+    Generates a tall correlated samples numpy array based on correlation coefficients and mean and stdev 
+    for modeling constants. Values are correlated from cholesky decomposition of correlation coefficients,
+    and n random samples for each modeling constant generated from a standard distribution with mean = 0
+    and standard deviation = 1.
+
+    Parameters
+    ----------
+    corr : List[Corr]
+
+    stats : 
+
+    n : int
+        number of samples to create
+
+    Returns
+    ----------
+    correlated_samples : np.ndarray
+        tall array of dimensions (n by # of modeling constants)
+
+    References
+    ----------
+    Burgess, Nicholas, Correlated Monte Carlo Simulation using Cholesky Decomposition (March 25, 2022). 
+    Available at SSRN: https://ssrn.com/abstract=4066115 
+    """
+
+    coeff_matrix = _symettric_correlation_matrix(corr)
+
+    decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
+
+    samples = np.random.normal(loc=0, scale=1, size=(n, len(stats)))
+    
+    correlated_samples = np.matmul(decomp, samples)
+
+    return correlated_samples
