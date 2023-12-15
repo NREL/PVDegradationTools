@@ -132,14 +132,47 @@ def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
     
     idx = ['mean', 'stdev']
 
-    stats_df = pd.DataFrame({'mean' : mc_mean, 'stdev' : mc_stdev}, index=modeling_constants)
+    stats_df = pd.DataFrame({'mean' : mc_mean, 'stdev' : mc_stdev}, index=modeling_constants).T
 
     return stats_df
 
-def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, float]], n : int) -> np.ndarray:
-    # CURRENTLY NO COLUMN NAMES BUT THEY SHOULD COME IN THE SAME ORDER AS THE ENTRIES IN THE MATRIX
-    # need to add some parsing function to make sure columns of the _symettric/decop matricies line up
-    # currently in testing code they do but assuming they didnt we would run into problems
+def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : pd.DataFrame) -> pd.DataFrame:
+
+    """
+    helper function. Uses meaningless correlated samples and makes meaningful by 
+    multiplying random samples by their parent modeling constant's standard deviation
+    and adding the mean
+
+    Parameters
+    ----------
+    samples_to_correlate : pd.DataFrame
+        contains n samples generated with N(0, 1) for each modeling constant
+        column names must be consistent with all modeling constant inputs
+
+    stats_for_correlation : pd.DataFrame
+        contains mean and stdev each modeling constant,
+        column names must be consistent with all modeling constant inputs
+
+    Returns
+    ----------
+    correlated_samples : pd.DataFrame
+        correlated samples in a tall dataframe. column names match modeling constant inputs,
+        integer indexes. See generateCorrelatedSamples() references section for process info
+    """
+
+    # accounts for out of order column names, AS LONG AS ALL MATCH
+    # UNKNOWN CASE: what will happen if there is an extra NON matching column in stats
+    columns = list(samples_to_correlate.columns.values)
+    ordered_stats = stats_for_correlation[columns]
+
+    correlated_samples = samples_to_correlate.multiply(ordered_stats.iloc[1]).add(ordered_stats.iloc[0])
+
+    return correlated_samples
+
+def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, float]], n : int) -> pd.DataFrame:
+    # columns are now named, may run into issues if more mean and stdev entries than correlation coefficients
+    # havent tested yet but this could cause major issues (see lines 163 and 164 for info)
+
     """
     Generates a tall correlated samples numpy array based on correlation coefficients and mean and stdev 
     for modeling constants. Values are correlated from cholesky decomposition of correlation coefficients,
@@ -157,8 +190,9 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
     Returns
     ----------
-    correlated_samples : np.ndarray
-        tall array of dimensions (n by # of modeling constants)
+    correlated_samples : pd.Dataframe
+        tall dataframe of dimensions (n by # of modeling constants).
+        Columns named as modeling constants from Corr object inputs
 
     References
     ----------
@@ -170,8 +204,14 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
     decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
 
-    samples = np.random.normal(loc=0, scale=1, size=(n, len(stats)))
+    samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     
-    correlated_samples = np.matmul(decomp, samples)
+    precorrelated_samples = np.matmul(decomp, samples) 
 
-    return correlated_samples
+    precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
+
+    stats_df = _createStats(stats)    
+
+    correlated_df = _correlateData(precorrelated_df, stats_df)
+
+    return correlated_df
