@@ -2,10 +2,14 @@
 """
 
 ### TODO:
-# generate correlated samples
-# implement existing pvdeg calculation functions
-# calculate using ↑
-# output in suitable format (dataframe?)
+
+# Seperate calculate function?
+
+# implement modular arrhenius implementation (used in jupyter notebook)
+# calculate : pd.DataFrame output
+# first do old case to make sure it works, add robustness testing
+# we dont have a function for the previous test case
+# then do standoff calculation (pvdeg.standards.standoff())
 
 import numpy as np
 import pandas as pd
@@ -13,14 +17,16 @@ from numba import njit
 from scipy.linalg import cholesky
 from scipy import stats
 
-"""corrlation class
-stores modeling constants and corresponding correlation coefficient to access at runtime
-"""
+
 class Corr:     # could be made into a dataclass
-    """modeling constants"""
+    """corrlation class
+    stores modeling constants and corresponding correlation coefficient to access at runtime
+    """
+
+    # modeling constants : str
     mc_1 = ''
     mc_2 = ''
-    """corresponding correlation coefficient"""
+    # corresonding corelation coefficient : float
     correlation = 0
 
     def __init__(self, mc_1_string, mc_2_string, corr): 
@@ -99,13 +105,6 @@ def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
     # identity_df should be renamed more appropriately 
     return identity_df
 
-# statistical data capture,
-# mean and stdev
-# for simplicity sake
-# this should happen before creating the correlation matrix
-
-# we already have list of correlation coefficients, 
-# unpack them
 def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
     """
     helper function. Unpacks mean and standard deviation for modeling constants into a DataFrame
@@ -122,14 +121,15 @@ def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
         contains unpacked means and standard deviations from dictionary
     """
 
+    # incomplete dataset
     for mc in stats:
         if 'mean' not in stats[mc] or 'stdev' not in stats[mc]:
             raise ValueError(f"Missing 'mean' or 'stdev' for modeling constant")
 
+    # unpack data 
     modeling_constants = list(stats.keys())
     mc_mean = [stats[mc]['mean'] for mc in modeling_constants]
     mc_stdev = [stats[mc]['stdev'] for mc in modeling_constants]
-    
     idx = ['mean', 'stdev']
 
     stats_df = pd.DataFrame({'mean' : mc_mean, 'stdev' : mc_stdev}, index=modeling_constants).T
@@ -165,6 +165,7 @@ def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : 
     columns = list(samples_to_correlate.columns.values)
     ordered_stats = stats_for_correlation[columns]
 
+    # SHOULD CHANGE FROM ILOC TO "mean" and "stdev" FOR ADAPTABILITY
     correlated_samples = samples_to_correlate.multiply(ordered_stats.iloc[1]).add(ordered_stats.iloc[0])
 
     return correlated_samples
@@ -215,3 +216,55 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     correlated_df = _correlateData(precorrelated_df, stats_df)
 
     return correlated_df
+
+# this shouldn't stay here but I thought it was best for short term cleanlyness sake
+def temp_arrhenius():
+    # port from jupyter notebook
+
+    return
+
+def simulate():
+    # similar to pvdeg.geospatial.analyis 
+
+    return
+
+
+# monte carlo function
+# model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
+# Define desired analysis
+# geo = {'func': pvdeg.letid.calc_letid_outdoors,
+#        'weather_ds': weather_SW_sub,
+#        'meta_df': meta_SW_sub,
+#        'tau_0': 115, # us, carrier lifetime in non-degraded states, e.g. LETID/LID states A or C
+#        'tau_deg': 55, # us, carrier lifetime in fully-degraded state, e.g. LETID/LID state B
+#        'wafer_thickness': 180, # um
+#        's_rear': 46, # cm/s
+#        'cell_area': 243, # cm^2
+#        'na_0': 100,
+#        'nb_0': 0,
+#        'nc_0': 0,
+#        'mechanism_params': 'repins'
+# }
+
+# letid_res = pvdeg.geospatial.analysis(**geo)
+# -----------------------
+# geospatial.analysis()
+
+
+# to call function we want to collect parameters in a modular way
+# --------------------------------------- #
+
+"""
+# parameters for simulation
+# function and input data
+sim =   {'func' : funcName(), # pvdeg.montecarlo.temp_arrhenius 
+         'weather_df' : pd.DataFrame, # could be datastructure
+         'meta_df' : pd.DataFrame 
+}
+
+# paramters to CONTROL simulation
+monte = {'trials' : int,
+         'correlations' : list[Corr],
+         'stats' : pd.DataFrame
+}
+"""
