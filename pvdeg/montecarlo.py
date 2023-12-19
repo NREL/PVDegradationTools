@@ -218,13 +218,59 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     return correlated_df
 
 # this shouldn't stay here but I thought it was best for short term cleanlyness sake
-def temp_arrhenius():
-    # port from jupyter notebook
+# modify to take arguments in more versitile way 
+@njit 
+def weirdArrhenius( # what is this called, not in spreadsheet
+    poa_global, 
+    module_temp, 
+    ea, 
+    x, 
+    lnR0
+    ):
 
-    return
+    """
+    Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
+
+    Parameters
+    ----------
+    poa_global : np.ndarray
+        Plane of array irradiance [units?]
+
+    module_temp : np.ndarray
+        Cell temperature [C].
+
+    ea : np.ndarray
+        Activation energy [kJ/mol]
+
+    x : np.ndarray
+        Irradiance relation [unitless]
+
+    lnR0 : np.ndarray
+        prefactor [ln(%/h)]
+
+    Returns
+    ----------
+    degredation : np.ndarray    
+        Degradation Rate [%/h]  ** this unit may not be accurate**
+
+    """
+
+    degredation = np.zeros_like(ea)
+
+    mask = poa_global >= 25
+    poa_global = poa_global[mask]
+    module_temp = module_temp[mask]
+
+    ea1 = ea / 8.31446261815324E-03
+    R0 = np.exp(lnR0)
+    poa_global_scaled = poa_global / 1000
+
+    degredation = [(z * np.exp(-x / (273.15 + module_temp)) * np.power(poa_global_scaled, y)).mean() for x, y, z in zip(ea1, x, R0)]
+    
+    return degredation   
 
 def simulate():
-    # similar to pvdeg.geospatial.analyis 
+    # reference pvdeg.geospatial.analyis 
 
     return
 
