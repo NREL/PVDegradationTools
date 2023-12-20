@@ -233,24 +233,24 @@ def weirdArrhenius( # what is this called, not in spreadsheet
 
     Parameters
     ----------
-    poa_global : np.ndarray
+    poa_global : numpy.ndarray
         Plane of array irradiance [units?]
 
-    module_temp : np.ndarray
+    module_temp : numpy.ndarray
         Cell temperature [C].
 
-    ea : np.ndarray
+    ea : numpy.ndarray
         Activation energy [kJ/mol]
 
-    x : np.ndarray
+    x : numpy.ndarray
         Irradiance relation [unitless]
 
-    lnR0 : np.ndarray
+    lnR0 : numpy.ndarray
         prefactor [ln(%/h)]
 
     Returns
     ----------
-    degredation : np.ndarray    
+    degredation : numpy.ndarray    
         Degradation Rate [%/h]  ** this unit may not be accurate**
 
     """
@@ -269,8 +269,55 @@ def weirdArrhenius( # what is this called, not in spreadsheet
     
     return degredation   
 
-def simulate():
+def simulate(
+        weather_df, 
+        meta_df,
+        func,
+        stats,
+        correlation,
+        trials,
+        **function_kwargs
+        ):
+
     # reference pvdeg.geospatial.analyis 
+    # should it work on ds instead 
+    # add template
+ 
+    # add stats dict
+    # add correlation coefficient
+
+    """
+    Applies a funtion to preform a monte carlo simulation
+
+    Parameters
+    ----------
+    weather_df : pandas.DataFrame
+        Dataframe containing weather data
+    meta_df : pandas.DataFrame
+        DataFrame containing meta data
+    func : function
+        Function to apply for monte carlo simulation
+    stats : Dict[string : float, string : float]
+        Dictionary of modeling constants with mean and standard deviation 
+    correlation : list[Corr]
+        List of correlation objects containing appropriate correlation coefficients
+    trials : int
+        Number of monte carlo iterations to run
+    func_kwargs : dict
+        Keyword arguments to pass to func.
+
+    Returns
+    -------
+    res : pandas.DataFrame
+        DataFrame with monte carlo results
+    """
+
+    # check if we have the right function arguments
+
+    # run function 
+
+    # 
+
 
     return
 
