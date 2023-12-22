@@ -288,17 +288,14 @@ def vecArrhenius(
     poa_global_scaled = poa_global / 1000
 
     degredation = 0
-    # refactor to list comprehension
+    # refactor to list comprehension approach
     for entry in range(len(poa_global_scaled)):
         degredation += R0 * np.exp(-ea_scaled / (273.15 + module_temp[entry])) * np.power(poa_global_scaled[entry], x)
 
-    # orgiginal length not updated length
     return (degredation / len(poa_global))
 
 
 def simulate(
-        weather_df, 
-        meta_df,
         func,
         stats,
         correlation,
@@ -318,10 +315,6 @@ def simulate(
 
     Parameters
     ----------
-    weather_df : pandas.DataFrame
-        Dataframe containing weather data
-    meta_df : pandas.DataFrame
-        DataFrame containing meta data
     func : function
         Function to apply for monte carlo simulation
     stats : Dict[string : float, string : float]
