@@ -4,6 +4,7 @@
 ### TODO:
 
 # Seperate calculate function?
+# standards.standoff, 
 
 # implement modular arrhenius implementation (used in jupyter notebook)
 # calculate : pd.DataFrame output
@@ -166,7 +167,13 @@ def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : 
     ordered_stats = stats_for_correlation[columns]
 
     # SHOULD CHANGE FROM ILOC TO "mean" and "stdev" FOR ADAPTABILITY
-    correlated_samples = samples_to_correlate.multiply(ordered_stats.iloc[1]).add(ordered_stats.iloc[0])
+    # i dont think this is taking into account column names, should onyl multiply if the column names match
+    # correlated_samples = samples_to_correlate.multiply(ordered_stats.iloc[1]).add(ordered_stats.iloc[0])
+
+    means = ordered_stats.loc['mean']
+    stdevs = ordered_stats.loc['stdev']
+
+    correlated_samples = samples_to_correlate.multiply(stdevs).add(means)
 
     return correlated_samples
 
@@ -202,16 +209,25 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     """
 
     coeff_matrix = _symettric_correlation_matrix(corr)
+    print(coeff_matrix)
 
     decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
+    print(decomp)
+
+    # something bad with correlated samples happening after this
+    # cholesky is in different order than input but that shouldnt matter
+    # checks on the correlated_df should return the matching correlation coefficients regardless of order but are NOT
 
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
+    print(samples)
     
     precorrelated_samples = np.matmul(decomp, samples) 
 
     precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
+    print(precorrelated_df.head(5))
 
     stats_df = _createStats(stats)    
+    print(stats_df.head())
 
     correlated_df = _correlateData(precorrelated_df, stats_df)
 
@@ -269,6 +285,48 @@ def weirdArrhenius( # what is this called, not in spreadsheet
     
     return degredation   
 
+@njit
+def vecArrhenius(
+    poa_global : np.ndarray, 
+    module_temp : np.ndarray, 
+    ea : float, 
+    x : float, 
+    lnR0 : float
+    ) -> float: # np.float64?
+
+    mask = poa_global >= 25
+    poa_global = poa_global[mask]
+    module_temp = module_temp[mask]
+
+    ea_scaled = ea / 8.31446261815324E-03
+    R0 = np.exp(lnR0)
+    poa_global_scaled = poa_global / 1000
+
+    degredation = 0
+    # refactor to list comprehension
+    for entry in range(len(poa_global_scaled)):
+        degredation += R0 * np.exp(-ea_scaled / (273.15 + module_temp[entry])) * np.power(poa_global_scaled[entry], x)
+
+    # orgiginal length not updated length
+    return (degredation / len(poa_global))
+
+    # mask = poa_global >= 25
+    # poa_global = poa_global[mask]
+    # module_temp = module_temp[mask]
+
+    # # These could be moved outside of func for speed
+    # # will be much slower with them in here
+    # ea1 = ea / 8.31446261815324E-03
+    # R0 = np.exp(lnR0)
+    # poa_global_scaled = poa_global / 1000
+
+    # # is this capturing all rows of weather, doesnt seem like it 
+    # # is this no just doing one iteration
+    # degradation = (R0 * np.exp(-ea1 / (273.15 + module_temp)) * np.power(poa_global_scaled, x)).mean()
+
+    return degradation
+
+
 def simulate(
         weather_df, 
         meta_df,
@@ -315,9 +373,6 @@ def simulate(
     # check if we have the right function arguments
 
     # run function 
-
-    # 
-
 
     return
 
