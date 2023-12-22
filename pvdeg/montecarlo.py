@@ -216,10 +216,8 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     """
 
     coeff_matrix = _symettric_correlation_matrix(corr)
-    print(coeff_matrix)
 
     decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
-    print(decomp)
 
     # something bad with correlated samples happening after this
     # cholesky is in different order than input but that shouldnt matter
@@ -227,28 +225,16 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     # but are in wrong columns
 
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
-    print(samples)
     
     precorrelated_samples = np.matmul(decomp, samples) 
 
     precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
-    print(precorrelated_df.head(5))
 
     # identified that the order of the columns change, this is problematic because we are applying the wrong 
     # information to some columns when they are swaped,
     # the mean and stdev are consistent with values I would expect but swapped column wise
 
-    ### -------- ###
-    print(precorrelated_df.columns)
-    print(stats.keys())
-    ### -------- ###
-
     stats_df = _createStats(stats, corr)    
-
-    ### -------- ###
-    print(stats_df.columns)
-    print(stats_df.head())
-    ### -------- ###
 
     correlated_df = _correlateData(precorrelated_df, stats_df)
 
@@ -256,6 +242,7 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
 # this shouldn't stay here but I thought it was best for short term cleanlyness sake
 # modify to take arguments in more versitile way 
+# 
 @njit
 def vecArrhenius(
     poa_global : np.ndarray, 
@@ -263,7 +250,7 @@ def vecArrhenius(
     ea : float, 
     x : float, 
     lnR0 : float
-    ) -> float: # np.float64?
+    ) -> float: 
 
     """
     Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
@@ -271,7 +258,7 @@ def vecArrhenius(
     Parameters
     ----------
     poa_global : numpy.ndarray
-        Plane of array irradiance [units?]
+        Plane of array irradiance [W/m^2]
 
     module_temp : numpy.ndarray
         Cell temperature [C].
@@ -288,7 +275,7 @@ def vecArrhenius(
     Returns
     ----------
     degredation : float
-        Degradation Rate [%/h]  ** this unit may not be accurate**
+        Degradation Rate [%/h]  
 
     """
 
