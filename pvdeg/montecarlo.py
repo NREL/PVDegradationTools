@@ -106,7 +106,7 @@ def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
     # identity_df should be renamed more appropriately 
     return identity_df
 
-def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
+def _createStats(stats : dict[str, dict[str, float]], corr : list[Corr]) -> pd.DataFrame:
     """
     helper function. Unpacks mean and standard deviation for modeling constants into a DataFrame
 
@@ -131,9 +131,20 @@ def _createStats(stats : dict[str, dict[str, float]]) -> pd.DataFrame:
     modeling_constants = list(stats.keys())
     mc_mean = [stats[mc]['mean'] for mc in modeling_constants]
     mc_stdev = [stats[mc]['stdev'] for mc in modeling_constants]
-    idx = ['mean', 'stdev']
 
     stats_df = pd.DataFrame({'mean' : mc_mean, 'stdev' : mc_stdev}, index=modeling_constants).T
+
+
+    # flatten and reorder
+    modeling_constants = [mc for i in corr for mc in i.getModelingConstants()]
+    uniques = np.unique(modeling_constants)
+
+    # what happens if columns do not match?  
+    if len(uniques) != len(corr): 
+        raise ValueError(f"correlation data is insufficient")
+    
+    # should match columns from correlation matrix
+    stats_df = stats_df[uniques]
 
     return stats_df
 
@@ -165,10 +176,6 @@ def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : 
     # UNKNOWN CASE: what will happen if there is an extra NON matching column in stats
     columns = list(samples_to_correlate.columns.values)
     ordered_stats = stats_for_correlation[columns]
-
-    # SHOULD CHANGE FROM ILOC TO "mean" and "stdev" FOR ADAPTABILITY
-    # i dont think this is taking into account column names, should onyl multiply if the column names match
-    # correlated_samples = samples_to_correlate.multiply(ordered_stats.iloc[1]).add(ordered_stats.iloc[0])
 
     means = ordered_stats.loc['mean']
     stdevs = ordered_stats.loc['stdev']
@@ -216,7 +223,8 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
     # something bad with correlated samples happening after this
     # cholesky is in different order than input but that shouldnt matter
-    # checks on the correlated_df should return the matching correlation coefficients regardless of order but are NOT
+    # checks on the correlated_df should return the matching correlation coefficients regardless of order 
+    # but are in wrong columns
 
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     print(samples)
@@ -235,13 +243,12 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     print(stats.keys())
     ### -------- ###
 
-    stats_df = _createStats(stats)    
+    stats_df = _createStats(stats, corr)    
 
     ### -------- ###
     print(stats_df.columns)
-    ### -------- ###
-
     print(stats_df.head())
+    ### -------- ###
 
     correlated_df = _correlateData(precorrelated_df, stats_df)
 
