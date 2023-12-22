@@ -226,7 +226,21 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
     print(precorrelated_df.head(5))
 
+    # identified that the order of the columns change, this is problematic because we are applying the wrong 
+    # information to some columns when they are swaped,
+    # the mean and stdev are consistent with values I would expect but swapped column wise
+
+    ### -------- ###
+    print(precorrelated_df.columns)
+    print(stats.keys())
+    ### -------- ###
+
     stats_df = _createStats(stats)    
+
+    ### -------- ###
+    print(stats_df.columns)
+    ### -------- ###
+
     print(stats_df.head())
 
     correlated_df = _correlateData(precorrelated_df, stats_df)
@@ -235,14 +249,14 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
 # this shouldn't stay here but I thought it was best for short term cleanlyness sake
 # modify to take arguments in more versitile way 
-@njit 
-def weirdArrhenius( # what is this called, not in spreadsheet
-    poa_global, 
-    module_temp, 
-    ea, 
-    x, 
-    lnR0
-    ):
+@njit
+def vecArrhenius(
+    poa_global : np.ndarray, 
+    module_temp : np.ndarray, 
+    ea : float, 
+    x : float, 
+    lnR0 : float
+    ) -> float: # np.float64?
 
     """
     Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
@@ -255,44 +269,21 @@ def weirdArrhenius( # what is this called, not in spreadsheet
     module_temp : numpy.ndarray
         Cell temperature [C].
 
-    ea : numpy.ndarray
+    ea : float
         Activation energy [kJ/mol]
 
-    x : numpy.ndarray
+    x : float
         Irradiance relation [unitless]
 
-    lnR0 : numpy.ndarray
+    lnR0 : float
         prefactor [ln(%/h)]
 
     Returns
     ----------
-    degredation : numpy.ndarray    
+    degredation : float
         Degradation Rate [%/h]  ** this unit may not be accurate**
 
     """
-
-    degredation = np.zeros_like(ea)
-
-    mask = poa_global >= 25
-    poa_global = poa_global[mask]
-    module_temp = module_temp[mask]
-
-    ea1 = ea / 8.31446261815324E-03
-    R0 = np.exp(lnR0)
-    poa_global_scaled = poa_global / 1000
-
-    degredation = [(z * np.exp(-x / (273.15 + module_temp)) * np.power(poa_global_scaled, y)).mean() for x, y, z in zip(ea1, x, R0)]
-    
-    return degredation   
-
-@njit
-def vecArrhenius(
-    poa_global : np.ndarray, 
-    module_temp : np.ndarray, 
-    ea : float, 
-    x : float, 
-    lnR0 : float
-    ) -> float: # np.float64?
 
     mask = poa_global >= 25
     poa_global = poa_global[mask]
@@ -309,22 +300,6 @@ def vecArrhenius(
 
     # orgiginal length not updated length
     return (degredation / len(poa_global))
-
-    # mask = poa_global >= 25
-    # poa_global = poa_global[mask]
-    # module_temp = module_temp[mask]
-
-    # # These could be moved outside of func for speed
-    # # will be much slower with them in here
-    # ea1 = ea / 8.31446261815324E-03
-    # R0 = np.exp(lnR0)
-    # poa_global_scaled = poa_global / 1000
-
-    # # is this capturing all rows of weather, doesnt seem like it 
-    # # is this no just doing one iteration
-    # degradation = (R0 * np.exp(-ea1 / (273.15 + module_temp)) * np.power(poa_global_scaled, x)).mean()
-
-    return degradation
 
 
 def simulate(
