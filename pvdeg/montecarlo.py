@@ -341,9 +341,9 @@ def simulate(
     args = {k.lower(): v for k, v in function_kwargs.items()} # make lowercase
 
     func_signature = inspect.signature(func)
-    print(f"func_signature: {func_signature}")
+    # print(f"func_signature: {func_signature}")
     func_args = set(func_signature.parameters.keys())
-    print(f"func_args: {func_args}")
+    # print(f"func_args: {func_args}")
 
     def prepare_args(row):
         return {arg: row[arg] if arg in row else function_kwargs.get(arg) for arg in func_args}
@@ -351,11 +351,11 @@ def simulate(
     args = prepare_args(correlated_samples.iloc[0])
     # good to this point,
     # has found the arguments it needed to
-    print(f"args: {args}")
+    # print(f"args: {args}")
 
     def apply_func(row):
         row_args = {**args, **{k.lower(): v for k, v in row.items()}}
-        print(f"Row args: {row_args}")
+        # print(f"Row args: {row_args}")
         return func(**row_args)
 
     result = correlated_samples.apply(apply_func, axis=1)
@@ -363,40 +363,3 @@ def simulate(
 
 # monte carlo function
 # model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
-# Define desired analysis
-# geo = {'func': pvdeg.letid.calc_letid_outdoors,
-#        'weather_ds': weather_SW_sub,
-#        'meta_df': meta_SW_sub,
-#        'tau_0': 115, # us, carrier lifetime in non-degraded states, e.g. LETID/LID states A or C
-#        'tau_deg': 55, # us, carrier lifetime in fully-degraded state, e.g. LETID/LID state B
-#        'wafer_thickness': 180, # um
-#        's_rear': 46, # cm/s
-#        'cell_area': 243, # cm^2
-#        'na_0': 100,
-#        'nb_0': 0,
-#        'nc_0': 0,
-#        'mechanism_params': 'repins'
-# }
-
-# letid_res = pvdeg.geospatial.analysis(**geo)
-# -----------------------
-# geospatial.analysis()
-
-
-# to call function we want to collect parameters in a modular way
-# --------------------------------------- #
-
-"""
-# parameters for simulation
-# function and input data
-sim =   {'func' : funcName(), # pvdeg.montecarlo.temp_arrhenius 
-         'weather_df' : pd.DataFrame, # could be datastructure
-         'meta_df' : pd.DataFrame 
-}
-
-# paramters to CONTROL simulation
-monte = {'trials' : int,
-         'correlations' : list[Corr],
-         'stats' : pd.DataFrame
-}
-"""
