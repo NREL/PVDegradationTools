@@ -314,11 +314,9 @@ def simulate(
     ):
 
     ### NOTES ###   
-    # the parameters from func of type numeric (not iterable) should be captured and used for dataframe accesss
-    # other parameters should be taken from kwargs
+    # func modeling constant parameters must be lowercase in function definition
     # dynamically construct argument list for func
     # call func with .apply(lambda)
-
 
     """
     Applies a funtion to preform a monte carlo simulation
@@ -327,15 +325,8 @@ def simulate(
     ----------
     func : function
         Function to apply for monte carlo simulation
-
-                                                stats : Dict[string : float, string : float]
-                                                    Dictionary of modeling constants with mean and standard deviation 
-                                                correlation : list[Corr]
-                                                    List of correlation objects containing appropriate correlation coefficients
-
     correlated_samples : pd.DataFrame        
         Dataframe of correlated samples with named columns for each appropriate modeling constant
-
     trials : int
         Number of monte carlo iterations to run
     func_kwargs : dict
@@ -347,50 +338,28 @@ def simulate(
         DataFrame with monte carlo results
     """
 
-    # we want to check if the samples in the correlated df will satisfy our requirements for 
-    # the current fucntion
-    # how do we get the arguments from it in a good way 
-    # for example (func signature) ['poa_global', 'module_temp', 'ea', 'x', 'lnR0']
-    # is different from correlated_samples ['Ea', 'X', 'LnR0']
-
-    # func_signature = inspect.signature(func)
-    # func_args = set(func_signature.parameters.keys())
-
-    
-    # # only need to unpack once
-    # def prep_args(row):
-    #     return {arg: (row[arg] if arg in row else function_kwargs.get(arg)) for arg in func_args}
-    
-    # # move lambda
-    # apply_func = lambda row : func(
-    #     **{arg: row[arg] if arg in row else function_kwargs[arg] for arg in func_args}
-    # )
-
-    # res = correlated_samples.apply(lambda row : prepared)
-
-    # ------------------------------
+    args = {k.lower(): v for k, v in function_kwargs.items()} # make lowercase
 
     func_signature = inspect.signature(func)
+    print(f"func_signature: {func_signature}")
     func_args = set(func_signature.parameters.keys())
+    print(f"func_args: {func_args}")
 
-    # Preparing the argument mapping
     def prepare_args(row):
-        return {arg: (row[arg] if arg in row else function_kwargs.get(arg)) for arg in func_args}
+        return {arg: row[arg] if arg in row else function_kwargs.get(arg) for arg in func_args}
 
-    prepared_args = correlated_samples.apply(prepare_args, axis=1)
+    args = prepare_args(correlated_samples.iloc[0])
+    # good to this point,
+    # has found the arguments it needed to
+    print(f"args: {args}")
 
-    # Define the simulation loop
-    results = []
-    for _ in range(trials):
-        # Apply the function to each set of arguments
-        trial_result = prepared_args.apply(lambda args: func(**args), axis=1)
-        results.append(trial_result)
+    def apply_func(row):
+        row_args = {**args, **{k.lower(): v for k, v in row.items()}}
+        print(f"Row args: {row_args}")
+        return func(**row_args)
 
-    # Combine the results
-    df_results = pd.concat(results, axis=1)
-
-    return df_results
-
+    result = correlated_samples.apply(apply_func, axis=1)
+    return result
 
 # monte carlo function
 # model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
