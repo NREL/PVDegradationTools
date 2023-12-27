@@ -30,7 +30,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
     geospatial : (bool)
         If True, initialize weather data via xarray dataset and meta data via
-        dask dataframe. This is useful for large scael geospatial analyses on
+        dask dataframe. This is useful for large scale geospatial analyses on
         distributed compute systems. Geospaital analyses are only supported for
         NSRDB data and locally stored h5 files that follow pvlib conventions.
     **kwargs :
@@ -84,6 +84,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         if "relative_humidity" not in weather_df.columns:
             print('Column "relative_humidity" not found in DataFrame. Calculating...')
             weather_df = humidity._ambient(weather_df)
+            print('Finished calculating.')
 
         # map meta-names as needed
         for key in [*meta.keys()]:
