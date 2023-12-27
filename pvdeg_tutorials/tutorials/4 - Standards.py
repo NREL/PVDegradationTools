@@ -35,27 +35,38 @@
 
 # ![T98 70C standoff Map.png](attachment:62279573-41e3-45dd-bf62-4fa60c1e7e69.png)
 
-# In[1]:
+# In[ ]:
 
 
 # if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent "ModuleNotFoundError" in later cells:
 # !pip install pvdeg==0.1.1
 
 
-# In[1]:
-
-
-import dask
-dask.__version__
-
-
-# In[2]:
+# In[ ]:
 
 
 import os
 import pvdeg
 import pandas as pd
 from pvdeg import DATA_DIR
+
+
+# In[ ]:
+
+
+# This information helps with debugging and getting support :)
+import sys, platform
+print("Working on a ", platform.system(), platform.release())
+print("Python version ", sys.version)
+print("Pandas version ", pd.__version__)
+print("pvdeg version ", pvdeg.__version__)
+
+
+# In[ ]:
+
+
+import dask
+print("dask version ", dask.__version__)
 
 
 # ## 1. Import Weather Data
@@ -67,7 +78,7 @@ from pvdeg import DATA_DIR
 # Alternatively one may can get meterological data from the NSRDB with just the longitude and latitude.
 # 
 
-# In[2]:
+# In[ ]:
 
 
 # Get data from a supplied data file
@@ -75,11 +86,22 @@ weather_file = os.path.join(DATA_DIR,'psm3_demo.csv')
 WEATHER, META = pvdeg.weather.read(weather_file,'psm')
 
 
-# In[3]:
+# In[ ]:
 
 
-# Get data from 'NSRDB' or 'PVGIS' using longitude and latitude (a geographic index (gid) can also be used).
-WEATHER, META = pvdeg.weather.get(databse='NSRDB', id=(33.4, -112.1), geospatial=False )
+API_KEY = 'your_api_key_here'
+# The example API key here is for demonstation and is rate-limited per IP.
+# To get your own API key, visit https://developer.nrel.gov/signup/
+
+weather_db = 'PSM3'
+weather_id = (33.4, -112.1)
+weather_arg = {'api_key': 'DEMO_KEY',
+               'email': 'michael.kempe@nrel.gov',
+               'names': 'tmy',
+               'attributes': [],
+               'map_variables': True}
+
+WEATHER, META = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
 
 
 # ## 2. Calculate Installation Standoff Minimum - Level 1 and Level 2
@@ -104,34 +126,49 @@ WEATHER, META = pvdeg.weather.get(databse='NSRDB', id=(33.4, -112.1), geospatial
 
 # The following is the minimum function call. 
 
-# In[5]:
+# In[ ]:
 
 
 standoff = pvdeg.standards.standoff(weather_df=WEATHER, meta=META)
-print ('The minimum standoff for Level 0 certification and T₉₈<70°C is ', '%.1f' % standoff , ' cm.')
+print ('The minimum standoff for Level 0 certification and T₉₈<70°C is ', '%.1f' % standoff['x'].iloc[0] , ' cm.')
 
 
 # The following is a full function call for both T₉₈=70°C and 80°C. This also includes the ability to print out a detailed interpretation of the results. With this function, one can also change the tilt, azimuth, or T_98 
 
-# In[6]:
+# In[ ]:
+
+
+META.latitude
+
+
+# In[ ]:
+
+
+standoff_1
+
+
+# In[ ]:
 
 
 standoff_1 = pvdeg.standards.standoff(weather_df=WEATHER, meta=META, 
-                                      T98=70, tilt=META.lat, azimuth=180, 
-                                      sky_model='isotropic', temp_model='sapm', conf_0='insulated_back_glass_polymer' conf_inf='open_rack_glass_polymer',
+                                      T98=70, tilt=META['latitude'], azimuth=180, 
+                                      sky_model='isotropic', temp_model='sapm', 
+                                      conf_0='insulated_back_glass_polymer', conf_inf='open_rack_glass_polymer',
                                       x_0=6.5, wind_speed_factor=1.7)
 standoff_2 = pvdeg.standards.standoff(weather_df=WEATHER, meta=META,
-                                      T98=80, tilt=META.lat, azimuth=180, 
-                                      sky_model='isotropic', temp_model='sapm', conf_0='insulated_back_glass_polymer' conf_inf='open_rack_glass_polymer',
+                                      T98=80, tilt=META['latitude'], azimuth=180, 
+                                      sky_model='isotropic', temp_model='sapm', 
+                                      conf_0='insulated_back_glass_polymer', conf_inf='open_rack_glass_polymer',
                                       x_0=6.5, wind_speed_factor=1.7)
 
-print ('Level 0 certification is valid for a standoff greather than ', '%.1f' % standoff_1 , ' cm.')
-if standoff_1 > 0 
-    if standoff_2 > 0
-        print ('Level 1 certification is required for a standoff between than ', '%.1f' % standoff_1 , ' cm, and ', '%.1f' % standoff_2 , ' cm.')
-        print ('Level 2 certification is required for a standoff less than ', '%.1f' % standoff_2 , ' cm.')
-    else 
-        print ('Level 1 certification is required for a standoff less than ', '%.1f' % standoff_1 , ' cm.')
+print ('Level 0 certification is valid for a standoff greather than ', '%.1f' % standoff_1['x'].iloc[0] , ' cm.')
+if standoff_1['x'].iloc[0] > 0:
+    if standoff_2['x'].iloc[0] > 0:
+        print ('Level 1 certification is required for a standoff between than ', '%.1f' % standoff_1['x'].iloc[0] , 
+               ' cm, and ', '%.1f' % standoff_2['x'].iloc[0] , ' cm.')
+        print ('Level 2 certification is required for a standoff less than ', '%.1f' % standoff_2['x'].iloc[0] , ' cm.')
+    else:
+        print ('Level 1 certification is required for a standoff less than ', '%.1f' % standoff_1['x'].iloc[0] , ' cm.')
         print ('Level 2 certification is never required for this temperature profile.')
 
 
