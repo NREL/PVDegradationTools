@@ -3,11 +3,8 @@
 
 ### TODO:
 
-# Seperate calculate function?
 # standards.standoff, 
 
-# implement modular arrhenius implementation (used in jupyter notebook)
-# calculate : pd.DataFrame output
 # first do old case to make sure it works, add robustness testing
 # we dont have a function for the previous test case
 # then do standoff calculation (pvdeg.standards.standoff())
@@ -223,20 +220,11 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
     decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
 
-    # something bad with correlated samples happening after this
-    # cholesky is in different order than input but that shouldnt matter
-    # checks on the correlated_df should return the matching correlation coefficients regardless of order 
-    # but are in wrong columns
-
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     
     precorrelated_samples = np.matmul(decomp, samples) 
 
     precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
-
-    # identified that the order of the columns change, this is problematic because we are applying the wrong 
-    # information to some columns when they are swaped,
-    # the mean and stdev are consistent with values I would expect but swapped column wise
 
     stats_df = _createStats(stats, corr)    
 
@@ -245,8 +233,7 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     return correlated_df
 
 # this shouldn't stay here but I thought it was best for short term cleanlyness sake
-# modify to take arguments in more versitile way 
-# 
+# HAD TO MAKE lnr0 all lowercase
 @njit
 def vecArrhenius(
     poa_global : np.ndarray, 
@@ -302,21 +289,13 @@ def vecArrhenius(
   # reference pvdeg.geospatial.analyis 
     # should it work on ds instead 
     # add template
- 
-    # add stats dict
-    # add correlation coefficient
 
 def simulate(
     func : Callable,
     correlated_samples : pd.DataFrame, 
-    trials : int, # do I even need this 
     **function_kwargs
+    # trials : int, # do I even need this 
     ):
-
-    ### NOTES ###   
-    # func modeling constant parameters must be lowercase in function definition
-    # dynamically construct argument list for func
-    # call func with .apply(lambda)
 
     """
     Applies a funtion to preform a monte carlo simulation
@@ -338,6 +317,11 @@ def simulate(
         DataFrame with monte carlo results
     """
 
+    ### NOTES ###   
+    # func modeling constant parameters must be lowercase in function definition
+    # dynamically construct argument list for func
+    # call func with .apply(lambda)
+
     args = {k.lower(): v for k, v in function_kwargs.items()} # make lowercase
 
     func_signature = inspect.signature(func)
@@ -349,8 +333,6 @@ def simulate(
         return {arg: row[arg] if arg in row else function_kwargs.get(arg) for arg in func_args}
 
     args = prepare_args(correlated_samples.iloc[0])
-    # good to this point,
-    # has found the arguments it needed to
     # print(f"args: {args}")
 
     def apply_func(row):
