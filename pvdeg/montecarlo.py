@@ -1,13 +1,13 @@
 """Colection of functions for monte carlo simulations.
 """
 
+# Challenges:
+# how do we deal with different return types and inputs? Some functions return floats while others dataframes
+
 ### TODO:
+# standards.standoff functionality
+# corr list empty case
 
-# standards.standoff, 
-
-# first do old case to make sure it works, add robustness testing
-# we dont have a function for the previous test case
-# then do standoff calculation (pvdeg.standards.standoff())
 
 import numpy as np
 import pandas as pd
@@ -71,6 +71,9 @@ def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
         Index and Column names represent modeling constants for comprehensibility
     """
 
+    if not corr:
+        return None
+
     # unpack individual modeling constants from correlations
     modeling_constants = [mc for i in corr for mc in i.getModelingConstants()]
 
@@ -122,6 +125,12 @@ def _createStats(stats : dict[str, dict[str, float]], corr : list[Corr]) -> pd.D
     stats_df : pd.DataFrame
         contains unpacked means and standard deviations from dictionary
     """
+
+    # empty correlation list case
+    if not corr:
+        stats_df = pd.DataFrame(stats)
+        return stats_df
+
 
     # incomplete dataset
     for mc in stats:
@@ -218,21 +227,34 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
     coeff_matrix = _symettric_correlation_matrix(corr)
 
-    decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
+    # refactor?
+    # feels messy 
+
+    # base case
+    if corr:
+        decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
 
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     
-    precorrelated_samples = np.matmul(decomp, samples) 
-
-    precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
-
     stats_df = _createStats(stats, corr)    
+    
+    # no correlation data given, only stats
+    if not corr:
+        nocorr_df = pd.DataFrame(samples.T, columns=stats_df.columns.tolist())
 
-    correlated_df = _correlateData(precorrelated_df, stats_df)
+        meaningful_nocorr_df = _correlateData(nocorr_df, stats_df)
 
-    return correlated_df
+        return meaningful_nocorr_df
 
-# this shouldn't stay here but I thought it was best for short term cleanlyness sake
+    if corr:
+        precorrelated_samples = np.matmul(decomp, samples) 
+
+        precorrelated_df = pd.DataFrame(precorrelated_samples.T, columns=coeff_matrix.columns.to_list())
+
+        correlated_df = _correlateData(precorrelated_df, stats_df)
+
+        return correlated_df
+
 # HAD TO MAKE lnr0 all lowercase
 @njit
 def vecArrhenius(
@@ -240,7 +262,7 @@ def vecArrhenius(
     module_temp : np.ndarray, 
     ea : float, 
     x : float, 
-    lnR0 : float
+    lnr0 : float
     ) -> float: 
 
     """
@@ -275,7 +297,7 @@ def vecArrhenius(
     module_temp = module_temp[mask]
 
     ea_scaled = ea / 8.31446261815324E-03
-    R0 = np.exp(lnR0)
+    R0 = np.exp(lnr0)
     poa_global_scaled = poa_global / 1000
 
     degredation = 0
@@ -285,16 +307,13 @@ def vecArrhenius(
 
     return (degredation / len(poa_global))
 
-
-  # reference pvdeg.geospatial.analyis 
-    # should it work on ds instead 
-    # add template
+# monte carlo function
+# model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
 
 def simulate(
     func : Callable,
     correlated_samples : pd.DataFrame, 
     **function_kwargs
-    # trials : int, # do I even need this 
     ):
 
     """
@@ -340,8 +359,7 @@ def simulate(
         # print(f"Row args: {row_args}")
         return func(**row_args)
 
+    # this line is often flagged when target function is not given required arguments
     result = correlated_samples.apply(apply_func, axis=1)
-    return result
 
-# monte carlo function
-# model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
+    return result
