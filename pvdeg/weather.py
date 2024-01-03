@@ -607,6 +607,6 @@ def get_satellite(location):
     # this is just a placeholder till the actual code gets programmed. 
     satellite="americas"
 
-    gid = f.lat_lon_gid(location)
+    gid = NSRDBX.lat_lon_gid(location)
 
     return satellite, gid
