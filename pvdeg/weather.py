@@ -6,7 +6,8 @@ from pvlib import iotools
 import os
 import glob
 import pandas as pd
-from rex import NSRDBX, Outputs
+from rex import NSRDBX as f
+from rex import Outputs 
 from pvdeg import humidity
 import datetime
 
@@ -605,8 +606,8 @@ def get_satellite(location):
     """
 
     # this is just a placeholder till the actual code gets programmed. 
-    satellite="americas"
+    satellite="Americas"
 
-    gid = NSRDBX.lat_lon_gid(location)
-
+    #gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
+    gid = None
     return satellite, gid
