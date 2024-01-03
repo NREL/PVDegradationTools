@@ -393,7 +393,8 @@ def get_NSRDB(
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     META_MAP = {"elevation": "altitude"}
-
+    if satellite == None:  # TODO: This function is not fully written as of January 3, 2024
+        satellite, gid = get_satellite(location)
     if not geospatial:
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
 
@@ -402,7 +403,7 @@ def get_NSRDB(
             with NSRDBX(file, hsds=hsds) as f:
                 if i == 0:
                     if gid == None:  # TODO: add exception handling
-                        satellite, gid = get_satellite(location)
+                        gid = f.lat_lon_gid(location)
                     meta = f["meta", gid].iloc[0]
                     index = f.time_index
 
