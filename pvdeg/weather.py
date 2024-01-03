@@ -49,8 +49,6 @@ def get(database, id=None, geospatial=False, **kwargs):
 
     if type(id) is tuple:
         location = id
-        if satellite == None:
-            satellite, gid = get_satellite(location)
         gid = None
         lat = location[0]
         lon = location[1]
@@ -404,7 +402,7 @@ def get_NSRDB(
             with NSRDBX(file, hsds=hsds) as f:
                 if i == 0:
                     if gid == None:  # TODO: add exception handling
-                        gid = f.lat_lon_gid(location)
+                        satellite, gid = get_satellite(location)
                     meta = f["meta", gid].iloc[0]
                     index = f.time_index
 
