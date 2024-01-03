@@ -57,9 +57,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         location = None
     elif id is None:
         if not geospatial:
-            raise TypeError(
-                "Specify location via tuple (latitude, longitude), or gid integer."
-            )
+            raise TypeError("Specify location via tuple (latitude, longitude), or gid integer.")
 
     if not geospatial:
         # TODO: decide wether to follow NSRDB or pvlib conventions...
@@ -353,9 +351,9 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
 
 
 def get_NSRDB(
-    satellite,
-    names,
-    NREL_HPC,
+    satellite=None,
+    names="TMY",
+    NREL_HPC=False,
     gid=None,
     location=None,
     geospatial=False,
@@ -364,7 +362,7 @@ def get_NSRDB(
 ):
     """
     Get NSRDB weather data from different satellites and years.
-    Get NSRDB weather data from different satellites and years.
+
     Provide either gid or location tuple.
 
     Parameters:
