@@ -42,7 +42,7 @@
 # !pip install pvdeg==0.1.1
 
 
-# In[1]:
+# In[13]:
 
 
 import os
@@ -51,14 +51,14 @@ import pandas as pd
 from pvdeg import DATA_DIR
 
 
-# In[2]:
+# In[14]:
 
 
 # !pip install pandas --upgrade
 #!pip install pyarrow >=14.01.01
 
 
-# In[3]:
+# In[15]:
 
 
 # This information helps with debugging and getting support :)
@@ -69,7 +69,7 @@ print("Pandas version ", pd.__version__)
 print("pvdeg version ", pvdeg.__version__)
 
 
-# In[4]:
+# In[16]:
 
 
 import dask
@@ -85,7 +85,7 @@ print("dask version ", dask.__version__)
 # Alternatively one may can get meterological data from the NSRDB with just the longitude and latitude.
 # 
 
-# In[5]:
+# In[17]:
 
 
 # Get data from a supplied data file
@@ -93,13 +93,13 @@ weather_file = os.path.join(DATA_DIR,'psm3_demo.csv')
 WEATHER, META = pvdeg.weather.read(weather_file,'psm')
 
 
-# In[6]:
+# In[18]:
 
 
 DATA_DIR
 
 
-# In[7]:
+# In[19]:
 
 
 API_KEY = 'your_api_key_here'
@@ -140,7 +140,7 @@ WEATHER, META = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
 
 # The following is the minimum function call. 
 
-# In[8]:
+# In[20]:
 
 
 standoff = pvdeg.standards.standoff(weather_df=WEATHER, meta=META)
@@ -149,7 +149,7 @@ print ('The minimum standoff for Level 0 certification and T₉₈<70°C is', '%
 
 # The following is a full function call for both T₉₈=70°C and 80°C. This also includes the ability to print out a detailed interpretation of the results. With this function, one can also change the tilt, azimuth, or T_98 
 
-# In[9]:
+# In[21]:
 
 
 standoff_1 = pvdeg.standards.standoff(weather_df=WEATHER, meta=META, 
@@ -187,7 +187,7 @@ if standoff_1['x'].iloc[0] > 0:
 # 
 # To do this, one should also filter the data to remove times when the sun is not shining or when snow is likely to be on the module. The recommendations and defaults are to use poa_min=100 W/m² and data when the minimum ambient temperature t_amb_min=0.
 
-# In[10]:
+# In[22]:
 
 
 # Get data from a supplied data file
@@ -195,7 +195,7 @@ weather_file = os.path.join(DATA_DIR,'xeff_demo.csv')
 Xeff_WEATHER, Xeff_META = pvdeg.weather.read(weather_file,'psm')
 
 
-# In[11]:
+# In[23]:
 
 
 # Get data from a supplied data file
@@ -222,11 +222,11 @@ print ('The effective standoff for this system is ', '%.1f' % x_eff , ' cm.')
 # 
 # and used to calculate the $98^{th}$ percential temperature, $T_{98}$, for a PV system having a given effective standoff height, $X_{eff}$,  for an arbitrarily oriented module can be calculated. The input parameter possibilities are the same as shown in Objective #2 above, but the example below uses the default parameters. The actual tilt [degrees], azimuth [degrees] and $X_{eff}$ [cm] can be modifed as desired.
 
-# In[12]:
+# In[27]:
 
 
 # This is the minimal function call using the common default settings to estimate T.
-T98 = T98_estimate(
+T98 = pvdeg.standards.T98_estimate(
     weather_df=WEATHER,
     meta=META,
     tilt=META.tilt,
