@@ -49,7 +49,7 @@ def get(database, id=None, geospatial=False, **kwargs):
 
     if type(id) is tuple:
         location = id
-        if satellite is None:
+        if satellite == None:
             satellite, gid = get_satellite(location)
         gid = None
         lat = location[0]
