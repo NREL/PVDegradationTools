@@ -206,7 +206,11 @@ def standoff(
     x : float [cm]
         Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
         Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
-
+    T98_0 : float [°C]
+        This is the 98th percential temperature of a theoretical module with no standoff.
+     T98_inf : float [°C]
+        This is the 98th percential temperature of a theoretical rack mounted module.
+        
     References
     ----------
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
@@ -249,8 +253,6 @@ def standoff(
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
-
-
 
 def T98_estimate(
     weather_df=None,
