@@ -49,6 +49,8 @@ def get(database, id=None, geospatial=False, **kwargs):
 
     if type(id) is tuple:
         location = id
+        if satellite=None
+            satellite, gid = get_satellite(location)
         gid = None
         lat = location[0]
         lon = location[1]
@@ -581,3 +583,31 @@ def is_leap_year(year):
         return False
     else:
         return True
+    
+def get_satellite(location)
+    
+    """
+    identify a satellite to use for a given lattitude and longitude. This is to provide default values worldwide, but a more
+    experienced user may want to specify a specific satellite to get better data.
+
+    Provide a location tuple.
+
+    Parameters:
+    -----------
+    location : (tuple)
+        (latitude, longitude) for the desired location
+
+    Returns:
+    --------
+    satellite : (str)
+        'GOES', 'METEOSAT', 'Himawari', 'SUNY', 'CONUS', 'Americas'
+    gid : (int)
+        gid for the desired location
+    """
+
+    # this is just a placeholder till the actual code gets programmed. 
+    satellite="americas"
+
+    gid = f.lat_lon_gid(location)
+
+    return satellite, gid
