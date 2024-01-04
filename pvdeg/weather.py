@@ -65,6 +65,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         # e.g. temp_air vs. air_temperature
         # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
         if database == "NSRDB":
+            print(kwargs)
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
@@ -391,13 +392,16 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
+  
+    print('HPC value set to ' , NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     META_MAP = {"elevation": "altitude"}
     if satellite == None:  # TODO: This function is not fully written as of January 3, 2024
         satellite, gid = get_satellite(location)
+        print('the satellite is ' , satellite)
     if not geospatial:
-        nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
+        nsrdb_fnames, hsds = get_NSRDB_fnames(satellite=satellite, names=names, NREL_HPC=NREL_HPC)
 
         dattr = {}
         for i, file in enumerate(nsrdb_fnames):
@@ -606,7 +610,7 @@ def get_satellite(location):
     """
 
     # this is just a placeholder till the actual code gets programmed. 
-    satellite="Americas"
+    satellite="PSM3"
 
     #gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
     gid = None
