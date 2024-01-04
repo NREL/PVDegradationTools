@@ -42,23 +42,17 @@
 # !pip install pvdeg==0.1.1
 
 
-# In[13]:
+# In[ ]:
 
 
 import os
 import pvdeg
 import pandas as pd
 from pvdeg import DATA_DIR
+import dask
 
 
-# In[14]:
-
-
-# !pip install pandas --upgrade
-#!pip install pyarrow >=14.01.01
-
-
-# In[15]:
+# In[ ]:
 
 
 # This information helps with debugging and getting support :)
@@ -67,13 +61,7 @@ print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
 print("Pandas version ", pd.__version__)
 print("pvdeg version ", pvdeg.__version__)
-
-
-# In[16]:
-
-
-import dask
-print("dask version ", dask.__version__)
+print("dask version", dask.__version__)
 
 
 # ## 1. Import Weather Data
@@ -85,37 +73,40 @@ print("dask version ", dask.__version__)
 # Alternatively one may can get meterological data from the NSRDB with just the longitude and latitude.
 # 
 
-# In[17]:
+# In[ ]:
 
 
-# Get data from a supplied data file
+# Get data from a supplied data file (Do not use the next box of code if using your own file)
 weather_file = os.path.join(DATA_DIR,'psm3_demo.csv')
 WEATHER, META = pvdeg.weather.read(weather_file,'psm')
 
 
-# In[18]:
+# In[ ]:
 
 
-DATA_DIR
-
-
-# In[19]:
-
-
+# From Tutorial 5 EXAMPLE, this works.
 API_KEY = 'your_api_key_here'
 # The example API key here is for demonstation and is rate-limited per IP.
 # To get your own API key, visit https://developer.nrel.gov/signup/
-# Setting this up is explained in tutorial #5
 
 weather_db = 'PSM3'
-weather_id = (33.4, -112.1)
+weather_id = (39.741931, -105.169891)
 weather_arg = {'api_key': 'DEMO_KEY',
                'email': 'user@mail.com',
                'names': 'tmy',
                'attributes': [],
                'map_variables': True}
 
-WEATHER, META = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
+weather_df, meta = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
+print (meta)
+
+
+# In[ ]:
+
+
+# Get data from 'NSRDB' or 'PVGIS' using longitude and latitude (a geographic index (gid) can also be used).
+# Will override data supplied from a file above.
+WEATHER, META = pvdeg.weather.get(database='NSRDB', id=(33.4, -112.1), geospatial=False, NREL_HPC=False )
 
 
 # ## 2. Calculate Installation Standoff Minimum - Level 1 and Level 2
@@ -140,37 +131,34 @@ WEATHER, META = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
 
 # The following is the minimum function call. 
 
-# In[20]:
+# In[ ]:
 
 
 standoff = pvdeg.standards.standoff(weather_df=WEATHER, meta=META)
-print ('The minimum standoff for Level 0 certification and T₉₈<70°C is', '%.1f' % standoff['x'].iloc[0] , 'cm.')
+print ('The minimum standoff for Level 0 certification and T₉₈<70°C is ', '%.1f' % standoff , ' cm.')
 
 
 # The following is a full function call for both T₉₈=70°C and 80°C. This also includes the ability to print out a detailed interpretation of the results. With this function, one can also change the tilt, azimuth, or T_98 
 
-# In[21]:
+# In[ ]:
 
 
 standoff_1 = pvdeg.standards.standoff(weather_df=WEATHER, meta=META, 
-                                      T98=70, tilt=META['latitude'], azimuth=180, 
-                                      sky_model='isotropic', temp_model='sapm', 
-                                      conf_0='insulated_back_glass_polymer', conf_inf='open_rack_glass_polymer',
+                                      T98=70, tilt=META.lat, azimuth=180, 
+                                      sky_model='isotropic', temp_model='sapm', conf_0='insulated_back_glass_polymer' conf_inf='open_rack_glass_polymer',
                                       x_0=6.5, wind_speed_factor=1.7)
 standoff_2 = pvdeg.standards.standoff(weather_df=WEATHER, meta=META,
-                                      T98=80, tilt=META['latitude'], azimuth=180, 
-                                      sky_model='isotropic', temp_model='sapm', 
-                                      conf_0='insulated_back_glass_polymer', conf_inf='open_rack_glass_polymer',
+                                      T98=80, tilt=META.lat, azimuth=180, 
+                                      sky_model='isotropic', temp_model='sapm', conf_0='insulated_back_glass_polymer' conf_inf='open_rack_glass_polymer',
                                       x_0=6.5, wind_speed_factor=1.7)
 
-print ('Level 0 certification is valid for a standoff greather than', '%.1f' % standoff_1['x'].iloc[0] , 'cm.')
-if standoff_1['x'].iloc[0] > 0:
-    if standoff_2['x'].iloc[0] > 0:
-        print ('Level 1 certification is required for a standoff between than', '%.1f' % standoff_1['x'].iloc[0] , 
-               'cm, and', '%.1f' % standoff_2['x'].iloc[0] , 'cm.')
-        print ('Level 2 certification is required for a standoff less than', '%.1f' % standoff_2['x'].iloc[0] , 'cm.')
-    else:
-        print ('Level 1 certification is required for a standoff less than', '%.1f' % standoff_1['x'].iloc[0] , 'cm.')
+print ('Level 0 certification is valid for a standoff greather than ', '%.1f' % standoff_1 , ' cm.')
+if standoff_1 > 0 
+    if standoff_2 > 0
+        print ('Level 1 certification is required for a standoff between than ', '%.1f' % standoff_1 , ' cm, and ', '%.1f' % standoff_2 , ' cm.')
+        print ('Level 2 certification is required for a standoff less than ', '%.1f' % standoff_2 , ' cm.')
+    else 
+        print ('Level 1 certification is required for a standoff less than ', '%.1f' % standoff_1 , ' cm.')
         print ('Level 2 certification is never required for this temperature profile.')
 
 
@@ -187,15 +175,7 @@ if standoff_1['x'].iloc[0] > 0:
 # 
 # To do this, one should also filter the data to remove times when the sun is not shining or when snow is likely to be on the module. The recommendations and defaults are to use poa_min=100 W/m² and data when the minimum ambient temperature t_amb_min=0.
 
-# In[22]:
-
-
-# Get data from a supplied data file
-weather_file = os.path.join(DATA_DIR,'xeff_demo.csv')
-Xeff_WEATHER, Xeff_META = pvdeg.weather.read(weather_file,'psm')
-
-
-# In[23]:
+# In[ ]:
 
 
 # Get data from a supplied data file
@@ -222,37 +202,31 @@ print ('The effective standoff for this system is ', '%.1f' % x_eff , ' cm.')
 # 
 # and used to calculate the $98^{th}$ percential temperature, $T_{98}$, for a PV system having a given effective standoff height, $X_{eff}$,  for an arbitrarily oriented module can be calculated. The input parameter possibilities are the same as shown in Objective #2 above, but the example below uses the default parameters. The actual tilt [degrees], azimuth [degrees] and $X_{eff}$ [cm] can be modifed as desired.
 
-# In[27]:
+# In[ ]:
 
 
 # This is the minimal function call using the common default settings to estimate T.
-T98 = pvdeg.standards.T98_estimate(
+T_98 = T98_estimate(
     weather_df=WEATHER,
     meta=META,
-    tilt=META.tilt,
-    azimuth=180,
+    tilt=META.tilt
+    azimuth=180
     x_eff=5)
-print ('The $98^{th}$ percential temperature is estimated to be ' , '%.1f' % T98 , ' °C.')
-
-
-# In[18]:
-
-
-T_98
+print ('The ' , $98^{th}$ , ' percential temperature is estimated to be ' , %.1f' % T_98 , ' °C.')
 
 
 # ## 5. Plot $X_{min}$ for all azimuth and tilt for a given $T_{98}$.
 # 
 # The temperature of a system is affected by the orientation. This section will scan all possible tilts and azimuths calculating the minimum standoff distance for a given $T_{98}$. Similar additional factors as above can also be modified but are not included here for simplicity. The tilt_count and azimuth_count are the number of divisions to break the 90° and 180° tilt and azimuth spans into, respectively.
 
-# In[21]:
+# In[ ]:
 
 
 # To do these plots we will be using Pyplot and need to import it first.
 import matplotlib.pyplot as plt
 
 
-# In[22]:
+# In[ ]:
 
 
 STANDOFF_SERIES=np.array
@@ -260,14 +234,6 @@ STANDOFF_SERIES=standoff_tilt_azimuth_scan( weather_df=WEATHER, meta=META, tilt_
 plt.show(contourf(STANDOFF_SERIES),colorbar(contourf(STANDOFF_SERIES)),
          Axes.set_title('Minimu Standoff Calculation'), Axes.set_xtick(np.linspace(0,180,18)),axes.set_ytick(np.linspace(0,90,18)),
          Axes.set_xlable('Azimuth (°)'),Axes.set_ylable('Tilt (°)'))):
-
-
-# In[23]:
-
-
-STANDOFF_SERIES
-list(range(starting value, endvalue+1, step))
-tilt_azm_pairs = list(itertools.product(tilts,azms))
 
 
 # ## 6. Plot $X_{min}$ for Level 1, Level 2, and $T_{98}$ for a given region.

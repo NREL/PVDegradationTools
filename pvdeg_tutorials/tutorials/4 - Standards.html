@@ -14636,18 +14636,19 @@ $**$ M. K. Fuentes, "A simplified thermal model for Flat-Plate photovoltaic arra
 </div>
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pvdeg</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+<span class="kn">import</span> <span class="nn">dask</span>
 </pre></div>
 
      </div>
@@ -14655,205 +14656,12 @@ $**$ M. K. Fuentes, "A simplified thermal model for Flat-Plate photovoltaic arra
 </div>
 </div>
 
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">AttributeError</span>                            Traceback (most recent call last)
-Cell <span class="ansi-green-intense-fg ansi-bold">In[1], line 2</span>
-<span class="ansi-green-fg">      1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">os</span>
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 2</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">pvdeg</span>
-<span class="ansi-green-fg">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">pandas</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span class="ansi-bold" style="color: rgb(0,0,255)">pd</span>
-<span class="ansi-green-fg">      4</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">pvdeg</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> DATA_DIR
-
-File <span class="ansi-green-intense-fg ansi-bold">c:\users\mkempe\documents\github\pvdegradationtools\pvdeg\__init__.py:7</span>
-<span class="ansi-green-fg">      5</span> <span style="color: rgb(95,135,135)"># from . import cli</span>
-<span class="ansi-green-fg">      6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> collection
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> degradation
-<span class="ansi-green-fg">      8</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> design
-<span class="ansi-green-fg">      9</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> fatigue
-
-File <span class="ansi-green-intense-fg ansi-bold">c:\users\mkempe\documents\github\pvdegradationtools\pvdeg\degradation.py:14</span>
-<span class="ansi-green-fg">     12</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> temperature
-<span class="ansi-green-fg">     13</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> spectral
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 14</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> weather
-<span class="ansi-green-fg">     16</span> <span style="color: rgb(95,135,135)"># TODO: Clean up all those functions and add gaps functionality</span>
-<span class="ansi-green-fg">     19</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">_deg_rate_env</span>(poa_global, temp, temp_chamber, p, Tf):
-
-File <span class="ansi-green-intense-fg ansi-bold">c:\users\mkempe\documents\github\pvdegradationtools\pvdeg\weather.py:14</span>
-<span class="ansi-green-fg">     11</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">datetime</span>
-<span class="ansi-green-fg">     13</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">h5py</span>
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 14</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dd</span>
-<span class="ansi-green-fg">     15</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">xarray</span> <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span class="ansi-bold" style="color: rgb(0,0,255)">xr</span>
-<span class="ansi-green-fg">     18</span> <span class="ansi-bold" style="color: rgb(0,135,0)">def</span> <span style="color: rgb(0,0,255)">get</span>(database, <span style="color: rgb(0,135,0)">id</span><span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">None</span>, geospatial<span style="color: rgb(98,98,98)">=</span><span class="ansi-bold" style="color: rgb(0,135,0)">False</span>, <span style="color: rgb(98,98,98)">*</span><span style="color: rgb(98,98,98)">*</span>kwargs):
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\dask\dataframe\__init__.py:6</span>
-<span class="ansi-green-fg">      4</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">_pyarrow_compat</span>
-<span class="ansi-green-fg">      5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">base</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> compute
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> backends, dispatch, rolling
-<span class="ansi-green-fg">      7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
-<span class="ansi-green-fg">      8</span>     DataFrame,
-<span class="ansi-green-fg">      9</span>     Index,
-<span class="ansi-green-intense-fg ansi-bold">   (...)</span>
-<span class="ansi-green-fg">     15</span>     to_timedelta,
-<span class="ansi-green-fg">     16</span> )
-<span class="ansi-green-fg">     17</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">groupby</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> Aggregation
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\dask\dataframe\backends.py:15</span>
-<span class="ansi-green-fg">     13</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">backends</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> CreationDispatch, DaskBackendEntrypoint
-<span class="ansi-green-fg">     14</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">_compat</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> is_any_real_numeric_dtype
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 15</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> DataFrame, Index, Scalar, Series, _Frame
-<span class="ansi-green-fg">     16</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dispatch</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
-<span class="ansi-green-fg">     17</span>     categorical_dtype_dispatch,
-<span class="ansi-green-fg">     18</span>     concat,
-<span class="ansi-green-intense-fg ansi-bold">   (...)</span>
-<span class="ansi-green-fg">     32</span>     union_categoricals_dispatch,
-<span class="ansi-green-fg">     33</span> )
-<span class="ansi-green-fg">     34</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">dataframe</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">extensions</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> make_array_nonempty, make_scalar
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\dask\dataframe\core.py:27</span>
-<span class="ansi-green-fg">     25</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> core
-<span class="ansi-green-fg">     26</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">array</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> Array, normalize_arg
-<span class="ansi-green-intense-fg ansi-bold">---&gt; 27</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">bag</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> map_partitions <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> map_bag_partitions
-<span class="ansi-green-fg">     28</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">base</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> (
-<span class="ansi-green-fg">     29</span>     DaskMethodsMixin,
-<span class="ansi-green-fg">     30</span>     dont_optimize,
-<span class="ansi-green-intense-fg ansi-bold">   (...)</span>
-<span class="ansi-green-fg">     33</span>     tokenize,
-<span class="ansi-green-fg">     34</span> )
-<span class="ansi-green-fg">     35</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">blockwise</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> Blockwise, BlockwiseDep, BlockwiseDepDict, blockwise
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\dask\bag\__init__.py:4</span>
-<span class="ansi-green-fg">      1</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">__future__</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> annotations
-<span class="ansi-green-fg">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 4</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">bag</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">avro</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> read_avro
-<span class="ansi-green-fg">      5</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">bag</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> Bag, Item
-<span class="ansi-green-fg">      6</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">dask</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">bag</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> bag_map <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> <span style="color: rgb(0,135,0)">map</span>
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\dask\bag\avro.py:6</span>
-<span class="ansi-green-fg">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">io</span>
-<span class="ansi-green-fg">      4</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">uuid</span>
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">fsspec</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> OpenFile, get_fs_token_paths, open_files
-<span class="ansi-green-fg">      7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">fsspec</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">utils</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> read_block
-<span class="ansi-green-fg">      8</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">fsspec</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">utils</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> tokenize <span class="ansi-bold" style="color: rgb(0,135,0)">as</span> fs_tokenize
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\fsspec\__init__.py:5</span>
-<span class="ansi-green-fg">      3</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> _version, caching
-<span class="ansi-green-fg">      4</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">callbacks</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> Callback
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 5</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">compression</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> available_compressions
-<span class="ansi-green-fg">      6</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">core</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> get_fs_token_paths, <span style="color: rgb(0,135,0)">open</span>, open_files, open_local
-<span class="ansi-green-fg">      7</span> <span class="ansi-bold" style="color: rgb(0,135,0)">from</span> <span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">exceptions</span> <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> FSTimeoutError
-
-File <span class="ansi-green-intense-fg ansi-bold">C:\ProgramData\Anaconda3\lib\site-packages\fsspec\compression.py:149</span>
-<span class="ansi-green-fg">    146</span> <span class="ansi-bold" style="color: rgb(0,135,0)">try</span>:
-<span class="ansi-green-fg">    147</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">import</span> <span class="ansi-bold" style="color: rgb(0,0,255)">lz4</span><span class="ansi-bold" style="color: rgb(0,0,255)">.</span><span class="ansi-bold" style="color: rgb(0,0,255)">frame</span>
-<span class="ansi-green-intense-fg ansi-bold">--&gt; 149</span>     register_compression(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">lz4</span><span style="color: rgb(175,0,0)">&#34;</span>, <span class="ansi-yellow-bg">lz4</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">frame</span><span class="ansi-yellow-bg" style="color: rgb(98,98,98)">.</span><span class="ansi-yellow-bg">open</span>, <span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">lz4</span><span style="color: rgb(175,0,0)">&#34;</span>)
-<span class="ansi-green-fg">    150</span> <span class="ansi-bold" style="color: rgb(0,135,0)">except</span> <span class="ansi-bold" style="color: rgb(215,95,95)">ImportError</span>:
-<span class="ansi-green-fg">    151</span>     <span class="ansi-bold" style="color: rgb(0,135,0)">pass</span>
-
-<span class="ansi-red-intense-fg ansi-bold">AttributeError</span>: module &#39;lz4.frame&#39; has no attribute &#39;open&#39;</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span>pandas<span class="w"> </span>--upgrade
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Defaulting to user installation because normal site-packages is not writeable
-Requirement already satisfied: pandas in c:\users\mkempe\appdata\roaming\python\python39\site-packages (2.0.3)
-Collecting pandas
-  Downloading pandas-2.1.4-cp39-cp39-win_amd64.whl (10.8 MB)
-     ---------------------------------------- 0.0/10.8 MB ? eta -:--:--
-     ---------------------------------------- 0.1/10.8 MB 1.7 MB/s eta 0:00:07
-     - -------------------------------------- 0.3/10.8 MB 3.5 MB/s eta 0:00:03
-     -- ------------------------------------- 0.7/10.8 MB 5.2 MB/s eta 0:00:02
-     ---- ----------------------------------- 1.2/10.8 MB 7.2 MB/s eta 0:00:02
-     ---------- ----------------------------- 2.9/10.8 MB 13.5 MB/s eta 0:00:01
-     ------------------- -------------------- 5.3/10.8 MB 21.2 MB/s eta 0:00:01
-     ------------------- -------------------- 5.3/10.8 MB 21.2 MB/s eta 0:00:01
-     ----------------------------------- ---- 9.7/10.8 MB 26.9 MB/s eta 0:00:01
-     --------------------------------------  10.8/10.8 MB 40.9 MB/s eta 0:00:01
-     --------------------------------------- 10.8/10.8 MB 34.4 MB/s eta 0:00:00
-Requirement already satisfied: numpy&lt;2,&gt;=1.22.4 in c:\users\mkempe\appdata\roaming\python\python39\site-packages (from pandas) (1.24.4)
-Requirement already satisfied: tzdata&gt;=2022.1 in c:\users\mkempe\appdata\roaming\python\python39\site-packages (from pandas) (2023.3)
-Requirement already satisfied: python-dateutil&gt;=2.8.2 in c:\programdata\anaconda3\lib\site-packages (from pandas) (2.8.2)
-Requirement already satisfied: pytz&gt;=2020.1 in c:\programdata\anaconda3\lib\site-packages (from pandas) (2022.7)
-Requirement already satisfied: six&gt;=1.5 in c:\programdata\anaconda3\lib\site-packages (from python-dateutil&gt;=2.8.2-&gt;pandas) (1.16.0)
-Installing collected packages: pandas
-  Attempting uninstall: pandas
-    Found existing installation: pandas 2.0.3
-    Uninstalling pandas-2.0.3:
-      Successfully uninstalled pandas-2.0.3
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>ERROR: Could not install packages due to an OSError: [WinError 5] Access is denied: &#39;C:\\Users\\mkempe\\AppData\\Roaming\\Python\\Python39\\site-packages\\~andas\\_libs\\algos.cp39-win_amd64.pyd&#39;
-Check the permissions.
-
-</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
@@ -14862,95 +14670,12 @@ Check the permissions.
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Python version "</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Pandas version "</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"pvdeg version "</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"dask version"</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
 </pre></div>
 
      </div>
 </div>
 </div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>Working on a  Windows 10
-Python version  3.9.16 (main, Mar  1 2023, 18:30:21) [MSC v.1916 64 bit (AMD64)]
-</pre>
-</div>
-</div>
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr">
-<pre>
-<span class="ansi-red-intense-fg ansi-bold">---------------------------------------------------------------------------</span>
-<span class="ansi-red-intense-fg ansi-bold">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-intense-fg ansi-bold">In[8], line 5</span>
-<span class="ansi-green-fg">      3</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Working on a </span><span style="color: rgb(175,0,0)">&#34;</span>, platform<span style="color: rgb(98,98,98)">.</span>system(), platform<span style="color: rgb(98,98,98)">.</span>release())
-<span class="ansi-green-fg">      4</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Python version </span><span style="color: rgb(175,0,0)">&#34;</span>, sys<span style="color: rgb(98,98,98)">.</span>version)
-<span class="ansi-green-intense-fg ansi-bold">----&gt; 5</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">Pandas version </span><span style="color: rgb(175,0,0)">&#34;</span>, <span class="ansi-yellow-bg">pd</span><span style="color: rgb(98,98,98)">.</span>__version__)
-<span class="ansi-green-fg">      6</span> <span style="color: rgb(0,135,0)">print</span>(<span style="color: rgb(175,0,0)">&#34;</span><span style="color: rgb(175,0,0)">pvdeg version </span><span style="color: rgb(175,0,0)">&#34;</span>, pvdeg<span style="color: rgb(98,98,98)">.</span>__version__)
-
-<span class="ansi-red-intense-fg ansi-bold">NameError</span>: name &#39;pd&#39; is not defined</pre>
-</div>
-</div>
-
-</div>
-
-</div>
-
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">dask</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"dask version "</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-<div class="jp-Cell-outputWrapper">
-<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
-</div>
-
-
-<div class="jp-OutputArea jp-Cell-outputArea">
-
-<div class="jp-OutputArea-child">
-
-    
-    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
-
-
-<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
-<pre>dask version  2023.6.0
-</pre>
-</div>
-</div>
-
-</div>
-
 </div>
 
 </div>
@@ -14978,7 +14703,7 @@ Cell <span class="ansi-green-intense-fg ansi-bold">In[8], line 5</span>
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get data from a supplied data file</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get data from a supplied data file (Do not use the next box of code if using your own file)</span>
 <span class="n">weather_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span><span class="s1">'psm3_demo.csv'</span><span class="p">)</span>
 <span class="n">WEATHER</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">weather_file</span><span class="p">,</span><span class="s1">'psm'</span><span class="p">)</span>
 </pre></div>
@@ -14996,19 +14721,39 @@ Cell <span class="ansi-green-intense-fg ansi-bold">In[8], line 5</span>
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">API_KEY</span> <span class="o">=</span> <span class="s1">'your_api_key_here'</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># From Tutorial 5 EXAMPLE, this works.</span>
+<span class="n">API_KEY</span> <span class="o">=</span> <span class="s1">'your_api_key_here'</span>
 <span class="c1"># The example API key here is for demonstation and is rate-limited per IP.</span>
 <span class="c1"># To get your own API key, visit https://developer.nrel.gov/signup/</span>
 
 <span class="n">weather_db</span> <span class="o">=</span> <span class="s1">'PSM3'</span>
-<span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">33.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">112.1</span><span class="p">)</span>
+<span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">39.741931</span><span class="p">,</span> <span class="o">-</span><span class="mf">105.169891</span><span class="p">)</span>
 <span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'api_key'</span><span class="p">:</span> <span class="s1">'DEMO_KEY'</span><span class="p">,</span>
-               <span class="s1">'email'</span><span class="p">:</span> <span class="s1">'michael.kempe@nrel.gov'</span><span class="p">,</span>
+               <span class="s1">'email'</span><span class="p">:</span> <span class="s1">'user@mail.com'</span><span class="p">,</span>
                <span class="s1">'names'</span><span class="p">:</span> <span class="s1">'tmy'</span><span class="p">,</span>
                <span class="s1">'attributes'</span><span class="p">:</span> <span class="p">[],</span>
                <span class="s1">'map_variables'</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
-<span class="n">WEATHER</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">,</span> <span class="o">**</span><span class="n">weather_arg</span><span class="p">)</span>
+<span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">,</span> <span class="o">**</span><span class="n">weather_arg</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get data from 'NSRDB' or 'PVGIS' using longitude and latitude (a geographic index (gid) can also be used).</span>
+<span class="c1"># Will override data supplied from a file above.</span>
+<span class="n">WEATHER</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s1">'NSRDB'</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="p">(</span><span class="mf">33.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">112.1</span><span class="p">),</span> <span class="n">geospatial</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">NREL_HPC</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15062,7 +14807,7 @@ $$ X_{min} = -X_0 \ln\left(1-\frac{T_{98,0}-T}{ T_{98,0}- T_{98,inf}}\right), Eq
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">standoff</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
-<span class="nb">print</span> <span class="p">(</span><span class="s1">'The minimum standoff for Level 0 certification and T₉₈&lt;70°C is '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">'The minimum standoff for Level 0 certification and T₉₈&lt;70°C is '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -15090,57 +14835,22 @@ $$ X_{min} = -X_0 \ln\left(1-\frac{T_{98,0}-T}{ T_{98,0}- T_{98,inf}}\right), Eq
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">META</span><span class="o">.</span><span class="n">latitude</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">standoff_1</span>
-</pre></div>
-
-     </div>
-</div>
-</div>
-</div>
-
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
-<div class="jp-Cell-inputWrapper">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-     <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">standoff_1</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span> 
-                                      <span class="n">T98</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">],</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> 
-                                      <span class="n">sky_model</span><span class="o">=</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">'sapm'</span><span class="p">,</span> 
-                                      <span class="n">conf_0</span><span class="o">=</span><span class="s1">'insulated_back_glass_polymer'</span><span class="p">,</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s1">'open_rack_glass_polymer'</span><span class="p">,</span>
+                                      <span class="n">T98</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> 
+                                      <span class="n">sky_model</span><span class="o">=</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">'sapm'</span><span class="p">,</span> <span class="n">conf_0</span><span class="o">=</span><span class="s1">'insulated_back_glass_polymer'</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s1">'open_rack_glass_polymer'</span><span class="p">,</span>
                                       <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">wind_speed_factor</span><span class="o">=</span><span class="mf">1.7</span><span class="p">)</span>
 <span class="n">standoff_2</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
-                                      <span class="n">T98</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="p">[</span><span class="s1">'latitude'</span><span class="p">],</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> 
-                                      <span class="n">sky_model</span><span class="o">=</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">'sapm'</span><span class="p">,</span> 
-                                      <span class="n">conf_0</span><span class="o">=</span><span class="s1">'insulated_back_glass_polymer'</span><span class="p">,</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s1">'open_rack_glass_polymer'</span><span class="p">,</span>
+                                      <span class="n">T98</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">azimuth</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> 
+                                      <span class="n">sky_model</span><span class="o">=</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">'sapm'</span><span class="p">,</span> <span class="n">conf_0</span><span class="o">=</span><span class="s1">'insulated_back_glass_polymer'</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s1">'open_rack_glass_polymer'</span><span class="p">,</span>
                                       <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">wind_speed_factor</span><span class="o">=</span><span class="mf">1.7</span><span class="p">)</span>
 
-<span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 0 certification is valid for a standoff greather than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_1</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
-<span class="k">if</span> <span class="n">standoff_1</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">standoff_2</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 1 certification is required for a standoff between than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_1</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> 
-               <span class="s1">' cm, and '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_2</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 2 certification is required for a standoff less than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_2</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 1 certification is required for a standoff less than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_1</span><span class="p">[</span><span class="s1">'x'</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 0 certification is valid for a standoff greather than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_1</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">standoff_1</span> <span class="o">&gt;</span> <span class="mi">0</span> 
+    <span class="k">if</span> <span class="n">standoff_2</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 1 certification is required for a standoff between than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_1</span> <span class="p">,</span> <span class="s1">' cm, and '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_2</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
+        <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 2 certification is required for a standoff less than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_2</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
+    <span class="k">else</span> 
+        <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 1 certification is required for a standoff less than '</span><span class="p">,</span> <span class="s1">'</span><span class="si">%.1f</span><span class="s1">'</span> <span class="o">%</span> <span class="n">standoff_1</span> <span class="p">,</span> <span class="s1">' cm.'</span><span class="p">)</span>
         <span class="nb">print</span> <span class="p">(</span><span class="s1">'Level 2 certification is never required for this temperature profile.'</span><span class="p">)</span>
 </pre></div>
 
