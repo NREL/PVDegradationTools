@@ -10,7 +10,7 @@ authors = [{name = "Pvdeg Python Developers", email = "Michael.Kempe@nrel.gov"}]
 maintainers = [{email = "Silvana.Ovaitt@nrel.gov"}]
 license = {text = "BSD-3"}
 readme = "README.md"
-requires-python = ">=3.9.0"
+requires-python = ">=3.9.0, <3.12"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
