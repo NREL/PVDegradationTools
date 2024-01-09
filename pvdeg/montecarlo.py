@@ -128,6 +128,7 @@ def _createStats(stats : dict[str, dict[str, float]], corr : list[Corr]) -> pd.D
 
     # empty correlation list case
     if not corr:
+        print('correct case triggered')
         stats_df = pd.DataFrame(stats)
         return stats_df
 
@@ -207,8 +208,10 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     Parameters
     ----------
     corr : List[Corr]
+        list containing correlations between variable
 
-    stats : 
+    stats : dict[str, dict[str, float]]
+        dictionary storing variable mean and standard deviation. Syntax : `<variable_name> : {'mean' : <float>, 'stdev' : <float>}`
 
     n : int
         number of samples to create
@@ -225,19 +228,23 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     Available at SSRN: https://ssrn.com/abstract=4066115 
     """
 
-    coeff_matrix = _symettric_correlation_matrix(corr)
+    # coeff_matrix = _symettric_correlation_matrix(corr)
 
     # refactor?
     # feels messy 
 
     # base case
     if corr:
+        coeff_matrix = _symettric_correlation_matrix(corr) # moved inside
+
         decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
 
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     
     stats_df = _createStats(stats, corr)    
     
+    print(stats_df)
+
     # no correlation data given, only stats
     if not corr:
         nocorr_df = pd.DataFrame(samples.T, columns=stats_df.columns.tolist())
@@ -317,23 +324,21 @@ def simulate(
     ):
 
     """
-    Applies a funtion to preform a monte carlo simulation
+    Applies a target function to data to preform a monte carlo simulation
 
     Parameters
     ----------
     func : function
         Function to apply for monte carlo simulation
     correlated_samples : pd.DataFrame        
-        Dataframe of correlated samples with named columns for each appropriate modeling constant
-    trials : int
-        Number of monte carlo iterations to run
+        Dataframe of correlated samples with named columns for each appropriate modeling constant, can be generated using generateCorrelatedSamples()
     func_kwargs : dict
-        Keyword arguments to pass to func.
+        Keyword arguments to pass to func, only include arguments not named in your correlated_samples columns
 
     Returns
     -------
     res : pandas.DataFrame
-        DataFrame with monte carlo results
+        DataFrame with monte carlo results from target function
     """
 
     ### NOTES ###   
