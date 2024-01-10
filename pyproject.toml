@@ -43,7 +43,7 @@ dependencies = [
     "openpyxl",
     "pandas",
     "photovoltaic",
-    "pvlib>=v0.10.3,<0.11",
+    "pvlib",
     "python-dateutil",
     "pytz",
     "scipy",

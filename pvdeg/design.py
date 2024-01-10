@@ -67,12 +67,13 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     """
 
     if from_dew_point:
-        temp_col = "temp_dew"
+        # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
+        temp = weather_df.get("temp_dew", weather_df.get("Dew Point"))
     else:
-        temp_col = "temp_air"
+        temp = weather_df["temp_air"]
 
     if k is None:
-        psat, avg_psat = humidity.psat(weather_df[temp_col])
+        psat, avg_psat = humidity.psat(temp)
         k = edge_seal_ingress_rate(avg_psat)
 
     width = k * (years * 365.25 * 24) ** 0.5
