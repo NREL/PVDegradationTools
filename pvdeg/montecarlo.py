@@ -1,13 +1,13 @@
 """Colection of functions for monte carlo simulations.
 """
 
-# Challenges:
-# how do we deal with different return types and inputs? Some functions return floats while others dataframes
+# DONE
+# - specify np seed
 
-### TODO:
-# standards.standoff functionality
-# corr list empty case
-
+# TODO
+# CASE: user enters single, 0 corrrelation value, ex: corr_coeff = [pvdeg.montecarlo.Corr('X_0', 'wind_speed_factor', 0)]
+# write pytest 
+# merge
 
 import numpy as np
 import pandas as pd
@@ -17,11 +17,9 @@ from scipy import stats
 from typing import Callable
 import inspect
 
-# add list of all valid modeling constants? 
-# this would restrict what users could do, pros vs cons
-
-class Corr:     # could be made into a dataclass
-    """corrlation class
+class Corr:
+    """
+    corrlation class : 
     stores modeling constants and corresponding correlation coefficient to access at runtime
     """
 
@@ -110,7 +108,11 @@ def _symettric_correlation_matrix(corr: list[Corr])->pd.DataFrame:
     # identity_df should be renamed more appropriately 
     return identity_df
 
-def _createStats(stats : dict[str, dict[str, float]], corr : list[Corr]) -> pd.DataFrame:
+def _createStats(
+    stats : dict[str, dict[str, float]], 
+    corr : list[Corr]
+    ) -> pd.DataFrame:
+
     """
     helper function. Unpacks mean and standard deviation for modeling constants into a DataFrame
 
@@ -158,7 +160,10 @@ def _createStats(stats : dict[str, dict[str, float]], corr : list[Corr]) -> pd.D
 
     return stats_df
 
-def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : pd.DataFrame) -> pd.DataFrame:
+def _correlateData(
+    samples_to_correlate : pd.DataFrame, 
+    stats_for_correlation : pd.DataFrame
+    ) -> pd.DataFrame:
 
     """
     helper function. Uses meaningless correlated samples and makes meaningful by 
@@ -170,7 +175,6 @@ def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : 
     samples_to_correlate : pd.DataFrame
         contains n samples generated with N(0, 1) for each modeling constant
         column names must be consistent with all modeling constant inputs
-
     stats_for_correlation : pd.DataFrame
         contains mean and stdev each modeling constant,
         column names must be consistent with all modeling constant inputs
@@ -194,7 +198,13 @@ def _correlateData(samples_to_correlate : pd.DataFrame, stats_for_correlation : 
 
     return correlated_samples
 
-def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, float]], n : int) -> pd.DataFrame:
+def generateCorrelatedSamples(
+        corr : list[Corr], 
+        stats : dict[str, dict[str, float]], 
+        n : int, 
+        seed = None
+        ) -> pd.DataFrame:
+
     # columns are now named, may run into issues if more mean and stdev entries than correlation coefficients
     # havent tested yet but this could cause major issues (see lines 163 and 164 for info)
 
@@ -208,12 +218,12 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     ----------
     corr : List[Corr]
         list containing correlations between variable
-
     stats : dict[str, dict[str, float]]
         dictionary storing variable mean and standard deviation. Syntax : `<variable_name> : {'mean' : <float>, 'stdev' : <float>}`
-
     n : int
         number of samples to create
+    seed : Any, optional
+        reseed the numpy BitGenerator, numpy legacy function (use cautiously)
 
     Returns
     ----------
@@ -229,6 +239,9 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
     # refactor?
     # feels messy 
+
+    if seed:
+        np.random.seed(seed=seed)
 
     # base case
     if corr:
@@ -257,58 +270,6 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
 
         return correlated_df
 
-# HAD TO MAKE lnr0 all lowercase
-@njit
-def vecArrhenius(
-    poa_global : np.ndarray, 
-    module_temp : np.ndarray, 
-    ea : float, 
-    x : float, 
-    lnr0 : float
-    ) -> float: 
-
-    """
-    Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
-
-    Parameters
-    ----------
-    poa_global : numpy.ndarray
-        Plane of array irradiance [W/m^2]
-
-    module_temp : numpy.ndarray
-        Cell temperature [C].
-
-    ea : float
-        Activation energy [kJ/mol]
-
-    x : float
-        Irradiance relation [unitless]
-
-    lnR0 : float
-        prefactor [ln(%/h)]
-
-    Returns
-    ----------
-    degredation : float
-        Degradation Rate [%/h]  
-
-    """
-
-    mask = poa_global >= 25
-    poa_global = poa_global[mask]
-    module_temp = module_temp[mask]
-
-    ea_scaled = ea / 8.31446261815324E-03
-    R0 = np.exp(lnr0)
-    poa_global_scaled = poa_global / 1000
-
-    degredation = 0
-    # refactor to list comprehension approach
-    for entry in range(len(poa_global_scaled)):
-        degredation += R0 * np.exp(-ea_scaled / (273.15 + module_temp[entry])) * np.power(poa_global_scaled[entry], x)
-
-    return (degredation / len(poa_global))
-
 # monte carlo function
 # model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
 
@@ -316,7 +277,7 @@ def simulate(
     func : Callable,
     correlated_samples : pd.DataFrame, 
     **function_kwargs
-    ):
+    ) -> pd.Series:
 
     """
     Applies a target function to data to preform a monte carlo simulation
@@ -332,8 +293,8 @@ def simulate(
 
     Returns
     -------
-    res : pandas.DataFrame
-        DataFrame with monte carlo results from target function
+    res : pandas.Series
+        Series with monte carlo results from target function
     """
 
     ### NOTES ###   
@@ -344,22 +305,21 @@ def simulate(
     args = {k.lower(): v for k, v in function_kwargs.items()} # make lowercase
 
     func_signature = inspect.signature(func)
-    # print(f"func_signature: {func_signature}")
+
     func_args = set(func_signature.parameters.keys())
-    # print(f"func_args: {func_args}")
 
     def prepare_args(row):
         return {arg: row[arg] if arg in row else function_kwargs.get(arg) for arg in func_args}
 
     args = prepare_args(correlated_samples.iloc[0])
-    # print(f"args: {args}")
 
     def apply_func(row):
         row_args = {**args, **{k.lower(): v for k, v in row.items()}}
-        # print(f"Row args: {row_args}")
+
         return func(**row_args)
 
     # this line is often flagged when target function is not given required arguments
+    # problems also arise when target function parameter names are not lowercase
     result = correlated_samples.apply(apply_func, axis=1)
 
     return result
