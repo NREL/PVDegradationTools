@@ -1,4 +1,5 @@
-"""Colection of functions for monte carlo simulations.
+"""
+Collection of functions for monte carlo simulations.
 """
 
 # DONE
