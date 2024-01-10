@@ -128,7 +128,6 @@ def _createStats(stats : dict[str, dict[str, float]], corr : list[Corr]) -> pd.D
 
     # empty correlation list case
     if not corr:
-        print('correct case triggered')
         stats_df = pd.DataFrame(stats)
         return stats_df
 
@@ -228,8 +227,6 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     Available at SSRN: https://ssrn.com/abstract=4066115 
     """
 
-    # coeff_matrix = _symettric_correlation_matrix(corr)
-
     # refactor?
     # feels messy 
 
@@ -242,8 +239,6 @@ def generateCorrelatedSamples(corr : list[Corr], stats : dict[str, dict[str, flo
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     
     stats_df = _createStats(stats, corr)    
-    
-    print(stats_df)
 
     # no correlation data given, only stats
     if not corr:
