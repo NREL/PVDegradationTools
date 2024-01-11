@@ -48,7 +48,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     Parameters
     ----------
     weather_df : pd.DataFrame
-        must be datetime indexed and contain at least temp_air, Dew Point
+        must be datetime indexed and contain at least temp_air, temp_dew
     meta : dict
         location meta-data (from weather file)
     k: float
@@ -58,7 +58,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     years : integer, default = 25
         Integer number of years under water ingress
     from_dew_point : boolean, optional
-        If true, will compute the edge seal width from Dew Point instead of dry bulb air temp
+        If true, will compute the edge seal width from temp_dew instead of dry bulb air temp
 
     Returns
     ----------
