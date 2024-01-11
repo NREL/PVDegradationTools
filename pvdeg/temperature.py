@@ -12,7 +12,7 @@ def module(
     poa=None,
     temp_model="sapm",
     conf="open_rack_glass_polymer",
-    wind_speed_factor=1,
+    wind_speed_factor=1.7,
 ):
     """
     Calculate module surface temperature using pvlib.
@@ -53,7 +53,14 @@ def module(
     return module_temperature
 
 
-def cell(weather_df, meta, poa=None, temp_model="sapm", conf="open_rack_glass_polymer"):
+def cell(
+    weather_df, 
+    meta, 
+    poa=None, 
+    temp_model="sapm", 
+    conf="open_rack_glass_polymer", 
+    wind_speed_factor=1.7,
+):
     """
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.
@@ -72,6 +79,11 @@ def cell(weather_df, meta, poa=None, temp_model="sapm", conf="open_rack_glass_po
         The configuration of the PV module architecture and mounting configuration.
         Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
                  'close_mount_glass_glass', 'insulated_back_glass_polymer'
+
+    Return:
+    -------
+    temp_cell : pandas.DataFrame
+        This is the temperature of the cell in a module at every time step. [°C]
     """
 
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
@@ -82,7 +94,7 @@ def cell(weather_df, meta, poa=None, temp_model="sapm", conf="open_rack_glass_po
     temp_cell = pvlib.temperature.sapm_cell(
         poa_global=poa["poa_global"],
         temp_air=weather_df["temp_air"],
-        wind_speed=weather_df["wind_speed"],
+        wind_speed=weather_df["wind_speed"]* wind_speed_factor,
         **parameters
     )
     return temp_cell
