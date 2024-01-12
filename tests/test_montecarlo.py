@@ -1,5 +1,5 @@
 # TODO:
-# add data to compare against
+# add standards.standoff() test, waiting until standoff function is not under active development
 
 import pytest
 import os 
@@ -19,13 +19,12 @@ with open(os.path.join(TEST_DATA_DIR, "meta.json"), "r") as file:
 
 
 CORRELATED_SAMPLES_1 = pd.read_csv(
-    os.path.join(TEST_DATA_DIR, r"correlated_samples_arrgenius.csv"),
-    index_col=0
+    os.path.join(TEST_DATA_DIR, r"correlated_samples_arrhenius.csv"),
 )
 
 ARRHENIUS_RESULT = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"monte_carlo_arrhenius.csv"),
-    index_col=0
+    # index_col=0
 )
 
 def test_generateCorrelatedSamples():
