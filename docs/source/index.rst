@@ -1,5 +1,11 @@
+.. pvdeg documentation master file, created by
+   sphinx-quickstart on Thu Jan 18 15:25:51 2024.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
 .. image:: ../../../pvdeg_tutorials/pvdeg_logo.png
-  :width: 200
+   :width: 500
+
 
 Welcome to pvdeg!
 ==============================================================
@@ -51,23 +57,17 @@ Please also cite the DOI corresponding to the specific version that you used.
 DOIs are listed at Zenodo.org
 
 
-Contents
-========
-
 .. toctree::
-   :maxdepth: 3
-   :caption: Contents:
+   :hidden:
+   :titlesonly:
 
-   package_overview
-   whatsnew
-   installation
-   api
+   user_guide/index
+   tutorials/index
 
+..
+   Indices and tables
+   ==================
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   * :ref:`genindex`
+   * :ref:`modindex`
+   * :ref:`search`
