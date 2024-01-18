@@ -107,6 +107,7 @@ def solder_fatigue(
     b=0.33,
     C1=405.6,
     Q=0.12,
+    wind_speed_factor=None,
 ):
     """
     Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
@@ -169,7 +170,8 @@ def solder_fatigue(
         time_range = weather_df.index
 
     if temp_cell is None:
-        temp_cell = temperature.cell(weather_df, meta)
+        temp_cell = temperature.cell(weather_df=weather_df, meta=meta,
+                                     wind_speed_factor=wind_speed_factor)
 
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)
 
