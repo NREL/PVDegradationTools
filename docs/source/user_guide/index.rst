@@ -7,6 +7,7 @@ User Guide
    :maxdepth: 2
 
    installation
+   package_overview
    montecarlo
    
 
