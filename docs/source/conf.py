@@ -73,6 +73,7 @@ html_theme_options = {
     'extra_nav_links': {
         'User Guide' : 'user_guide/index',
         'Tutorials' : 'tutorials/index',
+        'API' : 'api',
     },
 
     "github_url": "https://github.com/NREL/PVDegradationTools",
