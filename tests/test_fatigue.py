@@ -19,5 +19,5 @@ def test_solder_fatigue():
     # requires PSM3 weather file
 
     damage = fatigue.solder_fatigue(weather_df=WEATHER, meta=META,
-                                    wind_speed_factor=1.0)
+                                    wind_factor=1.0)
     assert damage == pytest.approx(15.646, abs=0.005)
