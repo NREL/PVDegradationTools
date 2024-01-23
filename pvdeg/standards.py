@@ -235,12 +235,15 @@ def standoff(
         This is the 98th percential temperature of a theoretical module with no standoff.
     T98_inf : float [°C]
         This is the 98th percential temperature of a theoretical rack mounted module.
+    T98 : float [°C]
+        This is the 98th percential temperature that was calculated to.
         
     References
     ----------
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     """
+
     if azimuth == None: #Sets the default orientation to equator facing.
         if float(meta['latitude']) < 0:
             azimuth=0
@@ -279,11 +282,60 @@ def standoff(
     if x<0: 
         x=0 
 
-    res = {"x": x, "T98_0": T98_0, "T98_inf": T98_inf}
+    res = {"x": x, "T98_0": T98_0, "T98_inf": T98_inf, "T98": T98}
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
 
+def Interpret_Standoff(
+        standoff_1=pd.DataFrame.from_dict({"T98": None}, orient="index").T, 
+        standoff_2=pd.DataFrame.from_dict({"T98": None}, orient="index").T 
+        ):
+    
+    """
+    This is a set of statments designed to provide a printable output to interpret the results of standoff calculations.
+    At a minimum, data for Standoff_1 must be included.
+
+    Parameters
+    ----------
+    Standoff_1 and Standoff_2 : df
+    This is the dataframe output from the standoff calculation method for calculations at 70°C and 80°C, respectively.
+        x : float [°C]
+            Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
+            Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
+        T98_0 : float [°C]
+            This is the 98th percential temperature of a theoretical module with no standoff.
+        T98_inf : float [°C]
+            This is the 98th percential temperature of a theoretical rack mounted module.
+
+    Returns
+    -------
+    Output: str
+        This is an interpretation of the accepatble effective standoff values suitable for presentation.
+    """
+
+    if (standoff_1.T98[0] == 80 and standoff_2.T98[0] == 70) or standoff_2.T98[0] == 70:
+        standoff_1, standoff_2 = standoff_2, standoff_1
+
+    if standoff_1.T98[0] == 70 and standoff_2.T98[0] == 80:
+        Output = 'The estimated temperature of an insulated-back module is ' + '%.1f' % standoff_1.T98_0[0] + '°C. \n'
+        Output = Output + 'The estimated temperature of an open-rack module is ' + '%.1f' % standoff_1.T98_inf[0] + '°C. \n'
+        Output = Output + 'Level 0 certification is valid for a standoff greather than ' + '%.1f' % standoff_1.x[0] + ' cm. \n'
+        if standoff_1.x[0] > 0: 
+            if standoff_2.x[0] > 0:
+                Output = Output + 'Level 1 certification is required for a standoff between than ' + '%.1f' % standoff_1.x[0]  + ' cm, and ' + '%.1f' % standoff_2.x[0] + ' cm. \n'
+                Output = Output + 'Level 2 certification is required for a standoff less than ' + '%.1f' % standoff_2.x[0]  + ' cm.'
+            else:
+                Output = Output + 'Level 1 certification is required for a standoff less than ' + '%.1f' % standoff_1.x[0]  + ' cm. \n'
+                Output = Output + 'Level 2 certification is never required for this temperature profile.'
+    elif standoff_1.T98[0] == 70:
+        Output = "The estimated temperature of an insulated-back module is " + '%.1f' % standoff_1.T98_0[0] + '°C. \n'
+        Output = Output + 'The estimated temperature of an open-rack module is ' + '%.1f' % standoff_1.T98_inf[0] + '°C. \n'
+        Output = Output + 'The minimum standoff for Level 0 certification and T₉₈<70°C is ' + '%.1f' % standoff_1.x[0] + ' cm.'
+    else:
+        Output = "Incorrect data for IEC TS 63126 Level determination."
+
+    return Output
 
 
 def T98_estimate(
