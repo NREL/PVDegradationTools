@@ -12,7 +12,7 @@ def module(
     poa=None,
     temp_model="sapm",
     conf="open_rack_glass_polymer",
-    wind_speed_factor=1.7,
+    wind_factor=0.33,
 ):
     """
     Calculate module surface temperature using pvlib.
@@ -44,7 +44,10 @@ def module(
 
     if poa is None:
         poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
-
+    if 'Wind_Height_m' not in meta():
+        wind_speed_factor = 1
+    else:
+        wind_speed_factor = (10/ meta['Wind_Height']) ^ wind_factor
     module_temperature = pvlib.temperature.sapm_module(
         poa_global=poa["poa_global"],
         temp_air=weather_df["temp_air"],
@@ -57,7 +60,7 @@ def module(
 
 
 def cell(weather_df, meta, poa=None, temp_model="sapm",
-         conf="open_rack_glass_polymer", wind_speed_factor=None):
+         conf="open_rack_glass_polymer", wind_factor=0.33):
     """
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.
@@ -78,10 +81,13 @@ def cell(weather_df, meta, poa=None, temp_model="sapm",
         configuration.
         Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
                  'close_mount_glass_glass', 'insulated_back_glass_polymer'
-    wind_speed_factor : (str)
-        Wind speed factor is a #KEMPE EXPLAIN HERE. Common values are 1.7 for
-        sapm. If None is passed, the function checks which algorithm for
-        temperature calculation is used and assigns it automatically.
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33 
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        this can vary significantly. 
 
     Return:
     -------
@@ -89,14 +95,10 @@ def cell(weather_df, meta, poa=None, temp_model="sapm",
         This is the temperature of the cell in a module at every time step.[°C]
     """
 
-    # TODO: if weather object passed is NSRDB data, use wind_seped_factor 1.7
-    # (and update description)
-    if wind_speed_factor is None:
-        if temp_model == "sapm":
-            wind_speed_factor = 1.7
-        else:
-            wind_speed_factor = 1.0
-
+    if 'Wind_Height_m' not in meta():
+        wind_speed_factor = 1
+    else:
+        wind_speed_factor = (10/ meta['Wind_Height']) ^ wind_factor
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
