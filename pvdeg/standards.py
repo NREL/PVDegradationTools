@@ -27,7 +27,7 @@ def eff_gap_parameters(
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
-    wind_speed_factor=1.7,):
+    wind_factor=0.33,):
 
     """
     Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system 
@@ -51,13 +51,13 @@ def eff_gap_parameters(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
-    wind_speed_factor : float, optional
-        Wind speed correction factor to account for different wind speed measurement heights
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRD provides calculations at 2m (i.e module height) but SAPM uses a 10m height.
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
         It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used. This results in a wind_speed_factor of 1.7. It is acknowledged that this can 
-        vary significantly. 
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        this can vary significantly. 
 
     Meta data
     ------------------
@@ -65,9 +65,9 @@ def eff_gap_parameters(
         Tilt angle of PV system relative to horizontal. [°] Required
     azimuth : float,
         Azimuth angle of PV system relative to north. [°] Required
-    Anemomenter_Height_m : float,
-        if wind_speed_factor is "None", it will run a calculation based on this height and a 
-        power factor of 0.33. If neither are supplied a wind speed factor of 1 will be used.
+    Wind_Height_m : float,
+        if wind_factor is "None", it will run a calculation based on the height and a 
+        power factor of 0.33. If neither are supplied, the wind speed will not be adjusted.
 
     Returns
     -------
@@ -102,17 +102,14 @@ def eff_gap_parameters(
         tilt=float(meta['Tilt']),
         azimuth=float(meta['Azimuth']),
         sky_model=sky_model, )
-    if wind_speed_factor is None:
-        if 'Anemometer_Height_m' in meta():
-            wind_speed_factor = (meta('Anemometer_Height_m')/2) ** 0.33 #Assumes a 2 meter height used in the module temperature model
-        else:
-            wind_speed_factor = 1
+    if 'Wind_Height_m' not in meta.keys():
+        wind_factor = 1
     T_0 = temperature.cell(
         weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_0, 
-        wind_speed_factor=wind_speed_factor )
+        wind_factor=wind_factor )
     T_inf = temperature.cell(
         weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_inf, 
-        wind_speed_factor=wind_speed_factor )
+        wind_factor=wind_factor )
     T_measured = weather_df.Module_Temperature
     T_ambient = weather_df.temp_air
 
@@ -186,7 +183,7 @@ def standoff(
     conf_inf="open_rack_glass_polymer",
     T98=70, # [°C]
     x_0=6.5, # [cm]
-    wind_speed_factor=1.7,
+    wind_factor=0.33,
 ):
     """
     Calculate a minimum standoff distance for roof mounded PV systems. 
@@ -219,12 +216,13 @@ def standoff(
         Default: 'open_rack_glass_polymer'
     x0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
-    wind_speed_factor : float, optional
-        Wind speed correction factor to account for different wind speed measurement heights
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRD provides calculations at 2m (i.e module height) but SAPM uses a 10m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 be used.
-        This results in a wind_speed_factor of 1.7. It is acknowledged that this can vary significantly. 
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33 
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        this can vary significantly. 
 
     Returns
     -------
@@ -249,7 +247,8 @@ def standoff(
             azimuth=0
         else:
             azimuth=180
-
+    if 'Wind_Height_m' not in meta.keys():
+        wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
@@ -269,10 +268,10 @@ def standoff(
         azimuth=azimuth,
         sky_model=sky_model, )
     T_0 = temperature.cell(
-        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_0, wind_speed_factor=wind_speed_factor )
+        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_0, wind_factor=wind_factor )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
     T_inf = temperature.cell(
-        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_inf, wind_speed_factor=wind_speed_factor )
+        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_inf, wind_factor=wind_factor )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     try:
@@ -346,7 +345,7 @@ def T98_estimate(
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
-    wind_speed_factor=1.7,
+    wind_factor=0.33,
     tilt=0,
     azimuth=None,
     x_eff=None,
@@ -382,12 +381,13 @@ def T98_estimate(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
-    wind_speed_factor : float, optional
-        Wind speed correction factor to account for different wind speed measurement heights
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRD provides calculations at 2m (i.e module height) but SAPM uses a 10m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 be used.
-        This results in a wind_speed_factor of 1.7. It is acknowledged that this can vary significantly. 
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33 
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        this can vary significantly. 
     
     Returns
     -------
@@ -400,7 +400,8 @@ def T98_estimate(
             azimuth=0
         else:
             azimuth=180
-
+    if 'Wind_Height_m' not in meta.keys():
+        wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
@@ -420,10 +421,10 @@ def T98_estimate(
         azimuth=azimuth,
         sky_model=sky_model, )
     T_0 = temperature.cell(
-        weather_df, meta, poa, temp_model, conf_0, wind_speed_factor, )
+        weather_df, meta, poa, temp_model, conf_0, wind_factor, )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
     T_inf = temperature.cell(
-        weather_df, meta, poa, temp_model, conf_inf, wind_speed_factor, )
+        weather_df, meta, poa, temp_model, conf_inf, wind_factor, )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     T98 = T98_0 - (T98_0-T98_inf)*(1-np.exp(-x_eff/x_0))
