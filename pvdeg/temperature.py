@@ -44,10 +44,10 @@ def module(
 
     if poa is None:
         poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
-    if 'Wind_Height_m' not in meta():
+    if 'Wind_Height_m' not in meta.keys():
         wind_speed_factor = 1
     else:
-        wind_speed_factor = (10/ meta['Wind_Height']) ^ wind_factor
+        wind_speed_factor = (10/ meta['Wind_Height_m']) ** wind_factor
     module_temperature = pvlib.temperature.sapm_module(
         poa_global=poa["poa_global"],
         temp_air=weather_df["temp_air"],
@@ -95,10 +95,10 @@ def cell(weather_df, meta, poa=None, temp_model="sapm",
         This is the temperature of the cell in a module at every time step.[°C]
     """
 
-    if 'Wind_Height_m' not in meta():
+    if 'Wind_Height_m' not in meta.keys():
         wind_speed_factor = 1
     else:
-        wind_speed_factor = (10/ meta['Wind_Height']) ^ wind_factor
+        wind_speed_factor = (10/ meta['Wind_Height_m']) ** wind_factor
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
