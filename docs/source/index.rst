@@ -63,6 +63,7 @@ DOIs are listed at Zenodo.org
 
    user_guide/index
    tutorials/index
+   api
 
 ..
    Indices and tables
