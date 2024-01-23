@@ -35,6 +35,14 @@ extensions = [
     'sphinx_toggleprompt',
 ]
 
+# Add or update these if necessary
+autodoc_default_options = {
+    'member-order': 'bysource',
+    'show-inheritance': True,
+    'undoc-members': True,
+    'exclude-members': '__weakref__'
+}
+
 napoleon_use_rtype = False  # group rtype on same line together with return
 
 templates_path = ['_templates']
