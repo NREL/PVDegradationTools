@@ -43,6 +43,14 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
+# sphinx_gallery_conf = {
+#     # Path to your example scripts
+#     'examples_dirs': '../pvdeg_tutorials/tutorials', # should this have an extra ..
+#     # Path to where to save gallery generated output
+#     'gallery_dirs': 'tutorials',
+#     # Other settings
+# }
+
 napoleon_use_rtype = False  # group rtype on same line together with return
 
 templates_path = ['_templates']
@@ -179,20 +187,7 @@ ipython_warning_is_error = False
 # https://github.com/pvlib/pvlib-python/issues/837
 suppress_warnings = ['ref.footnote']
 
-# settings for sphinx-gallery
-# sphinx_gallery_conf = {
-#     'examples_dirs': ['../../examples'],  # location of gallery scripts
-#     'gallery_dirs': ['gallery'],  # location of generated output
-#     # sphinx-gallery only shows plots from plot_*.py files by default:
-#     # 'filename_pattern': '*.py',
 
-#     # directory where function/class granular galleries are stored
-#     'backreferences_dir': 'reference/generated/gallery_backreferences',
-
-#     # Modules for which function/class level galleries are created. In
-#     # this case only pvdeg, could include others though.  must be tuple of str
-#     'doc_module': ('pvdeg',),
-# }
 # supress warnings in gallery output
 # https://sphinx-gallery.github.io/stable/configuration.html
 warnings.filterwarnings("ignore", category=UserWarning,

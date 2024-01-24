@@ -1,3 +1,5 @@
+.. _tutorials:
+
 ==========
 Tutorials
 ==========
@@ -5,7 +7,11 @@ Tutorials
 
 .. toctree::
     :maxdepth: 2
+    :caption: Contents
 
+Pvdeg tutorials
 
-*Links to Tutorials from PVDegredationTools.tutorials here
+.. 
+    .. include:: /tutorials/README.rst
+
    
