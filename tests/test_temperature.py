@@ -38,7 +38,7 @@ def test_module():
         poa,
         temp_model="sapm",
         conf="open_rack_glass_polymer",
-        wind_speed_factor=1,
+        wind_factor=0,
     )
 
     pd.testing.assert_series_equal(
@@ -47,7 +47,7 @@ def test_module():
 
 
 def test_cell():
-    result = pvdeg.temperature.cell(WEATHER, META, poa=poa)
+    result = pvdeg.temperature.cell(WEATHER, META, poa=poa, temp_model="sapm", conf="open_rack_glass_polymer", wind_factor=0,)
     pd.testing.assert_series_equal(
         result, celltemp_expected, check_dtype=False, check_names=False
     )
