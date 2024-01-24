@@ -8,6 +8,7 @@ User Guide
 
    installation
    package_overview
+   NSRDB_API_Key
    montecarlo
    
 
