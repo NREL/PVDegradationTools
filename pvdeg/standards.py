@@ -14,10 +14,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # from gaps import ProjectPoints
 
-from . import temperature
-from . import spectral
-from . import utilities
-from . import weather
+from pvdeg import temperature, spectral, utilities, weather
 
 def eff_gap_parameters(
     weather_df=None,
