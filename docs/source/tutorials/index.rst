@@ -4,15 +4,16 @@
 Tutorials
 ==========
 
-Purpose
+Tutorials to learn how to use and experiment with the various functionalities 
+are available for running interactively through Google Collab at
+`PVDeg JupyterBook
+<https://nrel.github.io/PVDegradationTools/intro.html>`_.
+
+Gallery
 -------
-These tutorials are designed to help you develop and understanding of pvdeg's functions and capabilities. These are not to be confused with calculators (coming later).
-
-
 .. toctree::
     :maxdepth: 2
     :caption: Contents
-
 
 .. include:: /tutorials/README.rst
 

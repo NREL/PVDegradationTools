@@ -12,7 +12,7 @@ Modules, methods, classes and attributes are explained here.
 :py:mod:`pvdeg`
 
 .. autosummary::
-    :toctree: 
+    :toctree: _autosummary/
     :template: module.rst
 
     collection

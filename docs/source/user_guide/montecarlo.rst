@@ -17,7 +17,6 @@ Defining Correlations
 ^^^^^^^^^^^^^^^^^^^
 If your variables are correlated form a list of correlations using pvdeg.montecarlo.Corr() objects.  
 ``my_correlations = [pvdeg.montecarlo.corr('<var_1>', '<var_2>', <float>), ...]``
-*why are there extra backticks this is upsetting*
 
 Defining Mean and Standard Deviation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -61,7 +60,7 @@ Use ``pvdeg.montecarlo.simulate()`` to run a Monte Carlo simulation on a target 
 
 Selecting Static and Dynamic Variables
 --------------------------------------
-*Something goes here*
+See the image below which shows how to split your Monte Carlo inputs into the appropriate function arguments.
 
 .. image:: Monte-Carlo-Details/Slide3.PNG
     :alt: missing image

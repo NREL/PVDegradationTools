@@ -28,9 +28,7 @@ other degradation profiles are in the works.
 The source code for pvdeg is hosted on `github
 <https://github.com/NREL/pvdeg>`_.
 
-Tutorials to learn how to use and experiment with the various functionalities
-are available for running interactively through Google Collab at
-`PVDeg JupyterBook<https://nrel.github.io/PVDegradationTools/intro.html>`.
+See :ref:`tutorials` to learn how to use and experiment with various functionalities 
 
 Please see the :ref:`installation` page for installation help.
 

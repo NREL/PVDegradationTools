@@ -6,9 +6,31 @@
 
 .. automodule:: {{ fullname }}
 
+   .. this is crazy  
+
+   {% block function_overview %}
+   {% if functions %}
+
+   Function Overview
+   -----------------
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+
+      {% for item in functions %}
+      {{ fullname }}.{{ item }}
+      {%- endfor %}
+
+   {% endif %}
+   {% endblock %}
+   
+   .. this is crazy  
+
    {% block functions %}
    {% if functions %}
 
+.. 
    Functions
    ---------
 
