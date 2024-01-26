@@ -1,12 +1,12 @@
 
 :orphan:
 
-.. _sphx_glr_sg_execution_times:
+.. _sphx_glr_auto_examples_sg_execution_times:
 
 
 Computation times
 =================
-**00:00.180** total execution time for 1 file **from all galleries**:
+**00:00.180** total execution time for 1 file **from auto_examples**:
 
 .. container::
 
@@ -32,6 +32,6 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_plot_fit_to_matrix.py` (``..\examples\plot_fit_to_matrix.py``)
+   * - :ref:`sphx_glr_auto_examples_plot_fit_to_matrix.py` (``plot_fit_to_matrix.py``)
      - 00:00.180
      - 0.0

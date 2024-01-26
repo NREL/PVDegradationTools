@@ -14,12 +14,12 @@ General Steps
 -------------
 
 Defining Correlations
-^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 If your variables are correlated form a list of correlations using pvdeg.montecarlo.Corr() objects.  
 ``my_correlations = [pvdeg.montecarlo.corr('<var_1>', '<var_2>', <float>), ...]``
 
 Defining Mean and Standard Deviation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Each variable passed to a Corr object in string form must have its own dictionary entry containing its mean and standard deviation in the following form.
 ```
 my_dict = {
@@ -48,7 +48,7 @@ To create uncorrelated samples the ``corr`` parameter of ``pvdeg.montecarlo.gene
 ```
 
 3rd Party Samples/Data
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 If you have another prefered way of creating samples to use in a Monte Carlo simulation you can bypass the previous steps. The samples DataFrame must have appropriate column names that match the target function's arguments.  
 
 Running A Monte Carlo Simulation

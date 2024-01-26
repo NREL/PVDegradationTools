@@ -11,10 +11,11 @@ are available for running interactively through Google Collab at
 
 Gallery
 -------
-.. toctree::
-    :maxdepth: 2
-    :caption: Contents
 
-.. include:: /tutorials/README.rst
+
+.. points to the auto generated gallery,
+.. to edit the gallery visit the examples directory found at ../../examples
+.. include:: ../auto_examples/index.rst
+
 
    
