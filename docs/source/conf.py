@@ -21,6 +21,10 @@ import pvdeg
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
+########################################################################################
+### INSTALL pydoc with conda NOT PIP and run in same conda environment when building ###
+########################################################################################
+
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
@@ -32,8 +36,8 @@ extensions = [
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
     # 'sphinx_gallery.gen_gallery',
-    'sphinx_gallery.load_style',
-    'nbsphinx',
+    'sphinx_gallery.load_style', # thumbnail gallery for .ipynb
+    'nbsphinx', # convert .ipynb to html, install pandoc using CONDA not pip
     'sphinx_toggleprompt',
 ]
 
