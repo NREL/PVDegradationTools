@@ -31,14 +31,16 @@ extensions = [
     'sphinx.ext.autosummary',
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
-    'sphinx_gallery.gen_gallery',
+    # 'sphinx_gallery.gen_gallery',
+    'sphinx_gallery.load_style',
+    'nbsphinx',
     'sphinx_toggleprompt',
 ]
 
-sphinx_gallery_conf = {
-     'examples_dirs': '../examples',   # path to your example scripts
-     'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
-}
+# sphinx_gallery_conf = {
+#      'examples_dirs': '../examples',   # path to your example scripts
+#      'gallery_dirs': 'auto_examples',  # path to where to save gallery generated output
+# }
 
 # Add or update these if necessary
 autodoc_default_options = {

@@ -12,6 +12,8 @@ are available for running interactively through Google Collab at
 Gallery
 -------
 
+.. nbgallery::
+    ../../../pvdeg_tutorials/tutorials/2 - Degradation.ipynb
 
 .. points to the auto generated gallery,
 .. to edit the gallery visit the examples directory found at ../../examples
