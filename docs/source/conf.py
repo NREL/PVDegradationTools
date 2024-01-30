@@ -75,7 +75,7 @@ version = '%s' % (pvdeg.__version__)
 # The full version, including alpha/beta/rc tags.
 release = version
 
-exclude_patterns = ['whatsnew/*', '**.ipynb_checkpoints']
+exclude_patterns = ['**.ipynb_checkpoints']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -93,12 +93,13 @@ html_theme = "pydata_sphinx_theme"
 # https://pydata-sphinx-theme.rtfd.io/en/latest/user_guide/configuring.html
 
 html_theme_options = {
-    'navigation_depth': 3,
+    'navigation_depth': 4,
     'titles_only': False,
     'extra_nav_links': {
         'User Guide' : 'user_guide/index',
         'Tutorials' : 'tutorials/index',
         'API reference' : 'api',
+        'What\'s New' : 'whatsnew/index',
     },
 
     "github_url": "https://github.com/NREL/PVDegradationTools",
