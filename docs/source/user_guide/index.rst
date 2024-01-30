@@ -10,5 +10,8 @@ User Guide
    package_overview
    NSRDB_API_Key
    montecarlo
+   pv-variables-terms
+   contributing
+   
    
 
