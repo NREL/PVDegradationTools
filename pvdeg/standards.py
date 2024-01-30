@@ -53,8 +53,12 @@ def eff_gap_parameters(
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
         It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
         this can vary significantly. 
+    
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy 
+        estimation, analysis of wind characteristics and energy potential assessment for selected
+        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
     Meta data
     ------------------
@@ -116,7 +120,7 @@ def eff_gap_parameters(
 def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_min=0):
     """
     Calculate the effective standoff distance for rooftop mounded PV system 
-    according to IEC TS 63126. The 98th percentile calculations for T_0 and T_inf are
+    according to IEC TS 63126. The 98ᵗʰ percentile calculations for T_0 and T_inf are
     also calculated.
 
     Parameters
@@ -218,8 +222,12 @@ def standoff(
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
         It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
         this can vary significantly. 
+    
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy 
+        estimation, analysis of wind characteristics and energy potential assessment for selected
+        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
     Returns
     -------
@@ -227,11 +235,11 @@ def standoff(
         Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
         Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
     T98_0 : float [°C]
-        This is the 98th percential temperature of a theoretical module with no standoff.
+        This is the 98ᵗʰ percential temperature of a theoretical module with no standoff.
     T98_inf : float [°C]
-        This is the 98th percential temperature of a theoretical rack mounted module.
+        This is the 98ᵗʰ percential temperature of a theoretical rack mounted module.
     T98 : float [°C]
-        This is the 98th percential temperature that was calculated to.
+        This is the 98ᵗʰ percential temperature that was calculated to.
         
     References
     ----------
@@ -300,9 +308,9 @@ def Interpret_Standoff(
             Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
             Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
         T98_0 : float [°C]
-            This is the 98th percential temperature of a theoretical module with no standoff.
+            This is the 98ᵗʰ percential temperature of a theoretical module with no standoff.
         T98_inf : float [°C]
-            This is the 98th percential temperature of a theoretical rack mounted module.
+            This is the 98ᵗʰ percential temperature of a theoretical rack mounted module.
 
     Returns
     -------
@@ -343,15 +351,15 @@ def T98_estimate(
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
     wind_factor=0.33,
-    tilt=0,
+    tilt=None,
     azimuth=None,
     x_eff=None,
     x_0=6.5,):
 
     """
-    Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system 
-    according to IEC TS 63126. The the temperature is modeled for T_0 and T_inf and the corresponding test
-    module temperature must be provided in the weather data.
+    Estimate the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
+    If any of these factors are supplied, it default to latitide tilt, equatorial facing, and
+    open rack mounted, respectively.
 
     Parameters
     ----------
@@ -383,15 +391,23 @@ def T98_estimate(
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
         It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
         this can vary significantly. 
     
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy 
+        estimation, analysis of wind characteristics and energy potential assessment for selected
+        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+
     Returns
     -------
     T98: float
-        This is the 98th percential temperature for the module at the given tilt, azimuth, and x_eff.
+        This is the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
 
     """
+
+    if tilt == None:
+        tilt = meta['latitude']
+
     if azimuth == None: #Sets the default orientation to equator facing.
         if float(meta['latitude']) < 0:
             azimuth=0
@@ -417,16 +433,19 @@ def T98_estimate(
         tilt=tilt,
         azimuth=azimuth,
         sky_model=sky_model, )
-    T_0 = temperature.cell(
-        weather_df, meta, poa, temp_model, conf_0, wind_factor, )
-    T98_0 = T_0.quantile(q=0.98, interpolation="linear")
+
     T_inf = temperature.cell(
         weather_df, meta, poa, temp_model, conf_inf, wind_factor, )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
-    T98 = T98_0 - (T98_0-T98_inf)*(1-np.exp(-x_eff/x_0))
-
-    return T98
+    if x_eff == None:
+        return T98_inf
+    else:
+        T_0 = temperature.cell(
+            weather_df, meta, poa, temp_model, conf_0, wind_factor, )
+        T98_0 = T_0.quantile(q=0.98, interpolation="linear")
+        T98 = T98_0 - (T98_0-T98_inf)*(1-np.exp(-x_eff/x_0))
+        return T98
 
 
 # def run_calc_standoff(
