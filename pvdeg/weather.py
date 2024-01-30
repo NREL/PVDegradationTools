@@ -6,8 +6,7 @@ from pvlib import iotools
 import os
 import glob
 import pandas as pd
-from rex import NSRDBX as f
-from rex import Outputs 
+from rex import NSRDBX, Outputs
 from pvdeg import humidity
 import datetime
 
