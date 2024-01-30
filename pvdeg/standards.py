@@ -291,7 +291,7 @@ def standoff(
 
     return df_res
 
-def Interpret_Standoff(
+def interpret_standoff(
         standoff_1=pd.DataFrame.from_dict({"T98": None}, orient="index").T, 
         standoff_2=pd.DataFrame.from_dict({"T98": None}, orient="index").T 
         ):
