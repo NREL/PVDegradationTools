@@ -4,11 +4,9 @@
 Tutorials
 ==========
 
-Tutorials to learn how to use and experiment with the various functionalities 
-are available for running interactively through Google Collab at
-`PVDeg JupyterBook
-<https://nrel.github.io/PVDegradationTools/intro.html>`_.
-
+Gallery Coming Soon  
+In the mean time check the jupyter-book for interactive trainings  
+*Nbgallery element*  
 
 Jupyter Book
 ------------
