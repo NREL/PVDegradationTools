@@ -9,7 +9,8 @@ PSM, META = weather.read(PSM_FILE, "psm")
 def test_edge_seal_ingress_rate():
     # test calculation for constant k
 
-    psat, avg_psat = humidity.psat(PSM["Dew Point"])
+    # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
+    psat, avg_psat = humidity.psat(PSM.get("temp_dew", PSM.get("Dew Point")))
     k = design.edge_seal_ingress_rate(avg_psat=avg_psat)
     assert k == pytest.approx(0.00096, abs=0.000005)
 

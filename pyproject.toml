@@ -1,0 +1,89 @@
+[build-system]
+
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pvdeg"
+description = "Pvdeg is a python library that supports the calculation of degradation related parameters for photovoltaic (PV) modules."
+authors = [{name = "Pvdeg Python Developers", email = "Michael.Kempe@nrel.gov"}]
+maintainers = [{email = "Silvana.Ovaitt@nrel.gov"}]
+license = {text = "BSD-3"}
+readme = "README.md"
+requires-python = ">=3.9.0, <3.12"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering",
+]
+keywords = [
+    "photovoltaic",
+    "solar",
+    "degradation",
+    "analysis",
+    "performance",
+    "module",
+    "PV",
+]
+dependencies = [
+    "NREL-rex",
+    "cartopy",
+    "dask",
+    "dask-jobqueue",
+    "h5netcdf",
+    "h5py",
+    "jupyterlab",
+    "matplotlib",
+    "netCDF4",
+    "notebook",
+    "numba",
+    "numpy",
+    "openpyxl",
+    "pandas",
+    "photovoltaic",
+    "pvlib",
+    "python-dateutil",
+    "pytz",
+    "scipy",
+    "tables",
+    "tqdm",
+    "xarray",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+docs = [
+    "readthedocs-sphinx-search>=0.3.1,<0.4",
+    "sphinx>=7.2.6,<8",
+    "sphinx_rtd_theme>=2.0.0,<3",
+]
+test = [
+    "coverage",
+    "pytest",
+]
+all = [
+    "pvdeg[docs,test]",
+]
+
+[project.entry-points.pvdeg]
+console_scripts = "pvdeg.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/NREL/PVDegradationTools"
+"Bug Tracker" = "https://github.com/NREL/PVDegradationTools/issues"
+Documentation = "https://pvdegradationtools.readthedocs.io/"
+"Source Code" = "https://github.com/NREL/PVDegradationTools"
+
+[tool.setuptools.packages.find]
+include = ["pvdeg"]
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+addopts = [
+    "-p no:warnings",
+    "--verbose",
+]
