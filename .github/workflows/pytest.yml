@@ -16,7 +16,6 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
         env: [
-          '-r requirements.txt .[test]',
           '--upgrade --upgrade-strategy=eager .[test]'
         ]
 
@@ -28,8 +27,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install ${{ matrix.env }}
       run: |
-        python -m pip install --upgrade pip wheel
-        pip install ${{ matrix.env }}
+        python -m pip install --progress-bar off --upgrade pip
+        python -m pip install --progress-bar off ${{ matrix.env }}
     - name: Test with pytest ${{ matrix.env }}
       run: |
-        pytest
+        python -m pytest
