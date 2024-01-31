@@ -4,7 +4,7 @@ on:
   push:
     branches:
     - main
-    - dev
+    - development
   pull_request:
 
 
@@ -32,3 +32,8 @@ jobs:
     - name: Test with pytest ${{ matrix.env }}
       run: |
         python -m pytest
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
