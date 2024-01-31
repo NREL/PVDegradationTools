@@ -20,11 +20,14 @@ from pvdeg import temperature, spectral, utilities, weather
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
+    module_temp=None,
     weather_kwarg=None,
     sky_model="isotropic",
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
+    tilt=None,
+    azimuth=None,
     wind_factor=0.33,
 ):
     """
@@ -38,7 +41,8 @@ def eff_gap_parameters(
         Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
-
+    measured_df : pd.DataFrame
+        Measured module temperature data.
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
@@ -49,6 +53,10 @@ def eff_gap_parameters(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
+    tilt : float, optional
+        Tilt angle of PV system relative to horizontal. [°]
+    azimuth : float, optional
+        Azimuth angle of PV system relative to north. [°]
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
@@ -57,19 +65,13 @@ def eff_gap_parameters(
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
 
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
-        estimation, analysis of wind characteristics and energy potential assessment for selected
-        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
-    Meta data
-    ------------------
-    tilt : float,
-        Tilt angle of PV system relative to horizontal. [°] Required
-    azimuth : float,
-        Azimuth angle of PV system relative to north. [°] Required
-    wind_height : float,
-        if wind_factor is "None", it will run a calculation based on the height and a
-        power factor of 0.33. If neither are supplied, the wind speed will not be adjusted.
+    References
+    ----------
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
+    estimation, analysis of wind characteristics and energy potential assessment for selected
+    sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+
 
     Returns
     -------
@@ -86,7 +88,7 @@ def eff_gap_parameters(
 
     """
 
-    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni", "Module_Temperature"]
+    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
         weather_df = weather_df[parameters].compute()
@@ -96,13 +98,24 @@ def eff_gap_parameters(
     elif weather_df is None:
         weather_df, meta = weather.get(**weather_kwarg)
 
+    if tilt == None:
+        tilt = meta["latitude"]
+
+    if azimuth == None:  # Sets the default orientation to equator facing.
+        if float(meta["latitude"]) < 0:
+            azimuth = 0
+        else:
+            azimuth = 180
+    if "wind_height" not in meta.keys():
+        wind_factor = 1
+
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(
         weather_df,
         meta,
         sol_position=solar_position,
-        tilt=float(meta["Tilt"]),
-        azimuth=float(meta["Azimuth"]),
+        tilt=tilt,
+        azimuth=azimuth,
         sky_model=sky_model,
     )
     T_0 = temperature.cell(
@@ -121,8 +134,8 @@ def eff_gap_parameters(
         conf=conf_inf,
         wind_factor=wind_factor,
     )
-    T_measured = weather_df.Module_Temperature
-    T_ambient = weather_df.temp_air
+    T_measured = module_temp
+    T_ambient = weather_df["temp_air"]
 
     return T_0, T_inf, T_measured, T_ambient, poa
 
