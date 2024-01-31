@@ -1,10 +1,3 @@
-"""
-Using pytest to create unit tests for pvdeg
-
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
-"""
-
 import os
 import pandas as pd
 import pvdeg

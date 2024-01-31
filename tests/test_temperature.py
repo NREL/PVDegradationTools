@@ -1,10 +1,3 @@
-"""
-Using pytest to create unit tests for pvdeg
-
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
-"""
-
 import os
 import pandas as pd
 import pvdeg
@@ -38,7 +31,7 @@ def test_module():
         poa,
         temp_model="sapm",
         conf="open_rack_glass_polymer",
-        wind_factor=0,
+        wind_speed_factor=1,
     )
 
     pd.testing.assert_series_equal(
@@ -47,14 +40,7 @@ def test_module():
 
 
 def test_cell():
-    result = pvdeg.temperature.cell(
-        WEATHER,
-        META,
-        poa=poa,
-        temp_model="sapm",
-        conf="open_rack_glass_polymer",
-        wind_factor=0,
-    )
+    result = pvdeg.temperature.cell(WEATHER, META, poa=poa)
     pd.testing.assert_series_equal(
         result, celltemp_expected, check_dtype=False, check_names=False
     )

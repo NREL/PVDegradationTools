@@ -1,10 +1,3 @@
-"""
-Using pytest to create unit tests for pvdeg
-
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
-"""
-
 import os
 import json
 import pandas as pd
@@ -35,13 +28,7 @@ def test_module():
     ---------
     weather dataframe and meta dictionary
     """
-    result = pvdeg.humidity.module(
-        WEATHER,
-        META,
-        temp_model="sapm",
-        conf="open_rack_glass_glass",
-        wind_factor=0,
-    )
+    result = pvdeg.humidity.module(WEATHER, META)
     pd.testing.assert_frame_equal(result, rh_expected, check_dtype=False)
 
 
