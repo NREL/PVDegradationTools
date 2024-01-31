@@ -30,9 +30,7 @@ jobs:
         python -m pip install --progress-bar off --upgrade pip
         python -m pip install --progress-bar off ${{ matrix.env }}
     - name: Test with pytest ${{ matrix.env }}
-      run: |
-        python -m pytest --cov=./ --cov-report=xml
-
+      run: pytest --cov=./ --cov-report=xml
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
