@@ -61,7 +61,7 @@ def module(
             wind_speed_factor = (
                 10 / float(meta["wind_height"])
             ) ** wind_factor  # I had to guess what this one was
-        elif temp_model == "notc_sam":
+        elif temp_model == "noct_sam":
             if meta["wind_height"] > 3:
                 wind_speed_factor = 2
             else:
