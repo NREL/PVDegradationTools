@@ -657,13 +657,13 @@ def module(
     azimuth=180,
     sky_model="isotropic",
     temp_model="sapm",
-    conf="open_rack_glass_glass",
+    mount_type="open_rack_glass_glass",
     WVTRo=7970633554,
     EaWVTR=55.0255,
     So=1.81390702,
     l=0.5,
     Eas=16.729,
-    wind_factor=0.33,
+    wind_speed_factor=1,
 ):
     """Calculate the Relative Humidity of solar module backsheet from timeseries data.
 
@@ -702,13 +702,9 @@ def module(
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729(kJ/mol) is the suggested value for EVA.
-    wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
+    wind_speed_factor : float, optional
+        Wind speed correction factor to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
 
     Returns
     --------
@@ -718,7 +714,7 @@ def module(
 
     # solar_position = spectral.solar_position(weather_df, meta)
     # poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
-    # temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_factor)
+    # temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_speed_factor)
 
     poa = spectral.poa_irradiance(
         weather_df=weather_df,
@@ -733,8 +729,8 @@ def module(
         meta,
         poa=poa,
         temp_model=temp_model,
-        conf=conf,
-        wind_factor=wind_factor,
+        conf=mount_type,
+        wind_speed_factor=wind_speed_factor,
     )
 
     rh_surface_outside = surface_outside(
@@ -794,7 +790,7 @@ def module(
 #     So=1.81390702,
 #     l=0.5,
 #     Eas=16.729,
-#     wind_factor=1
+#     wind_speed_factor=1
 # ):
 
 #     """Run the relative humidity calculation for a set of project points."""
@@ -865,7 +861,7 @@ def module(
 #                 So,
 #                 l,
 #                 Eas,
-#                 wind_factor
+#                 wind_speed_factor
 #             )
 #             future_to_point[future] = gid
 
