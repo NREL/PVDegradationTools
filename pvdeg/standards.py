@@ -103,8 +103,6 @@ def eff_gap_parameters(
         tilt=float(meta['Tilt']),
         azimuth=float(meta['Azimuth']),
         sky_model=sky_model, )
-    if 'Wind_Height_m' not in meta.keys():
-        wind_factor = 1
     T_0 = temperature.cell(
         weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_0, 
         wind_factor=wind_factor )
