@@ -30,7 +30,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
     geospatial : (bool)
         If True, initialize weather data via xarray dataset and meta data via
-        dask dataframe. This is useful for large scael geospatial analyses on
+        dask dataframe. This is useful for large scale geospatial analyses on
         distributed compute systems. Geospaital analyses are only supported for
         NSRDB data and locally stored h5 files that follow pvlib conventions.
     **kwargs :
@@ -66,6 +66,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         # e.g. temp_air vs. air_temperature
         # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
         if database == "NSRDB":
+            print(kwargs)
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
@@ -82,19 +83,34 @@ def get(database, id=None, geospatial=False, **kwargs):
             raise NameError("Weather database not found.")
 
         if "relative_humidity" not in weather_df.columns:
-            print('Column "relative_humidity" not found in DataFrame. Calculating...')
+            print(
+                'Column "relative_humidity" not found in DataFrame. Calculating...',
+                end="",
+            )
             weather_df = humidity._ambient(weather_df)
+            print(
+                "\r                                                                        ",
+                end="",
+            )
+            print("\r", end="")
 
         # map meta-names as needed
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
+        if meta["Source"] == "NSRDB":
+            meta["Wind_Height_m"] = 2
+        elif meta["Source"] == "PVGIS":
+            meta["Wind_Height_m"] = 10
+        else:
+            meta["Wind_Height_m"] = None
 
         return weather_df, meta
 
     elif geospatial:
         if database == "NSRDB":
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
+            meta_df.append({"Wind_Height_m": 2})
         elif database == "local":
             fp = kwargs.pop("file")
             weather_ds, meta_df = ini_h5_geospatial(fp)
@@ -352,9 +368,9 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
 
 
 def get_NSRDB(
-    satellite,
-    names,
-    NREL_HPC,
+    satellite=None,
+    names="TMY",
+    NREL_HPC=False,
     gid=None,
     location=None,
     geospatial=False,
@@ -363,7 +379,7 @@ def get_NSRDB(
 ):
     """
     Get NSRDB weather data from different satellites and years.
-    Get NSRDB weather data from different satellites and years.
+
     Provide either gid or location tuple.
 
     Parameters:
@@ -391,12 +407,19 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
+    print("HPC value set to ", NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     META_MAP = {"elevation": "altitude"}
-
+    if (
+        satellite == None
+    ):  # TODO: This function is not fully written as of January 3, 2024
+        satellite, gid = get_satellite(location)
+        print("the satellite is ", satellite)
     if not geospatial:
-        nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
+        nsrdb_fnames, hsds = get_NSRDB_fnames(
+            satellite=satellite, names=names, NREL_HPC=NREL_HPC
+        )
 
         dattr = {}
         for i, file in enumerate(nsrdb_fnames):
@@ -582,3 +605,31 @@ def is_leap_year(year):
         return False
     else:
         return True
+
+
+def get_satellite(location):
+    """
+    identify a satellite to use for a given lattitude and longitude. This is to provide default values worldwide, but a more
+    experienced user may want to specify a specific satellite to get better data.
+
+    Provide a location tuple.
+
+    Parameters:
+    -----------
+    location : (tuple)
+        (latitude, longitude) for the desired location
+
+    Returns:
+    --------
+    satellite : (str)
+        'GOES', 'METEOSAT', 'Himawari', 'SUNY', 'CONUS', 'Americas'
+    gid : (int)
+        gid for the desired location
+    """
+
+    # this is just a placeholder till the actual code gets programmed.
+    satellite = "PSM3"
+
+    # gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
+    gid = None
+    return satellite, gid
