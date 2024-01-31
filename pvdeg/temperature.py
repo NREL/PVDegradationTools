@@ -83,6 +83,6 @@ def cell(weather_df, meta, poa=None, temp_model="sapm", conf="open_rack_glass_po
         poa_global=poa["poa_global"],
         temp_air=weather_df["temp_air"],
         wind_speed=weather_df["wind_speed"],
-        **parameters
+        **parameters,
     )
     return temp_cell

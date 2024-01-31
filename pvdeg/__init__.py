@@ -18,7 +18,7 @@ from . import temperature
 from . import utilities
 from . import weather
 
-__version__ = version('pvdeg')
+__version__ = version("pvdeg")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
