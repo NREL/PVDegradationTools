@@ -24,7 +24,7 @@ project = "pvdeg"
 copyright = "2023, NREL"
 author = "Alliance for Sustainable Energy, LLC"
 
-import pvdeg
+version = pvdeg.__version__
 
 
 # -- General configuration ---------------------------------------------------

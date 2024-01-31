@@ -50,6 +50,7 @@ dependencies = [
     "tables",
     "tqdm",
     "xarray",
+    "pre-commit",
 ]
 dynamic = ["version"]
 
