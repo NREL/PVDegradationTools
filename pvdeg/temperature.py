@@ -44,25 +44,25 @@ def module(
 
     if poa is None:
         poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
-    if "Wind_Height_m" not in meta.keys():
+    if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
         if temp_model == "sapm":
-            wind_speed_factor = (10 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "pvsyst":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "faiman":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "faiman_rad":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "fuentes":
-            wind_speed_factor = (5 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (5 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "ross":
             wind_speed_factor = (
-                10 / float(meta["Wind_Height_m"])
+                10 / float(meta["wind_height"])
             ) ** wind_factor  # I had to guess what this one was
         elif temp_model == "notc_sam":
-            if meta["Wind_Height_m"] > 3:
+            if meta["wind_height"] > 3:
                 wind_speed_factor = 2
             else:
                 wind_speed_factor = (
@@ -73,9 +73,9 @@ def module(
                 1  # this model will take the wind speed height in and do an adjustment.
             )
         elif temp_model == "generic_linear":
-            wind_speed_factor = (10 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "GenericLinearModel":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
             # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
             # An appropriate facter will need to be figured out.
         else:
@@ -142,25 +142,25 @@ def cell(
         This is the temperature of the cell in a module at every time step.[°C]
     """
 
-    if "Wind_Height_m" not in meta.keys():
+    if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
         if temp_model == "sapm":
-            wind_speed_factor = (10 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "pvsyst":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "faiman":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "faiman_rad":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "fuentes":
-            wind_speed_factor = (5 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (5 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "ross":
             wind_speed_factor = (
-                10 / float(meta["Wind_Height_m"])
+                10 / float(meta["wind_height"])
             ) ** wind_factor  # I had to guess what this one was
         elif temp_model == "notc_sam":
-            if float(meta["Wind_Height_m"]) > 3:
+            if float(meta["wind_height"]) > 3:
                 wind_speed_factor = 2
             else:
                 wind_speed_factor = (
@@ -171,9 +171,9 @@ def cell(
                 1  # this model will take the wind speed height in and do an adjustment.
             )
         elif temp_model == "generic_linear":
-            wind_speed_factor = (10 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "GenericLinearModel":
-            wind_speed_factor = (2 / float(meta["Wind_Height_m"])) ** wind_factor
+            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
             # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
             # An appropriate facter will need to be figured out.
         else:

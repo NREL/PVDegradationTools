@@ -67,7 +67,7 @@ def eff_gap_parameters(
         Tilt angle of PV system relative to horizontal. [°] Required
     azimuth : float,
         Azimuth angle of PV system relative to north. [°] Required
-    Wind_Height_m : float,
+    wind_height : float,
         if wind_factor is "None", it will run a calculation based on the height and a
         power factor of 0.33. If neither are supplied, the wind speed will not be adjusted.
 
@@ -266,7 +266,7 @@ def standoff(
             azimuth = 0
         else:
             azimuth = 180
-    if "Wind_Height_m" not in meta.keys():
+    if "wind_height" not in meta.keys():
         wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
@@ -490,7 +490,7 @@ def T98_estimate(
             azimuth = 0
         else:
             azimuth = 180
-    if "Wind_Height_m" not in meta.keys():
+    if "wind_height" not in meta.keys():
         wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 

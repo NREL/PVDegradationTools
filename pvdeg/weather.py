@@ -99,18 +99,18 @@ def get(database, id=None, geospatial=False, **kwargs):
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
         if meta["Source"] == "NSRDB":
-            meta["Wind_Height_m"] = 2
+            meta["wind_height"] = 2
         elif meta["Source"] == "PVGIS":
-            meta["Wind_Height_m"] = 10
+            meta["wind_height"] = 10
         else:
-            meta["Wind_Height_m"] = None
+            meta["wind_height"] = None
 
         return weather_df, meta
 
     elif geospatial:
         if database == "NSRDB":
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
-            meta_df.append({"Wind_Height_m": 2})
+            meta_df.append({"wind_height": 2})
         elif database == "local":
             fp = kwargs.pop("file")
             weather_ds, meta_df = ini_h5_geospatial(fp)
