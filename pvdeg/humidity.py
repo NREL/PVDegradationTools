@@ -705,9 +705,9 @@ def module(
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
-        this can vary significantly. 
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
 
     Returns
     --------
