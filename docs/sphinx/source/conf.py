@@ -20,9 +20,9 @@ import pvdeg
 
 # -- Project information -----------------------------------------------------
 
-project = 'pvdeg'
-copyright = '2023, NREL'
-author = 'Alliance for Sustainable Energy, LLC'
+project = "pvdeg"
+copyright = "2023, NREL"
+author = "Alliance for Sustainable Energy, LLC"
 version = pvdeg.__version__
 
 
