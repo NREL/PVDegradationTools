@@ -23,6 +23,17 @@
 	</a>
   </td>
 </tr>
+<tr>
+  <td>Build status</td>
+  <td>
+   <a href="https://github.com/NREL/PVDegradationTools/actions/workflows/pytest.yml?query=branch%3Amain">
+      <img src="https://github.com/NREL/PVDegradationTools/actions/workflows/pytest.yml/badge.svg?branch=main" alt="GitHub Actions Testing Status" />
+   </a>
+   <a href="https://codecov.io/gh/NREL/PVDegradationTools" >
+   <img src="https://codecov.io/gh/NREL/PVDegradationTools/graph/badge.svg?token=4I24S8BTG7"/>
+   </a>
+  </td>
+</tr>
 </table>
 
 
