@@ -61,8 +61,8 @@ docs = [
     "sphinx_rtd_theme>=2.0.0,<3",
 ]
 test = [
-    "coverage",
     "pytest",
+    "pytest-cov",
 ]
 all = [
     "pvdeg[docs,test]",
