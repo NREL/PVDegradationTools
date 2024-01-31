@@ -35,7 +35,13 @@ def test_module():
     ---------
     weather dataframe and meta dictionary
     """
-    result = pvdeg.humidity.module(WEATHER, META, temp_model="sapm", conf="open_rack_glass_glass", wind_factor=0,)
+    result = pvdeg.humidity.module(
+        WEATHER,
+        META,
+        temp_model="sapm",
+        conf="open_rack_glass_glass",
+        wind_factor=0,
+    )
     pd.testing.assert_frame_equal(result, rh_expected, check_dtype=False)
 
 

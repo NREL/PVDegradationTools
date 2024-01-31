@@ -78,8 +78,8 @@ def test_standoff():
     }
 
     df_expected_result_l2 = pd.DataFrame.from_dict(expected_result_l2, orient="index").T
-    print (result_l1)
-    print (result_l2)
+    print(result_l1)
+    print(result_l2)
     pd.testing.assert_frame_equal(result_l1, df_expected_result_l1)
     pd.testing.assert_frame_equal(result_l2, df_expected_result_l2)
 

@@ -428,10 +428,10 @@ def tilt_azimuth_scan(
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
-    T98=70, # [°C]
-    x_0=6.5, # [cm]
-    wind_speed_factor=1.7):
-
+    T98=70,  # [°C]
+    x_0=6.5,  # [cm]
+    wind_speed_factor=1.7,
+):
     """
     Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
 
@@ -461,27 +461,28 @@ def tilt_azimuth_scan(
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRD provides calculations at 2m (i.e module height) but SAPM uses a 10m height.
         It is recommended that a power-law relationship between height and wind speed of 0.33 be used.
-        This results in a wind_speed_factor of 1.7. It is acknowledged that this can vary significantly. 
+        This results in a wind_speed_factor of 1.7. It is acknowledged that this can vary significantly.
     Returns
         standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
     """
-    
-    standoff_series=np.array([(azimuth_count+1)*(tilt_count+1)][3])
-    for x in range (0, azimuth_count+1):
-        for y in range (0,tilt_count+1):
-            standoff_series[x+y][0]=azimuth_count*180/azimuth_count
-            standoff_series[x+y][1]=tilt_count*90/azimuth_count
-            standoff_series[x+y][2]=standards.standoff(
-                weather_df=weather_df, 
+
+    standoff_series = np.array([(azimuth_count + 1) * (tilt_count + 1)][3])
+    for x in range(0, azimuth_count + 1):
+        for y in range(0, tilt_count + 1):
+            standoff_series[x + y][0] = azimuth_count * 180 / azimuth_count
+            standoff_series[x + y][1] = tilt_count * 90 / azimuth_count
+            standoff_series[x + y][2] = standards.standoff(
+                weather_df=weather_df,
                 meta=meta,
                 T98=T98,
-                tilt=y*90/tilt_count,
-                azimuth=x*180/azimuth_count,
+                tilt=y * 90 / tilt_count,
+                azimuth=x * 180 / azimuth_count,
                 sky_model=sky_model,
                 temp_model=temp_model,
                 conf_0=conf_0,
                 conf_inf=conf_inf,
                 x_0=x_0,
-                wind_speed_factor=wind_speed_factor)
-            
+                wind_speed_factor=wind_speed_factor,
+            )
+
     return standoff_series

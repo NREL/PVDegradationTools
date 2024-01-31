@@ -57,7 +57,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         location = None
     elif id is None:
         if not geospatial:
-            raise TypeError("Specify location via tuple (latitude, longitude), or gid integer.")
+            raise TypeError(
+                "Specify location via tuple (latitude, longitude), or gid integer."
+            )
 
     if not geospatial:
         # TODO: decide wether to follow NSRDB or pvlib conventions...
@@ -81,28 +83,34 @@ def get(database, id=None, geospatial=False, **kwargs):
             raise NameError("Weather database not found.")
 
         if "relative_humidity" not in weather_df.columns:
-            print('Column "relative_humidity" not found in DataFrame. Calculating...' , end='')
+            print(
+                'Column "relative_humidity" not found in DataFrame. Calculating...',
+                end="",
+            )
             weather_df = humidity._ambient(weather_df)
-            print('\r                                                                        ', end='')
-            print('\r', end='')
+            print(
+                "\r                                                                        ",
+                end="",
+            )
+            print("\r", end="")
 
         # map meta-names as needed
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
-        if meta['Source'] == 'NSRDB':
-            meta['Wind_Height_m']=2
-        elif meta['Source'] == 'PVGIS':
-            meta['Wind_Height_m']=10
+        if meta["Source"] == "NSRDB":
+            meta["Wind_Height_m"] = 2
+        elif meta["Source"] == "PVGIS":
+            meta["Wind_Height_m"] = 10
         else:
-            meta['Wind_Height_m']=None
+            meta["Wind_Height_m"] = None
 
         return weather_df, meta
 
     elif geospatial:
         if database == "NSRDB":
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
-            meta_df.append({'Wind_Height_m': 2})
+            meta_df.append({"Wind_Height_m": 2})
         elif database == "local":
             fp = kwargs.pop("file")
             weather_ds, meta_df = ini_h5_geospatial(fp)
@@ -399,16 +407,19 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-  
-    print('HPC value set to ' , NREL_HPC)
+    print("HPC value set to ", NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     META_MAP = {"elevation": "altitude"}
-    if satellite == None:  # TODO: This function is not fully written as of January 3, 2024
+    if (
+        satellite == None
+    ):  # TODO: This function is not fully written as of January 3, 2024
         satellite, gid = get_satellite(location)
-        print('the satellite is ' , satellite)
+        print("the satellite is ", satellite)
     if not geospatial:
-        nsrdb_fnames, hsds = get_NSRDB_fnames(satellite=satellite, names=names, NREL_HPC=NREL_HPC)
+        nsrdb_fnames, hsds = get_NSRDB_fnames(
+            satellite=satellite, names=names, NREL_HPC=NREL_HPC
+        )
 
         dattr = {}
         for i, file in enumerate(nsrdb_fnames):
@@ -594,9 +605,9 @@ def is_leap_year(year):
         return False
     else:
         return True
-    
+
+
 def get_satellite(location):
-    
     """
     identify a satellite to use for a given lattitude and longitude. This is to provide default values worldwide, but a more
     experienced user may want to specify a specific satellite to get better data.
@@ -616,9 +627,9 @@ def get_satellite(location):
         gid for the desired location
     """
 
-    # this is just a placeholder till the actual code gets programmed. 
-    satellite="PSM3"
+    # this is just a placeholder till the actual code gets programmed.
+    satellite = "PSM3"
 
-    #gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
+    # gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
     gid = None
     return satellite, gid
