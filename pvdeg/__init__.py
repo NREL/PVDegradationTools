@@ -1,3 +1,4 @@
+from importlib.metadata import version
 import logging
 
 from .config import *
@@ -16,9 +17,8 @@ from . import standards
 from . import temperature
 from . import utilities
 from . import weather
-from . import _version
 
-__version__ = _version.get_versions()["version"]
+__version__ = version("pvdeg")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
