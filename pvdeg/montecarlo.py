@@ -1,14 +1,6 @@
 """
 Collection of functions for monte carlo simulations.
 """
-
-# DONE
-# - specify np seed
-
-# TODO
-# CASE: user enters single, 0 corrrelation value, ex: corr_coeff = [pvdeg.montecarlo.Corr('X_0', 'wind_speed_factor', 0)]
-# merge
-
 import numpy as np
 import pandas as pd
 from numba import njit
