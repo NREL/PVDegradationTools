@@ -7,7 +7,6 @@ Collection of functions for monte carlo simulations.
 
 # TODO
 # CASE: user enters single, 0 corrrelation value, ex: corr_coeff = [pvdeg.montecarlo.Corr('X_0', 'wind_speed_factor', 0)]
-# write pytest 
 # merge
 
 import numpy as np
@@ -238,9 +237,6 @@ def generateCorrelatedSamples(
     Available at SSRN: https://ssrn.com/abstract=4066115 
     """
 
-    # refactor?
-    # feels messy 
-
     if seed:
         np.random.seed(seed=seed)
 
@@ -250,12 +246,22 @@ def generateCorrelatedSamples(
 
         decomp = cholesky(coeff_matrix.to_numpy(), lower = True)
 
+        # list of correlations
+        # using to check if all r = 0
+        values = []
+        for i in corr:
+            values.append(i.correlation)
+
+        # check if all zero
+        all_zeros = all(value == 0 for value in values)
+
     samples = np.random.normal(loc=0, scale=1, size=(len(stats), n)) 
     
     stats_df = _createStats(stats, corr)    
 
     # no correlation data given, only stats
-    if not corr:
+    # OR, all correlations are 0
+    if (not corr) or (all_zeros):
         nocorr_df = pd.DataFrame(samples.T, columns=stats_df.columns.tolist())
 
         meaningful_nocorr_df = _correlateData(nocorr_df, stats_df)
