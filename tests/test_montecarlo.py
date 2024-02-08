@@ -1,6 +1,5 @@
 # TODO:
-# add no correlation cases to generateCorrelatedSamples(): correlation list is empty, correlation list is populated with 0's
-# add standards.standoff() test, waiting until standoff function is not under active development
+# correlation list is empty AND correlation list is populated with r = 0's
 
 import pytest
 import os 
@@ -23,6 +22,14 @@ CORRELATED_SAMPLES_1 = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"correlated_samples_arrhenius.csv"),
 )
 
+CORRELATED_SAMPLES_2 = pd.read_csv(
+    os.path.join(TEST_DATA_DIR, r"noCorrEmpty_samples_arrhenius.csv")
+)
+
+CORRELATED_SAMPLES_3 = pd.read_csv(
+    os.path.join(TEST_DATA_DIR, r"noCorrR0_arrhenius.csv")
+)
+
 ARRHENIUS_RESULT = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"monte_carlo_arrhenius.csv"),
 )
@@ -35,15 +42,33 @@ def test_generateCorrelatedSamples():
     ---------
     list of correlations, stats dictionary (mean and standard deviation for each variable), number of iterations, seed, DataFrame to check against
     """
+    # standard case
     result_1 = pvdeg.montecarlo.generateCorrelatedSamples(
-        # is it bad to define these in here
         corr=[pvdeg.montecarlo.Corr('Ea', 'X', 0.0269), pvdeg.montecarlo.Corr('Ea', 'LnR0', -0.9995), pvdeg.montecarlo.Corr('X', 'LnR0', -0.0400)],
         stats={'Ea' : {'mean' : 62.08, 'stdev' : 7.3858 }, 'LnR0' : {'mean' : 13.7223084 , 'stdev' : 2.47334772}, 'X' : {'mean' : 0.0341 , 'stdev' : 0.0992757}},
         n = 50,
         seed = 1
     )
 
+    # EMPTY CORRELATION LIST
+    result_2 = pvdeg.montecarlo.generateCorrelatedSamples(
+        corr=[],
+        stats = {'Ea' : {'mean' : 62.08, 'stdev' : 7.3858 }, 'LnR0' : {'mean' : 13.7223084 , 'stdev' : 2.47334772}, 'X' : {'mean' : 0.0341 , 'stdev' : 0.0992757 }},
+        n = 50,
+        seed = 1
+    )
+
+    # populated correlation list, ALL R = 0
+    result_3 = pvdeg.montecarlo.generateCorrelatedSamples(
+        corr=[pvdeg.montecarlo.Corr('Ea', 'X', 0), pvdeg.montecarlo.Corr('Ea', 'LnR0', 0), pvdeg.montecarlo.Corr('X', 'LnR0', 0)],
+        stats = {'Ea' : {'mean' : 62.08, 'stdev' : 7.3858 }, 'LnR0' : {'mean' : 13.7223084 , 'stdev' : 2.47334772}, 'X' : {'mean' : 0.0341 , 'stdev' : 0.0992757 }},
+        n = 50,
+        seed = 1
+    )
+
     pd.testing.assert_frame_equal(result_1, CORRELATED_SAMPLES_1)
+    pd.testing.assert_frame_equal(result_2, CORRELATED_SAMPLES_2)
+    pd.testing.assert_frame_equal(result_3, CORRELATED_SAMPLES_3)
 
 def test_simulate():
     """
