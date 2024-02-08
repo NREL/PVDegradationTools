@@ -21,5 +21,4 @@
       front_encap
       module
       psat
-      run_module
       surface_outside

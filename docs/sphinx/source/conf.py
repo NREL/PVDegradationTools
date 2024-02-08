@@ -15,14 +15,15 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../../.."))
 
+import pvdeg
+
 
 # -- Project information -----------------------------------------------------
 
-project = 'pvdeg'
-copyright = '2023, NREL'
-author = 'Alliance for Sustainable Energy, LLC'
-
-import pvdeg
+project = "pvdeg"
+copyright = "2023, NREL"
+author = "Alliance for Sustainable Energy, LLC"
+version = pvdeg.__version__
 
 
 # -- General configuration ---------------------------------------------------
