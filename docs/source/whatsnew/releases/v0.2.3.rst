@@ -1,0 +1,17 @@
+v0.2.3 (2024-02-09)
+=======================
+
+Enhancements
+------------
+* refactor of the standoff calculation
+* refactor to wind_speed height instead of wind_speed factor
+* updates to standoff calculation notebooks
+* updates to documentation
+* include issue and pull request templates
+
+
+Contributors
+~~~~~~~~~~~~
+* Mike Kempe (:ghuser:`MDKempe`)
+* Tobin Ford (:ghuser:`tobin-ford`)
+* Martin Springer (:ghuser:`martin-springer`)

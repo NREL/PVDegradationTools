@@ -1,0 +1,24 @@
+v0.2.1 (2024-01-30)
+=======================
+
+Enhancements
+------------
+* integration of LeTID degradation modelling.
+* new geospatial demo notebooks
+* pre-commit hooks for code quality
+
+Requirements
+------------
+* update repo to use pyproject.toml for package management
+* requirements for multiple packages updated
+
+Bug Fixes
+---------
+* minor bug fixes in the documentation
+
+
+Contributors
+~~~~~~~~~~~~
+* Joe Karas (:ghuser:`jfkaras`)
+* Mark Campanelli (:ghuser:`markcampanelli`)
+* Martin Springer (:ghuser:`martin-springer`)
