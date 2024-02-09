@@ -65,6 +65,7 @@ warnings.filterwarnings(
 
 napoleon_use_rtype = False  # group rtype on same line together with return
 
+# Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
 
 # The suffix of source filenames.
@@ -78,7 +79,10 @@ version = "%s" % (pvdeg.__version__)
 # The full version, including alpha/beta/rc tags.
 release = version
 
-exclude_patterns = ["**.ipynb_checkpoints"]
+# List of patterns, relative to source directory, that match files and
+# directories to ignore when looking for source files.
+# This pattern also affects html_static_path and html_extra_path.
+exclude_patterns = ["**.ipynb_checkpoints", "_build", "Thumbs.db", ".DS_Store"]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -90,6 +94,7 @@ extlinks = {
     "ghuser": ("https://github.com/%s", "ghuser %s"),
 }
 
+## Generate autodoc stubs with summaries from code
 autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
