@@ -85,9 +85,9 @@ pygments_style = "sphinx"
 
 # List of external link aliases.  Allows use of :pull:`123` to autolink that PR
 extlinks = {
-    "issue": ("https://github.com/NREL/rdtools/issues/%s", "GH #"),
-    "pull": ("https://github.com/NREL/rdtools/pull/%s", "GH #"),
-    "ghuser": ("https://github.com/%s", "@"),
+    "issue": ("https://github.com/NREL/PVDegradationTools/issues/%s", "issue %s"),
+    "pull": ("https://github.com/NREL/PVDegradationTools/pull/%s", "pull %s"),
+    "ghuser": ("https://github.com/%s", "ghuser %s"),
 }
 
 autosummary_generate = True
