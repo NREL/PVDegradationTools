@@ -107,6 +107,7 @@ def solder_fatigue(
     b=0.33,
     C1=405.6,
     Q=0.12,
+    wind_factor=None,
 ):
     """
     Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
@@ -127,6 +128,13 @@ def solder_fatigue(
         Must contain dni, dhi, ghi, temp_air, windspeed, and datetime index
     meta : dict
         site location meta-data
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
     time_range : timestamp series, optional
         Local time of specific site by the hour year-month-day hr:min:sec
         (Example) 2002-01-01 01:00:00
@@ -169,7 +177,9 @@ def solder_fatigue(
         time_range = weather_df.index
 
     if temp_cell is None:
-        temp_cell = temperature.cell(weather_df, meta)
+        temp_cell = temperature.cell(
+            weather_df=weather_df, meta=meta, wind_factor=wind_factor
+        )
 
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)
 

@@ -42,7 +42,7 @@ def solar_position(weather_df, meta):
 
 
 def poa_irradiance(
-    weather_df, meta, sol_position=None, tilt=None, azimuth=180, sky_model="isotropic"
+    weather_df, meta, sol_position=None, tilt=None, azimuth=None, sky_model="isotropic"
 ):
     """
     Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
@@ -60,7 +60,7 @@ def poa_irradiance(
         The tilt angle of the PV panels in degrees, if None, the latitude of the
         location is used.
     azimuth : float, optional
-        The azimuth angle of the PV panels in degrees, 180 by default - facing south.
+        The azimuth angle of the PV panels in degrees. Equatorial facing by default.
     sky_model : str, optional
         The pvlib sky model to use, 'isotropic' by default.
 
@@ -74,6 +74,11 @@ def poa_irradiance(
     # TODO: change for handling HSAT tracking passed or requested
     if tilt is None:
         tilt = float(meta["latitude"])
+    if azimuth is None:  # Sets the default orientation to equator facing.
+        if float(meta["latitude"]) < 0:
+            azimuth = 0
+        else:
+            azimuth = 180
 
     if sol_position is None:
         sol_position = solar_position(weather_df, meta)
