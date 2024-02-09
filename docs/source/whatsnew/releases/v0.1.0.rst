@@ -1,0 +1,28 @@
+.. _whatsnew_0100:
+
+v0.1.0 (06 / 28 / 2023)
+=======================
+
+First official release.
+
+* pvdeg populated with various classes, including functions for:
+  - energy calculations of water, vapor pressure, ingress rate, edge seal width, van hoff irradiance degradation, weighted average irradiance, arrhenius acceleration factor, weighted average irradiance
+  - fatigue of soldering bonds
+  - humidity calculations, including relative humidity on outside surface, on front encapsulant, back encapsulant, and backsheet
+  - BoLID and LeTID degradation profile calculations
+  - Standards, such as minimum module stand-off distance calculation
+  - support of internal calculations needed such as spectral, solar position, etc.
+* Re-structured folders to include Documentation, Versioning and Setup.
+* Tutorial examples available on the tutorials folder to run through Jupyter, Collab or Binder
+* Added Sphinx Documentation
+* Added Versioneer
+* pytests implemented for most functions
+
+Contributors
+~~~~~~~~~~~~
+* Silvana Ovaitt (:ghuser:`shirubana`)
+* Derek Holsapple (:ghuser:`holsappled`)
+* Matthew Brown (:ghuser:`mcbrown042`)
+* Martin Springer (:ghuser:`martin-springer`)
+* Mike Kempe (:ghuser:`MDKempe`)
+* Joe Karas (:ghuser:`jfkaras`)
