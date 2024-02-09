@@ -17,4 +17,4 @@ For developer installation, download the repository, navigate to the folder loca
 
         pip install -e .
 
-Compatible with Python 3.5 and above.
+Compatible with Python 3.9 and above.
