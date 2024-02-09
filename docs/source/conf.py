@@ -135,7 +135,6 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-# html_logo = '../../../pvdeg_tutorials/pvdeg_logo.png'
 html_logo = "../../pvdeg_tutorials/pvdeg_logo.png"  # logo should work at this path
 
 # The name of an image file (within the static path) to use as favicon of the

@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: ../../../pvdeg_tutorials/pvdeg_logo.png
+.. image:: ../../pvdeg_tutorials/pvdeg_logo.png
    :width: 500
 
 
@@ -28,7 +28,7 @@ other degradation profiles are in the works.
 The source code for pvdeg is hosted on `github
 <https://github.com/NREL/pvdeg>`_.
 
-See :ref:`tutorials` to learn how to use and experiment with various functionalities 
+See :ref:`tutorials` to learn how to use and experiment with various functionalities
 
 Please see the :ref:`installation` page for installation help.
 
