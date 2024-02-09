@@ -61,6 +61,7 @@ docs = [
     "sphinx_rtd_theme>=2.0.0,<3",
     "sphinx-gallery",
     "nbsphinx",
+    "sphinx_toggleprompt",
 ]
 test = [
     "pytest",
