@@ -62,6 +62,7 @@ docs = [
     "sphinx-gallery",
     "nbsphinx",
     "sphinx_toggleprompt",
+    "pydata_sphinx_theme",
 ]
 test = [
     "pytest",
