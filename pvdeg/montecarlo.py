@@ -288,7 +288,7 @@ def simulate(
         Function to apply for monte carlo simulation
     correlated_samples : pd.DataFrame        
         Dataframe of correlated samples with named columns for each appropriate modeling constant, can be generated using generateCorrelatedSamples()
-    func_kwargs : dict
+    function_kwargs : dict
         Keyword arguments to pass to func, only include arguments not named in your correlated_samples columns
 
     Returns
