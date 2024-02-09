@@ -279,7 +279,8 @@ def simulate(
     ) -> pd.Series:
 
     """
-    Applies a target function to data to preform a monte carlo simulation
+    Applies a target function to data to preform a monte carlo simulation. If you get a key error and the target function has default parameters, 
+    try adding them to your ``func_kwargs`` dictionary instead of using the default value from the target function.
 
     Parameters
     ----------
