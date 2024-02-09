@@ -59,10 +59,14 @@ docs = [
     "readthedocs-sphinx-search>=0.3.1,<0.4",
     "sphinx>=7.2.6,<8",
     "sphinx_rtd_theme>=2.0.0,<3",
+    "sphinx-gallery",
+    "nbsphinx",
+    "sphinx_toggleprompt",
+    "pydata_sphinx_theme",
 ]
 test = [
-    "coverage",
     "pytest",
+    "pytest-cov",
 ]
 all = [
     "pvdeg[docs,test]",
