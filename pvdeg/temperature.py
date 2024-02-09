@@ -188,7 +188,7 @@ def cell(
             poa_global=poa["poa_global"],
             temp_air=weather_df["temp_air"],
             wind_speed=weather_df["wind_speed"] * wind_speed_factor,
-            **parameters
+            **parameters,
         )
     else:
         # TODO: add options for temperature model
