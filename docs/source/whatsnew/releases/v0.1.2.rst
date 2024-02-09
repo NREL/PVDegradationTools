@@ -1,0 +1,10 @@
+v0.1.2 (2023-07-07)
+=======================
+
+ASTM Conference Release.
+
+* Tutorial examples for live workshop demo.
+
+Contributors
+~~~~~~~~~~~~
+* Silvana Ovaitt (:ghuser:`shirubana`)
