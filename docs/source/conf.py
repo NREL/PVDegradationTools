@@ -7,14 +7,14 @@ import os
 import sys
 import warnings
 
-sys.path.insert(0, os.path.abspath("../../.."))
+sys.path.insert(0, os.path.abspath("../../"))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'pvdeg'
-copyright = '2023, NREL'
-author = 'Alliance For Sustainable Energy LLC'
+project = "pvdeg"
+copyright = "2023, NREL"
+author = "Alliance For Sustainable Energy LLC"
 
 import pvdeg
 
@@ -26,19 +26,19 @@ import pvdeg
 ########################################################################################
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.autosummary',
-    'IPython.sphinxext.ipython_directive',
-    'IPython.sphinxext.ipython_console_highlighting',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    "IPython.sphinxext.ipython_directive",
+    "IPython.sphinxext.ipython_console_highlighting",
     # 'sphinx_gallery.gen_gallery',
-    'sphinx_gallery.load_style', # thumbnail gallery for .ipynb
-    'nbsphinx', # convert .ipynb to html, install pandoc using CONDA not pip
-    'sphinx_toggleprompt',
+    "sphinx_gallery.load_style",  # thumbnail gallery for .ipynb
+    "nbsphinx",  # convert .ipynb to html, install pandoc using CONDA not pip
+    "sphinx_toggleprompt",
 ]
 
 # sphinx_gallery_conf = {
@@ -48,37 +48,40 @@ extensions = [
 
 # Add or update these if necessary
 autodoc_default_options = {
-    'member-order': 'bysource',
-    'show-inheritance': True,
-    'undoc-members': True,
-    'exclude-members': '__weakref__'
+    "member-order": "bysource",
+    "show-inheritance": True,
+    "undoc-members": True,
+    "exclude-members": "__weakref__",
 }
 
 # supress warnings in gallery output
 # https://sphinx-gallery.github.io/stable/configuration.html
-warnings.filterwarnings("ignore", category=UserWarning,
-                        message='Matplotlib is currently using agg, which is a'
-                                ' non-GUI backend, so cannot show the figure.')
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message="Matplotlib is currently using agg, which is a"
+    " non-GUI backend, so cannot show the figure.",
+)
 
 napoleon_use_rtype = False  # group rtype on same line together with return
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ".rst"
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = "index"
 
 # The short X.Y version.
-version = '%s' % (pvdeg.__version__)
+version = "%s" % (pvdeg.__version__)
 # The full version, including alpha/beta/rc tags.
 release = version
 
-exclude_patterns = ['**.ipynb_checkpoints']
+exclude_patterns = ["**.ipynb_checkpoints"]
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 
 autosummary_generate = True
 
@@ -93,21 +96,19 @@ html_theme = "pydata_sphinx_theme"
 # https://pydata-sphinx-theme.rtfd.io/en/latest/user_guide/configuring.html
 
 html_theme_options = {
-    'navigation_depth': 4,
-    'titles_only': False,
-    'extra_nav_links': {
-        'User Guide' : 'user_guide/index',
-        'Tutorials' : 'tutorials/index',
-        'API reference' : 'api',
-        'What\'s New' : 'whatsnew/index',
+    "navigation_depth": 4,
+    "titles_only": False,
+    "extra_nav_links": {
+        "User Guide": "user_guide/index",
+        "Tutorials": "tutorials/index",
+        "API reference": "api",
+        "What's New": "whatsnew/index",
     },
-
     "github_url": "https://github.com/NREL/PVDegradationTools",
     # "favicons": [
     #     {"rel": "icon", "sizes": "16x16", "href": "favicon-16x16.png"}, ### CHECK THIS IMAGE ###
-    #     {"rel": "icon", "sizes": "32x32", "href": "favicon-32x32.png"}, ### CHECK THIS IMAGE ### 
+    #     {"rel": "icon", "sizes": "32x32", "href": "favicon-32x32.png"}, ### CHECK THIS IMAGE ###
     # ],
-
     ### DO WE HAVE ANY OF THESE ###
     # "icon_links": [
     #     {
@@ -124,10 +125,9 @@ html_theme_options = {
     #         "name": "PyPI",
     #         "url": "https://pypi.org/project/pvlib/",
     #         "icon": "fab fa-python",
-        # },
+    # },
     # ],
-
-    # "use_edit_page_button": True, # THIS WAS PROBLEMATIC FOR SOME REASON 
+    # "use_edit_page_button": True, # THIS WAS PROBLEMATIC FOR SOME REASON
     "show_toc_level": 1,
     "footer_items": ["copyright", "sphinx-version", "sidebar-ethical-ads"],
     "left_sidebar_end": [],
@@ -136,20 +136,21 @@ html_theme_options = {
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
 # html_logo = '../../../pvdeg_tutorials/pvdeg_logo.png'
-html_logo = '../../pvdeg_tutorials/pvdeg_logo.png' # logo should work at this path
+html_logo = "../../pvdeg_tutorials/pvdeg_logo.png"  # logo should work at this path
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+# html_favicon = None
 
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 html_show_copyright = True
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pvdeg_pythondoc'
+htmlhelp_basename = "pvdeg_pythondoc"
+
 
 # custom CSS workarounds
 def setup(app):
@@ -161,6 +162,7 @@ def setup(app):
     # Add a warning banner at the top of the page if viewing the "latest" docs
     app.add_js_file("version-alert.js")
 
+
 # -- Options for LaTeX output ---------------------------------------------
 
 
@@ -171,16 +173,16 @@ def setup(app):
 #  dir menu entry, description, category)
 
 # Documents to append as an appendix to all manuals.
-#texinfo_appendices = []
+# texinfo_appendices = []
 
 # If false, no module index is generated.
-#texinfo_domain_indices = True
+# texinfo_domain_indices = True
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
-#texinfo_show_urls = 'footnote'
+# texinfo_show_urls = 'footnote'
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
-#texinfo_no_detailmenu = False
+# texinfo_no_detailmenu = False
 
 # Example configuration for intersphinx: refer to the Python standard library.
 # intersphinx_mapping = {
@@ -195,14 +197,17 @@ ipython_warning_is_error = False
 
 # suppress "WARNING: Footnote [1] is not referenced." messages
 # https://github.com/pvlib/pvlib-python/issues/837
-suppress_warnings = ['ref.footnote']
+suppress_warnings = ["ref.footnote"]
 
 
 # supress warnings in gallery output
 # https://sphinx-gallery.github.io/stable/configuration.html
-warnings.filterwarnings("ignore", category=UserWarning,
-                        message='Matplotlib is currently using agg, which is a'
-                                ' non-GUI backend, so cannot show the figure.')
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message="Matplotlib is currently using agg, which is a"
+    " non-GUI backend, so cannot show the figure.",
+)
 
 # %% helper functions for intelligent "View on Github" linking
 # based on
@@ -226,7 +231,7 @@ def get_obj_module(qualname):
     attrname = None
     while modname not in sys.modules:
         attrname = classname
-        modname, classname = modname.rsplit('.', 1)
+        modname, classname = modname.rsplit(".", 1)
 
     # retrieve object and find original module name
     if classname:
@@ -298,4 +303,3 @@ def get_obj_module(qualname):
 #     'make_github_url': make_github_url,
 #     'edit_page_url_template': '{{ make_github_url(file_name) }}',
 # }
-
