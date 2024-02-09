@@ -83,6 +83,13 @@ exclude_patterns = ["**.ipynb_checkpoints"]
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
 
+# List of external link aliases.  Allows use of :pull:`123` to autolink that PR
+extlinks = {
+    "issue": ("https://github.com/NREL/rdtools/issues/%s", "GH #"),
+    "pull": ("https://github.com/NREL/rdtools/pull/%s", "GH #"),
+    "ghuser": ("https://github.com/%s", "@"),
+}
+
 autosummary_generate = True
 
 # -- Options for HTML output -------------------------------------------------
