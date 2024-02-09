@@ -3,6 +3,8 @@
 What's New
 ==========
 
+pvdeg change log
+
 .. include:: releases/v0.2.2.rst
 .. include:: releases/v0.2.1.rst
 .. include:: releases/v0.2.0.rst
