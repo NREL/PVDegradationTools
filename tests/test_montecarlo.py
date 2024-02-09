@@ -78,7 +78,7 @@ def test_simulate():
     ---------
     target function, correlated samples dataframe, weather dataframe, meta dictionary
     """
-    
+
     poa_irradiance = pvdeg.spectral.poa_irradiance(WEATHER, META)
     temp_mod = pvdeg.temperature.module(weather_df=WEATHER, meta=META, poa=poa_irradiance, conf='open_rack_glass_polymer')
 
@@ -87,16 +87,13 @@ def test_simulate():
 
     function_kwargs = {'poa_global': poa_global, 'module_temp': cell_temperature}
 
-    results = pvdeg.montecarlo.simulate(
+    new_results = pvdeg.montecarlo.simulate(
         func=pvdeg.degradation.vecArrhenius,
         correlated_samples=CORRELATED_SAMPLES_1, 
-        **function_kwargs)  
+        **function_kwargs)
 
-    # convert to dataframe for comparison
-    results_df = pd.DataFrame(results)
+    new_results_df = pd.DataFrame(new_results)
 
-    # set columns equal
-    # FAILS TEST WITHOUT THIS LINE
-    results_df.columns = ARRHENIUS_RESULT.columns
+    new_results_df.columns = ARRHENIUS_RESULT.columns
 
-    pd.testing.assert_frame_equal(results_df, ARRHENIUS_RESULT)
+    pd.testing.assert_frame_equal(new_results_df, ARRHENIUS_RESULT)
