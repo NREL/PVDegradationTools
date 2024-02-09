@@ -2,9 +2,9 @@
 
 What's New
 ==========
+PVDegradationTools (pvdeg) change log:
 
-pvdeg change log
-
+.. include:: releases/v0.2.3.rst
 .. include:: releases/v0.2.2.rst
 .. include:: releases/v0.2.1.rst
 .. include:: releases/v0.2.0.rst
