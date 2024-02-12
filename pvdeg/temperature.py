@@ -177,7 +177,7 @@ def cell(
             # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
             # An appropriate facter will need to be figured out.
         else:
-            wind_speed_factor = 1  # this is just hear for completeness.
+            wind_speed_factor = 1  # this is just here for completeness.
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:

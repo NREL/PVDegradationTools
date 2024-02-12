@@ -3,7 +3,7 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit
+from numba import jit, njit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
@@ -722,3 +722,55 @@ def degradation(
     degradation = C * data["dD"].sum(axis=0)
 
     return degradation
+
+# change it to take pd.DataFrame? instead of np.ndarray
+@njit
+def vecArrhenius(
+    poa_global : np.ndarray, 
+    module_temp : np.ndarray, 
+    ea : float, 
+    x : float, 
+    lnr0 : float
+    ) -> float: 
+
+    """
+    Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
+
+    Parameters
+    ----------
+    poa_global : numpy.ndarray
+        Plane of array irradiance [W/m^2]
+
+    module_temp : numpy.ndarray
+        Cell temperature [C].
+
+    ea : float
+        Activation energy [kJ/mol]
+
+    x : float
+        Irradiance relation [unitless]
+
+    lnR0 : float
+        prefactor [ln(%/h)]
+
+    Returns
+    ----------
+    degredation : float
+        Degradation Rate [%/h]  
+
+    """
+
+    mask = poa_global >= 25
+    poa_global = poa_global[mask]
+    module_temp = module_temp[mask]
+
+    ea_scaled = ea / 8.31446261815324E-03
+    R0 = np.exp(lnr0)
+    poa_global_scaled = poa_global / 1000
+
+    degredation = 0
+    # refactor to list comprehension approach
+    for entry in range(len(poa_global_scaled)):
+        degredation += R0 * np.exp(-ea_scaled / (273.15 + module_temp[entry])) * np.power(poa_global_scaled[entry], x)
+
+    return (degredation / len(poa_global))
