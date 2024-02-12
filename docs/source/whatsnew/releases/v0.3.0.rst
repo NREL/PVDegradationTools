@@ -1,0 +1,13 @@
+v0.3.0 (2024-02-12)
+=======================
+
+Enhancements
+------------
+* Initial integration of the Monte-Carlo analysis package
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
+* Silvana Ovaitt (:ghuser:`shirubana`)
+* Martin Springer (:ghuser:`martin-springer`)
+* Mike Kempe (:ghuser:`MDKempe`)

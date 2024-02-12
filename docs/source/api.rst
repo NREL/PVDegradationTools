@@ -21,6 +21,7 @@ Modules, methods, classes and attributes are explained here.
     fatigue
     humidity
     letid
+    montecarlo
     spectral
     standards
     temperature
