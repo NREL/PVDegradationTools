@@ -242,7 +242,7 @@ def standoff(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
-    x0 : float, optional
+    x_0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement heights
