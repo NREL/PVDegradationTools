@@ -1,5 +1,5 @@
 import pytest
-from pvdeg import letid, utilities, collection, TEST_DIR, DATA_DIR
+from pvdeg import letid, utilities, collection, TEST_DIR, DATA_DIR, TEST_DATA_DIR
 import os
 import pandas as pd
 import numpy as np
@@ -10,7 +10,19 @@ from scipy.integrate import simpson
 import datetime
 # do we need the above
 
-# from LETID - Passivated Wafer.ipynb
+# Some of the assertions may have questionable error/abs values that cause the tests to fail
+# Some are left blank for now, may cause problems
+
+DEVICE_PARAMS = pd.read_csv(
+    os.path.join(TEST_DATA_DIR, r"letid-device-params.csv"),
+    index_col=0,
+    parse_dates=True
+)
+
+TIMESTEPS = pd.read_csv(
+    os.path.join(TEST_DATA_DIR, r"letid-timesteps.csv"),
+    index_col=0
+)
 
 
 def test_tau_now():
@@ -85,10 +97,24 @@ def test_j0_gray():
     pass
 
 def test_calc_voc_from_tau():
-    pass
+    tau_1 = 115.000000
+    tau_2 = 60.631208
+    wafer_thickness = 180
+    s_rear = 46
+    jsc_now = 41.28092915355781
+    temperature = 25
+
+    result_1 = letid.calc_voc_from_tau(tau_1, wafer_thickness, s_rear, jsc_now, temperature)
+    result_2 = letid.calc_voc_from_tau(tau_2, wafer_thickness, s_rear, jsc_now, temperature)
+
+    assert result_1 == pytest.approx(0.6661350284244034, abs = 5e-8 )
+    assert result_2 == pytest.approx(0.6531169204120689, abs = 5e-8)
 
 def test_calc_device_params():
-    pass
+
+    results = letid.calc_device_params(TIMESTEPS, cell_area = 243)
+
+    assert pd.testing.assert_frame_equal(results, DEVICE_PARAMS)
 
 def test_calc_energy_loss():
     pass
@@ -97,7 +123,20 @@ def test_calc_regeneration_time():
     pass
 
 def test_calc_pmp_loss_from_tau_loss():
-    pass
+# from B-O LID - Accelerated Test.ipynb
+
+    wafer_thickness = 180 # um
+    s_rear = 46 # cm/s
+    cell_area = 243 # cm^2
+    tau_0 = 115 # us, carrier lifetime in non-degraded states, e.g. LETID/LID states A or C
+    tau_deg = 55 # us, carrier lifetime in fully-degraded state, e.g. LETID/LID state B
+
+    result = letid.calc_pmp_loss_from_tau_loss(tau_0, tau_deg, cell_area, wafer_thickness, s_rear) # returns % power loss, pmp_0, pmp_deg
+
+    # are these ABS values reasonable? 
+    assert result[0] == pytest.approx(0.03495240755084558, abs = 5e-8)
+    assert result[1] == pytest.approx(5.663466529792824, abs = 5e-8)
+    assert result[2] == pytest.approx(5.465514739492932, abs = 5e-8)
 
 def test_calc_ndd():
     pass
