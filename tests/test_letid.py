@@ -46,7 +46,19 @@ def test_k_ij():
     assert result == pytest.approx(5.389713113272726e-06)
 
 def test_carrier_factor():
-    pass
+
+    tau = 350 # us, lifetime of the wafer for demonstration purposes
+    transition = 'ab'
+    temperature = 20 # C
+    suns = 0.5
+    meas_jsc = 40
+    wafer_thickness = 180 # um
+    s_rear = 90
+    mechanism_params = utilities.get_kinetics('repins')
+
+    result = letid.carrier_factor(tau, transition, temperature, suns, meas_jsc, wafer_thickness, s_rear, mechanism_params)
+
+    assert result == pytest.approx(1.2700522149193714, abs = 0.000005)
 
 def test_carrier_factor_wafer():
 # from LETID - Passivated Wafer.ipynb
@@ -91,7 +103,15 @@ def test_calc_dn():
     assert result == pytest.approx(7.064647199192719e+20) 
 
 def test_convert_i_to_v():
-    pass
+    tau = 350 # us, lifetime of the wafer for demonstration purposes
+    na = 7.2e21 
+    current = 0.005
+    wafer_thickness = 180 # um
+    srv = 41
+
+    result = letid.convert_i_to_v(tau, na, current, wafer_thickness, srv)
+
+    assert result == pytest.approx(0.539020964053319, abs = 0.000005)
 
 def test_j0_gray():
     pass
@@ -120,7 +140,13 @@ def test_calc_energy_loss():
     pass
 
 def test_calc_regeneration_time():
-    pass
+
+    # why doesnt this work #
+    TIMESTEPS.index = pd.to_datetime(TIMESTEPS.index)
+
+    result = letid.calc_regeneration_time(TIMESTEPS, 80)
+
+    # ASSERT HERE #
 
 def test_calc_pmp_loss_from_tau_loss():
 # from B-O LID - Accelerated Test.ipynb
