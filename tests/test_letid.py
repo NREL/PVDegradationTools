@@ -18,8 +18,11 @@ import datetime
 DEVICE_PARAMS = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"letid-device-params.csv"),
     index_col=0,
-    parse_dates=True
 )
+
+# set datetime columns
+DEVICE_PARAMS['Datetime'] = pd.to_datetime(DEVICE_PARAMS['Datetime'])
+DEVICE_PARAMS.set_index('Datetime', inplace=True)
 
 TIMESTEPS = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"letid-timesteps.csv"),
@@ -42,7 +45,6 @@ OUTDOORS_TIMESTEPS = pd.read_csv(
 LAB_TIMESTEPS = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"letid-lab-timesteps.csv"),
     index_col=0,
-    parse_dates=True
 )
 
 with open(os.path.join(TEST_DATA_DIR, "meta.json"), "r") as file:
