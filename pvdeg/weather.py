@@ -87,13 +87,16 @@ def get(database, id=None, geospatial=False, **kwargs):
             print('\r', end='')
 
         # map meta-names as needed
+        
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
-        if meta['Source'] == 'NSRDB':
+        if database == 'NSRDB' or database == 'PSM3':
             meta['Wind_Height_m']=2
-        elif meta['Source'] == 'PVGIS':
+            meta['Source']='NSRDB'
+        elif database == 'PVGIS':
             meta['Wind_Height_m']=10
+            meta['Source']='PVGIS'
         else:
             meta['Wind_Height_m']=None
 
