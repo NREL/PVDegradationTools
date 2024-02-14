@@ -64,7 +64,6 @@ def get(database, id=None, geospatial=False, **kwargs):
         # e.g. temp_air vs. air_temperature
         # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
         if database == "NSRDB":
-            print(kwargs)
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
