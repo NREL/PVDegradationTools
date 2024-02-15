@@ -66,7 +66,6 @@ def get(database, id=None, geospatial=False, **kwargs):
         # e.g. temp_air vs. air_temperature
         # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
         if database == "NSRDB":
-            print(kwargs)
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
@@ -95,13 +94,17 @@ def get(database, id=None, geospatial=False, **kwargs):
             print("\r", end="")
 
         # map meta-names as needed
+        
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
-        if meta["Source"] == "NSRDB":
-            meta["wind_height"] = 2
-        elif meta["Source"] == "PVGIS":
-            meta["wind_height"] = 10
+
+        if database == 'NSRDB' or database == 'PSM3':
+            meta['wind_height']=2
+            meta['Source']='NSRDB'
+        elif database == 'PVGIS':
+            meta['wind_height']=10
+            meta['Source']='PVGIS'
         else:
             meta["wind_height"] = None
 
