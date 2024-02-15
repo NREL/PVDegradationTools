@@ -165,7 +165,16 @@ def test_convert_i_to_v():
     assert result == pytest.approx(0.539020964053319, abs = 0.000005)
 
 def test_j0_gray():
-    pass
+    ni2 = 1.0e16  # m^-3
+    diffusivity = 3.0e-4  # m^2/s
+    na = 1.0e24  # m^-3
+    diffusion_length = 1.0e-3  # m
+    arg = 5  # unitless
+    srv = 1.0e-4  # m/s
+
+    result = letid.j0_gray(ni2, diffusivity, na, diffusion_length, arg, srv)
+
+    assert result == pytest.approx(4.806093780404662e-28)
 
 def test_calc_voc_from_tau():
     tau_1 = 115.000000
@@ -232,8 +241,8 @@ def test_ff_green():
 
     assert result == pytest.approx(0.9946395424055456, abs = 0.000005)
 
-def test_calc_injection_outdoors():
-    pass
+# def test_calc_injection_outdoors():
+#     pass
 
 def test_calc_letid_outdoors():
     tau_0 = 350
