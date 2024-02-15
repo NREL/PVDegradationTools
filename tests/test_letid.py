@@ -1,35 +1,14 @@
 import pytest
-from pvdeg import letid, utilities, collection, TEST_DIR, DATA_DIR, TEST_DATA_DIR
+from pvdeg import letid, utilities, collection, DATA_DIR, TEST_DATA_DIR
 import os
 import pandas as pd
 import numpy as np
 import json
 from pvlib.pvsystem import retrieve_sam
-
-# do we need the below
-from scipy.constants import convert_temperature, elementary_charge, Boltzmann 
-from scipy.integrate import simpson
-import datetime
-# do we need the above
+from scipy.constants import convert_temperature
 
 # Some of the assertions may have questionable error/abs values that cause the tests to fail
 # Some are left blank for now, may cause problems
-
-# TIMESTEPS = pd.read_csv(
-#     os.path.join(TEST_DATA_DIR, r"letid-timesteps.csv"),
-#     index_col=0, 
-#     parse_dates=True
-# )
-
-# OUTDOORS_TIMESTEPS = pd.read_csv(
-#     os.path.join(TEST_DATA_DIR, r"letid-outdoors-timesteps.csv"),
-#     index_col=0,
-#     parse_dates=True
-# )
-
-# LAB_TIMESTEPS = pd.read_csv(
-#     os.path.join(TEST_DATA_DIR, r"letid-lab-timesteps.csv"),
-#     index_col=0,
 
 WEATHER = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"weather_day_pytest.csv"),
