@@ -1,0 +1,12 @@
+v0.2.0 (2023-12-04)
+=======================
+
+Integrated geospatial analysis via dask and xarray.
+
+* new geospatial analysis functions
+* dask for parallel processing
+* xarray for geospatial data handling
+
+Contributors
+~~~~~~~~~~~~
+* Martin Springer (:ghuser:`martin-springer`)

@@ -16,18 +16,22 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from pvdeg import temperature, spectral, utilities, weather
 
+
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
+    module_temp=None,
     weather_kwarg=None,
     sky_model="isotropic",
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
-    wind_factor=0.33,):
-
+    tilt=None,
+    azimuth=None,
+    wind_factor=0.33,
+):
     """
-    Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system 
+    Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system
     according to IEC TS 63126. The the temperature is modeled for T_0 and T_inf and the corresponding test
     module temperature must be provided in the weather data.
 
@@ -37,7 +41,8 @@ def eff_gap_parameters(
         Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
-
+    measured_df : pd.DataFrame
+        Measured module temperature data.
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
@@ -48,33 +53,31 @@ def eff_gap_parameters(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
+    tilt : float, optional
+        Tilt angle of PV system relative to horizontal. [°]
+    azimuth : float, optional
+        Azimuth angle of PV system relative to north. [°]
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
-        this can vary significantly. 
-    
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy 
-        estimation, analysis of wind characteristics and energy potential assessment for selected
-        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
 
-    Meta data
-    ------------------
-    tilt : float, 
-        Tilt angle of PV system relative to horizontal. [°] Required
-    azimuth : float,
-        Azimuth angle of PV system relative to north. [°] Required
-    Wind_Height_m : float,
-        if wind_factor is "None", it will run a calculation based on the height and a 
-        power factor of 0.33. If neither are supplied, the wind speed will not be adjusted.
+
+    References
+    ----------
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
+    estimation, analysis of wind characteristics and energy potential assessment for selected
+    sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+
 
     Returns
     -------
     T_0 : float
-        An array of temperature values for a module with an insulated back or an 
-        alternatively desired small or zero standoff, [°C]. Used as the basis for the 
+        An array of temperature values for a module with an insulated back or an
+        alternatively desired small or zero standoff, [°C]. Used as the basis for the
         maximum achievable temperature.
     T_inf : float
         An array of temperature values for a module that is rack mounted, [°C].
@@ -85,7 +88,7 @@ def eff_gap_parameters(
 
     """
 
-    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni", "Module_Temperature"]
+    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
         weather_df = weather_df[parameters].compute()
@@ -95,37 +98,59 @@ def eff_gap_parameters(
     elif weather_df is None:
         weather_df, meta = weather.get(**weather_kwarg)
 
+    if tilt == None:
+        tilt = meta["latitude"]
+
+    if azimuth == None:  # Sets the default orientation to equator facing.
+        if float(meta["latitude"]) < 0:
+            azimuth = 0
+        else:
+            azimuth = 180
+    if "wind_height" not in meta.keys():
+        wind_factor = 1
+
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(
         weather_df,
         meta,
         sol_position=solar_position,
-        tilt=float(meta['Tilt']),
-        azimuth=float(meta['Azimuth']),
-        sky_model=sky_model, )
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+    )
     T_0 = temperature.cell(
-        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_0, 
-        wind_factor=wind_factor )
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_0,
+        wind_factor=wind_factor,
+    )
     T_inf = temperature.cell(
-        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_inf, 
-        wind_factor=wind_factor )
-    T_measured = weather_df.Module_Temperature
-    T_ambient = weather_df.temp_air
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_inf,
+        wind_factor=wind_factor,
+    )
+    T_measured = module_temp
+    T_ambient = weather_df["temp_air"]
 
     return T_0, T_inf, T_measured, T_ambient, poa
 
 
 def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_min=0):
     """
-    Calculate the effective standoff distance for rooftop mounded PV system 
+    Calculate the effective standoff distance for rooftop mounded PV system
     according to IEC TS 63126. The 98ᵗʰ percentile calculations for T_0 and T_inf are
     also calculated.
 
     Parameters
     ----------
     T_0 : float
-        An array of temperature values for a module with an insulated back or an 
-        alternatively desired small or zero standoff. Used as the basis for the 
+        An array of temperature values for a module with an insulated back or an
+        alternatively desired small or zero standoff. Used as the basis for the
         maximum achievable temperature, [°C].
     T_inf : float
         An array of temperature values for a module that is rack mounted, [°C].
@@ -142,7 +167,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_
     Returns
     -------
     x_eff : float
-        Effective module standoff distance. While not the actual physical standoff, 
+        Effective module standoff distance. While not the actual physical standoff,
         this can be thought of as a heat transfer coefficient that produces results
         that are similar to the modeled singl module temperature with that gap.
 
@@ -158,14 +183,18 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_
         if T_ambient.iloc[i] > t_amb_min:
             if poa.poa_global.iloc[i] > poa_min:
                 n = n + 1
-                summ = summ + (T_0.iloc[i] - T_measured.iloc[i]) / (T_0.iloc[i] - T_inf.iloc[i])
+                summ = summ + (T_0.iloc[i] - T_measured.iloc[i]) / (
+                    T_0.iloc[i] - T_inf.iloc[i]
+                )
 
     try:
-        x_eff = -x_0 * np.log(1 - summ/n)
+        x_eff = -x_0 * np.log(1 - summ / n)
     except RuntimeWarning as e:
-        x_eff = np.nan # results if the specified T₉₈ is cooler than an open_rack temperature 
-    if x_eff < 0: 
-        x_eff = 0 
+        x_eff = (
+            np.nan
+        )  # results if the specified T₉₈ is cooler than an open_rack temperature
+    if x_eff < 0:
+        x_eff = 0
 
     return x_eff
 
@@ -180,12 +209,12 @@ def standoff(
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
-    T98=70, # [°C]
-    x_0=6.5, # [cm]
+    T98=70,  # [°C]
+    x_0=6.5,  # [cm]
     wind_factor=0.33,
 ):
     """
-    Calculate a minimum standoff distance for roof mounded PV systems. 
+    Calculate a minimum standoff distance for roof mounded PV systems.
     Will default to horizontal tilt. If the azimuth is not provided, it
     will use equator facing.
     You can use customized temperature models for the building integrated
@@ -213,17 +242,17 @@ def standoff(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
-    x0 : float, optional
+    x_0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
-        this can vary significantly. 
-    
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy 
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
         sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
@@ -238,19 +267,19 @@ def standoff(
         This is the 98ᵗʰ percential temperature of a theoretical rack mounted module.
     T98 : float [°C]
         This is the 98ᵗʰ percential temperature that was calculated to.
-        
+
     References
     ----------
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     """
 
-    if azimuth == None: #Sets the default orientation to equator facing.
-        if float(meta['latitude']) < 0:
-            azimuth=0
+    if azimuth == None:  # Sets the default orientation to equator facing.
+        if float(meta["latitude"]) < 0:
+            azimuth = 0
         else:
-            azimuth=180
-    if 'Wind_Height_m' not in meta.keys():
+            azimuth = 180
+    if "wind_height" not in meta.keys():
         wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
@@ -269,31 +298,46 @@ def standoff(
         sol_position=solar_position,
         tilt=tilt,
         azimuth=azimuth,
-        sky_model=sky_model, )
+        sky_model=sky_model,
+    )
     T_0 = temperature.cell(
-        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_0, wind_factor=wind_factor )
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_0,
+        wind_factor=wind_factor,
+    )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
     T_inf = temperature.cell(
-        weather_df=weather_df, meta=meta, poa=poa, temp_model=temp_model, conf=conf_inf, wind_factor=wind_factor )
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_inf,
+        wind_factor=wind_factor,
+    )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     try:
         x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
     except RuntimeWarning as e:
-        x = np.nan # results if the specified T₉₈ is cooler than an open_rack temperature 
-    if x<0: 
-        x=0 
+        x = (
+            np.nan
+        )  # results if the specified T₉₈ is cooler than an open_rack temperature
+    if x < 0:
+        x = 0
 
     res = {"x": x, "T98_0": T98_0, "T98_inf": T98_inf, "T98": T98}
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
 
+
 def interpret_standoff(
-        standoff_1=pd.DataFrame.from_dict({"T98": None}, orient="index").T, 
-        standoff_2=pd.DataFrame.from_dict({"T98": None}, orient="index").T 
-        ):
-    
+    standoff_1=pd.DataFrame.from_dict({"T98": None}, orient="index").T,
+    standoff_2=pd.DataFrame.from_dict({"T98": None}, orient="index").T,
+):
     """
     This is a set of statments designed to provide a printable output to interpret the results of standoff calculations.
     At a minimum, data for Standoff_1 must be included.
@@ -320,20 +364,68 @@ def interpret_standoff(
         standoff_1, standoff_2 = standoff_2, standoff_1
 
     if standoff_1.T98[0] == 70 and standoff_2.T98[0] == 80:
-        Output = 'The estimated temperature of an insulated-back module is ' + '%.1f' % standoff_1.T98_0[0] + '°C. \n'
-        Output = Output + 'The estimated temperature of an open-rack module is ' + '%.1f' % standoff_1.T98_inf[0] + '°C. \n'
-        Output = Output + 'Level 0 certification is valid for a standoff greather than ' + '%.1f' % standoff_1.x[0] + ' cm. \n'
-        if standoff_1.x[0] > 0: 
+        Output = (
+            "The estimated temperature of an insulated-back module is "
+            + "%.1f" % standoff_1.T98_0[0]
+            + "°C. \n"
+        )
+        Output = (
+            Output
+            + "The estimated temperature of an open-rack module is "
+            + "%.1f" % standoff_1.T98_inf[0]
+            + "°C. \n"
+        )
+        Output = (
+            Output
+            + "Level 0 certification is valid for a standoff greather than "
+            + "%.1f" % standoff_1.x[0]
+            + " cm. \n"
+        )
+        if standoff_1.x[0] > 0:
             if standoff_2.x[0] > 0:
-                Output = Output + 'Level 1 certification is required for a standoff between than ' + '%.1f' % standoff_1.x[0]  + ' cm, and ' + '%.1f' % standoff_2.x[0] + ' cm. \n'
-                Output = Output + 'Level 2 certification is required for a standoff less than ' + '%.1f' % standoff_2.x[0]  + ' cm.'
+                Output = (
+                    Output
+                    + "Level 1 certification is required for a standoff between than "
+                    + "%.1f" % standoff_1.x[0]
+                    + " cm, and "
+                    + "%.1f" % standoff_2.x[0]
+                    + " cm. \n"
+                )
+                Output = (
+                    Output
+                    + "Level 2 certification is required for a standoff less than "
+                    + "%.1f" % standoff_2.x[0]
+                    + " cm."
+                )
             else:
-                Output = Output + 'Level 1 certification is required for a standoff less than ' + '%.1f' % standoff_1.x[0]  + ' cm. \n'
-                Output = Output + 'Level 2 certification is never required for this temperature profile.'
+                Output = (
+                    Output
+                    + "Level 1 certification is required for a standoff less than "
+                    + "%.1f" % standoff_1.x[0]
+                    + " cm. \n"
+                )
+                Output = (
+                    Output
+                    + "Level 2 certification is never required for this temperature profile."
+                )
     elif standoff_1.T98[0] == 70:
-        Output = "The estimated temperature of an insulated-back module is " + '%.1f' % standoff_1.T98_0[0] + '°C. \n'
-        Output = Output + 'The estimated temperature of an open-rack module is ' + '%.1f' % standoff_1.T98_inf[0] + '°C. \n'
-        Output = Output + 'The minimum standoff for Level 0 certification and T₉₈<70°C is ' + '%.1f' % standoff_1.x[0] + ' cm.'
+        Output = (
+            "The estimated temperature of an insulated-back module is "
+            + "%.1f" % standoff_1.T98_0[0]
+            + "°C. \n"
+        )
+        Output = (
+            Output
+            + "The estimated temperature of an open-rack module is "
+            + "%.1f" % standoff_1.T98_inf[0]
+            + "°C. \n"
+        )
+        Output = (
+            Output
+            + "The minimum standoff for Level 0 certification and T₉₈<70°C is "
+            + "%.1f" % standoff_1.x[0]
+            + " cm."
+        )
     else:
         Output = "Incorrect data for IEC TS 63126 Level determination."
 
@@ -352,8 +444,8 @@ def T98_estimate(
     tilt=None,
     azimuth=None,
     x_eff=None,
-    x_0=6.5,):
-
+    x_0=6.5,
+):
     """
     Estimate the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
     If any of these factors are supplied, it default to latitide tilt, equatorial facing, and
@@ -366,10 +458,10 @@ def T98_estimate(
     x_0 : float, optional
         Thermal decay constant. [cm]
     weather_df : pd.DataFrame
-        Weather data for a single location. 
+        Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
-    tilt : float, 
+    tilt : float,
         Tilt angle of PV system relative to horizontal. [°]
     azimuth : float, optional
         Azimuth angle of PV system relative to north. [°]
@@ -388,11 +480,11 @@ def T98_estimate(
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
-        this can vary significantly. 
-    
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy 
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
         sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
@@ -404,14 +496,14 @@ def T98_estimate(
     """
 
     if tilt == None:
-        tilt = meta['latitude']
+        tilt = meta["latitude"]
 
-    if azimuth == None: #Sets the default orientation to equator facing.
-        if float(meta['latitude']) < 0:
-            azimuth=0
+    if azimuth == None:  # Sets the default orientation to equator facing.
+        if float(meta["latitude"]) < 0:
+            azimuth = 0
         else:
-            azimuth=180
-    if 'Wind_Height_m' not in meta.keys():
+            azimuth = 180
+    if "wind_height" not in meta.keys():
         wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
@@ -430,19 +522,32 @@ def T98_estimate(
         sol_position=solar_position,
         tilt=tilt,
         azimuth=azimuth,
-        sky_model=sky_model, )
+        sky_model=sky_model,
+    )
 
     T_inf = temperature.cell(
-        weather_df, meta, poa, temp_model, conf_inf, wind_factor, )
+        weather_df,
+        meta,
+        poa,
+        temp_model,
+        conf_inf,
+        wind_factor,
+    )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     if x_eff == None:
         return T98_inf
     else:
         T_0 = temperature.cell(
-            weather_df, meta, poa, temp_model, conf_0, wind_factor, )
+            weather_df,
+            meta,
+            poa,
+            temp_model,
+            conf_0,
+            wind_factor,
+        )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
-        T98 = T98_0 - (T98_0-T98_inf)*(1-np.exp(-x_eff/x_0))
+        T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
         return T98
 
 

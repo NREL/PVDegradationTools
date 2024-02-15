@@ -30,7 +30,7 @@ def _ambient(weather_df):
     -----------
     weather_df : pd.DataFrame
         Datetime-indexed weather dataframe which contains (at minimum) Ambient temperature
-        ('temp_air') and dew point ('Dew Point') in units [C]
+        ('temp_air') and dew point ('temp_dew') in units [C]
 
     Returns:
     --------
@@ -39,7 +39,8 @@ def _ambient(weather_df):
         ambient relative humidity [%]
     """
     temp_air = weather_df["temp_air"]
-    dew_point = weather_df["Dew Point"]
+    # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
+    dew_point = weather_df.get("temp_dew", weather_df.get("Dew Point"))
 
     num = np.exp(17.625 * dew_point / (243.04 + dew_point))
     den = np.exp(17.625 * temp_air / (243.04 + temp_air))
@@ -705,9 +706,9 @@ def module(
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 
-        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that 
-        this can vary significantly. 
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
 
     Returns
     --------

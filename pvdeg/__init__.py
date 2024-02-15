@@ -1,3 +1,4 @@
+from importlib.metadata import version
 import logging
 
 from .config import *
@@ -10,15 +11,15 @@ from . import fatigue
 from . import geospatial
 from . import humidity
 from . import letid
+from . import montecarlo
 from .scenario import Scenario
 from . import spectral
 from . import standards
 from . import temperature
 from . import utilities
 from . import weather
-from . import _version
 
-__version__ = _version.get_versions()["version"]
+__version__ = version("pvdeg")
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
