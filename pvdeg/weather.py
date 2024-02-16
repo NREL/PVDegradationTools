@@ -9,6 +9,7 @@ import pandas as pd
 from rex import NSRDBX, Outputs
 from pvdeg import humidity
 import datetime
+import numpy as np
 
 import h5py
 import dask.dataframe as dd
@@ -250,8 +251,12 @@ def ini_h5_geospatial(fps):
         chunks = []
         shapes = []
         for var in attr_to_read:
-            chunks.append(hf[var].chunks)
-            shapes.append(hf[var].shape)
+            chunks.append(
+                hf[var].chunks if hf[var].chunks is not None else (np.nan, np.nan)
+            )
+            shapes.append(
+                hf[var].shape if hf[var].shape is not None else (np.nan, np.nan)
+            )
         chunks = min(set(chunks))
         shapes = min(set(shapes))
 
@@ -410,7 +415,6 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-    print("HPC value set to ", NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     META_MAP = {"elevation": "altitude"}
