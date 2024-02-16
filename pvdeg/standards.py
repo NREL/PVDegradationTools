@@ -265,8 +265,6 @@ def standoff(
         This is the 98ᵗʰ percential temperature of a theoretical module with no standoff.
     T98_inf : float [°C]
         This is the 98ᵗʰ percential temperature of a theoretical rack mounted module.
-    T98 : float [°C]
-        This is the 98ᵗʰ percential temperature that was calculated to.
 
     References
     ----------
@@ -328,7 +326,7 @@ def standoff(
     if x < 0:
         x = 0
 
-    res = {"x": x, "T98_0": T98_0, "T98_inf": T98_inf, "T98": T98}
+    res = {"x": x, "T98_0": T98_0, "T98_inf": T98_inf}
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
