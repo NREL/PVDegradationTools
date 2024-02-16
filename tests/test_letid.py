@@ -7,6 +7,12 @@ import json
 from pvlib.pvsystem import retrieve_sam
 from scipy.constants import convert_temperature
 
+import pvlib
+from pvlib.pvsystem import PVSystem, FixedMount
+from pvlib.location import Location
+from pvlib.modelchain import ModelChain
+from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
+
 # Some of the assertions may have questionable error/abs values that cause the tests to fail
 # Some are left blank for now, may cause problems
 
@@ -50,6 +56,11 @@ LETID_LAB = pd.read_csv(
 )
 LETID_LAB['Datetime'] = pd.to_datetime(LETID_LAB['Datetime'])
 
+INJECTION = pd.read_csv(
+    os.path.join(TEST_DATA_DIR, "injection-outdoors.csv"),
+    index_col=0,
+    parse_dates=True
+)
 
 with open(os.path.join(TEST_DATA_DIR, "meta.json"), "r") as file:
     META = json.load(file)
@@ -220,8 +231,31 @@ def test_ff_green():
 
     assert result == pytest.approx(0.9946395424055456, abs = 0.000005)
 
-# def test_calc_injection_outdoors():
-#     pass
+def test_calc_injection_outdoors():
+    temperature_model_parameters = TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_glass']
+    sandia_modules = pvlib.pvsystem.retrieve_sam('SandiaMod')
+    cec_inverters = pvlib.pvsystem.retrieve_sam('cecinverter')
+    sandia_module = sandia_modules['Canadian_Solar_CS5P_220M___2009_']
+    cec_inverter = cec_inverters['ABB__MICRO_0_25_I_OUTD_US_208__208V_']
+
+    location = Location(latitude=META['latitude'], longitude=META['longitude'])
+
+    system = PVSystem(surface_tilt=20, surface_azimuth=200,
+                    module_parameters=sandia_module,
+                    inverter_parameters=cec_inverter,
+                    temperature_model_parameters=temperature_model_parameters)
+
+    mc = ModelChain(system, location)
+
+    mc.run_model(WEATHER)
+    mc.complete_irradiance(WEATHER)
+
+    result = letid.calc_injection_outdoors(mc.results) 
+
+    result = pd.DataFrame(result)
+    result.columns = ['0']
+
+    pd.testing.assert_frame_equal(result, INJECTION, check_column_type=False, check_index_type=False)
 
 def test_calc_letid_outdoors():
     tau_0 = 350
