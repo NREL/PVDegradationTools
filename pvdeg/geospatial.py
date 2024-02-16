@@ -355,6 +355,6 @@ def plot_USA(
     ax.set_title(title)
 
     if fp is not None:
-        plt.savefig(fp, dpi=600)
+        plt.savefig(fp, dpi=1200)
 
     return fig, ax
