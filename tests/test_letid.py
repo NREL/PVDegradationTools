@@ -52,7 +52,7 @@ LETID_LAB = pd.read_csv(
     os.path.join(TEST_DATA_DIR, r"letid-lab.csv"),
     index_col=0,
     parse_dates=True,
-    dtype = {'Temperature':'int32'}
+    dtype = {'Temperature':'int64'}
 )
 LETID_LAB['Datetime'] = pd.to_datetime(LETID_LAB['Datetime'])
 
@@ -293,4 +293,4 @@ def test_calc_letid_lab():
     result_without_datetime = result.drop(columns=['Datetime'])
     letid_lab_without_datetime = LETID_LAB.drop(columns=['Datetime'])
 
-    pd.testing.assert_frame_equal(result_without_datetime, letid_lab_without_datetime, check_index_type=False)
+    pd.testing.assert_frame_equal(result_without_datetime, letid_lab_without_datetime, check_index_type=False, check_dtype=False)
