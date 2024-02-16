@@ -332,13 +332,13 @@ def plot_USA(
     ax.add_geometries(
         shpreader.Reader(states_shp).geometries(),
         ccrs.PlateCarree(),
-        facecolor="w",
+        facecolor="none",
         edgecolor="gray",
     )
 
     cm = xr_res.plot(
         transform=ccrs.PlateCarree(),
-        zorder=10,
+        zorder=1,
         add_colorbar=False,
         cmap=cmap,
         vmin=vmin,
