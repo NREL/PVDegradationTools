@@ -246,7 +246,11 @@ def ini_h5_geospatial(fps):
     for i, fp in enumerate(fps):
         hf = h5py.File(fp, "r")
         attr = list(hf)
-        attr_to_read = [elem for elem in attr if elem not in ["meta", "time_index"]]
+        attr_to_read = [
+            elem
+            for elem in attr
+            if elem not in ["meta", "time_index", "tmy_year", "tmy_year_short"]
+        ]
 
         chunks = []
         shapes = []
