@@ -6,11 +6,18 @@ to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
+import json
 import pandas as pd
 import pvdeg
 from rex import Outputs
 
-from pvdeg import TEST_DATA_DIR
+from pvdeg import TEST_DATA_DIR, DATA_LIBRARY
+
+fname="kinetic_parameters.json"
+fpath = os.path.join(DATA_LIBRARY, fname)
+
+with open(fpath) as f:
+    data = json.load(f)
 
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
@@ -53,3 +60,16 @@ def test_convert_tmy():
     with Outputs(FILES["h5"], "r") as f:
         datasets = f.dsets
     assert datasets.sort() == DSETS.sort()
+
+def test_get_kinetics():
+    """
+    Test pvdeg.utilities.get_kinetics
+
+    Requires:
+    --------
+    data : dict, from DATA_LIBRARY/kinetic_parameters.json 
+    """
+    
+    result = pvdeg.utilities.get_kinetics('repins')
+
+    assert data['repins'] == result
