@@ -696,7 +696,7 @@ def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
         percentage regeneration to look for. Note that 100% State C will take a very long time,
         whereas in most cases >99% of power is regenerated after NC = ~80%
 
-    rel_tol : float
+    rel_tol : float, default = 1e-05
         The relative tolerance parameter
 
     Returns
