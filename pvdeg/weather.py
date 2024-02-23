@@ -9,6 +9,7 @@ import pandas as pd
 from rex import NSRDBX, Outputs
 from pvdeg import humidity
 import datetime
+import numpy as np
 
 import h5py
 import dask.dataframe as dd
@@ -68,8 +69,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
+            URL = "https://re.jrc.ec.europa.eu/api/v5_2/"
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
-                latitude=lat, longitude=lon, map_variables=True, **kwargs
+                latitude=lat, longitude=lon, map_variables=True, url=URL, **kwargs
             )
             meta = meta["location"]
         elif database == "PSM3":
@@ -94,17 +96,17 @@ def get(database, id=None, geospatial=False, **kwargs):
             print("\r", end="")
 
         # map meta-names as needed
-        
+
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
 
-        if database == 'NSRDB' or database == 'PSM3':
-            meta['wind_height']=2
-            meta['Source']='NSRDB'
-        elif database == 'PVGIS':
-            meta['wind_height']=10
-            meta['Source']='PVGIS'
+        if database == "NSRDB" or database == "PSM3":
+            meta["wind_height"] = 2
+            meta["Source"] = "NSRDB"
+        elif database == "PVGIS":
+            meta["wind_height"] = 10
+            meta["Source"] = "PVGIS"
         else:
             meta["wind_height"] = None
 
@@ -113,7 +115,7 @@ def get(database, id=None, geospatial=False, **kwargs):
     elif geospatial:
         if database == "NSRDB":
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
-            meta_df.append({"wind_height": 2})
+            meta_df["wind_height"] = 2
         elif database == "local":
             fp = kwargs.pop("file")
             weather_ds, meta_df = ini_h5_geospatial(fp)
@@ -245,13 +247,21 @@ def ini_h5_geospatial(fps):
     for i, fp in enumerate(fps):
         hf = h5py.File(fp, "r")
         attr = list(hf)
-        attr_to_read = [elem for elem in attr if elem not in ["meta", "time_index"]]
+        attr_to_read = [
+            elem
+            for elem in attr
+            if elem not in ["meta", "time_index", "tmy_year", "tmy_year_short"]
+        ]
 
         chunks = []
         shapes = []
         for var in attr_to_read:
-            chunks.append(hf[var].chunks)
-            shapes.append(hf[var].shape)
+            chunks.append(
+                hf[var].chunks if hf[var].chunks is not None else (np.nan, np.nan)
+            )
+            shapes.append(
+                hf[var].shape if hf[var].shape is not None else (np.nan, np.nan)
+            )
         chunks = min(set(chunks))
         shapes = min(set(shapes))
 
@@ -410,7 +420,6 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-    print("HPC value set to ", NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     META_MAP = {"elevation": "altitude"}
