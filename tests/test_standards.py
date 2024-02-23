@@ -65,17 +65,11 @@ def test_standoff():
         "x": 2.7381790837131876,
         "T98_0": 79.074638,
         "T98_inf": 53.982905,
-        "T98": 70,
     }
 
     df_expected_result_l1 = pd.DataFrame.from_dict(expected_result_l1, orient="index").T
 
-    expected_result_l2 = {
-        "x": 0,
-        "T98_0": 79.074638,
-        "T98_inf": 53.982905,
-        "T98": 80,
-    }
+    expected_result_l2 = {"x": 0, "T98_0": 79.074638, "T98_inf": 53.982905}
 
     df_expected_result_l2 = pd.DataFrame.from_dict(expected_result_l2, orient="index").T
     print(result_l1)
