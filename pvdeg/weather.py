@@ -69,8 +69,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
+            URL = "https://re.jrc.ec.europa.eu/api/v5_2/"
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
-                latitude=lat, longitude=lon, map_variables=True, **kwargs
+                latitude=lat, longitude=lon, map_variables=True, url=URL, **kwargs
             )
             meta = meta["location"]
         elif database == "PSM3":
