@@ -1,0 +1,10 @@
+v0.3.1 (2024-02-27)
+=======================
+
+Enhancements
+------------
+Added recent tutorials to Jupyter-Book
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
