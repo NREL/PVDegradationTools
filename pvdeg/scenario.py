@@ -267,63 +267,50 @@ class Scenario:
             message = f"{func.__name__} added to pipeline as \n {job_dict}"
             warnings.warn(message, UserWarning)
 
-
     # # I hate that this reuturns the function name 
     # # the other add methods do not return the corresponding added values
-    # def addFunction(self, func_name=None, func_params=None):
-    #     """
-    #     Add a pvdeg function to the scenario pipeline
+    def addFunction(self, func_name=None, func_params=None):
+        """
+        Add a pvdeg function to the scenario pipeline
 
-    #     TODO: list public functions if no func_name given or bad func_name given
+        TODO: list public functions if no func_name given or bad func_name given
 
-    #     Parameters:
-    #     -----------
-    #     func_name : (str)
-    #         The name of the requested pvdeg function. Do not include the class.
-    #     func_params : (dict)
-    #         The required parameters to run the requested pvdeg function
+        Parameters:
+        -----------
+        func_name : (str)
+            The name of the requested pvdeg function. Do not include the class.
+        func_params : (dict)
+            The required parameters to run the requested pvdeg function
 
-    #     Returns:
-    #     --------
-    #     func_name : (str)
-    #         the name of the pvdeg function requested
-    #     """
+        Returns:
+        --------
+        func_name : (str)
+            the name of the pvdeg function requested
+        """
 
-    #     if isinstance(func_name, str):
-    #         _func, reqs = pvdeg.Scenario._verify_function(func_name)
+        _func, reqs = pvdeg.Scenario._verify_function(func_name)
 
-    #         if _func == None:
-    #             print(f'FAILED: Requested function "{func_name}" not found')
-    #             print("Function has not been added to pipeline.")
-    #             return None
+        if _func == None:
+            print(f'FAILED: Requested function "{func_name}" not found')
+            print("Function has not been added to pipeline.")
+            return None
 
-    #         if not all(x in func_params for x in reqs):
-    #             print(
-    #                 f"FAILED: Requestion function {func_name} did not receive enough parameters"
-    #             )
-    #             print(f"Requestion function: \n {_func} \n ---")
-    #             print(f"Required Parameters: \n {reqs} \n ---")
-    #             print("Function has not been added to pipeline.")
-    #             return None
-        
-    #     elif isinstance(func_name, function):
-    #         # this is redundant but here for readability
-    #         func_name = func_name
+        if not all(x in func_params for x in reqs):
+            print(
+                f"FAILED: Requestion function {func_name} did not receive enough parameters"
+            )
+            print(f"Requestion function: \n {_func} \n ---")
+            print(f"Required Parameters: \n {reqs} \n ---")
+            print("Function has not been added to pipeline.")
+            return None
 
-    #         # this may not work correctly
-    #         reqs_all = signature(func_name)
-    #         reqs = []
-    #         for param in reqs_all:
-    #             if reqs_all[param].default == reqs_all[param].empty:
-    #                 reqs.append(param)
+        # add the function and arguments to pipeline
+        job_dict = {"job": func_name, "params": func_params}
 
+        self.pipeline.append(job_dict)
+        return func_name
 
-    #     # add the function and arguments to pipeline
-    #     job_dict = {"job": func_name, "params": func_params}
-
-    #     self.pipeline.append(job_dict)
-    #     return func_name
-
+        # new #
     def runPipeline(self):
         """
         Runs entire pipeline on scenario object
@@ -343,41 +330,28 @@ class Scenario:
         # how can we store data in a useful way to be used later or for later calculations in the pipeline
         return results_dict
 
+    def runJob(self, job=None):
+        """
+        Run a named function on the scenario object
 
-    # def runJob(self, job=None):
-    #     """
-    #     Run a named function on the scenario object
+        TODO: overhaul with futures/slurm
+                capture results
+                standardize result format for all of pvdeg
 
-    #     TODO: overhaul with futures/slurm
-    #           capture results
-    #           standardize result format for all of pvdeg
+        Parameters:
+        -----------
+        job : (str, default=None)
+        """
+        # this seems to be breaking the method every time #
+        # even if i manually set the attribute to false
+        if self.hpc:
+            # do something else
+            pass
 
-    #     Parameters:
-    #     -----------
-    #     job : (str, default=None)
-    #     """
-    #     ### THIS WAS BREAKING MY METHOD CALL EVERY TIME ###
-    #     # manually setting .hpc attribute did not fix # 
-
-    #     # if self.hpc:
-    #     #     # do something else
-    #     #     pass
-
-    #     result = None
-    #     for job in self.pipeline:
-            
-    #         if isinstance(job['job'], str):
-    #             # args = job["parameters"]
-    #             args = job['params']
-    #             _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
-    #             result = _func(**args)
-
-    #         elif isinstance(job['job'], function): # should this be callable
-    #             # call function with args as parameters
-    #             _func = job['job']
-    #             result = _func(**args)
-
-    #     return result
+        for job in self.pipeline:
+            args = job["parameters"]
+            _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
+            result = _func(**args)
 
 
     def exportScenario(self, file_path=None):
