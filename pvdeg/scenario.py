@@ -9,6 +9,16 @@ import json
 
 # TODO: add functions...
 
+# resolve spillage between class instances, 
+# if two unique instances are created in the same notebook (i suspect current working dir as well)
+# they will use the same saved information and not be able to have unique data
+# for ex: 
+# create foo and add job "A" in the pipline,
+# create bar and add job "B" in the pipline
+# foo.pipeline = bar.pipeline
+# => A = B
+# the pipelines will be shared between class instances.
+# only current soltution is to not declare more than one class in the same file (/directory?!?)
 
 class Scenario:
     """
@@ -201,6 +211,8 @@ class Scenario:
             pp.pprint(mod)
         return
 
+    # I hate that this reuturns the function name 
+    # the other add methods do not return the corresponding added values
     def addFunction(self, func_name=None, func_params=None):
         """
         Add a pvdeg function to the scenario pipeline
@@ -254,12 +266,16 @@ class Scenario:
         -----------
         job : (str, default=None)
         """
-        if self.hpc:
-            # do something else
-            pass
+        ### THIS WAS BREAKING MY METHOD CALL EVERY TIME ###
+        # manually setting .hpc attribute did not fix # 
+
+        # if self.hpc:
+        #     # do something else
+        #     pass
 
         for job in self.pipeline:
-            args = job["parameters"]
+            # args = job["parameters"]
+            args = job['params']
             _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
             result = _func(**args)
 
