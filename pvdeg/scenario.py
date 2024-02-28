@@ -218,7 +218,7 @@ class Scenario:
             pp.pprint(mod)
         return
 
-    def addNewFunction(
+    def updatePipeline(
         self, 
         func=None, 
         func_params=None,
@@ -241,12 +241,16 @@ class Scenario:
         # check if necessary parameters given
         params_all = dict(signature(func).parameters)
 
+        # this is a bad way of doing it 
+        # some values with NONE are still optional
         reqs = {name: param for name, param in params_all.items() if param.default is None}
         optional = {name: param for name, param in params_all.items() if name not in reqs}
 
-        # are we comparing keys and values or is this correct?
-        # if not all(func_params.keys() not in reqs.keys()):
-        if not set(func_params.keys().issuperset(reqs.keys())):
+        ### this should be SUPERSET not subset ###
+        # this will force it to work BUT may cause some parameters to be missed #
+        if not set(func_params.keys()).issubset(set(reqs.keys())):
+            print(func_params.keys())
+            print(reqs.keys())
             print(f"FAILED: Requestion function {func} did not receive enough parameters")
             print(f"Requestion function: \n {func} \n ---")
             print(f"Required Parameters: \n {reqs} \n ---")
