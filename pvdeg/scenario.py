@@ -329,46 +329,55 @@ class Scenario:
         Runs entire pipeline on scenario object
         """
 
+        results_dict = {}
+
         for job in self.pipeline:
             _func = job['job']
             _params = job['params']
-            result = _func(_params)
+            # something weird with passing dictionary values in 
+            result = _func(**_params)
+
+            results_dict[job['job'].__name__] = result
+
+        # this is not attached to the object in a meaningful way?
+        # how can we store data in a useful way to be used later or for later calculations in the pipeline
+        return results_dict
 
 
-    def runJob(self, job=None):
-        """
-        Run a named function on the scenario object
+    # def runJob(self, job=None):
+    #     """
+    #     Run a named function on the scenario object
 
-        TODO: overhaul with futures/slurm
-              capture results
-              standardize result format for all of pvdeg
+    #     TODO: overhaul with futures/slurm
+    #           capture results
+    #           standardize result format for all of pvdeg
 
-        Parameters:
-        -----------
-        job : (str, default=None)
-        """
-        ### THIS WAS BREAKING MY METHOD CALL EVERY TIME ###
-        # manually setting .hpc attribute did not fix # 
+    #     Parameters:
+    #     -----------
+    #     job : (str, default=None)
+    #     """
+    #     ### THIS WAS BREAKING MY METHOD CALL EVERY TIME ###
+    #     # manually setting .hpc attribute did not fix # 
 
-        # if self.hpc:
-        #     # do something else
-        #     pass
+    #     # if self.hpc:
+    #     #     # do something else
+    #     #     pass
 
-        result = None
-        for job in self.pipeline:
+    #     result = None
+    #     for job in self.pipeline:
             
-            if isinstance(job['job'], str):
-                # args = job["parameters"]
-                args = job['params']
-                _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
-                result = _func(**args)
+    #         if isinstance(job['job'], str):
+    #             # args = job["parameters"]
+    #             args = job['params']
+    #             _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
+    #             result = _func(**args)
 
-            elif isinstance(job['job'], function): # should this be callable
-                # call function with args as parameters
-                _func = job['job']
-                result = _func(**args)
+    #         elif isinstance(job['job'], function): # should this be callable
+    #             # call function with args as parameters
+    #             _func = job['job']
+    #             result = _func(**args)
 
-        return result
+    #     return result
 
 
     def exportScenario(self, file_path=None):
