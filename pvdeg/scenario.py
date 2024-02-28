@@ -6,6 +6,9 @@ import os
 from pvdeg import utilities as utils
 import pvdeg
 import json
+from inspect import signature
+from typing import Callable
+import warnings
 
 # TODO: add functions...
 
@@ -19,6 +22,10 @@ import json
 # => A = B
 # the pipelines will be shared between class instances.
 # only current soltution is to not declare more than one class in the same file (/directory?!?)
+
+# this probably applies to other attributes as well (untested)
+
+# hpc attribute is super weird, it breaks everything (False or None still break)
 
 class Scenario:
     """
@@ -211,48 +218,118 @@ class Scenario:
             pp.pprint(mod)
         return
 
-    # I hate that this reuturns the function name 
-    # the other add methods do not return the corresponding added values
-    def addFunction(self, func_name=None, func_params=None):
+    def addNewFunction(
+        self, 
+        func=None, 
+        func_params=None,
+        see_added_function=None,
+        ):
         """
         Add a pvdeg function to the scenario pipeline
 
-        TODO: list public functions if no func_name given or bad func_name given
-
         Parameters:
         -----------
-        func_name : (str)
-            The name of the requested pvdeg function. Do not include the class.
-        func_params : (dict)
-            The required parameters to run the requested pvdeg function
-
-        Returns:
-        --------
-        func_name : (str)
-            the name of the pvdeg function requested
+        func : function
+            pvdeg function
         """
 
-        _func, reqs = pvdeg.Scenario._verify_function(func_name)
-
-        if _func == None:
-            print(f'FAILED: Requested function "{func_name}" not found')
+        if func is None or not callable(func):
+            print(f'FAILED: Requested function "{func}" not found')
             print("Function has not been added to pipeline.")
             return None
 
-        if not all(x in func_params for x in reqs):
-            print(
-                f"FAILED: Requestion function {func_name} did not receive enough parameters"
-            )
-            print(f"Requestion function: \n {_func} \n ---")
+        # check if necessary parameters given
+        params_all = dict(signature(func).parameters)
+
+        reqs = {name: param for name, param in params_all.items() if param.default is None}
+        optional = {name: param for name, param in params_all.items() if name not in reqs}
+
+        # are we comparing keys and values or is this correct?
+        # if not all(func_params.keys() not in reqs.keys()):
+        if not set(func_params.keys().issuperset(reqs.keys())):
+            print(f"FAILED: Requestion function {func} did not receive enough parameters")
+            print(f"Requestion function: \n {func} \n ---")
             print(f"Required Parameters: \n {reqs} \n ---")
+            print(f"Optional Parameters: {optional}")
             print("Function has not been added to pipeline.")
             return None
-
-        # add the function and arguments to pipeline
-        job_dict = {"job": func_name, "params": func_params}
-
+        
+        # implicit
+        # if we get here we have the required inputs
+        job_dict = {"job": func, "params": func_params}
         self.pipeline.append(job_dict)
-        return func_name
+        
+        if see_added_function:
+            message = f"{func.__name__} added to pipeline as \n {job_dict}"
+            warnings.warn(message, UserWarning)
+
+
+    # # I hate that this reuturns the function name 
+    # # the other add methods do not return the corresponding added values
+    # def addFunction(self, func_name=None, func_params=None):
+    #     """
+    #     Add a pvdeg function to the scenario pipeline
+
+    #     TODO: list public functions if no func_name given or bad func_name given
+
+    #     Parameters:
+    #     -----------
+    #     func_name : (str)
+    #         The name of the requested pvdeg function. Do not include the class.
+    #     func_params : (dict)
+    #         The required parameters to run the requested pvdeg function
+
+    #     Returns:
+    #     --------
+    #     func_name : (str)
+    #         the name of the pvdeg function requested
+    #     """
+
+    #     if isinstance(func_name, str):
+    #         _func, reqs = pvdeg.Scenario._verify_function(func_name)
+
+    #         if _func == None:
+    #             print(f'FAILED: Requested function "{func_name}" not found')
+    #             print("Function has not been added to pipeline.")
+    #             return None
+
+    #         if not all(x in func_params for x in reqs):
+    #             print(
+    #                 f"FAILED: Requestion function {func_name} did not receive enough parameters"
+    #             )
+    #             print(f"Requestion function: \n {_func} \n ---")
+    #             print(f"Required Parameters: \n {reqs} \n ---")
+    #             print("Function has not been added to pipeline.")
+    #             return None
+        
+    #     elif isinstance(func_name, function):
+    #         # this is redundant but here for readability
+    #         func_name = func_name
+
+    #         # this may not work correctly
+    #         reqs_all = signature(func_name)
+    #         reqs = []
+    #         for param in reqs_all:
+    #             if reqs_all[param].default == reqs_all[param].empty:
+    #                 reqs.append(param)
+
+
+    #     # add the function and arguments to pipeline
+    #     job_dict = {"job": func_name, "params": func_params}
+
+    #     self.pipeline.append(job_dict)
+    #     return func_name
+
+    def runPipeline(self):
+        """
+        Runs entire pipeline on scenario object
+        """
+
+        for job in self.pipeline:
+            _func = job['job']
+            _params = job['params']
+            result = _func(_params)
+
 
     def runJob(self, job=None):
         """
@@ -273,11 +350,22 @@ class Scenario:
         #     # do something else
         #     pass
 
+        result = None
         for job in self.pipeline:
-            # args = job["parameters"]
-            args = job['params']
-            _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
-            result = _func(**args)
+            
+            if isinstance(job['job'], str):
+                # args = job["parameters"]
+                args = job['params']
+                _func = pvdeg.Scenario._verify_function(job["job"], args)[0]
+                result = _func(**args)
+
+            elif isinstance(job['job'], function): # should this be callable
+                # call function with args as parameters
+                _func = job['job']
+                result = _func(**args)
+
+        return result
+
 
     def exportScenario(self, file_path=None):
         """
