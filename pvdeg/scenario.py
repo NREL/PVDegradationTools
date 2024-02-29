@@ -13,6 +13,19 @@ import pandas as pd
 
 # TODO: add functions...
 
+# fix reading files (only works with h5 currently)
+# strip metadata from files
+
+# add attributes for location and metadata?
+# location : pvlib.location object?
+# metadata is just dictionary, allow for population from files?
+
+# how does geospatial work?
+# questions for martin?
+# run through notebooks
+
+
+# SOLVE LATER:
 # resolve spillage between class instances, 
 # if two unique instances are created in the same notebook (i suspect current working dir as well)
 # they will use the same saved information and not be able to have unique data
@@ -24,9 +37,8 @@ import pandas as pd
 # the pipelines will be shared between class instances.
 # only current soltution is to not declare more than one class in the same file (/directory?!?)
 
-# this probably applies to other attributes as well (untested)
-
 # hpc attribute is super weird, it breaks everything (False or None still break)
+
 
 class Scenario:
     """
@@ -44,7 +56,7 @@ class Scenario:
         pipeline=[],
         hpc=False,
         file=None,
-        results : pd.Series = None,
+        results = None,
     ) -> None:
         """
         Initialize the degradation scenario object.
@@ -65,6 +77,8 @@ class Scenario:
         file : (path)
             Full file path to a pre-generated Scenario object. If specified, all other parameters
             will be ignored and taken from the .json file.
+        results : (pd.Series)
+            Full collection of outputs from pipeline execution. Populated by ``scenario.runPipeline()``
         """
 
         if file is not None:
@@ -110,6 +124,7 @@ class Scenario:
         None
         """
         return pvdeg.Scenario()
+
 
 
     def addLocation(
