@@ -94,6 +94,24 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
 
+    # this could be renamed ``reset`` or ``wipe``?
+    def clear(self):
+        """
+        Wipe the Scenario object. This is useful because the Scenario object stores its data in local files outside of the python script.
+        This causes issues when two unique scenario instances are created in the same directory, they appear to be seperate instances
+        to python but share the same data. Changes made to one are reflected in both.
+
+        Parameters:
+        -----------
+        None
+
+        Returns:
+        --------
+        None
+        """
+        return pvdeg.Scenario()
+
+
     def addLocation(
         self, weather_fp=None, region=None, region_col="state", lat_long=None, gids=None
     ):
