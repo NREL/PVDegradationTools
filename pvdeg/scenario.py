@@ -284,24 +284,30 @@ class Scenario:
         for job in self.pipeline:
             _func = job['job']
             _params = job['params']
-            # something weird with passing dictionary values in 
             result = _func(**_params)
 
             results_dict[job['job'].__name__] = result
 
         # this may be a roundabout approach but is probably acceptable
-        # seperate dictionary items into keys and inner dicts
-        # inner dict -> dataframe
-        # keys will be indecies of the series
-        series_index = results_dict.keys()
+        # be careful of type of nested dict value, may be df or other, 
+        # this changes how we will store the result
+        results_series = pd.Series(dtype='object')
 
-        # redo with list comprehension?
-        for entry in series_index:
-            to_add_df = pd.DataFrame([results_dict[entry]])            
-            results_series = pd.Series({entry, to_add_df})
+        for key in results_dict.keys():
+            print(f"results_dict dtype : {type(results_dict[key])}")
+            print(results_dict)
+
+            # instance checking here
+            # changes how we will store the result of each pipeline step in the result attribute
+            if isinstance(results_dict[key], pd.DataFrame):
+                results_series[key] = results_dict[key]
+
+            # implement other return types later
+            # elif isinstance(results_dict[key], dict):
+            #     to_add_df = pd.DataFrame([results_dict[key]])            
+            #     results_series[key] = to_add_df
 
         self.results = results_series
-
 
     def exportScenario(self, file_path=None):
         """
