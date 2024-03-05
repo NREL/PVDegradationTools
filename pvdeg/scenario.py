@@ -10,6 +10,7 @@ from inspect import signature
 from typing import Callable
 import warnings
 import pandas as pd
+from pvlib.location import Location
 
 # TODO: add functions...
 
@@ -56,7 +57,9 @@ class Scenario:
         pipeline=[],
         hpc=False,
         file=None,
-        results = None,
+        results=None,
+        location : Location = None, # do we want this. Wont work with hpc
+        
     ) -> None:
         """
         Initialize the degradation scenario object.
@@ -123,7 +126,16 @@ class Scenario:
         --------
         None
         """
-        return pvdeg.Scenario()
+
+        if self:
+            if self.file is not None:
+                # may not work properly, due to nested nature of files?
+                os.remove(self.file)
+
+            return Scenario
+
+        else:
+            raise ValueError(f"cannot clear scenario object: {self}")
 
 
 
