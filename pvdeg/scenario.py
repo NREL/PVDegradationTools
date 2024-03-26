@@ -12,7 +12,10 @@ import warnings
 import pandas as pd
 from pvlib.location import Location
 
-# TODO: add functions...
+# TODO: 
+# fix .clear(), currently breaks?
+
+# add scenario to docs sphinx API
 
 # fix reading files (only works with h5 currently)
 # strip metadata from files
@@ -20,11 +23,6 @@ from pvlib.location import Location
 # add attributes for location and metadata?
 # location : pvlib.location object?
 # metadata is just dictionary, allow for population from files?
-
-# how does geospatial work?
-# questions for martin?
-# run through notebooks
-
 
 # SOLVE LATER:
 # resolve spillage between class instances, 
@@ -37,9 +35,15 @@ from pvlib.location import Location
 # => A = B
 # the pipelines will be shared between class instances.
 # only current soltution is to not declare more than one class in the same file (/directory?!?)
+# hpc attribute is super weird running locally, it breaks everything (False or None still break), commented out
 
-# hpc attribute is super weird, it breaks everything (False or None still break)
+# QUESTIONS: 
+# addLocation only works via locally stored .h5 files (via pvdeg.weather.get()), do these come from NSRDB downloads, but are available on kestrel?
+# instead of saving the job in a csv every time the constructor is run should it be moved to its own method? drawback: won't save scenario attributes automattically
+# should gids attribute be called renamed and be able to take multiple types (gids via file [and current params] or pvlib.location.Location object)
 
+# is there a way to know how long it will take to run an hpc job? (roughly even)?
+# how do we check the allocation on kestrel?
 
 class Scenario:
     """
@@ -55,10 +59,9 @@ class Scenario:
         gids=None,
         modules=[],
         pipeline=[],
-        hpc=False,
+        # hpc=False,
         file=None,
         results=None,
-        location : Location = None, # do we want this. Wont work with hpc
         
     ) -> None:
         """
@@ -92,12 +95,14 @@ class Scenario:
             modules = data["modules"]
             gids = data["gids"]
             pipeline = data["pipeline"]
+            # add results to file
 
         self.name = name
         self.path = path
         self.modules = modules
         self.gids = gids
         self.pipeline = pipeline
+        self.results = results
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
@@ -112,11 +117,12 @@ class Scenario:
         os.chdir(self.path)
 
     # this could be renamed ``reset`` or ``wipe``?
+    # not functional currently (close though)
     def clear(self):
         """
         Wipe the Scenario object. This is useful because the Scenario object stores its data in local files outside of the python script.
         This causes issues when two unique scenario instances are created in the same directory, they appear to be seperate instances
-        to python but share the same data. Changes made to one are reflected in both.
+        to python but share the same data (if no path is provided). Changes made to one are reflected in both.
 
         Parameters:
         -----------
@@ -128,16 +134,20 @@ class Scenario:
         """
 
         if self:
+            # add recursive search check?
             if self.file is not None:
-                # may not work properly, due to nested nature of files?
+                # may not work properly due to nested nature, need to test
+                # only deletes file, not nested directory structure
                 os.remove(self.file)
+            
+            # update attribute
+            self.file = None
 
-            return Scenario
+            # blank scenario object
+            self = Scenario
 
         else:
             raise ValueError(f"cannot clear scenario object: {self}")
-
-
 
     def addLocation(
         self, weather_fp=None, region=None, region_col="state", lat_long=None, gids=None
@@ -155,7 +165,7 @@ class Scenario:
             Region or state to iterate over
         region_col : (str)
             Region column name within h5 file (example "State")
-        lat : (tuple - float)
+        lat_long : (tuple - float)
             latitute and longitude of a single location
         """
 
