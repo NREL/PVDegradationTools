@@ -67,7 +67,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     """
 
     if from_dew_point:
-        temp_col = "Dew Point"
+        temp_col = "dew_point"
     else:
         temp_col = "temp_air"
 
