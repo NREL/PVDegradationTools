@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
 from pvdeg import DATA_LIBRARY
+from typing import Callable
+import inspect
+import math
 
 
 def gid_downsampling(meta, n):
@@ -421,16 +424,11 @@ def ts_gid_df(file, gid):
 def tilt_azimuth_scan(
     weather_df=None,
     meta=None,
-    weather_kwarg=None,
-    tilt_count=18,
-    azimuth_count=72,
-    sky_model="isotropic",
-    temp_model="sapm",
-    conf_0="insulated_back_glass_polymer",
-    conf_inf="open_rack_glass_polymer",
-    T98=70, # [°C]
-    x_0=6.5, # [cm]
-    wind_speed_factor=1.7):
+    tilt_step=5,
+    azimuth_step=5,
+    func= Callable, 
+    **kwarg
+):
 
     """
     Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
@@ -441,47 +439,38 @@ def tilt_azimuth_scan(
         Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
-    tilt_count : integer
-        Step in degrees of change in tilt angle of PV system between calculations.
-    azimuth_count : integer
-        Step in degrees of change in Azimuth angle of PV system relative to north.
-    sky_model : str, optional
-        Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
-    temp_model : str, optional
-        Options: 'sapm'.  'pvsyst' and 'faiman' will be added later.
-        Performs the calculations for the cell temperature.
-    conf_0 : str, optional
-        Default: 'insulated_back_glass_polymer'
-    conf_inf : str, optional
-        Default: 'open_rack_glass_polymer'
-    x_0 : float, optional
-        Thermal decay constant [cm], [Kempe, PVSC Proceedings 2023]
-    wind_speed_factor : float, optional
-        Wind speed correction factor to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRD provides calculations at 2m (i.e module height) but SAPM uses a 10m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33 be used.
-        This results in a wind_speed_factor of 1.7. It is acknowledged that this can vary significantly. 
+    tilt_step : integer
+        Step in degrees of change in tilt angle of PV system between calculations. Will scan from 0 to 90 degrees.
+    azimuth_step : integer
+        Step in degrees of change in Azimuth angle of PV system relative to north. Will scan from 0 to 180 degrees.
+    kwarg : dict
+        All the keywords in a dictionary form that are needed to run the function.
+    calc_function : string
+        The name of the function that will be calculated.
     Returns
         standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
     """
-    
-    standoff_series=np.array([(azimuth_count+1)*(tilt_count+1)][3])
-    for x in range (0, azimuth_count+1):
-        for y in range (0,tilt_count+1):
-            standoff_series[x+y][0]=azimuth_count*180/azimuth_count
-            standoff_series[x+y][1]=tilt_count*90/azimuth_count
-            standoff_series[x+y][2]=standards.standoff(
-                weather_df=weather_df, 
-                meta=meta,
-                T98=T98,
-                tilt=y*90/tilt_count,
-                azimuth=x*180/azimuth_count,
-                sky_model=sky_model,
-                temp_model=temp_model,
-                conf_0=conf_0,
-                conf_inf=conf_inf,
-                x_0=x_0,
-                wind_speed_factor=wind_speed_factor)
+
+    total_count=(math.ceil(360/azimuth_step)+1)*(math.ceil(90/tilt_step)+1)
+    tilt_azimuth_series=np.zeros((total_count,3))
+    count = 0
+    azimuth = - azimuth_step
+    while azimuth < 360:
+        tilt = - tilt_step
+        azimuth = azimuth + azimuth_step
+        if azimuth > 360:
+            azimuth = 360
+        while tilt < 90:
+            tilt = tilt + tilt_step
+            if tilt > 90:
+                tilt = 90
+            tilt_azimuth_series[count][0]=tilt
+            tilt_azimuth_series[count][1]=azimuth
+            tilt_azimuth_series[count][2]=func(weather_df=weather_df, meta=meta, tilt=tilt, azimuth=azimuth, **kwarg)
+            count = count + 1
+            print('\r', '%.1f' % (100*count/total_count),'% complete' , sep='', end='')
             
-    return standoff_series
+    print('\r                     ', end='')
+    print('\r', end='')
+    return tilt_azimuth_series
+
