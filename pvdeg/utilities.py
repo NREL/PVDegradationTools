@@ -416,3 +416,48 @@ def ts_gid_df(file, gid):
                 res.lat = meta.latitude[gid]
                 res.lon = meta.longitude[gid]
     return res
+
+def meta_df_from_csv(
+    file_paths : list
+    ):
+    """
+    Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
+
+    Parameters
+    ----------
+    file_paths : list[str]
+        List of local csv files to strip metadata from.
+
+    Returns
+    -------
+    metadata_df : pandas.DataFrame
+        Dataframe of stripped metadata from csv. Columns represent attribute names while rows represent a unique file.
+
+    """
+
+    def read_meta(path):
+        df = pd.read_csv(path, nrows=1)
+        listed = df.to_dict(orient='list')
+        stripped = {key: value[0] for key, value in listed.items()}
+
+        return stripped
+
+    metadata_df = pd.DataFrame()
+
+    for i in range(len(file_paths)):
+        metadata_df[i] = read_meta(file_paths[i])
+
+    metadata_df = metadata_df.T
+
+    # correct level of precision?
+    conversions = {
+        'Location ID' : np.int32,
+        'Latitude' : np.double,
+        'Longitude' : np.double,
+        'Time Zone' : np.int8,
+        'Elevation' : np.int16,
+        'Local Time Zone' : np.int8
+    }
+
+    metadata_df = metadata_df.astype(conversions)
+    return metadata_df
