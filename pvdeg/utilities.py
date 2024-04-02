@@ -418,7 +418,7 @@ def ts_gid_df(file, gid):
     return res
 
 def meta_df_from_csv(
-    file_paths : list
+    file_paths : list[str]
     ):
     """
     Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
@@ -426,14 +426,17 @@ def meta_df_from_csv(
     Parameters
     ----------
     file_paths : list[str]
-        List of local csv files to strip metadata from.
+        List of local weather csv files to strip metadata from. For example: download a collection of weather files from the NSRDB web viewer. 
 
     Returns
     -------
     metadata_df : pandas.DataFrame
         Dataframe of stripped metadata from csv. Columns represent attribute names while rows represent a unique file.
-
     """
+    # TODO: functionality
+    # list[path] instead of just string
+    # or a directory, just use csv from provided directory
+
 
     def read_meta(path):
         df = pd.read_csv(path, nrows=1)
@@ -449,7 +452,7 @@ def meta_df_from_csv(
 
     metadata_df = metadata_df.T
 
-    # correct level of precision?
+    # correct level of precision??
     conversions = {
         'Location ID' : np.int32,
         'Latitude' : np.double,
@@ -461,3 +464,55 @@ def meta_df_from_csv(
 
     metadata_df = metadata_df.astype(conversions)
     return metadata_df
+
+def weather_ds_from_csv(
+    file_paths : list[str],
+    # coerce_year : int,
+    # select year, should be able to provide single year, or list of years 
+):
+    """
+    Create a geospatial xarray dataset from local csv files.
+
+    Parameters
+    ----------
+
+    Returns
+    ----------
+    """
+    # PROBLEM: all csv do not contain all years but these all appear to have 2004
+    # when missing years, xarray will see mismatched coordinates and populate all these values with nan
+    
+    # Prepare a list to hold the DataFrames
+    dataframes = []
+
+    # Process each file
+    for file_path in file_paths:
+        # Extract GID from the filename
+        header = pd.read_csv(file_path, nrows=1)
+        gid = header['Location ID'][0]
+        
+        # Read the CSV, skipping rows to get to the relevant data
+        df = pd.read_csv(file_path, skiprows=2)
+        
+        # Add GID and Time columns
+        df['gid'] = gid
+
+        df['time'] = pd.to_datetime(df[['Year', 'Month', 'Day', 'Hour', 'Minute']])
+
+        # keep only year 2004
+        df = df[df['time'].dt.year == 2004]
+
+        # add generic approach, dont manually do this, could change based on user selections  
+
+        # Select relevant columns and append to the list
+        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Direction', 'Wind Speed']]
+        df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Speed']]
+        dataframes.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(dataframes)
+
+    # Convert the combined DataFrame to an xarray Dataset
+    weather_ds = combined_df.set_index(['gid', 'time']).to_xarray()
+
+    return weather_ds
