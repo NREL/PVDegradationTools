@@ -417,11 +417,11 @@ def ts_gid_df(file, gid):
                 res.lon = meta.longitude[gid]
     return res
 
-def meta_df_from_csv(
+def _meta_df_from_csv(
     file_paths : list[str]
     ):
     """
-    Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
+    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
 
     Parameters
     ----------
@@ -465,13 +465,13 @@ def meta_df_from_csv(
     metadata_df = metadata_df.astype(conversions)
     return metadata_df
 
-def weather_ds_from_csv(
+def _weather_ds_from_csv(
     file_paths : list[str],
-    # coerce_year : int,
+    year : int,
     # select year, should be able to provide single year, or list of years 
-):
+    ):
     """
-    Create a geospatial xarray dataset from local csv files.
+    Helper Function: Create a geospatial xarray dataset from local csv files.
 
     Parameters
     ----------
@@ -499,8 +499,8 @@ def weather_ds_from_csv(
 
         df['time'] = pd.to_datetime(df[['Year', 'Month', 'Day', 'Hour', 'Minute']])
 
-        # keep only year 2004
-        df = df[df['time'].dt.year == 2004]
+        # make allow this to take list of years
+        df = df[df['time'].dt.year == year]
 
         # add generic approach, dont manually do this, could change based on user selections  
 
@@ -516,3 +516,36 @@ def weather_ds_from_csv(
     weather_ds = combined_df.set_index(['gid', 'time']).to_xarray()
 
     return weather_ds
+
+def geospatial_from_csv(
+    file_path : list[str],
+    year : int # should be able to take a range of years
+    ): 
+    """
+    Create an xarray dataset contaning geospatial weather data and a pandas dataframe 
+    containing geospatial metadata from a list of local csv files. 
+    
+    Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
+    when downloaded locally as csv
+
+    Parameters
+    ----------
+    file_path : list[str]
+        List of absolute paths to csv files in string form.
+    year : int
+        Single year of data to use from local csv files. 
+    """
+
+    weather_ds, meta_df = _weather_ds_from_csv(file_path, year), _meta_df_from_csv(file_path)
+
+    # only want to keep meta from given file using GIDs from DS
+    # gather included files' gids from xarray
+    included_gids = weather_ds.coords['gid'].values
+
+    # filter the metadate to only include gid values found above
+    filtered_meta = meta_df[meta_df['Location ID'].isin(included_gids)]
+
+    # reset the indecies of updated dataframe (might not be nessecary)
+    filtered_meta = filtered_meta.reset_index(drop=True)
+
+    return weather_ds, filtered_meta
