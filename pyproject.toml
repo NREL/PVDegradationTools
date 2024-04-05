@@ -30,7 +30,7 @@ keywords = [
 dependencies = [
     "NREL-rex",
     "cartopy",
-    "dask",
+    "dask<2024.3",
     "dask-jobqueue",
     "h5netcdf",
     "h5py",
