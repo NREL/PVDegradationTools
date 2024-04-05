@@ -41,8 +41,8 @@ def eff_gap_parameters(
         Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
-    measured_df : pd.DataFrame
-        Measured module temperature data.
+    weather_kwarg : dict
+        other variables needed to access a particular weather dataset.
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
@@ -227,6 +227,8 @@ def standoff(
         Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
+    weather_kwarg : dict
+        other variables needed to access a particular weather dataset.
     tilt : float, optional
         Tilt angle of PV system relative to horizontal. [°]
     azimuth : float, optional
@@ -332,10 +334,7 @@ def standoff(
     return df_res
 
 
-def interpret_standoff(
-    standoff_1=pd.DataFrame.from_dict({"T98": None}, orient="index").T,
-    standoff_2=pd.DataFrame.from_dict({"T98": None}, orient="index").T,
-):
+def interpret_standoff(standoff_1=None, standoff_2=None):
     """
     This is a set of statments designed to provide a printable output to interpret the results of standoff calculations.
     At a minimum, data for Standoff_1 must be included.
@@ -358,74 +357,79 @@ def interpret_standoff(
         This is an interpretation of the accepatble effective standoff values suitable for presentation.
     """
 
-    if (standoff_1.T98[0] == 80 and standoff_2.T98[0] == 70) or standoff_2.T98[0] == 70:
-        standoff_1, standoff_2 = standoff_2, standoff_1
-
-    if standoff_1.T98[0] == 70 and standoff_2.T98[0] == 80:
-        Output = (
-            "The estimated temperature of an insulated-back module is "
-            + "%.1f" % standoff_1.T98_0[0]
-            + "°C. \n"
-        )
-        Output = (
-            Output
-            + "The estimated temperature of an open-rack module is "
-            + "%.1f" % standoff_1.T98_inf[0]
-            + "°C. \n"
-        )
-        Output = (
-            Output
-            + "Level 0 certification is valid for a standoff greather than "
-            + "%.1f" % standoff_1.x[0]
-            + " cm. \n"
-        )
-        if standoff_1.x[0] > 0:
-            if standoff_2.x[0] > 0:
-                Output = (
-                    Output
-                    + "Level 1 certification is required for a standoff between than "
-                    + "%.1f" % standoff_1.x[0]
-                    + " cm, and "
-                    + "%.1f" % standoff_2.x[0]
-                    + " cm. \n"
+    if standoff_1 is not None:
+        x70 = standoff_1["x"].iloc[0]
+        T98_0 = standoff_1["T98_0"].iloc[0]
+        T98_inf = standoff_1["T98_inf"].iloc[0]
+        if standoff_2 is not None:
+            x80 = standoff_2["x"].iloc[0]
+        else:
+            try:
+                x80 = -(-x70 / (np.log(1 - (T98_0 - 70) / (T98_0 - T98_inf)))) * np.log(
+                    1 - (T98_0 - 80) / (T98_0 - T98_inf)
                 )
-                Output = (
-                    Output
-                    + "Level 2 certification is required for a standoff less than "
-                    + "%.1f" % standoff_2.x[0]
-                    + " cm."
-                )
-            else:
-                Output = (
-                    Output
-                    + "Level 1 certification is required for a standoff less than "
-                    + "%.1f" % standoff_1.x[0]
-                    + " cm. \n"
-                )
-                Output = (
-                    Output
-                    + "Level 2 certification is never required for this temperature profile."
-                )
-    elif standoff_1.T98[0] == 70:
-        Output = (
-            "The estimated temperature of an insulated-back module is "
-            + "%.1f" % standoff_1.T98_0[0]
-            + "°C. \n"
-        )
-        Output = (
-            Output
-            + "The estimated temperature of an open-rack module is "
-            + "%.1f" % standoff_1.T98_inf[0]
-            + "°C. \n"
-        )
-        Output = (
-            Output
-            + "The minimum standoff for Level 0 certification and T₉₈<70°C is "
-            + "%.1f" % standoff_1.x[0]
-            + " cm."
-        )
+            except RuntimeWarning as e:
+                x80 = None
     else:
-        Output = "Incorrect data for IEC TS 63126 Level determination."
+        x70 = None
+
+    if x70 == None:
+        Output = "Insufficient data for IEC TS 63126 Level determination."
+    else:
+        if T98_0 is not None:
+            Output = (
+                "The estimated temperature of an insulated-back module is "
+                + "%.1f" % T98_0
+                + "°C. \n"
+            )
+        if T98_inf is not None:
+            Output = (
+                Output
+                + "The estimated temperature of an open-rack module is "
+                + "%.1f" % T98_inf
+                + "°C. \n"
+            )
+        if x80 == None:
+            Output = (
+                Output
+                + "The minimum standoff for Level 0 certification and T₉₈<70°C is "
+                + "%.1f" % x70
+                + " cm."
+            )
+        else:
+            Output = (
+                Output
+                + "Level 0 certification is valid for a standoff greather than "
+                + "%.1f" % x70
+                + " cm. \n"
+            )
+            if x70 > 0:
+                if x80 > 0:
+                    Output = (
+                        Output
+                        + "Level 1 certification is required for a standoff between than "
+                        + "%.1f" % x70
+                        + " cm, and "
+                        + "%.1f" % x80
+                        + " cm. \n"
+                    )
+                    Output = (
+                        Output
+                        + "Level 2 certification is required for a standoff less than "
+                        + "%.1f" % x80
+                        + " cm."
+                    )
+                else:
+                    Output = (
+                        Output
+                        + "Level 1 certification is required for a standoff less than "
+                        + "%.1f" % x70
+                        + " cm. \n"
+                    )
+                    Output = (
+                        Output
+                        + "Level 2 certification is never required for this temperature profile."
+                    )
 
     return Output
 
@@ -459,6 +463,8 @@ def T98_estimate(
         Weather data for a single location.
     meta : pd.DataFrame
         Meta data for a single location.
+    weather_kwarg : dict
+        other variables needed to access a particular weather dataset.
     tilt : float,
         Tilt angle of PV system relative to horizontal. [°]
     azimuth : float, optional
@@ -547,6 +553,52 @@ def T98_estimate(
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
         T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
         return T98
+
+
+def standoff_x(
+    weather_df,
+    meta,
+    tilt,
+    azimuth,
+    sky_model,
+    temp_model=None,
+    conf_0=None,
+    conf_inf=None,
+    T98=None,
+    x_0=None,
+    wind_factor=None,
+):
+    """
+    Calculate a minimum standoff distance for roof mounded PV systems.
+    Will default to horizontal tilt and return only that value. It just passes
+    through the calling function and returns a single value.
+
+    Parameters
+    ----------
+    See Standoff() documentation
+
+    Returns
+    -------
+    x : float [cm]
+        Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
+        Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
+    """
+
+    temp_df = standoff(
+        weather_df=weather_df,
+        meta=meta,
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+        temp_model=temp_model,
+        conf_0=conf_0,
+        conf_inf=conf_inf,
+        T98=T98,
+        x_0=x_0,
+        wind_factor=wind_factor,
+    ).x[0]
+
+    return temp_df
 
 
 # def run_calc_standoff(
