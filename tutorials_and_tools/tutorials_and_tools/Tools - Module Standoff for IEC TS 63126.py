@@ -3,11 +3,7 @@
 
 # # Tools - Module Standoff for IEC TS 63126
 # ## Calculation of module standoff distance according to IEC TS 63126
-# ***
-# Matthew Brown, Michael Kempe
 # 
-# 2023.12.21
-# ***
 # 
 # **Requirements:**
 # - Local weather data file or site longitude and latittude
