@@ -1,0 +1,17 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+chapters:
+- file: tutorials/1 - Basics, Humidity, Design
+- file: tutorials/2 - Degradation
+- file: tutorials/3 - Spectral Degradation
+- file: tutorials/5 - Weather Database Access
+- file: tutorials/Tools - Module Standoff for IEC TS 63126
+- file: tutorials/ASTM Live Demo
+- file: tutorials/B-O LID - Accelerated Test
+- file: tutorials/LETID - Accelerated Test
+- file: tutorials/LETID - Outdoor LETID
+- file: tutorials/LETID - Outdoor Scenario Based on Accelerated Test Result
+- file: tutorials/LETID - Passivated Wafer
