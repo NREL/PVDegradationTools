@@ -23,6 +23,17 @@
 	</a>
   </td>
 </tr>
+<tr>
+  <td>Build status</td>
+  <td>
+   <a href="https://github.com/NREL/PVDegradationTools/actions/workflows/pytest.yml?query=branch%3Amain">
+      <img src="https://github.com/NREL/PVDegradationTools/actions/workflows/pytest.yml/badge.svg?branch=main" alt="GitHub Actions Testing Status" />
+   </a>
+   <a href="https://codecov.io/gh/NREL/PVDegradationTools" >
+   <img src="https://codecov.io/gh/NREL/PVDegradationTools/graph/badge.svg?token=4I24S8BTG7"/>
+   </a>
+  </td>
+</tr>
 </table>
 
 
@@ -50,28 +61,24 @@ It takes a minute to load the environment.
 
 ### Locally
 
-You can also run the tutorial locally with
-[miniconda](https://docs.conda.io/en/latest/miniconda.html) by following thes
-steps:
+You can also run the tutorial locally in a virtual environment, i.e., `venv` or
+[miniconda](https://docs.conda.io/en/latest/miniconda.html).
 
-1. Install [miniconda](https://docs.conda.io/en/latest/miniconda.html).
-
-1. Clone the repository:
-
+1. Create and activate a new environment, e.g., on Mac/Linux terminal with `venv`:
    ```
-   git clone https://github.com/NREL/PVDegradationTools.git
+   python -m venv pvdeg
+   . pvdeg/bin/activate
    ```
-
-1. Create the environment and install the requirements. The repository includes
-   a `requirements.txt` file that contains a list the packages needed to run
-   this tutorial. To install them using conda run:
-
+   or with `conda`:
    ```
-   conda create -n pvdeg jupyter -c pvlib --file requirements.txt
+   conda create -n pvdeg
    conda activate pvdeg
    ```
 
-   or you can install it with `pip install pvdeg` as explained in the installation instructions into the environment.
+1. Install `pvdeg` into the new environment with `pip`:
+   ```
+   python -m pip install pvdeg
+   ```
 
 1. Start a Jupyter session:
 
@@ -98,9 +105,9 @@ Install with:
 
     pip install pvdeg
 
-For developer installation, download the repository, navigate to the folder location and install as:
+For developer installation, clone the repository, navigate to the folder location and install as:
 
-    pip install -e .
+    pip install -e .[all]
 
 
 License

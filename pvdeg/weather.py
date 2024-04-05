@@ -9,6 +9,7 @@ import pandas as pd
 from rex import NSRDBX, Outputs
 from pvdeg import humidity
 import datetime
+import numpy as np
 
 import h5py
 import dask.dataframe as dd
@@ -55,7 +56,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         location = None
     elif id is None:
         if not geospatial:
-            raise TypeError("Specify location via tuple (latitude, longitude), or gid integer.")
+            raise TypeError(
+                "Specify location via tuple (latitude, longitude), or gid integer."
+            )
 
     if not geospatial:
         # TODO: decide wether to follow NSRDB or pvlib conventions...
@@ -64,8 +67,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
+            URL = "https://re.jrc.ec.europa.eu/api/v5_2/"
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
-                latitude=lat, longitude=lon, map_variables=True, **kwargs
+                latitude=lat, longitude=lon, map_variables=True, url=URL, **kwargs
             )
             meta = meta["location"]
         elif database == "PSM3":
@@ -78,36 +82,44 @@ def get(database, id=None, geospatial=False, **kwargs):
             raise NameError("Weather database not found.")
 
         if "relative_humidity" not in weather_df.columns:
-            print('Column "relative_humidity" not found in DataFrame. Calculating...' , end='')
+            print(
+                'Column "relative_humidity" not found in DataFrame. Calculating...',
+                end="",
+            )
             weather_df = humidity._ambient(weather_df)
-            print('\r                                                                        ', end='')
-            print('\r', end='')
-     
-        # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_df)
-        map_meta(meta)
+            print(
+                "\r                                                                        ",
+                end="",
+            )
+            print("\r", end="")
 
-        if database == 'NSRDB' or database == 'PSM3':
-            meta['Wind_Height_m']=2
-            meta['Source']='NSRDB'
-        elif database == 'PVGIS':
-            meta['Wind_Height_m']=10
-            meta['Source']='PVGIS'
+        # map meta-names as needed
+
+        for key in [*meta.keys()]:
+            if key in META_MAP.keys():
+                meta[META_MAP[key]] = meta.pop(key)
+
+        if database == "NSRDB" or database == "PSM3":
+            meta["wind_height"] = 2
+            meta["Source"] = "NSRDB"
+        elif database == "PVGIS":
+            meta["wind_height"] = 10
+            meta["Source"] = "PVGIS"
         else:
-            meta['Wind_Height_m']=None
+            meta["wind_height"] = None
 
         return weather_df, meta
 
     elif geospatial:
         if database == "NSRDB":
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
-            meta_df.append({'Wind_Height_m': 2})
+            meta_df["wind_height"] = 2
         elif database == "local":
             fp = kwargs.pop("file")
             weather_ds, meta_df = ini_h5_geospatial(fp)
         else:
             raise NameError(f"Geospatial analysis not implemented for {database}.")
-        
+
         # switch weather data headers and metadata to pvlib standard
         map_weather(weather_df)
         map_meta(meta_df)
@@ -115,7 +127,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         return weather_ds, meta_df
 
 
-def read(file_in, file_type, map_variables = True, **kwargs):
+def read(file_in, file_type, map_variables=True, **kwargs):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
@@ -144,7 +156,7 @@ def read(file_in, file_type, map_variables = True, **kwargs):
     elif file_type == "H5":
         weather_df, meta = read_h5(file=file_in, **kwargs)
     elif file_type == "CSV":
-         weather_df, meta = csv_read(filename=file_in)
+        weather_df, meta = csv_read(filename=file_in)
     else:
         print(f"File-Type not recognized. supported types:\n{supported}")
 
@@ -152,16 +164,17 @@ def read(file_in, file_type, map_variables = True, **kwargs):
         meta = meta.to_dict()
 
     # map meta-names as needed
-    if map_variables == True:    
+    if map_variables == True:
         map_weather(weather_df)
         map_meta(meta)
 
     return weather_df, meta
 
+
 def csv_read(filename):
     """
     Read a locally stored csv weather file. The first line contains the meta data
-    variable names, and the second line contains the meta data values. This is followed 
+    variable names, and the second line contains the meta data values. This is followed
     by the meterological data.
 
 
@@ -178,44 +191,59 @@ def csv_read(filename):
         Dictionary of metadata for the weather data
     """
 
-    file1 = open(filename, 'r')
+    file1 = open(filename, "r")
     # get the meta data from the first two lines
-    metadata_fields = file1.readline().split(',')
+    metadata_fields = file1.readline().split(",")
     metadata_fields[-1] = metadata_fields[-1].strip()  # strip trailing newline
-    metadata_values = file1.readline().split(',')
+    metadata_values = file1.readline().split(",")
     metadata_values[-1] = metadata_values[-1].strip()  # strip trailing newline
     meta = dict(zip(metadata_fields, metadata_values))
     # get the column headers
-    columns = file1.readline().split(',')
+    columns = file1.readline().split(",")
     columns[-1] = columns[-1].strip()  # strip trailing newline
     # remove blank columns if they are there
-    columns = [col for col in columns if col != '']
+    columns = [col for col in columns if col != ""]
     dtypes = dict.fromkeys(columns, float)  # all floats except datevec
     dtypes.update(Year=int, Month=int, Day=int, Hour=int, Minute=int)
-    dtypes['Cloud Type'] = int
-    dtypes['Fill Flag'] = int
-    weather_df=pd.read_csv(file1, header=None, names=columns, usecols=columns, dtype=dtypes, delimiter=',', lineterminator='\n')
+    dtypes["Cloud Type"] = int
+    dtypes["Fill Flag"] = int
+    weather_df = pd.read_csv(
+        file1,
+        header=None,
+        names=columns,
+        usecols=columns,
+        dtype=dtypes,
+        delimiter=",",
+        lineterminator="\n",
+    )
     try:
-        dtidx =pd.to_datetime(weather_df[['Year', 'Month', 'Day', 'Hour', 'Minute', 'Second']])
+        dtidx = pd.to_datetime(
+            weather_df[["Year", "Month", "Day", "Hour", "Minute", "Second"]]
+        )
     except:
         try:
-            dtidx =pd.to_datetime(weather_df[['Year', 'Month', 'Day', 'Hour', 'Minute']])  
+            dtidx = pd.to_datetime(
+                weather_df[["Year", "Month", "Day", "Hour", "Minute"]]
+            )
         except:
             try:
-                dtidx =pd.to_datetime(weather_df[['Year', 'Month', 'Day', 'Hour']]) 
+                dtidx = pd.to_datetime(weather_df[["Year", "Month", "Day", "Hour"]])
             finally:
-                dtidx=print('Your data file should have columns for Year, Month, Day, and Hour')
+                dtidx = print(
+                    "Your data file should have columns for Year, Month, Day, and Hour"
+                )
     try:
-        tz='Etc/GMT%+d' % -meta['tz']
+        tz = "Etc/GMT%+d" % -meta["tz"]
         weather_df.index = pd.DatetimeIndex(dtidx.tz_localize(tz))
     except:
         weather_df.index = pd.DatetimeIndex(dtidx)
-    file1.close() 
+    file1.close()
 
     return weather_df, meta
 
+
 def map_meta(meta):
-    """"
+    """ "
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.
 
@@ -224,15 +252,17 @@ def map_meta(meta):
     meta : dictionary
         DataFrame of weather data with modified column headers.
     """
-    
-    META_MAP = {'elevation': 'altitude',
-                'Elevation': 'altitude', 
-                'Local Time Zone': 'tz', 
-                'Time Zone': 'tz', 
-                'Dew Point': 'dew_point',
-                'Longitude': 'longitude',
-                'Latitude': 'latitude',}
-    
+
+    META_MAP = {
+        "elevation": "altitude",
+        "Elevation": "altitude",
+        "Local Time Zone": "tz",
+        "Time Zone": "tz",
+        "Dew Point": "dew_point",
+        "Longitude": "longitude",
+        "Latitude": "latitude",
+    }
+
     # map meta-names as needed
     for key in [*meta.keys()]:
         if key in META_MAP.keys():
@@ -240,8 +270,9 @@ def map_meta(meta):
 
     return meta
 
+
 def map_weather(weather_df):
-    """"
+    """ "
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.
 
@@ -252,33 +283,35 @@ def map_weather(weather_df):
     """
 
     DSET_MAP = {
-        'year': 'Year',
-        'month': 'Month',
-        'day': 'Day',
-        'hour': 'Hour',
-        'minute': 'Minute',
-        'second': 'Second',
-        'GHI': 'ghi',
-        'DHI': 'dhi',
-        'DNI': 'dni',
-        'Clearsky GHI': 'ghi_clear',
-        'Clearsky DHI': 'dhi_clear',
-        'Clearsky DNI': 'dni_clear',
-        'Solar Zenith Angle': 'solar_zenith',
-        'Temperature': 'temp_air',
-        'Dew Point': 'dew_point',
-        'Relative Humidity': 'relative_humidity',
-        'Pressure': 'pressure',
-        'Wind Speed': 'wind_speed',
-        'Wind Direction': 'wind_direction',
-        'Surface Albedo': 'albedo',
-        'Precipitable Water': 'precipitable_water',
+        "year": "Year",
+        "month": "Month",
+        "day": "Day",
+        "hour": "Hour",
+        "minute": "Minute",
+        "second": "Second",
+        "GHI": "ghi",
+        "DHI": "dhi",
+        "DNI": "dni",
+        "Clearsky GHI": "ghi_clear",
+        "Clearsky DHI": "dhi_clear",
+        "Clearsky DNI": "dni_clear",
+        "Solar Zenith Angle": "solar_zenith",
+        "Temperature": "temp_air",
         "Dew Point": "dew_point",
-        }
-    
+        "Relative Humidity": "relative_humidity",
+        "Pressure": "pressure",
+        "Wind Speed": "wind_speed",
+        "Wind Direction": "wind_direction",
+        "Surface Albedo": "albedo",
+        "Precipitable Water": "precipitable_water",
+        "Dew Point": "dew_point",
+    }
+
     for column_name in weather_df.columns:
         if column_name in [*DSET_MAP.keys()]:
-            weather_df.rename(columns={column_name: DSET_MAP[column_name]},  inplace=True)
+            weather_df.rename(
+                columns={column_name: DSET_MAP[column_name]}, inplace=True
+            )
 
     return weather_df
 
@@ -357,13 +390,21 @@ def ini_h5_geospatial(fps):
     for i, fp in enumerate(fps):
         hf = h5py.File(fp, "r")
         attr = list(hf)
-        attr_to_read = [elem for elem in attr if elem not in ["meta", "time_index"]]
+        attr_to_read = [
+            elem
+            for elem in attr
+            if elem not in ["meta", "time_index", "tmy_year", "tmy_year_short"]
+        ]
 
         chunks = []
         shapes = []
         for var in attr_to_read:
-            chunks.append(hf[var].chunks)
-            shapes.append(hf[var].shape)
+            chunks.append(
+                hf[var].chunks if hf[var].chunks is not None else (np.nan, np.nan)
+            )
+            shapes.append(
+                hf[var].shape if hf[var].shape is not None else (np.nan, np.nan)
+            )
         chunks = min(set(chunks))
         shapes = min(set(shapes))
 
@@ -522,14 +563,19 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-  
-    print('HPC value set to ' , NREL_HPC)
+    print("HPC value set to ", NREL_HPC)
+    DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
-    if satellite == None:  # TODO: This function is not fully written as of January 3, 2024
+    META_MAP = {"elevation": "altitude"}
+    if (
+        satellite == None
+    ):  # TODO: This function is not fully written as of January 3, 2024
         satellite, gid = get_satellite(location)
-        print('the satellite is ' , satellite)
+        print("the satellite is ", satellite)
     if not geospatial:
-        nsrdb_fnames, hsds = get_NSRDB_fnames(satellite=satellite, names=names, NREL_HPC=NREL_HPC)
+        nsrdb_fnames, hsds = get_NSRDB_fnames(
+            satellite=satellite, names=names, NREL_HPC=NREL_HPC
+        )
 
         dattr = {}
         for i, file in enumerate(nsrdb_fnames):
@@ -698,9 +744,9 @@ def is_leap_year(year):
         return False
     else:
         return True
-    
+
+
 def get_satellite(location):
-    
     """
     identify a satellite to use for a given lattitude and longitude. This is to provide default values worldwide, but a more
     experienced user may want to specify a specific satellite to get better data.
@@ -720,20 +766,20 @@ def get_satellite(location):
         gid for the desired location
     """
 
-    # this is just a placeholder till the actual code gets programmed. 
-    satellite="PSM3"
+    # this is just a placeholder till the actual code gets programmed.
+    satellite = "PSM3"
 
-    #gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
+    # gid = f.lat_lon_gid(lat_lon=location) # I couldn't get this to work
     gid = None
     return satellite, gid
 
 
-def write(data_df, metadata, savefile='WeatherFile.csv'):
+def write(data_df, metadata, savefile="WeatherFile.csv"):
     """
     Saves dataframe with weather data and any associated meta data in an *.csv format.
-    The metadata will be formatted on the first two lines with the first being the descriptor 
+    The metadata will be formatted on the first two lines with the first being the descriptor
     and the second line being the value. Then the meterological, time and other data series
-    headers on on the third line with all the subsequent data on the remaining lines. This 
+    headers on on the third line with all the subsequent data on the remaining lines. This
     format can be read by the PVDeg software.
 
     Parameters
@@ -758,7 +804,7 @@ def write(data_df, metadata, savefile='WeatherFile.csv'):
         If minutes are included, it will calculate the sun position at the time
         of the timestamp (12:00 at 12:00)
         Set to true if resolution of data is sub-hourly.
-        Name of file to save output as.    
+        Name of file to save output as.
     standardSAM : boolean
         This checks the dataframe to avoid having a leap day, then averages it
         to SAM style (closed to the right),
@@ -771,27 +817,33 @@ def write(data_df, metadata, savefile='WeatherFile.csv'):
         If minutes are included, it will calculate the sun position at the time
         of the timestamp (12:00 at 12:00)
         Set to true if resolution of data is sub-hourly.
-    
+
     Returns
     -------
     Nothing, it just writes the file.
 
     """
 
-    meta_string=(', '.join(str(key)  for key, value in metadata.items()) + '\n' + ', '.join( str(value) for key, value in metadata.items()))
+    meta_string = (
+        ", ".join(str(key) for key, value in metadata.items())
+        + "\n"
+        + ", ".join(str(value) for key, value in metadata.items())
+    )
 
     result_df = pd.concat([data_df], axis=1).reindex()
 
-    savedata = result_df.to_string(index=False).split('\n')
+    savedata = result_df.to_string(index=False).split("\n")
     savedata.pop(0)
-    savedata = [','.join(ele.split()) for ele in savedata]
-    savedata = '\n'.join(savedata)
-    columns =list(data_df.columns) # This had to be pulled out separately because spaces can get turned into commas in the header names.
-    str1=''
+    savedata = [",".join(ele.split()) for ele in savedata]
+    savedata = "\n".join(savedata)
+    columns = list(
+        data_df.columns
+    )  # This had to be pulled out separately because spaces can get turned into commas in the header names.
+    str1 = ""
     for ele in columns:
-            str1 = str1 + ele + ','
-    savedata = meta_string + '\n' + str1 + '\n' + savedata
-   
-    file1 = open(savefile, 'w')
+        str1 = str1 + ele + ","
+    savedata = meta_string + "\n" + str1 + "\n" + savedata
+
+    file1 = open(savefile, "w")
     file1.writelines(savedata)
-    file1.close() 
+    file1.close()

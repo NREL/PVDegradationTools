@@ -187,7 +187,9 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     return res
 
 
-def output_template(ds_gids, shapes, attrs=dict(), add_dims=dict()):
+def output_template(
+    ds_gids, shapes, attrs=dict(), global_attrs=dict(), add_dims=dict()
+):
     """
     Generates a xarray template for output data. Output variables and
     associated dimensions need to be specified via the shapes dictionary.
@@ -215,11 +217,11 @@ def output_template(ds_gids, shapes, attrs=dict(), add_dims=dict()):
 
     output_template = xr.Dataset(
         data_vars={
-            var: (dim, da.empty([dims_size[d] for d in dim]))
+            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
             for var, dim in shapes.items()
         },
         coords={dim: ds_gids[dim] for dim in dims},
-        attrs=attrs,
+        attrs=global_attrs,
     ).chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
     return output_template
@@ -235,6 +237,8 @@ def template_parameters(func):
         Dictionary of variable names and their associated dimensions.
     attrs : dict
         Dictionary of attributes for each variable (e.g. units).
+    global_attrs: dict
+        Dictionary of global attributes for the output template.
     add_dims : dict
         Dictionary of dimensions to add to the output template.
     """
@@ -247,9 +251,19 @@ def template_parameters(func):
         }
 
         attrs = {
-            "x": {"units": "cm"},
-            "T98_0": {"units": "Celsius"},
-            "T98_inf": {"units": "Celsius"},
+            "x": {"long_name": "Standoff distance", "units": "cm"},
+            "T98_0": {
+                "long_name": "98th percential temperature of a theoretical module with no standoff",
+                "units": "Celsius",
+            },
+            "T98_inf": {
+                "long_name": "98th percential temperature of a theoretical rack mounted module",
+                "units": "Celsius",
+            },
+        }
+
+        global_attrs = {
+            "long_name": "Standoff dataset",
         }
 
         add_dims = {}
@@ -263,6 +277,8 @@ def template_parameters(func):
         }
 
         attrs = {}
+
+        global_attrs = {}
 
         add_dims = {}
 
@@ -284,12 +300,19 @@ def template_parameters(func):
 
         attrs = {}
 
+        global_attrs = {}
+
         add_dims = {}
 
     else:
         raise ValueError(f"No preset output template for function {func}.")
 
-    parameters = {"shapes": shapes, "attrs": attrs, "add_dims": add_dims}
+    parameters = {
+        "shapes": shapes,
+        "attrs": attrs,
+        "global_attrs": global_attrs,
+        "add_dims": add_dims,
+    }
 
     return parameters
 
@@ -309,13 +332,13 @@ def plot_USA(
     ax.add_geometries(
         shpreader.Reader(states_shp).geometries(),
         ccrs.PlateCarree(),
-        facecolor="w",
+        facecolor="none",
         edgecolor="gray",
     )
 
     cm = xr_res.plot(
         transform=ccrs.PlateCarree(),
-        zorder=10,
+        zorder=1,
         add_colorbar=False,
         cmap=cmap,
         vmin=vmin,
@@ -332,6 +355,6 @@ def plot_USA(
     ax.set_title(title)
 
     if fp is not None:
-        plt.savefig(fp, dpi=600)
+        plt.savefig(fp, dpi=1200)
 
     return fig, ax

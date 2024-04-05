@@ -422,14 +422,8 @@ def ts_gid_df(file, gid):
 
 
 def tilt_azimuth_scan(
-    weather_df=None,
-    meta=None,
-    tilt_step=5,
-    azimuth_step=5,
-    func= Callable, 
-    **kwarg
+    weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
 ):
-
     """
     Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
 
@@ -451,12 +445,12 @@ def tilt_azimuth_scan(
         standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
     """
 
-    total_count=(math.ceil(360/azimuth_step)+1)*(math.ceil(90/tilt_step)+1)
-    tilt_azimuth_series=np.zeros((total_count,3))
+    total_count = (math.ceil(360 / azimuth_step) + 1) * (math.ceil(90 / tilt_step) + 1)
+    tilt_azimuth_series = np.zeros((total_count, 3))
     count = 0
-    azimuth = - azimuth_step
+    azimuth = -azimuth_step
     while azimuth < 360:
-        tilt = - tilt_step
+        tilt = -tilt_step
         azimuth = azimuth + azimuth_step
         if azimuth > 360:
             azimuth = 360
@@ -464,13 +458,16 @@ def tilt_azimuth_scan(
             tilt = tilt + tilt_step
             if tilt > 90:
                 tilt = 90
-            tilt_azimuth_series[count][0]=tilt
-            tilt_azimuth_series[count][1]=azimuth
-            tilt_azimuth_series[count][2]=func(weather_df=weather_df, meta=meta, tilt=tilt, azimuth=azimuth, **kwarg)
+            tilt_azimuth_series[count][0] = tilt
+            tilt_azimuth_series[count][1] = azimuth
+            tilt_azimuth_series[count][2] = func(
+                weather_df=weather_df, meta=meta, tilt=tilt, azimuth=azimuth, **kwarg
+            )
             count = count + 1
-            print('\r', '%.1f' % (100*count/total_count),'% complete' , sep='', end='')
-            
-    print('\r                     ', end='')
-    print('\r', end='')
-    return tilt_azimuth_series
+            print(
+                "\r", "%.1f" % (100 * count / total_count), "% complete", sep="", end=""
+            )
 
+    print("\r                     ", end="")
+    print("\r", end="")
+    return tilt_azimuth_series
