@@ -515,6 +515,24 @@ def _weather_ds_from_csv(
     # Convert the combined DataFrame to an xarray Dataset
     weather_ds = combined_df.set_index(['gid', 'time']).to_xarray()
 
+    # combined_df = combined_df.set_index(['time', 'gid']).sort_index()
+    # weather_ds = combined_df.set_index(['time', 'gid']).to_xarray()
+
+    # GHI             (gid, time) int64 12kB 0 0 0 0 0 0 ... 507 439 393 238 54 20
+    # Temperature     (gid, time) float64 12kB -12.6 -13.3 -13.6 ... -3.4 -4.6
+    # DHI             (gid, time) int64 12kB 0 0 0 0 0 0 0 ... 56 113 94 129 54 20
+    # DNI             (gid, time) int64 12kB 0 0 0 0 0 0 ... 1004 718 728 337 0 0
+    # Surface Albedo  (gid, time) float64 12kB 0.8 0.8 0.8 0.8 ... 0.8 0.8 0.8 0.8
+    # Wind Speed     
+
+    weather_ds = weather_ds.rename_vars({
+        'GHI' : 'ghi',
+        'Temperature' : 'temp_air',
+        'DHI' : 'dhi',
+        'DNI' : 'dni',
+        'Wind Speed' : 'wind_speed',
+    })
+
     return weather_ds
 
 def geospatial_from_csv(
@@ -547,5 +565,8 @@ def geospatial_from_csv(
 
     # reset the indecies of updated dataframe (might not be nessecary)
     filtered_meta = filtered_meta.reset_index(drop=True)
+
+    # rename Location ID column to gid
+    filtered_meta = filtered_meta.rename({'Location ID' : 'gid'}, axis="columns")
 
     return weather_ds, filtered_meta
