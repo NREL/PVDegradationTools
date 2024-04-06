@@ -6,6 +6,15 @@ import pvlib
 import pvdeg
 
 
+# TODO:
+# "sapm" 
+# add the following temperature models
+# "pvsyst"
+# "faiman"
+# "faiman_rad"
+# "fuentes"
+# "ross"
+
 def module(
     weather_df,
     meta,
@@ -13,6 +22,7 @@ def module(
     temp_model="sapm",
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
+    module_kwarg=None
 ):
     """
     Calculate module surface temperature using pvlib.
@@ -34,6 +44,8 @@ def module(
             'sapm': 'open_rack_glass_polymer' (default),
             'open_rack_glass_glass', 'close_mount_glass_glass',
             'insulated_back_glass_polymer'
+    module_kwarg: dict
+        Keyword arguments for module parameters. 
 
     Returns
     -------
@@ -82,14 +94,58 @@ def module(
             wind_speed_factor = 1  # this is just hear for completeness.
     # TODO put in code for the other models, PVSYS, Faiman,
 
+    # moved outside of conditionals
+    poa_global=poa["poa_global"],
+    temp_air=weather_df["temp_air"],
+    wind_speed=weather_df["wind_speed"] * wind_speed_factor,
+
     if temp_model == "sapm":
         module_temperature = pvlib.temperature.sapm_module(
-            poa_global=poa["poa_global"],
-            temp_air=weather_df["temp_air"],
-            wind_speed=weather_df["wind_speed"] * wind_speed_factor,
+            poa_global,
+            temp_air,
+            wind_speed,
             a=parameters["a"],
             b=parameters["b"],
         )
+
+    # NEW temperature models
+    # elif temp_model == "pvsyst":
+    #     # this wants to be cell not module???
+    #     # module_temperature = pvlib.temperature.
+    #     pass
+
+    # elif temp_model == "faiman":
+    #     module_temperature = pvlib.temperature.faiman(
+    #         poa_global=poa_global, 
+    #         temp_air=temp_air,
+    #         wind_speed=wind_speed,
+    #     )
+
+    # elif temp_model == "faiman_rad":
+    #     module_temperature = pvlib.temperature.faiman_rad(
+    #         poa_global=poa_global, 
+    #         temp_air=temp_air,
+    #         wind_speed=wind_speed,
+    #     )        
+
+    # elif temp_model == "fuentes":
+    #     pass
+
+    # elif temp_model == "ross":
+    #     pass
+
+    # elif temp_model == "noct_sam":
+    #     pass
+
+    # elif temp_model == "prilliman":
+    #     pass
+
+    # elif temp_model == "generic_linear":
+    #     pass
+
+    # elif temp_model == "GenericLinearModel":
+    #     pass
+
     else:
         # TODO: add options for temperature model
         print("There are other models but they haven't been implemented yet!")

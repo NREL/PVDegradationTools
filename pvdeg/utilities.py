@@ -471,3 +471,156 @@ def tilt_azimuth_scan(
     print("\r                     ", end="")
     print("\r", end="")
     return tilt_azimuth_series
+def _meta_df_from_csv(
+    file_paths : list[str]
+    ):
+    """
+    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
+
+    Parameters
+    ----------
+    file_paths : list[str]
+        List of local weather csv files to strip metadata from. For example: download a collection of weather files from the NSRDB web viewer. 
+
+    Returns
+    -------
+    metadata_df : pandas.DataFrame
+        Dataframe of stripped metadata from csv. Columns represent attribute names while rows represent a unique file.
+    """
+    # TODO: functionality
+    # list[path] instead of just string
+    # or a directory, just use csv from provided directory
+
+
+    def read_meta(path):
+        df = pd.read_csv(path, nrows=1)
+        listed = df.to_dict(orient='list')
+        stripped = {key: value[0] for key, value in listed.items()}
+
+        return stripped
+
+    metadata_df = pd.DataFrame()
+
+    for i in range(len(file_paths)):
+        metadata_df[i] = read_meta(file_paths[i])
+
+    metadata_df = metadata_df.T
+
+    # correct level of precision??
+    conversions = {
+        'Location ID' : np.int32,
+        'Latitude' : np.double,
+        'Longitude' : np.double,
+        'Time Zone' : np.int8,
+        'Elevation' : np.int16,
+        'Local Time Zone' : np.int8
+    }
+
+    metadata_df = metadata_df.astype(conversions)
+    return metadata_df
+
+def _weather_ds_from_csv(
+    file_paths : list[str],
+    year : int,
+    # select year, should be able to provide single year, or list of years 
+    ):
+    """
+    Helper Function: Create a geospatial xarray dataset from local csv files.
+
+    Parameters
+    ----------
+
+    Returns
+    ----------
+    """
+    # PROBLEM: all csv do not contain all years but these all appear to have 2004
+    # when missing years, xarray will see mismatched coordinates and populate all these values with nan
+    
+    # Prepare a list to hold the DataFrames
+    dataframes = []
+
+    # Process each file
+    for file_path in file_paths:
+        # Extract GID from the filename
+        header = pd.read_csv(file_path, nrows=1)
+        gid = header['Location ID'][0]
+        
+        # Read the CSV, skipping rows to get to the relevant data
+        df = pd.read_csv(file_path, skiprows=2)
+        
+        # Add GID and Time columns
+        df['gid'] = gid
+
+        df['time'] = pd.to_datetime(df[['Year', 'Month', 'Day', 'Hour', 'Minute']])
+
+        # make allow this to take list of years
+        df = df[df['time'].dt.year == year]
+
+        # add generic approach, dont manually do this, could change based on user selections  
+
+        # Select relevant columns and append to the list
+        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Direction', 'Wind Speed']]
+        df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Speed']]
+        dataframes.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(dataframes)
+
+    # Convert the combined DataFrame to an xarray Dataset
+    weather_ds = combined_df.set_index(['gid', 'time']).to_xarray()
+
+    # combined_df = combined_df.set_index(['time', 'gid']).sort_index()
+    # weather_ds = combined_df.set_index(['time', 'gid']).to_xarray()
+
+    # GHI             (gid, time) int64 12kB 0 0 0 0 0 0 ... 507 439 393 238 54 20
+    # Temperature     (gid, time) float64 12kB -12.6 -13.3 -13.6 ... -3.4 -4.6
+    # DHI             (gid, time) int64 12kB 0 0 0 0 0 0 0 ... 56 113 94 129 54 20
+    # DNI             (gid, time) int64 12kB 0 0 0 0 0 0 ... 1004 718 728 337 0 0
+    # Surface Albedo  (gid, time) float64 12kB 0.8 0.8 0.8 0.8 ... 0.8 0.8 0.8 0.8
+    # Wind Speed     
+
+    weather_ds = weather_ds.rename_vars({
+        'GHI' : 'ghi',
+        'Temperature' : 'temp_air',
+        'DHI' : 'dhi',
+        'DNI' : 'dni',
+        'Wind Speed' : 'wind_speed',
+    })
+
+    return weather_ds
+
+def geospatial_from_csv(
+    file_path : list[str],
+    year : int # should be able to take a range of years
+    ): 
+    """
+    Create an xarray dataset contaning geospatial weather data and a pandas dataframe 
+    containing geospatial metadata from a list of local csv files. 
+    
+    Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
+    when downloaded locally as csv
+
+    Parameters
+    ----------
+    file_path : list[str]
+        List of absolute paths to csv files in string form.
+    year : int
+        Single year of data to use from local csv files. 
+    """
+
+    weather_ds, meta_df = _weather_ds_from_csv(file_path, year), _meta_df_from_csv(file_path)
+
+    # only want to keep meta from given file using GIDs from DS
+    # gather included files' gids from xarray
+    included_gids = weather_ds.coords['gid'].values
+
+    # filter the metadate to only include gid values found above
+    filtered_meta = meta_df[meta_df['Location ID'].isin(included_gids)]
+
+    # reset the indecies of updated dataframe (might not be nessecary)
+    filtered_meta = filtered_meta.reset_index(drop=True)
+
+    # rename Location ID column to gid
+    filtered_meta = filtered_meta.rename({'Location ID' : 'gid'}, axis="columns")
+
+    return weather_ds, filtered_meta
