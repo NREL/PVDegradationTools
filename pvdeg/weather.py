@@ -46,6 +46,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
     """
 
+    # WHY WAS THIS TAKEN OUT???
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"} 
+
     if type(id) is tuple:
         location = id
         gid = None
