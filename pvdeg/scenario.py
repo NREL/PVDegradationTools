@@ -51,9 +51,11 @@ class Scenario:
         gids=None,
         modules=[],
         pipeline=[],
-        hpc=False,
         file=None,
         results=None,
+        # are these valuable
+        hpc=False,
+        geospatial=False,
         
     ) -> None:
         """
@@ -98,6 +100,7 @@ class Scenario:
         self.pipeline = pipeline
         self.results = results
         self.hpc = hpc
+        self.geospatial = geospatial
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
@@ -296,73 +299,122 @@ class Scenario:
             pvdeg function
         """
 
-        if func is None or not callable(func):
-            print(f'FAILED: Requested function "{func}" not found')
-            print("Function has not been added to pipeline.")
-            return None
+        if not self.geospatial:
+            if func is None or not callable(func):
+                print(f'FAILED: Requested function "{func}" not found')
+                print("Function has not been added to pipeline.")
+                return None
 
-        params_all = dict(signature(func).parameters)
+            params_all = dict(signature(func).parameters)
 
-        # this is a bad way of doing it 
-        # some values with NONE are still optional
-        # causing if statement below to work improperly, 
-        reqs = {name: param for name, param in params_all.items() if param.default is None}
-        optional = {name: param for name, param in params_all.items() if name not in reqs}
+            # this is a bad way of doing it 
+            # some values with NONE are still optional
+            # causing if statement below to work improperly, 
+            reqs = {name: param for name, param in params_all.items() if param.default is None}
+            optional = {name: param for name, param in params_all.items() if name not in reqs}
 
-        ### this should be SUPERSET not subset ###
-        # this will force it to work BUT may cause some parameters to be missed #
-        if not set(func_params.keys()).issubset(set(reqs.keys())):
-            print(func_params.keys())
-            print(reqs.keys())
-            print(f"FAILED: Requestion function {func} did not receive enough parameters")
-            print(f"Requestion function: \n {func} \n ---")
-            print(f"Required Parameters: \n {reqs} \n ---")
-            print(f"Optional Parameters: {optional}")
-            print("Function has not been added to pipeline.")
-            return None
-        
-        job_dict = {"job": func, "params": func_params}
-        self.pipeline.append(job_dict)
-        
-        if see_added_function:
-            message = f"{func.__name__} added to pipeline as \n {job_dict}"
-            warnings.warn(message, UserWarning)
+            ### this should be SUPERSET not subset ###
+            # this will force it to work BUT may cause some parameters to be missed #
+            if not set(func_params.keys()).issubset(set(reqs.keys())):
+                print(func_params.keys())
+                print(reqs.keys())
+                print(f"FAILED: Requestion function {func} did not receive enough parameters")
+                print(f"Requestion function: \n {func} \n ---")
+                print(f"Required Parameters: \n {reqs} \n ---")
+                print(f"Optional Parameters: {optional}")
+                print("Function has not been added to pipeline.")
+                return None
+            
+            job_dict = {"job": func, "params": func_params}
+            self.pipeline.append(job_dict)
+            
+            if see_added_function:
+                message = f"{func.__name__} added to pipeline as \n {job_dict}"
+                warnings.warn(message, UserWarning)
+
+        if self.geospatial:
+            # not sure if this will unpack correctly with function call inside of pipeline
+            # working example from DURAMAT DEMO
+            # geo = {'func': pvdeg.standards.standoff,
+            #     'weather_ds': weather_NM_sub,
+            #     'meta_df': meta_NM_sub}
+
+            # standoff_res = pvdeg.geospatial.analysis(**geo)
+
+            # need to store results template as well
+            try: 
+               pvdeg.geospatial.output_template(func) 
+
+            except ValueError: # function does not have valid geospatial results template
+                message = f"{func.__name__} does does not have a valid geospatial results template or does not exist"
+                warnings.warn(message, UserWarning)
+
+            # just add function name for geospatial, we will use a kwargs dict with function and parameters to pass to geospatial analysis
+            geospatial_job_dict = {
+                # "job" : func.__name__,
+                "func" : func # named to match "geo" dict in DURAMAT DEMO
+            }
+
+            # combines (flattened) dictionaries to yield the "geo" dict from cell 9 in DURAMAT DEMO
+            geospatial_job_dict.update(func_params)
+
+            self.pipeline.append(geospatial_job_dict)
+
+            if see_added_function:
+                message = f"{func.__name__} added to pipeline as \n {job_dict}"
+                warnings.warn(message, UserWarning)
 
     def runPipeline(self):
-        # TODO: run pipeline on each module added
+        # TODO: run pipeline on each module added (if releveant)
         """
         Runs entire pipeline on scenario object
         """
 
-        results_dict = {}
-
-        for job in self.pipeline:
-            _func = job['job']
-            _params = job['params']
-            result = _func(**_params)
-
-            results_dict[job['job'].__name__] = result
-
-        # this may be a roundabout approach but is probably acceptable
-        # be careful of type of nested dict value, may be df or other, 
-        # this changes how we will store the result
+        # maybe roundabout approach, be careful of type of nested dict value, may be df or other, 
         results_series = pd.Series(dtype='object')
 
-        for key in results_dict.keys():
+        if not self.geospatial:
+            results_dict = {}
+
+            for job in self.pipeline:
+                _func = job['job']
+                _params = job['params']
+                result = _func(**_params)
+
+                results_dict[job['job'].__name__] = result
+
+                # move standard results to single dictionary
+                pipeline_results = results_dict
+        
+        # apply functions using pvdeg.geospatial.analysis with kwargs dictionary
+        if self.geospatial:
+            geospatial_results_dict = {}
+            
+            for job in self.pipeline:
+                # geospatial jobs in pipeline should only have parameters (function is included in given parameters)
+                # what datatype?
+                geospatial_job_result = pvdeg.geospatial.analysis(job)
+
+                # add geospatial return values to temp dictionary
+                geospatial_results_dict[job['func'].__name__] = geospatial_job_result
+
+                # move geospatial results to single dictionary
+                pipeline_results = geospatial_results_dict
+
+        # all job results -> pd.Series[pd.DataFrame]
+        for key in pipeline_results.keys():
             print(f"results_dict dtype : {type(results_dict[key])}")
             print(results_dict)
 
-            # instance checking here
-            # changes how we will store the result of each pipeline step in the result attribute
+            # properly store dataframe in results series
             if isinstance(results_dict[key], pd.DataFrame):
                 results_series[key] = results_dict[key]
 
-            # implement other return types later
-            # elif isinstance(results_dict[key], dict):
-            #     to_add_df = pd.DataFrame([results_dict[key]])            
-            #     results_series[key] = to_add_df
+            # implement instance check and convert to df for other return types
+            # should all be stored as dataframes in results
 
-        self.results = results_series
+            self.results = results_series
+
 
     def exportScenario(self, file_path=None):
         """
