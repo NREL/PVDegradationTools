@@ -46,6 +46,8 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
     """
 
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
+
     if type(id) is tuple:
         location = id
         gid = None
@@ -108,6 +110,10 @@ def get(database, id=None, geospatial=False, **kwargs):
         else:
             meta["wind_height"] = None
 
+        # switch weather data headers and metadata to pvlib standard
+        map_weather(weather_df)
+        map_meta(meta_df)
+
         return weather_df, meta
 
     elif geospatial:
@@ -119,10 +125,6 @@ def get(database, id=None, geospatial=False, **kwargs):
             weather_ds, meta_df = ini_h5_geospatial(fp)
         else:
             raise NameError(f"Geospatial analysis not implemented for {database}.")
-
-        # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_df)
-        map_meta(meta_df)
 
         return weather_ds, meta_df
 
@@ -387,14 +389,12 @@ def ini_h5_geospatial(fps):
         Dictionary of metadata for the weather data
     """
     dss = []
+    drop_variables = ["meta", "time_index", "tmy_year", "tmy_year_short", "coordinates"]
+
     for i, fp in enumerate(fps):
         hf = h5py.File(fp, "r")
         attr = list(hf)
-        attr_to_read = [
-            elem
-            for elem in attr
-            if elem not in ["meta", "time_index", "tmy_year", "tmy_year_short"]
-        ]
+        attr_to_read = [elem for elem in attr if elem not in drop_variables]
 
         chunks = []
         shapes = []
@@ -419,7 +419,7 @@ def ini_h5_geospatial(fps):
             engine="h5netcdf",
             phony_dims="sort",
             chunks={"phony_dim_0": chunks[0], "phony_dim_1": chunks[1]},
-            drop_variables=["time_index", "meta"],
+            drop_variables=drop_variables,
             mask_and_scale=False,
             decode_cf=True,
         )
@@ -429,34 +429,42 @@ def ini_h5_geospatial(fps):
                 scale_factor = 1 / ds[var].psm_scale_factor
                 getattr(ds, var).attrs["scale_factor"] = scale_factor
 
-        if tuple(coords_len.values()) == (
-            ds.dims["phony_dim_0"],
-            ds.dims["phony_dim_1"],
-        ):
-            rename = {"phony_dim_0": "time", "phony_dim_1": "gid"}
-        elif tuple(coords_len.values()) == (
-            ds.dims["phony_dim_1"],
-            ds.dims["phony_dim_0"],
-        ):
-            rename = {"phony_dim_0": "gid", "phony_dim_1": "time"}
-        else:
-            raise ValueError("Dimensions do not match")
-        ds = ds.rename(
-            {"phony_dim_0": rename["phony_dim_0"], "phony_dim_1": rename["phony_dim_1"]}
-        )
+        # TODO: delete
+        # if tuple(coords_len.values()) == (
+        #     ds.sizes["phony_dim_0"],
+        #     ds.sizes["phony_dim_1"],
+        # ):
+        #     rename = {"phony_dim_0": "time", "phony_dim_1": "gid"}
+        # elif tuple(coords_len.values()) == (
+        #     ds.sizes["phony_dim_1"],
+        #     ds.sizes["phony_dim_0"],
+        # ):
+        #     rename = {"phony_dim_0": "gid", "phony_dim_1": "time"}
+        # else:
+        #     raise ValueError("Dimensions do not match for {}".format(var))
+        rename = {}
+        for (
+            phony,
+            length,
+        ) in ds.sizes.items():
+            if length == coords_len["time"]:
+                rename[phony] = "time"
+            elif length == coords_len["gid"]:
+                rename[phony] = "gid"
+        ds = ds.rename(rename)
         ds = ds.assign_coords(coords)
 
         # TODO: In case re-chunking becomes necessary
-        # ax0 = list(ds.dims.keys())[list(ds.dims.values()).index(shapes[0])]
-        # ax1 = list(ds.dims.keys())[list(ds.dims.values()).index(shapes[1])]
+        # ax0 = list(ds.sizes.keys())[list(ds.sizes.values()).index(shapes[0])]
+        # ax1 = list(ds.sizes.keys())[list(ds.sizes.values()).index(shapes[1])]
         # ds = ds.chunk(chunks={ax0:chunks[0], ax1:chunks[1]})
         dss.append(ds)
 
     ds = xr.merge(dss)
     ds = xr.decode_cf(ds)
 
-    # Rechunk time axis
-    ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
+    # Rechunk time axis - TODO: fix this
+    # ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
 
@@ -615,7 +623,7 @@ def get_NSRDB(
             weather_ds = weather_ds[attributes]
 
         # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_ds)
+        # map_weather(weather_ds)
         meta_df.to_dict()
         map_meta(meta_df)
 
