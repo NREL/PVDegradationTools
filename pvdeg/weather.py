@@ -100,9 +100,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         map_weather(weather_df)
         map_meta(meta)
 
-        # if "relative_humidity" not in weather_df.columns:
-        #     print('Column "relative_humidity" not found in DataFrame. Calculating...')
-        #     weather_df = humidity._ambient(weather_df)
+        if "relative_humidity" not in weather_df.columns:
+            print('Column "relative_humidity" not found in DataFrame. Calculating...')
+            weather_df = humidity._ambient(weather_df)
 
         return weather_df, meta
 
