@@ -83,20 +83,6 @@ def get(database, id=None, geospatial=False, **kwargs):
         else:
             raise NameError("Weather database not found.")
 
-        if "relative_humidity" not in weather_df.columns:
-            print(
-                'Column "relative_humidity" not found in DataFrame. Calculating...',
-                end="",
-            )
-            weather_df = humidity._ambient(weather_df)
-            print(
-                "\r                                                                        ",
-                end="",
-            )
-            print("\r", end="")
-
-        # map meta-names as needed
-
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
@@ -112,7 +98,11 @@ def get(database, id=None, geospatial=False, **kwargs):
 
         # switch weather data headers and metadata to pvlib standard
         map_weather(weather_df)
-        map_meta(meta_df)
+        map_meta(meta)
+
+        # if "relative_humidity" not in weather_df.columns:
+        #     print('Column "relative_humidity" not found in DataFrame. Calculating...')
+        #     weather_df = humidity._ambient(weather_df)
 
         return weather_df, meta
 
@@ -144,7 +134,9 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         [psm3, tmy3, epw, h5, csv]
     """
 
-    supported = ["psm3", "tmy3", "epw", "h5", "csv"]
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
+
+    supported = ["psm3", "tmy3", "epw", "h5"]
     file_type = file_type.upper()
 
     if file_type in ["PSM3", "PSM"]:
@@ -299,14 +291,14 @@ def map_weather(weather_df):
         "Clearsky DNI": "dni_clear",
         "Solar Zenith Angle": "solar_zenith",
         "Temperature": "temp_air",
-        "Dew Point": "dew_point",
+        "air_temperature": "temp_air",
         "Relative Humidity": "relative_humidity",
+        "Dew Point": "dew_point",
         "Pressure": "pressure",
         "Wind Speed": "wind_speed",
         "Wind Direction": "wind_direction",
         "Surface Albedo": "albedo",
         "Precipitable Water": "precipitable_water",
-        "Dew Point": "dew_point",
     }
 
     for column_name in weather_df.columns:
@@ -571,10 +563,9 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-    print("HPC value set to ", NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
-
     META_MAP = {"elevation": "altitude"}
+
     if (
         satellite == None
     ):  # TODO: This function is not fully written as of January 3, 2024
@@ -608,12 +599,26 @@ def get_NSRDB(
 
         weather_df = pd.DataFrame(index=index)
 
-        # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_df)
-        meta.to_dict()
-        map_meta(meta)
+        for dset in attributes:
+            # switch dset names to pvlib standard
+            if dset in [*DSET_MAP.keys()]:
+                column_name = DSET_MAP[dset]
+            else:
+                column_name = dset
 
-        return weather_df, meta
+            with NSRDBX(dattr[dset], hsds=hsds) as f:
+                weather_df[column_name] = f[dset, :, gid]
+
+        # switch meta key names to pvlib standard
+        re_idx = []
+        for key in [*meta.index]:
+            if key in META_MAP.keys():
+                re_idx.append(META_MAP[key])
+            else:
+                re_idx.append(key)
+        meta.index = re_idx
+
+        return weather_df, meta.to_dict()
 
     elif geospatial:
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
@@ -622,10 +627,13 @@ def get_NSRDB(
         if attributes is not None:
             weather_ds = weather_ds[attributes]
 
-        # switch weather data headers and metadata to pvlib standard
-        # map_weather(weather_ds)
-        meta_df.to_dict()
-        map_meta(meta_df)
+        for dset in weather_ds.data_vars:
+            if dset in DSET_MAP.keys():
+                weather_ds = weather_ds.rename({dset: DSET_MAP[dset]})
+
+        for mset in meta_df.columns:
+            if mset in META_MAP.keys():
+                meta_df.rename(columns={mset: META_MAP[mset]}, inplace=True)
 
         return weather_ds, meta_df
 
