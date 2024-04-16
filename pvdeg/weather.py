@@ -46,8 +46,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
     """
 
-    # WHY WAS THIS TAKEN OUT???
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"} 
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
 
     if type(id) is tuple:
         location = id
@@ -84,20 +83,6 @@ def get(database, id=None, geospatial=False, **kwargs):
         else:
             raise NameError("Weather database not found.")
 
-        if "relative_humidity" not in weather_df.columns:
-            print(
-                'Column "relative_humidity" not found in DataFrame. Calculating...',
-                end="",
-            )
-            weather_df = humidity._ambient(weather_df)
-            print(
-                "\r                                                                        ",
-                end="",
-            )
-            print("\r", end="")
-
-        # map meta-names as needed
-
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
@@ -111,6 +96,14 @@ def get(database, id=None, geospatial=False, **kwargs):
         else:
             meta["wind_height"] = None
 
+        # switch weather data headers and metadata to pvlib standard
+        map_weather(weather_df)
+        map_meta(meta)
+
+        if "relative_humidity" not in weather_df.columns:
+            print('Column "relative_humidity" not found in DataFrame. Calculating...')
+            weather_df = humidity._ambient(weather_df)
+
         return weather_df, meta
 
     elif geospatial:
@@ -122,10 +115,6 @@ def get(database, id=None, geospatial=False, **kwargs):
             weather_ds, meta_df = ini_h5_geospatial(fp)
         else:
             raise NameError(f"Geospatial analysis not implemented for {database}.")
-
-        # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_df)
-        map_meta(meta_df)
 
         return weather_ds, meta_df
 
@@ -145,7 +134,9 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         [psm3, tmy3, epw, h5, csv]
     """
 
-    supported = ["psm3", "tmy3", "epw", "h5", "csv"]
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
+
+    supported = ["psm3", "tmy3", "epw", "h5"]
     file_type = file_type.upper()
 
     if file_type in ["PSM3", "PSM"]:
@@ -300,14 +291,14 @@ def map_weather(weather_df):
         "Clearsky DNI": "dni_clear",
         "Solar Zenith Angle": "solar_zenith",
         "Temperature": "temp_air",
-        "Dew Point": "dew_point",
+        "air_temperature": "temp_air",
         "Relative Humidity": "relative_humidity",
+        "Dew Point": "dew_point",
         "Pressure": "pressure",
         "Wind Speed": "wind_speed",
         "Wind Direction": "wind_direction",
         "Surface Albedo": "albedo",
         "Precipitable Water": "precipitable_water",
-        "Dew Point": "dew_point",
     }
 
     for column_name in weather_df.columns:
@@ -390,14 +381,12 @@ def ini_h5_geospatial(fps):
         Dictionary of metadata for the weather data
     """
     dss = []
+    drop_variables = ["meta", "time_index", "tmy_year", "tmy_year_short", "coordinates"]
+
     for i, fp in enumerate(fps):
         hf = h5py.File(fp, "r")
         attr = list(hf)
-        attr_to_read = [
-            elem
-            for elem in attr
-            if elem not in ["meta", "time_index", "tmy_year", "tmy_year_short"]
-        ]
+        attr_to_read = [elem for elem in attr if elem not in drop_variables]
 
         chunks = []
         shapes = []
@@ -422,7 +411,7 @@ def ini_h5_geospatial(fps):
             engine="h5netcdf",
             phony_dims="sort",
             chunks={"phony_dim_0": chunks[0], "phony_dim_1": chunks[1]},
-            drop_variables=["time_index", "meta"],
+            drop_variables=drop_variables,
             mask_and_scale=False,
             decode_cf=True,
         )
@@ -432,34 +421,42 @@ def ini_h5_geospatial(fps):
                 scale_factor = 1 / ds[var].psm_scale_factor
                 getattr(ds, var).attrs["scale_factor"] = scale_factor
 
-        if tuple(coords_len.values()) == (
-            ds.dims["phony_dim_0"],
-            ds.dims["phony_dim_1"],
-        ):
-            rename = {"phony_dim_0": "time", "phony_dim_1": "gid"}
-        elif tuple(coords_len.values()) == (
-            ds.dims["phony_dim_1"],
-            ds.dims["phony_dim_0"],
-        ):
-            rename = {"phony_dim_0": "gid", "phony_dim_1": "time"}
-        else:
-            raise ValueError("Dimensions do not match")
-        ds = ds.rename(
-            {"phony_dim_0": rename["phony_dim_0"], "phony_dim_1": rename["phony_dim_1"]}
-        )
+        # TODO: delete
+        # if tuple(coords_len.values()) == (
+        #     ds.sizes["phony_dim_0"],
+        #     ds.sizes["phony_dim_1"],
+        # ):
+        #     rename = {"phony_dim_0": "time", "phony_dim_1": "gid"}
+        # elif tuple(coords_len.values()) == (
+        #     ds.sizes["phony_dim_1"],
+        #     ds.sizes["phony_dim_0"],
+        # ):
+        #     rename = {"phony_dim_0": "gid", "phony_dim_1": "time"}
+        # else:
+        #     raise ValueError("Dimensions do not match for {}".format(var))
+        rename = {}
+        for (
+            phony,
+            length,
+        ) in ds.sizes.items():
+            if length == coords_len["time"]:
+                rename[phony] = "time"
+            elif length == coords_len["gid"]:
+                rename[phony] = "gid"
+        ds = ds.rename(rename)
         ds = ds.assign_coords(coords)
 
         # TODO: In case re-chunking becomes necessary
-        # ax0 = list(ds.dims.keys())[list(ds.dims.values()).index(shapes[0])]
-        # ax1 = list(ds.dims.keys())[list(ds.dims.values()).index(shapes[1])]
+        # ax0 = list(ds.sizes.keys())[list(ds.sizes.values()).index(shapes[0])]
+        # ax1 = list(ds.sizes.keys())[list(ds.sizes.values()).index(shapes[1])]
         # ds = ds.chunk(chunks={ax0:chunks[0], ax1:chunks[1]})
         dss.append(ds)
 
     ds = xr.merge(dss)
     ds = xr.decode_cf(ds)
 
-    # Rechunk time axis
-    ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
+    # Rechunk time axis - TODO: fix this
+    # ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
 
@@ -566,10 +563,9 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
 
-    print("HPC value set to ", NREL_HPC)
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
-
     META_MAP = {"elevation": "altitude"}
+
     if (
         satellite == None
     ):  # TODO: This function is not fully written as of January 3, 2024
@@ -603,12 +599,26 @@ def get_NSRDB(
 
         weather_df = pd.DataFrame(index=index)
 
-        # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_df)
-        meta.to_dict()
-        map_meta(meta)
+        for dset in attributes:
+            # switch dset names to pvlib standard
+            if dset in [*DSET_MAP.keys()]:
+                column_name = DSET_MAP[dset]
+            else:
+                column_name = dset
 
-        return weather_df, meta
+            with NSRDBX(dattr[dset], hsds=hsds) as f:
+                weather_df[column_name] = f[dset, :, gid]
+
+        # switch meta key names to pvlib standard
+        re_idx = []
+        for key in [*meta.index]:
+            if key in META_MAP.keys():
+                re_idx.append(META_MAP[key])
+            else:
+                re_idx.append(key)
+        meta.index = re_idx
+
+        return weather_df, meta.to_dict()
 
     elif geospatial:
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
@@ -617,10 +627,13 @@ def get_NSRDB(
         if attributes is not None:
             weather_ds = weather_ds[attributes]
 
-        # switch weather data headers and metadata to pvlib standard
-        map_weather(weather_ds)
-        meta_df.to_dict()
-        map_meta(meta_df)
+        for dset in weather_ds.data_vars:
+            if dset in DSET_MAP.keys():
+                weather_ds = weather_ds.rename({dset: DSET_MAP[dset]})
+
+        for mset in meta_df.columns:
+            if mset in META_MAP.keys():
+                meta_df.rename(columns={mset: META_MAP[mset]}, inplace=True)
 
         return weather_ds, meta_df
 
