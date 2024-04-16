@@ -14,28 +14,11 @@ from pvlib.location import Location
 
 # TODO: 
 # fix .clear(), currently breaks?
-
-# add scenario to docs sphinx API
-
-# fix reading files (only works with h5 currently)
-# strip metadata from files
-
-# add attributes for location and metadata?
-# location : pvlib.location object?
-# metadata is just dictionary, allow for population from files?
+# test adding geospatial data to the secenario
 
 # SOLVE LATER:
-# resolve spillage between class instances, 
-# if two unique instances are created in the same notebook (i suspect current working dir as well)
-# they will use the same saved information and not be able to have unique data
-# for ex: 
-# create foo and add job "A" in the pipline,
-# create bar and add job "B" in the pipline
-# foo.pipeline = bar.pipeline
-# => A = B
-# the pipelines will be shared between class instances.
-# only current soltution is to not declare more than one class in the same file (/directory?!?)
-# hpc attribute is super weird running locally, it breaks everything (False or None still break), commented out
+# resolve spillage between class instances
+# how do we save the weather at locations (project points)
 
 class Scenario:
     """
@@ -179,12 +162,31 @@ class Scenario:
             print(self.gids)
             return
 
-        if self.hpc and not weather_fp:
-            weather_fp = r"/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
+        if self.hpc and not weather:
+            # is this path relevant
+            nsrdb_fp = r"/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
+            # from duramat tutorial (add kwargs for this)
+
+            # Get weather data
+            weather_db = 'NSRDB'
+
+            weather_arg = {'satellite': 'Americas',
+                        'names': 2022,
+                        'NREL_HPC': True,
+                        'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
+
+            geo_weather, geo_meta = pvdeg.weather.get(weather_db, geospatial=True, **weather_arg)
+
+            # downselect 
+            if region:
+                geo_meta = geo_meta[region]
+
+            if region_col:
+                geo_meta = geo_meta[region_col]
 
         file_name = f"gids_{self.name}"
         gids_path = utils.write_gids(
-            weather_fp,
+            nsrdb_fp,
             region=region,
             region_col=region_col,
             lat_long=lat_long,
