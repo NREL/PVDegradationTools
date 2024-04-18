@@ -45,8 +45,9 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
         rate of Degradation (NEED TO ADD METRIC)
 
     """
-    return poa_global ** (p) * Tf ** ((temp - temp_chamber) / 10)
-
+   
+    # poa_global ** (p) * Tf ** ((temp - temp_chamber) / 10)
+    return np.multiply(np.power(poa_global, p), np.power(Tf, np.divide(np.subtract(temp, temp_chamber), 10)))
 
 def _deg_rate_chamber(I_chamber, p):
     """
@@ -67,7 +68,8 @@ def _deg_rate_chamber(I_chamber, p):
     chamberdegradationrate : float
         Degradation rate of chamber
     """
-    chamberdegradationrate = I_chamber ** (p)
+    # chamberdegradationrate = I_chamber ** (p)
+    chamberdegradationrate = np.power(I_chamber, p)
 
     return chamberdegradationrate
 
@@ -91,7 +93,8 @@ def _acceleration_factor(numerator, denominator):
         Acceleration Factor of chamber (NEED TO ADD METRIC)
     """
 
-    chamberAccelerationFactor = numerator / denominator
+    chamberAccelerationFactor = np.divide(numerator, denominator)
+    # chamberAccelerationFactor = numerator / denominator
 
     return chamberAccelerationFactor
 
@@ -169,7 +172,8 @@ def _to_eq_vantHoff(temp, Tf=1.41):
 
     """
 
-    toSum = Tf ** (temp / 10)
+    # toSum = Tf ** (temp / 10)
+    toSum = np.power(Tf, np.divide(temp, 10))
     summation = toSum.sum(axis=0, skipna=True)
 
     Toeq = (10 / np.log(Tf)) * np.log(summation / len(temp))
@@ -220,10 +224,13 @@ def IwaVantHoff(weather_df, meta, poa=None, temp=None, Teq=None, p=0.5, Tf=1.41)
     else:
         poa_global = poa
 
-    toSum = (poa_global**p) * (Tf ** ((temp - Teq) / 10))
+    # toSum = (poa_global**p) * (Tf ** ((temp - Teq) / 10))
+    toSum = np.multiply(np.power(poa_global, p), np.power(Tf, np.divide(np.subtract(temp, Teq), 10)) )
+
     summation = toSum.sum(axis=0, skipna=True)
 
-    Iwa = (summation / len(poa_global)) ** (1 / p)
+    # Iwa = (summation / len(poa_global)) ** (1 / p)
+    Iwa = np.power(np.divide(summation, len(poa_global)), np.divide(1, p)) 
 
     return Iwa
 
@@ -255,11 +262,13 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
         Degradation rate of environment
     """
 
-    environmentDegradationRate = (
-        poa_global ** (p)
-        * rh_outdoor ** (n)
-        * np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
-    )
+    # environmentDegradationRate = (
+    #     poa_global ** (p)
+    #     * rh_outdoor ** (n)
+    #     * np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
+    # )
+
+    environmentDegradationRate = np.multiply(np.multiply(np.power(poa_global, p), np.power(rh_outdoor, n)), np.exp(np.negative(np.divide(Ea, np.multiply(0.00831446261815324, np.add(temp, 273.15)))) ) )
 
     return environmentDegradationRate
 
@@ -290,13 +299,23 @@ def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
         Degradation rate of the chamber
     """
 
-    arrheniusNumerator = (
-        I_chamber ** (p)
-        * rh_chamber ** (n)
-        * np.exp(-(Ea / (0.00831446261815324 * (temp_chamber + 273.15))))
-    )
-    return arrheniusNumerator
+    # arrheniusNumerator = (
+    #     I_chamber ** (p)
+    #     * rh_chamber ** (n)
+    #     * np.exp(-(Ea / (0.00831446261815324 * (temp_chamber + 273.15))))
+    # )
 
+    arrheniusNumerator = (
+        np.multiply(
+            np.multiply(
+                np.power(I_chamber, p),
+                np.power(rh_chamber, n)
+            ),
+            np.exp(np.negative(np.divide(Ea, np.multiply(0.00831446261815324, np.add(temp_chamber, 273.15)))) )
+        )
+    )
+
+    return arrheniusNumerator
 
 def arrhenius_deg(
     weather_df,
