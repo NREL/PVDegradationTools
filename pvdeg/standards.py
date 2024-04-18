@@ -182,13 +182,16 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_
     for i in range(0, len(T_0)):
         if T_ambient.iloc[i] > t_amb_min:
             if poa.poa_global.iloc[i] > poa_min:
-                n = n + 1
-                summ = summ + (T_0.iloc[i] - T_measured.iloc[i]) / (
-                    T_0.iloc[i] - T_inf.iloc[i]
-                )
+                # n = n + 1
+                # summ = summ + (T_0.iloc[i] - T_measured.iloc[i]) / (
+                    # T_0.iloc[i] - T_inf.iloc[i]
+                # )
+                n = np.add(n, 1)
+                summ = np.add(summ, np.divide(np.subtract(T_0.iloc[i], T_measured.iloc[i]), np.subtract(T_0.iloc[i], T_inf.iloc[i])))
 
     try:
-        x_eff = -x_0 * np.log(1 - summ / n)
+        # x_eff = -x_0 * np.log(1 - summ / n)
+        x_eff = np.multiply(np.negative(x_0), np.log(np.subtract(1, np.divide(summ, n))))
     except RuntimeWarning as e:
         x_eff = (
             np.nan
@@ -552,7 +555,9 @@ def T98_estimate(
             wind_factor,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
-        T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
+        # T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
+        T98 = np.subtract(T98_0, np.multiply(np.subtract(T98_0 - T98_inf), np.subtract(1, np.divide(np.negative(-x_eff), x_0))))
+
         return T98
 
 
