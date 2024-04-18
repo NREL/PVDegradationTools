@@ -567,7 +567,7 @@ def _weather_ds_from_csv(
     combined_df = pd.concat(dataframes)
 
     # Convert the combined DataFrame to an xarray Dataset
-    weather_ds = combined_df.set_index(['gid', 'time']).to_xarray()
+    weather_ds = combined_df.set_index(['time', 'gid']).to_xarray()
 
     # combined_df = combined_df.set_index(['time', 'gid']).sort_index()
     # weather_ds = combined_df.set_index(['time', 'gid']).to_xarray()
