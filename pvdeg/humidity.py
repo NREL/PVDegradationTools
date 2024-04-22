@@ -40,7 +40,7 @@ def _ambient(weather_df):
     """
     temp_air = weather_df["temp_air"]
     # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
-    dew_point = weather_df.get("temp_dew", weather_df.get("Dew Point"))
+    dew_point = weather_df.get("dew_point")
 
     num = np.exp(17.625 * dew_point / (243.04 + dew_point))
     den = np.exp(17.625 * temp_air / (243.04 + temp_air))
