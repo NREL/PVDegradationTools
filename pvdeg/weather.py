@@ -136,7 +136,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
 
     META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
 
-    supported = ["psm3", "tmy3", "epw", "h5"]
+    supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
 
     if file_type in ["PSM3", "PSM"]:
@@ -294,6 +294,7 @@ def map_weather(weather_df):
         "air_temperature": "temp_air",
         "Relative Humidity": "relative_humidity",
         "Dew Point": "dew_point",
+        "temp_dew": "dew_point",
         "Pressure": "pressure",
         "Wind Speed": "wind_speed",
         "Wind Direction": "wind_direction",
@@ -501,7 +502,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
         hpc_fp = "/kfs2/pdatasets/NSRDB/"
         hsds = False
     else:
-        hpc_fp = "/nrel/nsrdb/"
+        hpc_fp = "/nrel/nsrdb/v3/"
         hsds = True
 
     if type(names) in [int, float]:
