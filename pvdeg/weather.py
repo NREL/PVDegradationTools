@@ -501,7 +501,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
         hpc_fp = "/kfs2/pdatasets/NSRDB/"
         hsds = False
     else:
-        hpc_fp = "/nrel/nsrdb/"
+        hpc_fp = "/nrel/nsrdb/v3/"
         hsds = True
 
     if type(names) in [int, float]:
