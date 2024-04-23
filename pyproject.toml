@@ -30,7 +30,7 @@ keywords = [
 dependencies = [
     "NREL-rex",
     "cartopy",
-    "dask<2024.3",
+    "dask",
     "dask-jobqueue",
     "h5netcdf",
     "h5py",
@@ -83,6 +83,9 @@ Documentation = "https://pvdegradationtools.readthedocs.io/"
 
 [tool.setuptools.packages.find]
 include = ["pvdeg"]
+
+[tool.setuptools.package-data]
+"pvdeg.data" = ["*.json"]
 
 [tool.setuptools_scm]
 

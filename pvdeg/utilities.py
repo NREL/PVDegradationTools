@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
-from pvdeg import DATA_LIBRARY
+from pvdeg import DATA_DIR
 from typing import Callable
 import inspect
 import math
@@ -72,7 +72,7 @@ def get_kinetics(name=None, fname="kinetic_parameters.json"):
     parameter_dict : (dict)
         dictionary of kinetic parameters
     """
-    fpath = os.path.join(DATA_LIBRARY, fname)
+    fpath = os.path.join(DATA_DIR, fname)
 
     with open(fpath) as f:
         data = json.load(f)
@@ -287,7 +287,7 @@ def _read_material(name, fname="materials.json"):
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
     # file = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_LIBRARY, fname)
+    fpath = os.path.join(DATA_DIR, fname)
     with open(fpath) as f:
         data = json.load(f)
 
@@ -343,7 +343,7 @@ def _add_material(
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
     # OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_LIBRARY, fname)
+    fpath = os.path.join(DATA_DIR, fname)
 
     material_dict = {
         "alias": alias,
