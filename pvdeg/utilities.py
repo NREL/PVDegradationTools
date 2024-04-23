@@ -471,6 +471,7 @@ def tilt_azimuth_scan(
     print("\r                     ", end="")
     print("\r", end="")
     return tilt_azimuth_series
+
 def _meta_df_from_csv(
     file_paths : list[str]
     ):
