@@ -173,7 +173,7 @@ class Scenario:
 
         # untested
         if not self.geospatial:
-            weather_db = 'PSM3' # wrong sat??
+            weather_db = 'PSM3' # wrong type, move this to func arg
             # check if lat long is a tuple of 2 floats, may not be a nessecary check
             if isinstance(lat_long, tuple) and all(isinstance(item, float) for item in lat_long) and len(lat_long) == 2:
                 weather_id = lat_long
@@ -254,6 +254,7 @@ class Scenario:
         module_name,
         racking="open_rack_glass_polymer",  # move ?? split RACKING_CONSTRUCTION
         material="EVA",
+        temperature_model='sapm'
     ):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
@@ -271,6 +272,9 @@ class Scenario:
         material : (str)
             Name of the material desired. For a complete list, see data/materials.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
+        temp_model : (str)
+            select pvlib temperature models. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
+            
         """
 
         # fetch material parameters (Eas, Ead, So, etc)
