@@ -39,6 +39,8 @@ class Scenario:
         # are these valuable
         hpc=False,
         geospatial=False,
+        weather_data=None, # xarray ds when geospatial
+        meta_data = None, # dataframe when geospatial
         
     ) -> None:
         """
@@ -74,9 +76,7 @@ class Scenario:
             pipeline = data["pipeline"]
             # add results to file
 
-        if (isinstance(self.name, str)):
-            self.name = name
-
+        self.name = name
         self.path = path
         self.modules = modules
         self.gids = gids
@@ -84,6 +84,8 @@ class Scenario:
         self.results = results
         self.hpc = hpc
         self.geospatial = geospatial
+        self.weather_data = weather_data
+        self.meta_data = meta_data
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
@@ -130,12 +132,15 @@ class Scenario:
         else:
             raise ValueError(f"cannot clear scenario object: {self}")
 
+# for non geospatial, just use lat_long, ignore weather arg
+# add error checks for arg types?
     def addLocation(self, 
-        weather=None, 
+        # weather=None, # should delete this???
         region=None,
         region_col="state", 
         lat_long=None, 
-        gids=None
+        gids=None, 
+        downsample_factor=0,
     ):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
@@ -153,6 +158,10 @@ class Scenario:
             Region column name within h5 file (example "State")
         lat_long : (tuple - float)
             latitute and longitude of a single location
+        gids : 
+
+        downsample_factor : int
+            downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         """
 
         if self.gids is not None:
@@ -162,9 +171,39 @@ class Scenario:
             print(self.gids)
             return
 
-        if self.hpc and not weather:
+        # untested
+        if not self.geospatial:
+            weather_db = 'PSM3' # wrong sat??
+            # check if lat long is a tuple of 2 floats, may not be a nessecary check
+            if isinstance(lat_long, tuple) and all(isinstance(item, float) for item in lat_long) and len(lat_long) == 2:
+                weather_id = lat_long
+            else:
+                return ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
+
+            # change email and api key???
+            weather_arg = {'api_key': 'DEMO_KEY',
+                        'email': 'user@mail.com',
+                        'names': 'tmy',
+                        'attributes': [],
+                        'map_variables': True}
+
+            point_weather, point_meta = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
+
+            try:
+                # gid type = str when reading from meta
+                gid = point_meta['Location ID']            
+            except KeyError:
+                return UserWarning(f"metadata missing location ID")
+
+            # added location, for single point, this may be misleading
+            self.gids = gid
+            self.weather_data[int(gid)] == point_weather
+            
+        # untested
+        if self.geospatial:
             # is this path relevant
-            nsrdb_fp = r"/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
+            # not correct path
+            # nsrdb_fp = r"/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
             # from duramat tutorial (add kwargs for this)
 
             # Get weather data
@@ -184,18 +223,31 @@ class Scenario:
             if region_col:
                 geo_meta = geo_meta[region_col]
 
+            if downsample_factor > 0:
+                geo_meta_sub, geo_gids_sub = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
+
+            # take only the weather data we want
+            geo_weather_sub = geo_weather.sel(gid=geo_meta_sub.index)
+
+            # dataframe of metadata
+            # xarray dataset of weather, cant store in 
+            self.weather_data = geo_weather_sub
+            self.gids = geo_gids_sub
+
         file_name = f"gids_{self.name}"
         gids_path = utils.write_gids(
-            nsrdb_fp,
+            # nsrdb_fp,
             region=region,
             region_col=region_col,
             lat_long=lat_long,
             gids=gids,
             out_fn=file_name,
         )
+        # we only want to access the file if we need to retrieve the gids for later
+        # self.gids = gids_path
 
-        self.gids = gids_path
         print(f"Location Added - {self.gids}")
+
 
     def addModule(
         self,
@@ -272,13 +324,28 @@ class Scenario:
         import pprint
 
         pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
-        pp.pprint(f"Name : {self.name}")
-        pp.pprint(f"pipeline: {self.pipeline}")
-        try:
-            pp.pprint(f"pipeline results : {self.results}")
-        except:
-            pp.pprint(f"pipeline has not been run")
 
+        if self.name:
+            print(f"Name : {self.name}")
+
+        if self.pipeline:
+            print('Pipeline : ')
+
+            # pipeline is a list of dictionaries, each list entry is one pipeline job
+            df_pipeline = pd.json_normalize(self.pipeline)
+            print(df_pipeline.to_string()) # should this be display?
+
+        if not self.results.empty:
+            print(f"Pipeline results : ")
+
+            for result in self.results:
+                if isinstance(result, pd.DataFrame):
+                    print(result.to_string())
+
+        else:
+            print("pipeline has not been run")
+
+        # leave this to make sure the others work
         pp.pprint(f"gids : {self.gids}")
         pp.pprint("test modules :")
         for mod in self.modules:
