@@ -341,7 +341,7 @@ class Scenario:
         else:
             print("Pipeline : no jobs in pipeline")
 
-        # if there are entries in the results
+        print("Results : ", end='')
         try: 
             # if this throws an error we have not run the pipeline yet
             results = self.results.empty
