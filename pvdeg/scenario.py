@@ -339,17 +339,20 @@ class Scenario:
             df_pipeline = pd.json_normalize(self.pipeline)
             print(df_pipeline.to_string()) # should this be display?
         else:
-            print("no jobs in pipeline")
+            print("Pipeline : no jobs in pipeline")
 
         # if there are entries in the results
-        if len(self.results):
+        try: 
+            # if this throws an error we have not run the pipeline yet
+            results = self.results.empty
+
             print(f"Pipeline results : ")
 
             for result in self.results:
                 if isinstance(result, pd.DataFrame):
                     print(result.to_string())
-        else:
-            print("pipeline has not been run")
+        except:
+            print("Pipeline has not been run")
 
         # leave this to make sure the others work
         pp.pprint(f"gids : {self.gids}")
