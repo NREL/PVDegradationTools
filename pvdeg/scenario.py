@@ -226,7 +226,7 @@ class Scenario:
                 geo_meta = geo_meta[geo_meta['country'] == country]
             if state:
                 geo_meta = geo_meta[geo_meta['state'] == state]
-            if country:
+            if county:
                 geo_meta = geo_meta[geo_meta['county'] == county]
             
             # if downsample factor is 0, 
