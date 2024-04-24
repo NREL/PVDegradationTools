@@ -15,6 +15,7 @@ from pvlib.location import Location
 # TODO: 
 # fix .clear(), currently breaks?
 # test adding geospatial data to the secenario
+# combine getValidCounty, getValidState, getValidCounty into one function
 
 # SOLVE LATER:
 # resolve spillage between class instances
@@ -382,9 +383,10 @@ class Scenario:
 
     def updatePipeline(
         self, 
+
         func=None, 
         func_params=None,
-        see_added_function=None,
+        see_added_function=False,
         ):
         """
         Add a pvdeg function to the scenario pipeline
@@ -392,7 +394,20 @@ class Scenario:
         Parameters:
         -----------
         func : function
-            pvdeg function
+            pvdeg function to use for single point calculation or geospatial analysis.
+            All regular pvdeg functions will work at a single point when ``Scenario.geospatial == False``  
+
+
+            *Note: geospatial analysis is only available with a limited subset of pvdeg 
+            functions*   
+
+            Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``, 
+            ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
+        func_params : dict  
+            TODO
+        see_added_function : bool
+            set flag to get a userWarning notifying the user of the job added  
+            to the pipeline in method call. ``default = False``
         """
 
         if not self.geospatial:
@@ -429,39 +444,26 @@ class Scenario:
                 warnings.warn(message, UserWarning)
 
         if self.geospatial:
-            # not sure if this will unpack correctly with function call inside of pipeline
-            # working example from DURAMAT DEMO
-            # geo = {'func': pvdeg.standards.standoff,
-            #     'weather_ds': weather_NM_sub,
-            #     'meta_df': meta_NM_sub}
 
-            # standoff_res = pvdeg.geospatial.analysis(**geo)
-
-            # need to store results template as well
+            # check if we can do geospatial analyis on desired function,
+            # may not be the best way, could just elif
             try: 
-               pvdeg.geospatial.output_template(func) 
+               pvdeg.template_parameters(func)
+            except ValueError: 
+                return ValueError(f"{func.__name__} does does not have a valid geospatial results template or does not exist")
 
-            except ValueError: # function does not have valid geospatial results template
-                message = f"{func.__name__} does does not have a valid geospatial results template or does not exist"
-                warnings.warn(message, UserWarning)
+            # standards.standoff only needs weather, meta, and func
+            # weather and meta in self.weather and self.meta respctively
+            geo_job_dict = {"geospatial_job" : func}
 
-            # just add function name for geospatial, we will use a kwargs dict with function and parameters to pass to geospatial analysis
-            geospatial_job_dict = {
-                # "job" : func.__name__,
-                "func" : func # named to match "geo" dict in DURAMAT DEMO
-            }
-
-            # combines (flattened) dictionaries to yield the "geo" dict from cell 9 in DURAMAT DEMO
-            geospatial_job_dict.update(func_params)
-
-            self.pipeline.append(geospatial_job_dict)
+            self.pipeline.append(geo_job_dict)
 
             if see_added_function:
-                message = f"{func.__name__} added to pipeline as \n {job_dict}"
+                message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
                 warnings.warn(message, UserWarning)
 
+    # TODO: run pipeline on each module added (if releveant)
     def runPipeline(self):
-        # TODO: run pipeline on each module added (if releveant)
         """
         Runs entire pipeline on scenario object
         """
@@ -484,6 +486,9 @@ class Scenario:
         
         # apply functions using pvdeg.geospatial.analysis with kwargs dictionary
         if self.geospatial:
+            # FROM DURAMAT DEMO
+            # standoff_res = pvdeg.geospatial.analysis(**geo)
+
             geospatial_results_dict = {}
             
             for job in self.pipeline:
