@@ -28,6 +28,12 @@ def gid_downsampling(meta, n):
         List of GIDs for the downsampled NSRDB meta data
     """
 
+    # no downsample case, used to generate gids for scenario
+    if n == 0:
+        gids_sub = meta.index.values
+
+        return meta, gids_sub
+
     lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
     lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
 

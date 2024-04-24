@@ -136,8 +136,13 @@ class Scenario:
 # add error checks for arg types?
     def addLocation(self, 
         # weather=None, # should delete this???
-        region=None,
-        region_col="state", 
+        # region=None,
+        # region_col="state", 
+
+        country=None,
+        state=None,
+        county=None,
+
         lat_long=None, 
         gids=None, 
         downsample_factor=0,
@@ -217,32 +222,36 @@ class Scenario:
             geo_weather, geo_meta = pvdeg.weather.get(weather_db, geospatial=True, **weather_arg)
 
             # downselect 
-            if region:
-                geo_meta = geo_meta[region]
-
-            if region_col:
-                geo_meta = geo_meta[region_col]
-
-            if downsample_factor > 0:
-                geo_meta_sub, geo_gids_sub = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
+            if country:
+                geo_meta = geo_meta[geo_meta['country'] == country]
+            if state:
+                geo_meta = geo_meta[geo_meta['state'] == state]
+            if country:
+                geo_meta = geo_meta[geo_meta['county'] == county]
+            
+            # if downsample factor is 0, 
+            # no downsampling happens but gid_downsampling() generates gids
+            geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
 
             # take only the weather data we want
-            geo_weather_sub = geo_weather.sel(gid=geo_meta_sub.index)
+            geo_weather_sub = geo_weather.sel(gid=geo_meta.index)
 
             # dataframe of metadata
             # xarray dataset of weather, cant store in 
             self.weather_data = geo_weather_sub
-            self.gids = geo_gids_sub
+            
+            self.gids = geo_gids
 
         file_name = f"gids_{self.name}"
-        gids_path = utils.write_gids(
-            # nsrdb_fp,
-            region=region,
-            region_col=region_col,
-            lat_long=lat_long,
-            gids=gids,
-            out_fn=file_name,
-        )
+        # need to change utilties.write_gids to save properly?
+        # gids_path = utils.write_gids(
+        #     # nsrdb_fp,
+        #     region=region,
+        #     region_col=region_col,
+        #     lat_long=lat_long,
+        #     gids=gids,
+        #     out_fn=file_name,
+        # )
         # we only want to access the file if we need to retrieve the gids for later
         # self.gids = gids_path
 
