@@ -322,7 +322,7 @@ class Scenario:
 
     def viewScenario(self):
         """
-        Print all scenario information currently stored
+        Print all scenario information currently stored in the scenario instance
         """
 
         import pprint
@@ -338,14 +338,16 @@ class Scenario:
             # pipeline is a list of dictionaries, each list entry is one pipeline job
             df_pipeline = pd.json_normalize(self.pipeline)
             print(df_pipeline.to_string()) # should this be display?
+        else:
+            print("no jobs in pipeline")
 
-        if not self.results.empty:
+        # if there are entries in the results
+        if len(self.results):
             print(f"Pipeline results : ")
 
             for result in self.results:
                 if isinstance(result, pd.DataFrame):
                     print(result.to_string())
-
         else:
             print("pipeline has not been run")
 
