@@ -249,7 +249,7 @@ class Scenario:
             # dataframe of metadata
             # xarray dataset of weather, cant store in 
             self.weather_data = geo_weather_sub
-            
+            self.meta_data = geo_meta # already downselected, bad naming?
             self.gids = geo_gids
 
         file_name = f"gids_{self.name}"
@@ -339,6 +339,7 @@ class Scenario:
         print("Material has been added.")
         print("To add the material as a module in your current scene, run .addModule()")
 
+    # this is kind of a mess, redo using ironpython special printing like for xarray dataset
     def viewScenario(self):
         """
         Print all scenario information currently stored in the scenario instance
@@ -350,6 +351,9 @@ class Scenario:
 
         if self.name:
             print(f"Name : {self.name}")
+
+        if self.geospatial:
+            print("\033[1;32mGEOSPATIAL = True\033[0m")
 
         if self.pipeline:
             print('Pipeline : ')
@@ -378,6 +382,10 @@ class Scenario:
         pp.pprint("test modules :")
         for mod in self.modules:
             pp.pprint(mod)
+        
+        if self.weather_data:
+            print(f"scenario weather : {self.weather_data}")
+            # pp.pprint(f"sceneario weather : {self.weather_data}")
 
         return
 
@@ -448,13 +456,18 @@ class Scenario:
             # check if we can do geospatial analyis on desired function,
             # may not be the best way, could just elif
             try: 
-               pvdeg.template_parameters(func)
+               pvdeg.geospatial.template_parameters(func)
             except ValueError: 
                 return ValueError(f"{func.__name__} does does not have a valid geospatial results template or does not exist")
 
             # standards.standoff only needs weather, meta, and func
             # weather and meta in self.weather and self.meta respctively
-            geo_job_dict = {"geospatial_job" : func}
+            # geo_job_dict = {f"geospatial_{func.__name__}" : func}
+            geo_job_dict = {f"geospatial_job" : func} # needs to be this for dictionary index in runPipeline()
+
+            # UNTESTED
+            if func_params:
+                geo_job_dict.update(func_params)
 
             self.pipeline.append(geo_job_dict)
 
@@ -463,6 +476,7 @@ class Scenario:
                 warnings.warn(message, UserWarning)
 
     # TODO: run pipeline on each module added (if releveant)
+    # may only work with one geospatial job in the pipeline
     def runPipeline(self):
         """
         Runs entire pipeline on scenario object
@@ -484,7 +498,19 @@ class Scenario:
                 # move standard results to single dictionary
                 pipeline_results = results_dict
         
-        # apply functions using pvdeg.geospatial.analysis with kwargs dictionary
+            # all job results -> pd.Series[pd.DataFrame]
+            for key in pipeline_results.keys():
+                print(f"results_dict dtype : {type(results_dict[key])}")
+                print(results_dict)
+
+                # properly store dataframe in results series
+                if isinstance(results_dict[key], pd.DataFrame):
+                    results_series[key] = results_dict[key]
+
+                # implement instance check and convert to df for other return types
+                # should all be stored as dataframes in results
+                self.results = results_series
+
         if self.geospatial:
             # FROM DURAMAT DEMO
             # standoff_res = pvdeg.geospatial.analysis(**geo)
@@ -492,31 +518,30 @@ class Scenario:
             geospatial_results_dict = {}
             
             for job in self.pipeline:
-                # geospatial jobs in pipeline should only have parameters (function is included in given parameters)
-                # what datatype?
-                geospatial_job_result = pvdeg.geospatial.analysis(job)
+                func = job['geospatial_job']
 
-                # add geospatial return values to temp dictionary
-                geospatial_results_dict[job['func'].__name__] = geospatial_job_result
+                if func == pvdeg.standards.standoff:
+                    geo = {
+                        'func': func,
+                        'weather_ds': self.weather_data,
+                        'meta_df': self.meta_data
+                        }
+                    
+                    # update geo dictionary with kwargs
+                    # or update function with partial args
+                    # geo.update(job[''])
 
-                # move geospatial results to single dictionary
-                pipeline_results = geospatial_results_dict
+                    analysis_result = pvdeg.geospatial.analysis(**geo)
 
-        # all job results -> pd.Series[pd.DataFrame]
-        for key in pipeline_results.keys():
-            print(f"results_dict dtype : {type(results_dict[key])}")
-            print(results_dict)
+                    # only works for one geospatial analysis per scenario instance
+                    self.results = analysis_result
 
-            # properly store dataframe in results series
-            if isinstance(results_dict[key], pd.DataFrame):
-                results_series[key] = results_dict[key]
+                    # store xr.ds in pd.Series (might be goofy)
+                    # results_series['geospatial_job'] = analysis_result           
 
-            # implement instance check and convert to df for other return types
-            # should all be stored as dataframes in results
+                    # self.results = results_series
 
-            self.results = results_series
-
-
+           
     def exportScenario(self, file_path=None):
         """
         Export the scenario dictionaries to a json configuration file
