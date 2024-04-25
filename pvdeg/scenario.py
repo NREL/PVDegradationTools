@@ -742,20 +742,39 @@ class Scenario:
 
     def plot_USA(
         self, 
-        column_from_result : str, 
+        data_from_result : str, 
         fpath : str = None, 
-        cmap = 'viridis'
+        cmap = 'viridis',
+        vmin = 0,
+        vmax = None,
         ):
+        """
+        Plot a vizualization of the geospatial scenario result. 
+        Only works on geospatial scenarios.
 
-        fig, ax = pvdeg.geospatial.plot_USA(self.results[column_from_result], 
-            cmap=cmap, vmin=0, vmax=None, 
+        Parameters
+        ----------
+        data_from_result : str
+            select the datavariable to plot from the result xarray
+        fpath : str
+            path to save plot output on, saves to current directory if ``None``
+        cmap : str
+            colormap to use in plot
+        vmin : int
+            lower bound on values in linear color map
+        vmax : int
+            upper bound on values in linear color map
+        """
+
+        if not self.geospatial:
+            return False
+
+        fig, ax = pvdeg.geospatial.plot_USA(self.results[data_from_result], 
+            cmap=cmap, vmin=vmin, vmax=vmax, 
             title='add_dynamic_title', 
-            cb_title=f'dynamic title : {column_from_result}'
+            cb_title=f'dynamic title : {data_from_result}'
             )
 
         # is cwd the right place?
-        fpath if fpath else [f"os.getcwd/{self.name}-{self.results[column_from_result]}"]
+        fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
-
-
-
