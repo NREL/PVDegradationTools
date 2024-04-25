@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # 2 - Spectral Degradation
+# # 3 - Spectral Degradation
 # 
 # **Requirements:**
 # - spectral irradiance (measured or simulated)
