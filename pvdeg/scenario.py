@@ -517,7 +517,11 @@ class Scenario:
                 self.results = results_series
 
         if self.geospatial:
-            
+
+            # start dask, not sure if this is the right spot
+            # add check to see if there is already a dask client running
+            pvdeg.geospatial.start_dask()   
+
             for job in self.pipeline:
                 func = job['geospatial_job']
 
@@ -736,8 +740,22 @@ class Scenario:
 
         pass
 
-    def plot_USA(self):
-        # inspiration from geospatial.plot_USA()
+    def plot_USA(
+        self, 
+        column_from_result : str, 
+        fpath : str = None, 
+        cmap = 'viridis'
+        ):
 
-        pass
+        fig, ax = pvdeg.geospatial.plot_USA(self.results[column_from_result], 
+            cmap=cmap, vmin=0, vmax=None, 
+            title='add_dynamic_title', 
+            cb_title=f'dynamic title : {column_from_result}'
+            )
+
+        # is cwd the right place?
+        fpath if fpath else [f"os.getcwd/{self.name}-{self.results[column_from_result]}"]
+        fig.savefig()
+
+
 
