@@ -29,7 +29,7 @@
 
 
 # if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent "ModuleNotFoundError" in later cells:
-# !pip install pvdeg==0.1.1
+# !pip install pvdeg==0.3.1
 
 
 # In[1]:
@@ -37,6 +37,7 @@
 
 from pvdeg import letid, collection, utilities, DATA_DIR
 
+import pvdeg
 import pvlib
 import os
 import pandas as pd
