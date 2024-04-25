@@ -83,5 +83,20 @@ def test_standoff():
     pd.testing.assert_frame_equal(result_l1, df_expected_result_l1)
     pd.testing.assert_frame_equal(result_l2, df_expected_result_l2)
 
+def test_eff_gap(): 
+    T_0=25
+    T_inf=20
+    T_measured=25
+    T_ambient=20
+    poa=700
+    x_0=6.5
+    poa_min=100
+    t_amb_min=0
+    eff_gap=pvdeg.standards.eff_gap(T_0=T_0, T_inf=T_inf, T_measured=T_measured, T_ambient=T_ambient, poa=poa, x_0=x_0, poa_min=poa_min, t_amb_min=t_amb_min) 
+    assert eff_gap==
+
+
+
+
     # assert expected_result_l1 == pytest.approx(result_l1)
     # assert expected_result_l2 == pytest.approx(result_l2, abs=1e-5)
