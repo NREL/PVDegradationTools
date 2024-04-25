@@ -2,8 +2,7 @@
 # coding: utf-8
 
 # # 2 - Degradation
-# 
-# Example of calculating degradation and solder fatigue
+# Degradation and Solder Fatigue
 # 
 # **Requirements**:
 # - compatible weather file (PSM3, TMY3, EPW)
