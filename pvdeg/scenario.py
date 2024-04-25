@@ -240,13 +240,16 @@ class Scenario:
 
             geo_weather, geo_meta = pvdeg.weather.get(weather_db, geospatial=True, **weather_arg)
 
+            # string to list whole word list or keep list
+            toList = lambda s : s if isinstance(list, s) else [s]
+
             # downselect 
             if country:
-                geo_meta = geo_meta[geo_meta['country'] == country]
+                geo_meta = geo_meta[geo_meta['country'].isin(toList(country))]
             if state:
-                geo_meta = geo_meta[geo_meta['state'] == state]
+                geo_meta = geo_meta[geo_meta['state'].isin(toList(state))]
             if county:
-                geo_meta = geo_meta[geo_meta['county'] == county]
+                geo_meta = geo_meta[geo_meta['county'].isin(toList(county))]
             
             # if downsample factor is 0, 
             # no downsampling happens but gid_downsampling() generates gids
@@ -730,6 +733,11 @@ class Scenario:
         attribute : str or list[str]
             attribute names to save to csv file
         """
+
+        pass
+
+    def plot_USA(self):
+        # inspiration from geospatial.plot_USA()
 
         pass
 
