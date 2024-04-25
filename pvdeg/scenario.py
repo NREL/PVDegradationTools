@@ -1,5 +1,4 @@
-"""Class to define an analysis scenario.
-"""
+"""Class to define an analysis scenario."""
 from datetime import date
 from datetime import datetime as dt
 import os
@@ -16,6 +15,7 @@ from pvlib.location import Location
 # fix .clear(), currently breaks?
 # test adding geospatial data to the secenario
 # combine getValidCounty, getValidState, getValidCounty into one function
+# rename see_added_function, see_added_location flags to just flag or see_added
 
 # SOLVE LATER:
 # resolve spillage between class instances
@@ -42,6 +42,9 @@ class Scenario:
         geospatial=False,
         weather_data=None, # xarray ds when geospatial
         meta_data = None, # dataframe when geospatial
+
+        email = None, # only for single location
+        api_key = None,
         
     ) -> None:
         """
@@ -87,6 +90,12 @@ class Scenario:
         self.geospatial = geospatial
         self.weather_data = weather_data
         self.meta_data = meta_data
+
+        if geospatial and api_key:
+            raise ValueError("you cannot use an api key on hpc, NSRDB files exist locally")
+        # only if not geospatial
+        self.api_key = api_key
+        self.email = email
 
         filedate = dt.strftime(date.today(), "%d%m%y")
 
@@ -134,11 +143,11 @@ class Scenario:
             raise ValueError(f"cannot clear scenario object: {self}")
 
     
+# add list of strings for county, state, country input so we can have multiples
+# add two letter state support, theres a mapping function for these already
 # for non geospatial, just use lat_long, ignore weather arg
 # add error checks for arg types?
-# seperate into geospatial and non-geospatial methods
     def addLocation(self, 
-        # weather=None, # should delete this???
         # region=None,
         # region_col="state", 
 
@@ -151,6 +160,7 @@ class Scenario:
         # gids=None, 
 
         lat_long=None, 
+        see_added_location = False
     ):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
@@ -173,6 +183,8 @@ class Scenario:
         lat_long : (tuple - float)
             latitute and longitude of a single location
 
+        see_added_location : bool
+            flag true if you want to see a runtime notification for added location/gids
 
         weather_fp : (str, path_obj, pd.Dataframe)  
             File path to the source dataframe for weather and spatial data. Default should be NSRDB. 
@@ -216,10 +228,7 @@ class Scenario:
             
         # untested
         if self.geospatial:
-            # is this path relevant
-            # not correct path
-            # nsrdb_fp = r"/datasets/NSRDB/current/nsrdb_tmy-2021.h5"
-            # from duramat tutorial (add kwargs for this)
+            # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory, need to update this
 
             # Get weather data
             weather_db = 'NSRDB'
@@ -243,17 +252,20 @@ class Scenario:
             # no downsampling happens but gid_downsampling() generates gids
             geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
 
-            # take only the weather data we want
+            # apply downsampling to weather data
             geo_weather_sub = geo_weather.sel(gid=geo_meta.index)
 
-            # dataframe of metadata
-            # xarray dataset of weather, cant store in 
             self.weather_data = geo_weather_sub
             self.meta_data = geo_meta # already downselected, bad naming?
             self.gids = geo_gids
 
+        if see_added_location:
+            message = f"Gids Added - {self.gids}"
+            warnings.warn(message, UserWarning)
+
+        # redo writing gids logic
         file_name = f"gids_{self.name}"
-        # need to change utilties.write_gids to save properly?
+
         # gids_path = utils.write_gids(
         #     # nsrdb_fp,
         #     region=region,
@@ -262,10 +274,6 @@ class Scenario:
         #     gids=gids,
         #     out_fn=file_name,
         # )
-        # we only want to access the file if we need to retrieve the gids for later
-        # self.gids = gids_path
-
-        print(f"Location Added - {self.gids}")
 
 
     def addModule(
@@ -404,11 +412,8 @@ class Scenario:
         func : function
             pvdeg function to use for single point calculation or geospatial analysis.
             All regular pvdeg functions will work at a single point when ``Scenario.geospatial == False``  
-
-
             *Note: geospatial analysis is only available with a limited subset of pvdeg 
             functions*   
-
             Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``, 
             ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
         func_params : dict  
@@ -453,17 +458,14 @@ class Scenario:
 
         if self.geospatial:
 
-            # check if we can do geospatial analyis on desired function,
-            # may not be the best way, could just elif
+            # check if we can do geospatial analyis on desired function
             try: 
                pvdeg.geospatial.template_parameters(func)
             except ValueError: 
                 return ValueError(f"{func.__name__} does does not have a valid geospatial results template or does not exist")
 
             # standards.standoff only needs weather, meta, and func
-            # weather and meta in self.weather and self.meta respctively
-            # geo_job_dict = {f"geospatial_{func.__name__}" : func}
-            geo_job_dict = {f"geospatial_job" : func} # needs to be this for dictionary index in runPipeline()
+            geo_job_dict = {f"geospatial_job" : func} 
 
             # UNTESTED
             if func_params:
@@ -512,34 +514,26 @@ class Scenario:
                 self.results = results_series
 
         if self.geospatial:
-            # FROM DURAMAT DEMO
-            # standoff_res = pvdeg.geospatial.analysis(**geo)
-
-            geospatial_results_dict = {}
             
             for job in self.pipeline:
                 func = job['geospatial_job']
 
-                if func == pvdeg.standards.standoff:
+                # shared case, letid may be identical
+                if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
                     geo = {
                         'func': func,
                         'weather_ds': self.weather_data,
                         'meta_df': self.meta_data
                         }
-                    
-                    # update geo dictionary with kwargs
-                    # or update function with partial args
+               
+                    # update geo dictionary with kwargs from job
                     # geo.update(job[''])
 
                     analysis_result = pvdeg.geospatial.analysis(**geo)
 
+                    # store xr.ds in pd.Series (might be goofy)
                     # only works for one geospatial analysis per scenario instance
                     self.results = analysis_result
-
-                    # store xr.ds in pd.Series (might be goofy)
-                    # results_series['geospatial_job'] = analysis_result           
-
-                    # self.results = results_series
 
            
     def exportScenario(self, file_path=None):
@@ -724,3 +718,18 @@ class Scenario:
             meta_df=meta_df[meta_df['state'] == state]
 
         return meta_df['county'].unique()
+
+    def dump(
+        self,
+        attribute,
+        ):
+        """
+        Dump desired class attributes to a file (what type???) previously using json, netcdf?
+        Parameters
+        ----------
+        attribute : str or list[str]
+            attribute names to save to csv file
+        """
+
+        pass
+
