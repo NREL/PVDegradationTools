@@ -173,11 +173,26 @@ class Scenario:
         Parameters:
         -----------
         country : str
-            country to include from NSRDB (using pvdeg.weather.get() geospatial call)
+            country to include from NSRDB. Currently supports full string names only.
+            Either single string form or list of strings form.
+            Examples:
+            - ``country='United States'``
+            - ``country=['United States']``
+            - ``country=['Mexico', 'Canada']``
+            
         state : str
-            state or providence to include from NSRDB (using pvdeg.weather.get() geospatial call)
+            combination of states or provinces to include from NSRDB.  
+            Supports two-letter codes for American states. Can mix two-letter
+            codes with full length strings. Can take single string, or list of strings (len >= 1)
+            Examples:
+            - ``state='Washington'``
+            - ``state=WA`` (state abbr is case insensitive)
+            - ``state=['CO', 'British Columbia']``
+
         county : str
-            county to include from NSRDB (using pvdeg.weather.get() geospatial call)
+            county to include from NSRDB. If duplicate county exists in two
+            states present in the ``state`` argument, both will be included. 
+            If no state is provided 
         downsample_factor : int
             downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         year : int
@@ -247,24 +262,25 @@ class Scenario:
 
             # string to list whole word list or keep list
             toList = lambda s : s if isinstance(s, list)  else [s]
-
-            ###
-            print(state)
-
+            
             # downselect 
             if country:
-                geo_meta = geo_meta[geo_meta['country'].isin( toList(country)) ]
+                countries = toList(country)
+                geo_meta = geo_meta[geo_meta['country'].isin( countries )]
             if state:
-                # Only for American states, how do we ensure that we are in america
-                if len(state) == 2:
-                    state = pvdeg.utilities._get_state( state.upper() )
-                    
-                    print(state)
-
-                geo_meta = geo_meta[geo_meta['state'].isin( toList(state)) ]
+                states = toList(state)
+                
+                # convert 2-letter codes to full state names
+                states = [pvdeg.utilities._get_state(entry) if len(entry) == 2
+                        else entry 
+                        for entry in states]
+                   
+                geo_meta = geo_meta[geo_meta['state'].isin( states )]
             if county:
-                geo_meta = geo_meta[geo_meta['county'].isin( toList(county)) ]
+                counties = toList(county)
+                geo_meta = geo_meta[geo_meta['county'].isin( counties )]
             
+
             # if factor is 0 generate gids anyway 
             # no downsampling happens but gid_downsampling() generates gids
             geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 

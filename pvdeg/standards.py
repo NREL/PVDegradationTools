@@ -323,8 +323,8 @@ def standoff(
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     try:
-        # x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
-        x = np.multiply( np.negative(x_0), np.log( np.subtract(1, np.divide(np.subtract(T98_0, T98), np.subtract(T98_0, T98_inf)))) )
+        x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
+        # x = np.multiply( np.negative(x_0), np.log( np.subtract(1, np.divide(np.subtract(T98_0, T98), np.subtract(T98_0, T98_inf)))) )
     except RuntimeWarning as e:
         x = (
             np.nan
