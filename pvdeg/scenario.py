@@ -16,6 +16,7 @@ from pvlib.location import Location
 # test adding geospatial data to the secenario
 # combine getValidCounty, getValidState, getValidCounty into one function
 # rename see_added_function, see_added_location flags to just flag or see_added
+# dask cluster on initialization? or on pipeline run?
 
 # SOLVE LATER:
 # resolve spillage between class instances
@@ -143,7 +144,8 @@ class Scenario:
             raise ValueError(f"cannot clear scenario object: {self}")
 
     
-# add list of strings for county, state, country input so we can have multiples
+# TEST: List of country, state, county
+
 # add two letter state support, theres a mapping function for these already
 # for non geospatial, just use lat_long, ignore weather arg
 # add error checks for arg types?
@@ -157,10 +159,11 @@ class Scenario:
         county=None,
         year=2022,
         downsample_factor=0,
+        nsrdb_attributes=['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity'],
         # gids=None, 
 
         lat_long=None, 
-        see_added_location = False
+        see_added = False
     ):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
@@ -178,12 +181,14 @@ class Scenario:
         downsample_factor : int
             downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         year : int
-            year of data to use from NSRDB, default = 2022
-
+            year of data to use from NSRDB, default = ``2022``
+        nsrdb_attributes : list(str)
+            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).\
+            Default = ``['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']``
         lat_long : (tuple - float)
             latitute and longitude of a single location
 
-        see_added_location : bool
+        see_added : bool
             flag true if you want to see a runtime notification for added location/gids
 
         weather_fp : (str, path_obj, pd.Dataframe)  
@@ -236,22 +241,31 @@ class Scenario:
             weather_arg = {'satellite': 'Americas',
                         'names': year,
                         'NREL_HPC': True,
-                        'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
+                        'attributes': nsrdb_attributes}
 
             geo_weather, geo_meta = pvdeg.weather.get(weather_db, geospatial=True, **weather_arg)
 
             # string to list whole word list or keep list
-            toList = lambda s : s if isinstance(list, s) else [s]
+            toList = lambda s : s if isinstance(s, list)  else [s]
+
+            ###
+            print(state)
 
             # downselect 
             if country:
-                geo_meta = geo_meta[geo_meta['country'].isin(toList(country))]
+                geo_meta = geo_meta[geo_meta['country'].isin( toList(country)) ]
             if state:
-                geo_meta = geo_meta[geo_meta['state'].isin(toList(state))]
+                # Only for American states, how do we ensure that we are in america
+                if len(state) == 2:
+                    state = pvdeg.utilities._get_state( state.upper() )
+                    
+                    print(state)
+
+                geo_meta = geo_meta[geo_meta['state'].isin( toList(state)) ]
             if county:
-                geo_meta = geo_meta[geo_meta['county'].isin(toList(county))]
+                geo_meta = geo_meta[geo_meta['county'].isin( toList(county)) ]
             
-            # if downsample factor is 0, 
+            # if factor is 0 generate gids anyway 
             # no downsampling happens but gid_downsampling() generates gids
             geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
 
@@ -262,7 +276,7 @@ class Scenario:
             self.meta_data = geo_meta # already downselected, bad naming?
             self.gids = geo_gids
 
-        if see_added_location:
+        if see_added:
             message = f"Gids Added - {self.gids}"
             warnings.warn(message, UserWarning)
 
@@ -405,7 +419,7 @@ class Scenario:
 
         func=None, 
         func_params=None,
-        see_added_function=False,
+        see_added=False,
         ):
         """
         Add a pvdeg function to the scenario pipeline
@@ -421,7 +435,7 @@ class Scenario:
             ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
         func_params : dict  
             TODO
-        see_added_function : bool
+        see_added : bool
             set flag to get a userWarning notifying the user of the job added  
             to the pipeline in method call. ``default = False``
         """
@@ -455,9 +469,9 @@ class Scenario:
             job_dict = {"job": func, "params": func_params}
             self.pipeline.append(job_dict)
             
-            if see_added_function:
-                message = f"{func.__name__} added to pipeline as \n {job_dict}"
-                warnings.warn(message, UserWarning)
+            # if see_added:
+            #     message = f"{func.__name__} added to pipeline as \n {job_dict}"
+            #     warnings.warn(message, UserWarning)
 
         if self.geospatial:
 
@@ -476,9 +490,19 @@ class Scenario:
 
             self.pipeline.append(geo_job_dict)
 
-            if see_added_function:
+            # if see_added:
+            #     message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
+            #     warnings.warn(message, UserWarning)
+
+        if see_added:
+            if self.geospatial:
                 message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
                 warnings.warn(message, UserWarning)
+
+            elif not self.geospatial:
+                message = f"{func.__name__} added to pipeline as \n {job_dict}"
+                warnings.warn(message, UserWarning)
+
 
     # TODO: run pipeline on each module added (if releveant)
     # may only work with one geospatial job in the pipeline
@@ -486,7 +510,6 @@ class Scenario:
         """
         Runs entire pipeline on scenario object
         """
-
         # maybe roundabout approach, be careful of type of nested dict value, may be df or other, 
         results_series = pd.Series(dtype='object')
 
