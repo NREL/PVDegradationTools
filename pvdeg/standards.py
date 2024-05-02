@@ -140,7 +140,7 @@ def eff_gap_parameters(
     return T_0, T_inf, T_measured, T_ambient, poa
 
 
-def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_min=0):
+def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_min=0):
     """
     Calculate the effective standoff distance for rooftop mounded PV system
     according to IEC TS 63126. The 98ᵗʰ percentile calculations for T_0 and T_inf are
