@@ -214,7 +214,7 @@ def output_template(
         Template for output data.
     """
     dims = set([d for dim in shapes.values() for d in dim])
-    dims_size = dict(ds_gids.dims) | add_dims
+    dims_size = dict(ds_gids.sizes) | add_dims
 
     output_template = xr.Dataset(
         data_vars={
