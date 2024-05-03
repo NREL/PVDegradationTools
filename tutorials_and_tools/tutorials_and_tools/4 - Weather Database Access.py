@@ -38,20 +38,19 @@
  # !pip install pvdeg==0.3.1
 
 
-# In[1]:
+# In[2]:
 
 
 import pvdeg
 
 
-# In[ ]:
+# In[3]:
 
 
 # This information helps with debugging and getting support :)
 import sys, platform
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
-print("Pandas version ", pd.__version__)
 print("pvdeg version ", pvdeg.__version__)
 
 
@@ -106,7 +105,7 @@ print(meta)
 #     - names = 'tmy' : generate a TMY-like weather dataframe aggregate. This will calculate the relative humidity from temperature and dew point.
 #     - names = '2019' : collect a weather dataframe including measured relative humidity.
 
-# In[5]:
+# In[ ]:
 
 
 API_KEY = 'your_api_key_here'
@@ -133,7 +132,7 @@ print(meta)
 # 
 # This method uses the PVGIS database, a public resource. It requires no API key or user account.
 
-# In[6]:
+# In[ ]:
 
 
 weather_db = 'PVGIS'
