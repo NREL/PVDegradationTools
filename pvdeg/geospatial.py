@@ -183,6 +183,7 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
         [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
     )
 
+    stacked = stacked.drop_duplicates("gid")
     res = stacked.unstack("gid")  # , sparse=True
     return res
 
@@ -353,6 +354,52 @@ def plot_USA(
     cb = plt.colorbar(cm, shrink=0.5)
     cb.set_label(cb_title)
     ax.set_title(title)
+
+    if fp is not None:
+        plt.savefig(fp, dpi=1200)
+
+    return fig, ax
+
+
+def plot_Europe(
+    xr_res, cmap="viridis", vmin=None, vmax=None, title=None, cb_title=None, fp=None
+):
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.PlateCarree(), frameon=True)
+    ax.patch.set_visible(True)
+    ax.set_extent([-12, 31.6, 35, 71.2], ccrs.PlateCarree())
+
+    shapename = "admin_0_countries"
+    states_shp = shpreader.natural_earth(
+        resolution="110m", category="cultural", name=shapename
+    )
+    ax.add_geometries(
+        shpreader.Reader(states_shp).geometries(),
+        ccrs.PlateCarree(),
+        facecolor="none",
+        edgecolor="gray",
+    )
+
+    cm = xr_res.plot(
+        transform=ccrs.PlateCarree(),
+        zorder=1,
+        add_colorbar=False,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        shading="gouraud",
+        infer_intervals=False,
+    )
+
+    cb = plt.colorbar(cm, shrink=0.5)
+    cb.set_label(cb_title)
+    ax.set_title(title)
+
+    ax.set_xticks([-10, 0, 10, 20, 30], crs=ccrs.PlateCarree())
+    ax.set_yticks([30, 40, 50, 60, 70], crs=ccrs.PlateCarree())
+
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
 
     if fp is not None:
         plt.savefig(fp, dpi=1200)
