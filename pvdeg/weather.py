@@ -456,8 +456,8 @@ def ini_h5_geospatial(fps):
     ds = xr.merge(dss)
     ds = xr.decode_cf(ds)
 
-    # Rechunk time axis - TODO: fix this
-    # ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
+    # Rechunk time axis
+    ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
 

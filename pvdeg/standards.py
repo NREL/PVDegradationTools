@@ -98,16 +98,16 @@ def eff_gap_parameters(
     elif weather_df is None:
         weather_df, meta = weather.get(**weather_kwarg)
 
-    if tilt == None:
-        tilt = meta["latitude"]
+    # if tilt == None:
+    #     tilt = meta["latitude"]
 
-    if azimuth == None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
-    if "wind_height" not in meta.keys():
-        wind_factor = 1
+    # if azimuth == None:  # Sets the default orientation to equator facing. MSP: Defaults are already set in temperature.py
+    #     if float(meta["latitude"]) < 0:
+    #         azimuth = 0
+    #     else:
+    #         azimuth = 180
+    # if "wind_height" not in meta.keys():
+    #     wind_factor = 1
 
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(
@@ -203,7 +203,7 @@ def standoff(
     weather_df=None,
     meta=None,
     weather_kwarg=None,
-    tilt=0,
+    tilt=None,
     azimuth=None,
     sky_model="isotropic",
     temp_model="sapm",
@@ -274,13 +274,13 @@ def standoff(
     to IEC TS 63126, PVSC Proceedings 2023
     """
 
-    if azimuth == None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
-    if "wind_height" not in meta.keys():
-        wind_factor = 1
+    # if azimuth == None:  # Sets the default orientation to equator facing.
+    #     if float(meta["latitude"]) < 0:
+    #         azimuth = 0
+    #     else:
+    #         azimuth = 180
+    # if "wind_height" not in meta.keys():
+    #     wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
@@ -322,9 +322,8 @@ def standoff(
     try:
         x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
     except RuntimeWarning as e:
-        x = (
-            np.nan
-        )  # results if the specified T₉₈ is cooler than an open_rack temperature
+        x = np.nan
+        # results if the specified T₉₈ is cooler than an open_rack temperature
     if x < 0:
         x = 0
 
@@ -499,16 +498,16 @@ def T98_estimate(
 
     """
 
-    if tilt == None:
-        tilt = meta["latitude"]
+    # if tilt == None:
+    #     tilt = meta["latitude"]
 
-    if azimuth == None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
-    if "wind_height" not in meta.keys():
-        wind_factor = 1
+    # if azimuth == None:  # Sets the default orientation to equator facing.
+    #     if float(meta["latitude"]) < 0:
+    #         azimuth = 0
+    #     else:
+    #         azimuth = 180
+    # if "wind_height" not in meta.keys():
+    #     wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):

@@ -130,10 +130,10 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
         Dataset with results for a block of gids.
     """
 
-    res = weather_ds_block.groupby("gid").map(
+    res = weather_ds_block.groupby("gid", squeeze=False).map(
         lambda ds_gid: calc_gid(
-            ds_gid=ds_gid,
-            meta_gid=future_meta_df.loc[ds_gid["gid"].values].to_dict(),
+            ds_gid=ds_gid.squeeze(),
+            meta_gid=future_meta_df.loc[ds_gid["gid"].values[0]].to_dict(),
             func=func,
             **func_kwargs,
         )
@@ -179,9 +179,14 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     # lons = stacked.longitude.values.flatten()
     stacked = stacked.drop(["gid"])
     # stacked = stacked.drop_vars(['latitude', 'longitude'])
-    stacked.coords["gid"] = pd.MultiIndex.from_arrays(
+    # stacked.coords["gid"] = pd.MultiIndex.from_arrays(
+    #     [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
+    # )
+    mindex_obj = pd.MultiIndex.from_arrays(
         [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
     )
+    mindex_coords = xr.Coordinates.from_pandas_multiindex(mindex_obj, "gid")
+    stacked = stacked.assign_coords(mindex_coords)
 
     stacked = stacked.drop_duplicates("gid")
     res = stacked.unstack("gid")  # , sparse=True
