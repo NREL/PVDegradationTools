@@ -84,6 +84,9 @@ Documentation = "https://pvdegradationtools.readthedocs.io/"
 [tool.setuptools.packages.find]
 include = ["pvdeg"]
 
+[tool.setuptools.package-data]
+"pvdeg.data" = ["*.json"]
+
 [tool.setuptools_scm]
 
 [tool.pytest.ini_options]
