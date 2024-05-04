@@ -20,7 +20,6 @@ from pvdeg import temperature, spectral, utilities, weather
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
-    module_temp=None,
     weather_kwarg=None,
     sky_model="isotropic",
     temp_model="sapm",
@@ -46,9 +45,10 @@ def eff_gap_parameters(
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
-        Options: 'sapm'.  'pvsyst' and 'faiman' will be added later.
+        Options: 'sapm'.  'pvsyst' and 'faiman' and others from PVlib.
         Performs the calculation for the cell temperature.
-    conf_0 : str, optional        Model for the high temperature module on the exponential decay curve.
+    conf_0 : str, optional        
+        Model for the high temperature module on the exponential decay curve.
         Default: 'insulated_back_glass_polymer'
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
@@ -81,8 +81,6 @@ def eff_gap_parameters(
         maximum achievable temperature.
     T_inf : float
         An array of temperature values for a module that is rack mounted, [°C].
-    T_measured : float
-        An array of values for the test module in the system, [°C] interest.
     poa : float
         An array of values for the plane of array irradiance, [W/m²]
 
@@ -99,14 +97,22 @@ def eff_gap_parameters(
         weather_df, meta = weather.get(**weather_kwarg)
 
     if tilt == None:
-        tilt = meta["latitude"]
+        try:
+            tilt = meta["tilt"]
+        except:
+            tilt = meta["latitude"]
+            print("The array tilt angle was not provided, therfore the latitude tilt of" & "%.1f" % tilt & "was used.")
 
     if azimuth == None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
-    if "wind_height" not in meta.keys():
+        try:
+            azimuth = meta["azimuth"]
+        except:
+            if float(meta["latitude"]) < 0:
+                azimuth = 0
+            else:
+                azimuth = 180
+            print("The array azimuth was not provided, therfore an azimuth of" & "%.1f" % azimuth & "was used.")
+    if "wind_height" not in meta.keys(): #if the anenometer hight is not give, this will make it just use the unadjusted wind speed as given.
         wind_factor = 1
 
     solar_position = spectral.solar_position(weather_df, meta)
@@ -134,13 +140,11 @@ def eff_gap_parameters(
         conf=conf_inf,
         wind_factor=wind_factor,
     )
-    T_measured = module_temp
-    T_ambient = weather_df["temp_air"]
 
-    return T_0, T_inf, T_measured, T_ambient, poa
+    return T_0, T_inf, poa
 
 
-def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_min=0):
+def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_min=0):
     """
     Calculate the effective standoff distance for rooftop mounded PV system
     according to IEC TS 63126. The 98ᵗʰ percentile calculations for T_0 and T_inf are
@@ -159,10 +163,16 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_
     T_ambient : float
         An array of values for the ambient temperature, [°C].
     poa : float
-        An array of values for the plane of array irradiance, [W/m²]
+        An array of values for the plane of array irradiance, [W/m²].
     x_0 : float, optional
         Thermal decay constant [cm], [Kempe, PVSC Proceedings 2023].
         According to edition 2 of IEC TS 63126 a value of 6.5 cm is recommended.
+    poa_min : float
+        The minimum value for which the data will be used, [W/m²]. 
+        400 W/m² is recommended.
+    t_amb_min : float
+        The minimum ambient temperature for which the calculation will be made, [°C]. 
+        A value of 0 °C is recommended to avoid data where snow might be present.
 
     Returns
     -------
@@ -186,7 +196,6 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=100, t_amb_
                 summ = summ + (T_0.iloc[i] - T_measured.iloc[i]) / (
                     T_0.iloc[i] - T_inf.iloc[i]
                 )
-
     try:
         x_eff = -x_0 * np.log(1 - summ / n)
     except RuntimeWarning as e:
@@ -378,14 +387,14 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
     else:
         if T98_0 is not None:
             Output = (
-                "The estimated temperature of an insulated-back module is "
+                "The estimated T₉₈ of an insulated-back module is "
                 + "%.1f" % T98_0
                 + "°C. \n"
             )
         if T98_inf is not None:
             Output = (
                 Output
-                + "The estimated temperature of an open-rack module is "
+                + "The estimated T₉₈ of an open-rack module is "
                 + "%.1f" % T98_inf
                 + "°C. \n"
             )
