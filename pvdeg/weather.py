@@ -162,6 +162,10 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         map_weather(weather_df)
         map_meta(meta)
 
+    if weather_df.index.tzinfo is None:
+        tz = "Etc/GMT%+d" % -meta["tz"]
+        weather_df = weather_df.tz_localize(tz)
+         
     return weather_df, meta
 
 
@@ -192,6 +196,11 @@ def csv_read(filename):
     metadata_values = file1.readline().split(",")
     metadata_values[-1] = metadata_values[-1].strip()  # strip trailing newline
     meta = dict(zip(metadata_fields, metadata_values))
+    for key in meta: #converts everything to a float that is possible to convert to a float
+        try: 
+            meta[key]=float(meta[key])
+        except:
+            pass
     # get the column headers
     columns = file1.readline().split(",")
     columns[-1] = columns[-1].strip()  # strip trailing newline
@@ -226,11 +235,7 @@ def csv_read(filename):
                 dtidx = print(
                     "Your data file should have columns for Year, Month, Day, and Hour"
                 )
-    try:
-        tz = "Etc/GMT%+d" % -meta["tz"]
-        weather_df.index = pd.DatetimeIndex(dtidx.tz_localize(tz))
-    except:
-        weather_df.index = pd.DatetimeIndex(dtidx)
+    weather_df.index = pd.DatetimeIndex(dtidx)
     file1.close()
 
     return weather_df, meta
