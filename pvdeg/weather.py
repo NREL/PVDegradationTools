@@ -257,6 +257,7 @@ def map_meta(meta):
         "Elevation": "altitude",
         "Local Time Zone": "tz",
         "Time Zone": "tz",
+        "timezone": "tz",
         "Dew Point": "dew_point",
         "Longitude": "longitude",
         "Latitude": "latitude",
