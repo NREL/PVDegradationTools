@@ -48,7 +48,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     Parameters
     ----------
     weather_df : pd.DataFrame
-        must be datetime indexed and contain at least temp_air, temp_dew
+        must be datetime indexed and contain at least temp_air, dew_point
     meta : dict
         location meta-data (from weather file)
     k: float
@@ -58,7 +58,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     years : integer, default = 25
         Integer number of years under water ingress
     from_dew_point : boolean, optional
-        If true, will compute the edge seal width from temp_dew instead of dry bulb air temp
+        If true, will compute the edge seal width from dew_point instead of dry bulb air temp
 
     Returns
     ----------
@@ -68,7 +68,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
 
     if from_dew_point:
         # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
-        temp = weather_df.get("temp_dew", weather_df.get("Dew Point"))
+        temp = weather_df.get("dew_point", weather_df.get("Dew Point"))
     else:
         temp = weather_df["temp_air"]
 
