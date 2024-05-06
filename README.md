@@ -1,4 +1,4 @@
-<img src="pvdeg_tutorials/pvdeg_logo.png" width="200">
+<img src="tutorials_and_tools/pvdeg_logo.png" width="200">
 
 <table>
 <tr>
@@ -18,8 +18,8 @@
 <tr>
   <td>Documentation</td>
   <td>
-	<a href='https://pvdegradationtools.readthedocs.io/en/latest/?badge=latest'>
-	    <img src='https://readthedocs.org/projects/pvdegradationtools/badge/?version=latest' alt='Documentation Status' />
+	<a href='https://PVDegradationTools.readthedocs.io'>
+	    <img src='https://readthedocs.org/projects/pvdegradationtools/badge/?version=stable' alt='Documentation Status' />
 	</a>
   </td>
 </tr>
