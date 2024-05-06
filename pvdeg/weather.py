@@ -134,7 +134,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         [psm3, tmy3, epw, h5, csv]
     """
 
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
