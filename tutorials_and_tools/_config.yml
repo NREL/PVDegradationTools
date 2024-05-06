@@ -2,7 +2,7 @@
 # Learn more at https://jupyterbook.org/customize/config.html
 
 title: PVDEG Tutorials
-author: Matthew Brown, Silvana Ovaitt
+author: Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Michael Kempe
 logo: PVD_logo.png
 
 # Auto-exclude files not in the toc
