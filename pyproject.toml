@@ -68,8 +68,11 @@ test = [
     "pytest",
     "pytest-cov",
 ]
+books = [
+    "jupyter-book",
+]
 all = [
-    "pvdeg[docs,test]",
+    "pvdeg[docs,test,books]",
 ]
 
 [project.entry-points.pvdeg]

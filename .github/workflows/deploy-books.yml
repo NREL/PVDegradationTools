@@ -32,7 +32,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install -r tutorials_and_tools/requirements.txt
+        pip install .[books]
 
     # (optional) Cache your executed notebooks between runs
     # if you have config:
