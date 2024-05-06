@@ -96,17 +96,6 @@ def eff_gap_parameters(
     elif weather_df is None:
         weather_df, meta = weather.get(**weather_kwarg)
 
-    # if tilt == None:
-    #     tilt = meta["latitude"]
-
-    # if azimuth == None:  # Sets the default orientation to equator facing. MSP: Defaults are already set in temperature.py
-    #     if float(meta["latitude"]) < 0:
-    #         azimuth = 0
-    #     else:
-    #         azimuth = 180
-    # if "wind_height" not in meta.keys():
-    #     wind_factor = 1
-
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(
         weather_df,
@@ -275,13 +264,6 @@ def standoff(
     to IEC TS 63126, PVSC Proceedings 2023
     """
 
-    # if azimuth == None:  # Sets the default orientation to equator facing.
-    #     if float(meta["latitude"]) < 0:
-    #         azimuth = 0
-    #     else:
-    #         azimuth = 180
-    # if "wind_height" not in meta.keys():
-    #     wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
@@ -499,16 +481,6 @@ def T98_estimate(
 
     """
 
-    # if tilt == None:
-    #     tilt = meta["latitude"]
-
-    # if azimuth == None:  # Sets the default orientation to equator facing.
-    #     if float(meta["latitude"]) < 0:
-    #         azimuth = 0
-    #     else:
-    #         azimuth = 180
-    # if "wind_height" not in meta.keys():
-    #     wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
@@ -599,111 +571,3 @@ def standoff_x(
     ).x[0]
 
     return temp_df
-
-
-# def run_calc_standoff(
-#     project_points,
-#     out_dir,
-#     tag,
-#     #weather_db,
-#     #weather_satellite,
-#     #weather_names,
-#     max_workers=None,
-#     tilt=None,
-#     azimuth=180,
-#     sky_model='isotropic',
-#     temp_model='sapm',
-#     module_type='glass_polymer',
-#     level=1,
-#     x_0=6.1,
-#     wind_speed_factor=1
-# ):
-
-#     """
-#     parallelization utilizing gaps     #TODO: write docstring
-#     """
-
-#     #inputs
-#     weather_arg = {}
-#     #weather_arg['satellite'] = weather_satellite
-#     #weather_arg['names'] = weather_names
-#     weather_arg['NREL_HPC'] = True  #TODO: add argument or auto detect
-#     weather_arg['attributes'] = [
-#         'air_temperature',
-#         'wind_speed',
-#         'dhi',
-#         'ghi',
-#         'dni',
-#         'relative_humidity'
-#         ]
-
-#     all_fields = ['x', 'T98_0', 'T98_inf']
-
-#     out_fp = Path(out_dir) / f"out_standoff{tag}.h5"
-#     shapes = {n : (len(project_points), ) for n in all_fields}
-#     attrs = {'x' : {'units': 'cm'},
-#              'T98_0' : {'units': 'Celsius'},
-#              'T98_inf' : {'units': 'Celsius'}}
-#     chunks = {n : None for n in all_fields}
-#     dtypes = {n : "float32" for n in all_fields}
-
-#     # #TODO: is there a better way to add the meta data?
-#     # nsrdb_fnames, hsds  = weather.get_NSRDB_fnames(
-#     #     weather_arg['satellite'],
-#     #     weather_arg['names'],
-#     #     weather_arg['NREL_HPC'])
-
-#     # with NSRDBX(nsrdb_fnames[0], hsds=hsds) as f:
-#     #     meta = f.meta[f.meta.index.isin(project_points.gids)]
-
-#     Outputs.init_h5(
-#         out_fp,
-#         all_fields,
-#         shapes,
-#         attrs,
-#         chunks,
-#         dtypes,
-#         #meta=meta.reset_index()
-#         meta=project_points.df
-#     )
-
-#     future_to_point = {}
-#     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-#         for idx, point in project_points.df.iterrows():
-#             database = point.weather_db
-#             gid = idx #int(point.gid)
-#             df_weather_kwargs = point.drop('weather_db', inplace=False).filter(like='weather_')
-#             df_weather_kwargs.index = df_weather_kwargs.index.map(
-#                 lambda arg: arg.lstrip('weather_'))
-#             weather_kwarg = weather_arg | df_weather_kwargs.to_dict()
-
-#             weather_df, meta = weather.load(
-#                 database = database,
-#                 id = gid,
-#                 #satellite = point.satellite,  #TODO: check input
-#                 **weather_kwarg)
-#             future = executor.submit(
-#                 calc_standoff,
-#                 weather_df,
-#                 meta,
-#                 tilt,
-#                 azimuth,
-#                 sky_model,
-#                 temp_model,
-#                 module_type,
-#                 level,
-#                 x_0,
-#                 wind_speed_factor
-#             )
-#             future_to_point[future] = gid
-
-#         with Outputs(out_fp, mode="a") as out:
-#             for future in as_completed(future_to_point):
-#                 result = future.result()
-#                 gid = future_to_point.pop(future)
-
-#                 #ind = project_points.index(gid)
-#                 for dset, data in result.items():
-#                     out[dset,  idx] = np.array([data])
-
-#     return out_fp.as_posix()
