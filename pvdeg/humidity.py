@@ -542,7 +542,7 @@ def back_encap(
     Csat = _csat(temp_module=temp_module, So=So, Eas=Eas)
     Ceq = _ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
-    start = Ceq[0]
+    start = Ceq.iloc[0]
 
     # Need to convert these series to numpy arrays for numba function
     temp_module_numba = temp_module.to_numpy()

@@ -165,7 +165,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
     if weather_df.index.tzinfo is None:
         tz = "Etc/GMT%+d" % -meta["tz"]
         weather_df = weather_df.tz_localize(tz)
-         
+
     return weather_df, meta
 
 
@@ -196,9 +196,11 @@ def csv_read(filename):
     metadata_values = file1.readline().split(",")
     metadata_values[-1] = metadata_values[-1].strip()  # strip trailing newline
     meta = dict(zip(metadata_fields, metadata_values))
-    for key in meta: #converts everything to a float that is possible to convert to a float
-        try: 
-            meta[key]=float(meta[key])
+    for (
+        key
+    ) in meta:  # converts everything to a float that is possible to convert to a float
+        try:
+            meta[key] = float(meta[key])
         except:
             pass
     # get the column headers
@@ -462,8 +464,8 @@ def ini_h5_geospatial(fps):
     ds = xr.merge(dss)
     ds = xr.decode_cf(ds)
 
-    # Rechunk time axis - TODO: fix this
-    # ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
+    # Rechunk time axis
+    ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
 

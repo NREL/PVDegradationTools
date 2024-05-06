@@ -47,7 +47,7 @@ def eff_gap_parameters(
     temp_model : str, optional
         Options: 'sapm'.  'pvsyst' and 'faiman' and others from PVlib.
         Performs the calculation for the cell temperature.
-    conf_0 : str, optional        
+    conf_0 : str, optional
         Model for the high temperature module on the exponential decay curve.
         Default: 'insulated_back_glass_polymer'
     conf_inf : str, optional
@@ -96,24 +96,16 @@ def eff_gap_parameters(
     elif weather_df is None:
         weather_df, meta = weather.get(**weather_kwarg)
 
-    if tilt == None:
-        try:
-            tilt = meta["tilt"]
-        except:
-            tilt = meta["latitude"]
-            print("The array tilt angle was not provided, therfore the latitude tilt of" & "%.1f" % tilt & "was used.")
+    # if tilt == None:
+    #     tilt = meta["latitude"]
 
-    if azimuth == None:  # Sets the default orientation to equator facing.
-        try:
-            azimuth = meta["azimuth"]
-        except:
-            if float(meta["latitude"]) < 0:
-                azimuth = 0
-            else:
-                azimuth = 180
-            print("The array azimuth was not provided, therfore an azimuth of" & "%.1f" % azimuth & "was used.")
-    if "wind_height" not in meta.keys(): #if the anenometer hight is not give, this will make it just use the unadjusted wind speed as given.
-        wind_factor = 1
+    # if azimuth == None:  # Sets the default orientation to equator facing. MSP: Defaults are already set in temperature.py
+    #     if float(meta["latitude"]) < 0:
+    #         azimuth = 0
+    #     else:
+    #         azimuth = 180
+    # if "wind_height" not in meta.keys():
+    #     wind_factor = 1
 
     solar_position = spectral.solar_position(weather_df, meta)
     poa = spectral.poa_irradiance(
@@ -168,10 +160,10 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
         Thermal decay constant [cm], [Kempe, PVSC Proceedings 2023].
         According to edition 2 of IEC TS 63126 a value of 6.5 cm is recommended.
     poa_min : float
-        The minimum value for which the data will be used, [W/m²]. 
+        The minimum value for which the data will be used, [W/m²].
         400 W/m² is recommended.
     t_amb_min : float
-        The minimum ambient temperature for which the calculation will be made, [°C]. 
+        The minimum ambient temperature for which the calculation will be made, [°C].
         A value of 0 °C is recommended to avoid data where snow might be present.
 
     Returns
@@ -212,7 +204,7 @@ def standoff(
     weather_df=None,
     meta=None,
     weather_kwarg=None,
-    tilt=0,
+    tilt=None,
     azimuth=None,
     sky_model="isotropic",
     temp_model="sapm",
@@ -283,13 +275,13 @@ def standoff(
     to IEC TS 63126, PVSC Proceedings 2023
     """
 
-    if azimuth == None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
-    if "wind_height" not in meta.keys():
-        wind_factor = 1
+    # if azimuth == None:  # Sets the default orientation to equator facing.
+    #     if float(meta["latitude"]) < 0:
+    #         azimuth = 0
+    #     else:
+    #         azimuth = 180
+    # if "wind_height" not in meta.keys():
+    #     wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
@@ -331,9 +323,8 @@ def standoff(
     try:
         x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
     except RuntimeWarning as e:
-        x = (
-            np.nan
-        )  # results if the specified T₉₈ is cooler than an open_rack temperature
+        x = np.nan
+        # results if the specified T₉₈ is cooler than an open_rack temperature
     if x < 0:
         x = 0
 
@@ -508,16 +499,16 @@ def T98_estimate(
 
     """
 
-    if tilt == None:
-        tilt = meta["latitude"]
+    # if tilt == None:
+    #     tilt = meta["latitude"]
 
-    if azimuth == None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
-    if "wind_height" not in meta.keys():
-        wind_factor = 1
+    # if azimuth == None:  # Sets the default orientation to equator facing.
+    #     if float(meta["latitude"]) < 0:
+    #         azimuth = 0
+    #     else:
+    #         azimuth = 180
+    # if "wind_height" not in meta.keys():
+    #     wind_factor = 1
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
