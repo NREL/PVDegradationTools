@@ -10,20 +10,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>LETID - Passivated Wafer &#8212; PVDEG Tutorials</title>
-  
-  
-  
+
+
+
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
   </script>
-  
+
   <!-- Loaded before other Sphinx assets -->
   <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 <link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
-  
+
   <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
-  
+
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
@@ -70,26 +70,26 @@ const thebe_selector_output = ".output, .cell_output"
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
-  
-  
+
+
   <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  
-  
+
+
   <a class="skip-link" href="#main-content">Skip to main content</a>
-  
+
   <input type="checkbox"
           class="sidebar-toggle"
           name="__primary"
           id="__primary"/>
   <label class="overlay overlay-primary" for="__primary"></label>
-  
+
   <input type="checkbox"
           class="sidebar-toggle"
           name="__secondary"
           id="__secondary"/>
   <label class="overlay overlay-secondary" for="__secondary"></label>
-  
+
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
@@ -110,46 +110,46 @@ const thebe_selector_output = ".output, .cell_output"
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
-  
+
     <nav class="bd-header navbar navbar-expand-lg bd-navbar">
     </nav>
-  
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
-      
-      <div class="bd-sidebar-primary bd-sidebar">
-        
 
-  
+      <div class="bd-sidebar-primary bd-sidebar">
+
+
+
   <div class="sidebar-header-items sidebar-primary__section">
-    
-    
-    
-    
+
+
+
+
   </div>
-  
+
     <div class="sidebar-primary-items__start sidebar-primary__section">
         <div class="sidebar-primary-item">
-  
+
 
 <a class="navbar-brand logo" href="../intro.html">
-  
-  
-  
-  
-    
-    
-      
-    
-    
+
+
+
+
+
+
+
+
+
     <img src="../_static/PVD_logo.png" class="logo__image only-light" alt="Logo image"/>
     <script>document.write(`<img src="../_static/PVD_logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
-  
-  
+
+
 </a></div>
         <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        
+
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="../intro.html">
@@ -174,39 +174,39 @@ const thebe_selector_output = ".output, .cell_output"
     </div>
 </nav></div>
     </div>
-  
-  
+
+
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
-  
+
   <div id="rtd-footer-container"></div>
 
 
       </div>
-      
+
       <main id="main-content" class="bd-main">
-        
-        
+
+
 
 <div class="sbt-scroll-pixel-helper"></div>
 
           <div class="bd-content">
             <div class="bd-article-container">
-              
+
               <div class="bd-header-article">
 <div class="header-article-items header-article__inner">
-  
+
     <div class="header-article-items__start">
-      
+
         <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
   <span class="fa-solid fa-bars"></span>
 </label></div>
-      
+
     </div>
-  
-  
+
+
     <div class="header-article-items__end">
-      
+
         <div class="header-article-item">
 
 <div class="article-header-buttons">
@@ -220,34 +220,34 @@ const thebe_selector_output = ".output, .cell_output"
     <i class="fas fa-rocket"></i>
   </button>
   <ul class="dropdown-menu">
-      
-      
-      
+
+
+
       <li><a href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID - Passivated Wafer.ipynb" target="_blank"
    class="btn btn-sm dropdown-item"
    title="Launch onColab"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
-  
+
     <img src="../_static/images/logo_colab.png">
   </span>
 <span class="btn__text-container">Colab</span>
 </a>
 </li>
-      
-      
-      
-      
+
+
+
+
       <li>
 <button onclick="initThebeSBT()"
   class="btn btn-sm btn-launch-thebe dropdown-item"
   title="Launch Thebe"
   data-bs-placement="left" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
   <i class="fas fa-play"></i>
@@ -255,7 +255,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="btn__text-container">Live Code</span>
 </button>
 </li>
-      
+
   </ul>
 </div>
 
@@ -269,15 +269,15 @@ const thebe_selector_output = ".output, .cell_output"
     <i class="fab fa-github"></i>
   </button>
   <ul class="dropdown-menu">
-      
-      
-      
+
+
+
       <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
    class="btn btn-sm btn-source-repository-button dropdown-item"
    title="Source repository"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
   <i class="fab fa-github"></i>
@@ -285,16 +285,16 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="btn__text-container">Repository</span>
 </a>
 </li>
-      
-      
-      
-      
+
+
+
+
       <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2Ftutorials/LETID - Passivated Wafer.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
   <i class="fas fa-lightbulb"></i>
@@ -302,7 +302,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="btn__text-container">Open issue</span>
 </a>
 </li>
-      
+
   </ul>
 </div>
 
@@ -316,15 +316,15 @@ const thebe_selector_output = ".output, .cell_output"
     <i class="fas fa-download"></i>
   </button>
   <ul class="dropdown-menu">
-      
-      
-      
+
+
+
       <li><a href="../_sources/tutorials/LETID - Passivated Wafer.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
@@ -332,17 +332,17 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="btn__text-container">.ipynb</span>
 </a>
 </li>
-      
-      
-      
-      
+
+
+
+
       <li>
 <button onclick="window.print()"
   class="btn btn-sm btn-download-pdf-button dropdown-item"
   title="Print to PDF"
   data-bs-placement="left" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
   <i class="fas fa-file-pdf"></i>
@@ -350,7 +350,7 @@ const thebe_selector_output = ".output, .cell_output"
 <span class="btn__text-container">.pdf</span>
 </button>
 </li>
-      
+
   </ul>
 </div>
 
@@ -362,7 +362,7 @@ const thebe_selector_output = ".output, .cell_output"
   title="Fullscreen mode"
   data-bs-placement="bottom" data-bs-toggle="tooltip"
 >
-  
+
 
 <span class="btn__icon-container">
   <i class="fas fa-expand"></i>
@@ -392,20 +392,20 @@ document.write(`
     <span class="fa-solid fa-list"></span>
 </label>
 </div></div>
-      
+
     </div>
-  
+
 </div>
 </div>
-              
-              
+
+
 
 <div id="jb-print-docs-body" class="onlyprint">
     <h1>LETID - Passivated Wafer</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
-            
+
             <div>
                 <h2> Contents </h2>
             </div>
@@ -428,11 +428,11 @@ document.write(`
     </div>
 </div>
 
-              
-                
+
+
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
-                  
+
   <section class="tex2jax_ignore mathjax_ignore" id="letid-passivated-wafer">
 <h1>LETID - Passivated Wafer<a class="headerlink" href="#letid-passivated-wafer" title="Permalink to this heading">#</a></h1>
 <p>Example: LETID progression in passivated wafer</p>
@@ -457,7 +457,7 @@ In a well-passivated wafer, carrier injection (<span class="math notranslate noh
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
-<span class="c1"># !pip install pvdeg==0.1.1</span>
+<span class="c1"># !pip install pvdeg==0.3.2</span>
 </pre></div>
 </div>
 </div>
@@ -822,11 +822,11 @@ Assuming literature experiments were carried out on cells, this requires using t
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    
+
     <span class="c1"># first row tau has already been assigned</span>
     <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">pass</span>
-    
+
     <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span>
@@ -835,7 +835,7 @@ Assuming literature experiments were carried out on cells, this requires using t
 
         <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
         <span class="n">j_gen</span> <span class="o">=</span> <span class="n">j_gen</span>
-        
+
         <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">]</span>
         <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Injection&#39;</span><span class="p">]</span>
 
@@ -856,7 +856,7 @@ Assuming literature experiments were carried out on cells, this requires using t
         <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
 
         <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
-        
+
         <span class="c1"># assign new defect state percentages</span>
         <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
         <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span><span class="o">*</span><span class="n">t_step</span>
@@ -1097,30 +1097,30 @@ Assuming literature experiments were carried out on cells, this requires using t
 <span class="ne">FileNotFoundError</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
 <span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Local</span>\<span class="n">Temp</span>\<span class="mi">1</span>\<span class="n">ipykernel_7848</span>\<span class="mf">2663229218.</span><span class="n">py</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
 <span class="g g-Whitespace">     </span><span class="mi">16</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;NDD [$\mu s^{-1}$]&#39;</span><span class="p">)</span>
-<span class="g g-Whitespace">     </span><span class="mi">17</span> 
+<span class="g g-Whitespace">     </span><span class="mi">17</span>
 <span class="ne">---&gt; </span><span class="mi">18</span> <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;example data\wyller data.csv&#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
 <span class="g g-Whitespace">     </span><span class="mi">19</span> <span class="n">filtered</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Series&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0.5 sun 125C&#39;</span><span class="p">]</span>
 <span class="g g-Whitespace">     </span><span class="mi">20</span> <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">filtered</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="n">filtered</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;NDD data from Wyller&#39;</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">)</span>
 
 <span class="nn">~\AppData\Roaming\Python\Python39\site-packages\pandas\io\parsers\readers.py</span> in <span class="ni">read_csv</span><span class="nt">(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)</span>
 <span class="g g-Whitespace">    </span><span class="mi">910</span>     <span class="n">kwds</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwds_defaults</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">911</span> 
+<span class="g g-Whitespace">    </span><span class="mi">911</span>
 <span class="ne">--&gt; </span><span class="mi">912</span>     <span class="k">return</span> <span class="n">_read</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="n">kwds</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">913</span> 
-<span class="g g-Whitespace">    </span><span class="mi">914</span> 
+<span class="g g-Whitespace">    </span><span class="mi">913</span>
+<span class="g g-Whitespace">    </span><span class="mi">914</span>
 
 <span class="nn">~\AppData\Roaming\Python\Python39\site-packages\pandas\io\parsers\readers.py</span> in <span class="ni">_read</span><span class="nt">(filepath_or_buffer, kwds)</span>
-<span class="g g-Whitespace">    </span><span class="mi">575</span> 
+<span class="g g-Whitespace">    </span><span class="mi">575</span>
 <span class="g g-Whitespace">    </span><span class="mi">576</span>     <span class="c1"># Create the parser.</span>
 <span class="ne">--&gt; </span><span class="mi">577</span>     <span class="n">parser</span> <span class="o">=</span> <span class="n">TextFileReader</span><span class="p">(</span><span class="n">filepath_or_buffer</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
-<span class="g g-Whitespace">    </span><span class="mi">578</span> 
+<span class="g g-Whitespace">    </span><span class="mi">578</span>
 <span class="g g-Whitespace">    </span><span class="mi">579</span>     <span class="k">if</span> <span class="n">chunksize</span> <span class="ow">or</span> <span class="n">iterator</span><span class="p">:</span>
 
 <span class="nn">~\AppData\Roaming\Python\Python39\site-packages\pandas\io\parsers\readers.py</span> in <span class="ni">__init__</span><span class="nt">(self, f, engine, **kwds)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1405</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1405</span>
 <span class="g g-Whitespace">   </span><span class="mi">1406</span>         <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">:</span> <span class="n">IOHandles</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="ne">-&gt; </span><span class="mi">1407</span>         <span class="bp">self</span><span class="o">.</span><span class="n">_engine</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_engine</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1408</span> 
+<span class="g g-Whitespace">   </span><span class="mi">1408</span>
 <span class="g g-Whitespace">   </span><span class="mi">1409</span>     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 
 <span class="nn">~\AppData\Roaming\Python\Python39\site-packages\pandas\io\parsers\readers.py</span> in <span class="ni">_make_engine</span><span class="nt">(self, f, engine)</span>
@@ -1187,11 +1187,11 @@ Comparison with experimental data requires normalization constant (<span class="
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    
+
     <span class="c1"># first row tau has already been assigned</span>
     <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">pass</span>
-    
+
     <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span>
@@ -1200,7 +1200,7 @@ Comparison with experimental data requires normalization constant (<span class="
 
         <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
         <span class="n">j_gen</span> <span class="o">=</span> <span class="n">j_gen</span>
-        
+
         <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">]</span>
         <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Injection&#39;</span><span class="p">]</span>
 
@@ -1221,7 +1221,7 @@ Comparison with experimental data requires normalization constant (<span class="
         <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
 
         <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
-        
+
         <span class="c1"># assign new defect state percentages</span>
         <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
         <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span><span class="o">*</span><span class="n">t_step</span>
@@ -1271,11 +1271,11 @@ Comparison with experimental data requires normalization constant (<span class="
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-    
+
     <span class="c1"># first row tau has already been assigned</span>
     <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">pass</span>
-    
+
     <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span>
@@ -1284,7 +1284,7 @@ Comparison with experimental data requires normalization constant (<span class="
 
         <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
         <span class="n">j_gen</span> <span class="o">=</span> <span class="n">j_gen</span>
-        
+
         <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">]</span>
         <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Injection&#39;</span><span class="p">]</span>
 
@@ -1305,7 +1305,7 @@ Comparison with experimental data requires normalization constant (<span class="
         <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
 
         <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
-        
+
         <span class="c1"># assign new defect state percentages</span>
         <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
         <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span><span class="o">*</span><span class="n">t_step</span>
@@ -1383,7 +1383,7 @@ Comparison with experimental data requires normalization constant (<span class="
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 
 
-<span class="n">marker</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span> 
+<span class="n">marker</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
 
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="p">:</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Wyller NDD </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">$\degree$C&quot;</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">marker</span><span class="p">))</span>
@@ -1415,7 +1415,7 @@ Comparison with experimental data requires normalization constant (<span class="
     <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
 
 
-<span class="n">marker</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span> 
+<span class="n">marker</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
 
 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="p">:</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Literature data  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">$\degree$C&quot;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="n">marker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">marker</span><span class="p">),</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">70</span><span class="p">)</span>
@@ -1467,14 +1467,14 @@ Comparison with experimental data requires normalization constant (<span class="
     <script>kernelName = 'python3'</script>
 
                 </article>
-              
 
-              
-              
+
+
+
                 <footer class="bd-footer-article">
-                  
+
 <div class="footer-article-items footer-article__inner">
-  
+
     <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
@@ -1487,15 +1487,15 @@ Comparison with experimental data requires normalization constant (<span class="
       </div>
     </a>
 </div></div>
-  
+
 </div>
 
                 </footer>
-              
+
             </div>
-            
-            
-              
+
+
+
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
   <div class="sidebar-secondary-item">
@@ -1519,48 +1519,48 @@ Comparison with experimental data requires normalization constant (<span class="
   </nav></div>
 
 </div></div>
-              
-            
+
+
           </div>
           <footer class="bd-footer-content">
-            
+
 <div class="bd-footer-content__inner container">
-  
+
   <div class="footer-item">
-    
+
 <p class="component-author">
 By Matthew Brown, Silvana Ovaitt
 </p>
 
   </div>
-  
+
   <div class="footer-item">
-    
+
   <p class="copyright">
-    
+
       © Copyright 2022.
       <br/>
-    
+
   </p>
 
   </div>
-  
+
   <div class="footer-item">
-    
+
   </div>
-  
+
   <div class="footer-item">
-    
+
   </div>
-  
+
 </div>
           </footer>
-        
+
 
       </main>
     </div>
   </div>
-  
+
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
   <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
 <script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
