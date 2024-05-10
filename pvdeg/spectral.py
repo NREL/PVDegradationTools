@@ -73,12 +73,24 @@ def poa_irradiance(
 
     # TODO: change for handling HSAT tracking passed or requested
     if tilt is None:
-        tilt = float(meta["latitude"])
+        try:
+            tilt = float(meta["tilt"])
+        except:
+            tilt = float(meta["latitude"])
+            print(
+                f"The array tilt angle was not provided, therefore the latitude tilt of {tilt:.1f} was used."
+            )
     if azimuth is None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
+        try:
+            azimuth = float(meta["azimuth"])
+        except:
+            if float(meta["latitude"]) < 0:
+                azimuth = 0
+            else:
+                azimuth = 180
+                print(
+                    f"The array azimuth was not provided, therefore an azimuth of {azimuth:.1f} was used."
+                )
 
     if sol_position is None:
         sol_position = solar_position(weather_df, meta)

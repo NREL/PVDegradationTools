@@ -130,10 +130,10 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
         Dataset with results for a block of gids.
     """
 
-    res = weather_ds_block.groupby("gid").map(
+    res = weather_ds_block.groupby("gid", squeeze=False).map(
         lambda ds_gid: calc_gid(
-            ds_gid=ds_gid,
-            meta_gid=future_meta_df.loc[ds_gid["gid"].values].to_dict(),
+            ds_gid=ds_gid.squeeze(),
+            meta_gid=future_meta_df.loc[ds_gid["gid"].values[0]].to_dict(),
             func=func,
             **func_kwargs,
         )
@@ -179,10 +179,16 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     # lons = stacked.longitude.values.flatten()
     stacked = stacked.drop(["gid"])
     # stacked = stacked.drop_vars(['latitude', 'longitude'])
-    stacked.coords["gid"] = pd.MultiIndex.from_arrays(
+    # stacked.coords["gid"] = pd.MultiIndex.from_arrays(
+    #     [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
+    # )
+    mindex_obj = pd.MultiIndex.from_arrays(
         [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
     )
+    mindex_coords = xr.Coordinates.from_pandas_multiindex(mindex_obj, "gid")
+    stacked = stacked.assign_coords(mindex_coords)
 
+    stacked = stacked.drop_duplicates("gid")
     res = stacked.unstack("gid")  # , sparse=True
     return res
 
@@ -213,7 +219,7 @@ def output_template(
         Template for output data.
     """
     dims = set([d for dim in shapes.values() for d in dim])
-    dims_size = dict(ds_gids.dims) | add_dims
+    dims_size = dict(ds_gids.sizes) | add_dims
 
     output_template = xr.Dataset(
         data_vars={
@@ -353,6 +359,52 @@ def plot_USA(
     cb = plt.colorbar(cm, shrink=0.5)
     cb.set_label(cb_title)
     ax.set_title(title)
+
+    if fp is not None:
+        plt.savefig(fp, dpi=1200)
+
+    return fig, ax
+
+
+def plot_Europe(
+    xr_res, cmap="viridis", vmin=None, vmax=None, title=None, cb_title=None, fp=None
+):
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.PlateCarree(), frameon=True)
+    ax.patch.set_visible(True)
+    ax.set_extent([-12, 31.6, 35, 71.2], ccrs.PlateCarree())
+
+    shapename = "admin_0_countries"
+    states_shp = shpreader.natural_earth(
+        resolution="110m", category="cultural", name=shapename
+    )
+    ax.add_geometries(
+        shpreader.Reader(states_shp).geometries(),
+        ccrs.PlateCarree(),
+        facecolor="none",
+        edgecolor="gray",
+    )
+
+    cm = xr_res.plot(
+        transform=ccrs.PlateCarree(),
+        zorder=1,
+        add_colorbar=False,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        shading="gouraud",
+        infer_intervals=False,
+    )
+
+    cb = plt.colorbar(cm, shrink=0.5)
+    cb.set_label(cb_title)
+    ax.set_title(title)
+
+    ax.set_xticks([-10, 0, 10, 20, 30], crs=ccrs.PlateCarree())
+    ax.set_yticks([30, 40, 50, 60, 70], crs=ccrs.PlateCarree())
+
+    ax.set_xlabel("Longitude")
+    ax.set_ylabel("Latitude")
 
     if fp is not None:
         plt.savefig(fp, dpi=1200)

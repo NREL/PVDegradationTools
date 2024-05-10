@@ -1,0 +1,1060 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tools - Module Standoff for IEC TS 63126 &#8212; PVDEG Tutorials</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials_and_tools/Tools - Module Standoff for IEC TS 63126';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="B-O LID - Accelerated Test" href="B-O%20LID%20-%20Accelerated%20Test.html" />
+    <link rel="prev" title="4 - Weather Database Access" href="4%20-%20Weather%20Database%20Access.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <div class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<a class="navbar-brand logo" href="../intro.html">
+
+
+
+
+
+
+
+
+
+
+    <img src="../_static/PVD_logo.png" class="logo__image only-light" alt="PVDEG Tutorials - Home"/>
+    <script>document.write(`<img src="../_static/PVD_logo.png" class="logo__image only-dark" alt="PVDEG Tutorials - Home"/>`);</script>
+
+
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome to the PVDEG Tutorials and Tools
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1%20-%20Basics%2C%20Humidity%2C%20Design.html">1 - Basics, Humidity, Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4%20-%20Weather%20Database%20Access.html">4 - Weather Database Access</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Tools - Module Standoff for IEC TS 63126</a></li>
+<li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">LETID - Outdoor Scenario Based on Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Passivated%20Wafer.html">LETID - Passivated Wafer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main">
+
+
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+
+    </div>
+
+
+    <div class="header-article-items__end">
+
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials_and_tools/Tools - Module Standoff for IEC TS 63126.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2Ftutorials_and_tools/Tools - Module Standoff for IEC TS 63126.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="../_sources/tutorials_and_tools/Tools - Module Standoff for IEC TS 63126.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+
+    </div>
+
+</div>
+</div>
+
+
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Tools - Module Standoff for IEC TS 63126</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculation-of-module-standoff-distance-according-to-iec-ts-63126">Calculation of module standoff distance according to IEC TS 63126</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-weather-data">1. Import Weather Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-installation-standoff-minimum-level-1-and-level-2">2. Calculate Installation Standoff Minimum - Level 1 and Level 2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-x-eff-from-provided-module-temperature-data">3. Calculate <span class="math notranslate nohighlight">\(X_{eff}\)</span> from provided module temperature data.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-t-98-for-a-given-azimuth-tilt-and-x-eff">4. Calculate <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given azimuth, tilt, and <span class="math notranslate nohighlight">\(X_{eff}\)</span>.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-x-min-for-all-azimuth-and-tilt-for-a-given-t-98">5. Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(T_{98}\)</span>.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-t-98-for-all-azimuth-and-tilt-for-a-given-x-eff">6. Plot <span class="math notranslate nohighlight">\(T_{98}\)</span>  for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(X_{eff}\)</span>.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-x-min-for-level-1-level-2-and-t-98-for-a-given-region">7. Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for Level 1, Level 2, and <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given region.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#save-data-outputs">8. Save data outputs.</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="tools-module-standoff-for-iec-ts-63126">
+<h1>Tools - Module Standoff for IEC TS 63126<a class="headerlink" href="#tools-module-standoff-for-iec-ts-63126" title="Link to this heading">#</a></h1>
+<section id="calculation-of-module-standoff-distance-according-to-iec-ts-63126">
+<h2>Calculation of module standoff distance according to IEC TS 63126<a class="headerlink" href="#calculation-of-module-standoff-distance-according-to-iec-ts-63126" title="Link to this heading">#</a></h2>
+<p><strong>Requirements:</strong></p>
+<ul class="simple">
+<li><p>Local weather data file or site longitude and latittude</p></li>
+</ul>
+<p><strong>Objectives:</strong></p>
+<ol class="arabic simple">
+<li><p>Import weather data.</p></li>
+<li><p>Calculate installation standoff - Level 1 and Level 2.</p></li>
+<li><p>Calculate <span class="math notranslate nohighlight">\(X_{eff}\)</span> from provided module temperature data.</p></li>
+<li><p>Calculate <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given azimuth, tilt, and <span class="math notranslate nohighlight">\(X_{eff}\)</span>.</p></li>
+<li><p>Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(T_{98}\)</span>.</p></li>
+<li><p>Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for Level 1, Level 2, or a <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given region.</p></li>
+</ol>
+<p><strong>Background:</strong></p>
+<p>This notebook calculates the a minimum effective standoff distance (<span class="math notranslate nohighlight">\(X_{eff}\)</span>) necessary for roof-mounted PV modules to ensure that the <span class="math notranslate nohighlight">\(98^{th}\)</span> percentile operating temperature, <span class="math notranslate nohighlight">\(T_{98}\)</span>, remains under 70°C for compliance to IEC 61730 and IEC 61215. For higher <span class="math notranslate nohighlight">\(T_{98}\)</span> values above 70°C or 80°C testing must be done to the specifications for Level 1 and Level 2 of IEC TS 63126. This method is outlined in the appendix of IEC TS 63126 and is based on the model from *[King 2004] and data from **[Fuentes, 1987] to model the approximate exponential decay in temperature, <span class="math notranslate nohighlight">\(T(X)\)</span>, with increasing standoff distance, <span class="math notranslate nohighlight">\(X\)</span>, as,</p>
+<div class="math notranslate nohighlight">
+\[ X = -X_0 \ln\left(1-\frac{T_0-T}{\Delta T}\right), Equation 1 \]</div>
+<p>where <span class="math notranslate nohighlight">\(T_0\)</span> is the temperature for <span class="math notranslate nohighlight">\(X=0\)</span> (insulated-back) and <span class="math notranslate nohighlight">\(\Delta T\)</span> is the temperature difference between an insulated-back (<span class="math notranslate nohighlight">\(X=0\)</span>) and open-rack mounting configuration (<span class="math notranslate nohighlight">\(X=\infty)\)</span>.</p>
+<p>We used pvlib and data from the National Solar Radiation Database (NSRDB) to calculate the module temperatures for the insulated-back and open-rack mounting configurations and apply our model to obtain the minimum standoff distance for roof-mounted PV systems to achieve a temperature lower than a specified <span class="math notranslate nohighlight">\(T_{98}\)</span>. The following figure showcases this calulation for the entire world for an <span class="math notranslate nohighlight">\(X_{eff}\)</span> that results in <span class="math notranslate nohighlight">\(T_{98}\)</span>=70°C. Values of <span class="math notranslate nohighlight">\(X_{eff}\)</span> higher than this will require Level 1 or Level 2 certification.</p>
+<p><span class="math notranslate nohighlight">\(*\)</span> D. L. King, W. E. Boyson, and J. A. Kratochvil, “Photovoltaic array performance model,” SAND2004-3535, Sandia National Laboratories, Albuquerque, NM, 2004. ‘<br />
+<span class="math notranslate nohighlight">\(**\)</span> M. K. Fuentes, “A simplified thermal model for Flat-Plate photovoltaic arrays,” United States, 1987-05-01 1987. <a class="reference external" href="https://www.osti.gov/biblio/6802914">https://www.osti.gov/biblio/6802914</a></p>
+<p><img alt="T98 70C standoff Map.png" src="tutorials_and_tools/attachment:62279573-41e3-45dd-bf62-4fa60c1e7e69.png" /></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+<span class="c1"># !pip install pvdeg==0.3.3</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pvdeg</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+<span class="kn">import</span> <span class="nn">dask</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">math</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">platform</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Working on a &quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python version &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pandas version &quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pvdeg version &quot;</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dask version&quot;</span><span class="p">,</span> <span class="n">dask</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Windows 10
+Python version  3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]
+Pandas version  2.2.0
+pvdeg version  0.2.4.dev83+ge2ceab9.d20240422
+dask version 2024.1.1
+C:\Users\mspringe\OneDrive - NREL\msp\projects\2023_DegradationTools\Github\PVDegradationTools\pvdeg\data
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="import-weather-data">
+<h2>1. Import Weather Data<a class="headerlink" href="#import-weather-data" title="Link to this heading">#</a></h2>
+<p>The function has these minimum requirements when using a weather data file:</p>
+<ul class="simple">
+<li><p>Weather data containing (at least) DNI, DHI, GHI, Temperature, RH, and Wind-Speed data at module level.</p></li>
+<li><p>Site meta-data containing (at least) latitude, longitude, and time zone</p></li>
+</ul>
+<p>Alternatively one may can get meterological data from the NSRDB or PVGIS with just the longitude and latitude. This function for the NSRDB (via NSRDB ‘PSM3’) works primarily for most of North America and South America. PVGIS works for most of the rest of the world (via SARAH ‘PVGIS’). See the tutorial “Weather Database Access.ipynb” tutorial on PVdeg or Jensen et al. <a class="reference external" href="https://doi.org/10.1016/j.solener.2023.112092">https://doi.org/10.1016/j.solener.2023.112092</a> for satellite coverage information.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get data from a supplied data file (Do not use the next box of code if using your own file)</span>
+<span class="n">weather_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;psm3_demo.csv&#39;</span><span class="p">)</span>
+<span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">weather_file</span><span class="p">,</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">META</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;Source&#39;: &#39;NSRDB&#39;, &#39;Location ID&#39;: 145809.0, &#39;City&#39;: &#39;-&#39;, &#39;State&#39;: &#39;-&#39;, &#39;Country&#39;: &#39;-&#39;, &#39;Clearsky DHI Units&#39;: &#39;w/m2&#39;, &#39;Clearsky DNI Units&#39;: &#39;w/m2&#39;, &#39;Clearsky GHI Units&#39;: &#39;w/m2&#39;, &#39;Dew Point Units&#39;: &#39;c&#39;, &#39;DHI Units&#39;: &#39;w/m2&#39;, &#39;DNI Units&#39;: &#39;w/m2&#39;, &#39;GHI Units&#39;: &#39;w/m2&#39;, &#39;Solar Zenith Angle Units&#39;: &#39;Degree&#39;, &#39;Temperature Units&#39;: &#39;c&#39;, &#39;Pressure Units&#39;: &#39;mbar&#39;, &#39;Relative Humidity Units&#39;: &#39;%&#39;, &#39;Precipitable Water Units&#39;: &#39;cm&#39;, &#39;Wind Direction Units&#39;: &#39;Degrees&#39;, &#39;Wind Speed Units&#39;: &#39;m/s&#39;, &#39;Cloud Type -15&#39;: &#39;N/A&#39;, &#39;Cloud Type 0&#39;: &#39;Clear&#39;, &#39;Cloud Type 1&#39;: &#39;Probably Clear&#39;, &#39;Cloud Type 2&#39;: &#39;Fog&#39;, &#39;Cloud Type 3&#39;: &#39;Water&#39;, &#39;Cloud Type 4&#39;: &#39;Super-Cooled Water&#39;, &#39;Cloud Type 5&#39;: &#39;Mixed&#39;, &#39;Cloud Type 6&#39;: &#39;Opaque Ice&#39;, &#39;Cloud Type 7&#39;: &#39;Cirrus&#39;, &#39;Cloud Type 8&#39;: &#39;Overlapping&#39;, &#39;Cloud Type 9&#39;: &#39;Overshooting&#39;, &#39;Cloud Type 10&#39;: &#39;Unknown&#39;, &#39;Cloud Type 11&#39;: &#39;Dust&#39;, &#39;Cloud Type 12&#39;: &#39;Smoke&#39;, &#39;Fill Flag 0&#39;: &#39;N/A&#39;, &#39;Fill Flag 1&#39;: &#39;Missing Image&#39;, &#39;Fill Flag 2&#39;: &#39;Low Irradiance&#39;, &#39;Fill Flag 3&#39;: &#39;Exceeds Clearsky&#39;, &#39;Fill Flag 4&#39;: &#39;Missing CLoud Properties&#39;, &#39;Fill Flag 5&#39;: &#39;Rayleigh Violation&#39;, &#39;Surface Albedo Units&#39;: &#39;N/A&#39;, &#39;Version&#39;: &#39;3.0.6&#39;, &#39;latitude&#39;: 39.73, &#39;longitude&#39;: -105.18, &#39;tz&#39;: -7.0, &#39;altitude&#39;: 1820.0}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># From Tutorial 5 EXAMPLE, this works.</span>
+<span class="c1">#API_KEY = &#39;your_api_key_here&#39;</span>
+<span class="n">API_KEY</span> <span class="o">=</span> <span class="s1">&#39;DEMO_KEY&#39;</span> <span class="c1">#you can activate this line to use the demonstration API key but it has limited usage.</span>
+<span class="c1"># The example API key here is for demonstation and is rate-limited per IP.</span>
+<span class="c1"># To get your own API key, visit https://developer.nrel.gov/signup/</span>
+
+<span class="n">weather_db</span> <span class="o">=</span> <span class="s1">&#39;PSM3&#39;</span> <span class="c1">#This pulls data from the NSRDB just for locations in North and South America.</span>
+<span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">33.4152</span><span class="p">,</span> <span class="o">-</span><span class="mf">111.8315</span><span class="p">)</span>
+<span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;api_key&#39;</span><span class="p">:</span> <span class="n">API_KEY</span><span class="p">,</span>
+               <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;user@mail.com&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;names&#39;</span><span class="p">:</span> <span class="s1">&#39;tmy&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[],</span>
+               <span class="s1">&#39;map_variables&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+<span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">,</span> <span class="o">**</span><span class="n">weather_arg</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="n">META</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Column &quot;relative_humidity&quot; not found in DataFrame. Calculating...
+{&#39;Source&#39;: &#39;NSRDB&#39;, &#39;Location ID&#39;: &#39;77855&#39;, &#39;City&#39;: &#39;-&#39;, &#39;State&#39;: &#39;-&#39;, &#39;Country&#39;: &#39;-&#39;, &#39;Dew Point Units&#39;: &#39;c&#39;, &#39;DHI Units&#39;: &#39;w/m2&#39;, &#39;DNI Units&#39;: &#39;w/m2&#39;, &#39;GHI Units&#39;: &#39;w/m2&#39;, &#39;Temperature Units&#39;: &#39;c&#39;, &#39;Pressure Units&#39;: &#39;mbar&#39;, &#39;Wind Direction Units&#39;: &#39;Degrees&#39;, &#39;Wind Speed Units&#39;: &#39;m/s&#39;, &#39;Surface Albedo Units&#39;: &#39;N/A&#39;, &#39;Version&#39;: &#39;3.2.0&#39;, &#39;latitude&#39;: 33.41, &#39;longitude&#39;: -111.82, &#39;altitude&#39;: 381, &#39;tz&#39;: -7, &#39;wind_height&#39;: 2}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">weather_db</span> <span class="o">=</span> <span class="s1">&#39;PVGIS&#39;</span> <span class="c1">#This pulls data for most of the world.</span>
+<span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">24.7136</span><span class="p">,</span> <span class="mf">46.6753</span><span class="p">)</span> <span class="c1">#Riyadh, Saudi Arabia</span>
+<span class="c1">#weather_id = (35.6754, 139.65) #Tokyo, Japan</span>
+<span class="n">weather_arg</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;map_variables&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">weather_db</span><span class="p">,</span> <span class="n">weather_id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">META</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-installation-standoff-minimum-level-1-and-level-2">
+<h2>2. Calculate Installation Standoff Minimum - Level 1 and Level 2<a class="headerlink" href="#calculate-installation-standoff-minimum-level-1-and-level-2" title="Link to this heading">#</a></h2>
+<p>According to IEC TS 63126, Level 0, Level 1 and Level 2 certification is limited to T₉₈&lt;70°C, &lt;80°C and &lt;90°C, respectively. Level 0 certification is essentially compliance to IEC 61730 and IEC 61215. The default value of T₉₈&lt;70°C represents the minimium gap to avoid higher temperature certification according to IEC TS 63126. This minimum standoff (<span class="math notranslate nohighlight">\(x_{min}\)</span>) is the distance between the bottom of the module frame and the roof and can be extimated for a given environment as,</p>
+<div class="math notranslate nohighlight">
+\[ X_{min} = -X_0 \ln\left(1-\frac{T_{98,0}-T}{ T_{98,0}- T_{98,inf}}\right), Equation 2 \]</div>
+<p>where <span class="math notranslate nohighlight">\(T_{98,0}\)</span> is the <span class="math notranslate nohighlight">\(98^{th}\)</span> percentile temperature for an insulated back module and <span class="math notranslate nohighlight">\(T_{98,inf}\)</span> is the <span class="math notranslate nohighlight">\(98^{th}\)</span> percentile temperature for an open rack mounted module.</p>
+<p>Once the meterological data has been obtained, the input parameter possibilities are:</p>
+<ul class="simple">
+<li><p>T₉₈ : Does not necessarily need to be set at 70°C or 80°C for IEC TS 63216, you might want to use a different number to compensate for a thermal aspect of the particular system you are considering. The default is 70°C.</p></li>
+<li><p>tilt : tilt from horizontal of PV module. The default is 0°.</p></li>
+<li><p>azimuth : azimuth in degrees from North. The default is 180° for south facing.</p></li>
+<li><p>sky_model : pvlib compatible model for generating sky characteristics (Options: ‘isotropic’, ‘klucher’, ‘haydavies’, ‘reindl’, ‘king’, ‘perez’). The default is ‘isotropic’.</p></li>
+<li><p>temp_model : pvlib compatible module temperature model. (Options: ‘sapm’, ‘pvsyst’, ‘faiman’, ‘sandia’). The default is ‘sapm’.</p></li>
+<li><p>conf_0 : Temperature model for hotest mounting configuration. Default is “insulated_back_glass_polymer”.</p></li>
+<li><p>conf_inf : Temperature model for open rack mounting. Default is “open_rack_glass_polymer”.</p></li>
+<li><p>x_0 : thermal decay constant [cm] (see documentation). The default is 6.5 cm.</p></li>
+<li><p>wind_factor : Wind speed power law correction factor to account for different wind speed measurement heights between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM). The default is 0.33.</p></li>
+</ul>
+<p>The following is the minimum function call. It defaults to horizontal tilt and T₉₈=70°C.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">standoff</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">interpret_standoff</span><span class="p">(</span><span class="n">standoff</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 24.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+The estimated T₉₈ of an insulated-back module is 89.6°C.
+The estimated T₉₈ of an open-rack module is 63.8°C.
+Level 0 certification is valid for a standoff greather than 9.3 cm.
+Level 1 certification is required for a standoff between than 9.3 cm, and 3.0 cm.
+Level 2 certification is required for a standoff less than 3.0 cm.
+</pre></div>
+</div>
+</div>
+</div>
+<p>The following is a full function call for both T₉₈=70°C and 80°C separately even though the second standoff distance can be calculated using only T98_0 and T98_inf. With this function, one may also want to change the tilt, azimuth, or T98.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">standoff_1</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                      <span class="n">T98</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span> <span class="n">azimuth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span> <span class="n">conf_0</span><span class="o">=</span><span class="s1">&#39;insulated_back_glass_polymer&#39;</span><span class="p">,</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s1">&#39;open_rack_glass_polymer&#39;</span><span class="p">,</span>
+                                      <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">wind_factor</span><span class="o">=</span><span class="mf">0.33</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;First calculation standoff = &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">standoff_1</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">&#39; cm.&#39;</span><span class="p">)</span>
+<span class="n">standoff_2</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                      <span class="n">T98</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span> <span class="n">azimuth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                      <span class="n">sky_model</span><span class="o">=</span><span class="s1">&#39;isotropic&#39;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span> <span class="n">conf_0</span><span class="o">=</span><span class="s1">&#39;insulated_back_glass_polymer&#39;</span><span class="p">,</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s1">&#39;open_rack_glass_polymer&#39;</span><span class="p">,</span>
+                                      <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">wind_factor</span><span class="o">=</span><span class="mf">0.33</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Second calculation standoff = &#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">standoff_2</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="s1">&#39; cm.&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">interpret_standoff</span><span class="p">(</span><span class="n">standoff_1</span><span class="o">=</span><span class="n">standoff_1</span><span class="p">,</span> <span class="n">standoff_2</span><span class="o">=</span><span class="n">standoff_2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+First calculation standoff =  9.3  cm.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+Second calculation standoff =  3.0  cm.
+The estimated T₉₈ of an insulated-back module is 89.6°C.
+The estimated T₉₈ of an open-rack module is 63.8°C.
+Level 0 certification is valid for a standoff greather than 9.3 cm.
+Level 1 certification is required for a standoff between than 9.3 cm, and 3.0 cm.
+Level 2 certification is required for a standoff less than 3.0 cm.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-x-eff-from-provided-module-temperature-data">
+<h2>3. Calculate <span class="math notranslate nohighlight">\(X_{eff}\)</span> from provided module temperature data.<a class="headerlink" href="#calculate-x-eff-from-provided-module-temperature-data" title="Link to this heading">#</a></h2>
+<p>To do this calculation, one must use a set of data with:</p>
+<ul class="simple">
+<li><p>meterological irradiance data sufficient to calculate the POA irradiance (DHI, GHI, and DNI),</p></li>
+<li><p>ambient temperature data,</p></li>
+<li><p>wind speed at module height, (wind_factor=0.33 will be used unless otherwise specified)</p></li>
+<li><p>temperature measurements of the module in the test system. Ideally this would be measured under a worst case scenario that maximizes the module temperature for a given site,</p></li>
+<li><p>geographic meta data including longitude and latitude,</p></li>
+</ul>
+<p>To create a weather file of your own, copy the format of the example file ‘xeff_demo.csv’. This is formatted with the first row containing meta data variable names, the second row containing the corresponding values, the third row containing meteorological data headers, and all the remaining rows containing the meteorological data.</p>
+<p>To do this calculation, one should also filter the data to remove times when the sun is not shining or when snow is likely to be on the module. The recommendations and programmed defaults are to use poa_min=100 W/m² and data when the minimum ambient temperature t_amb_min=0.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read the weather file</span>
+<span class="n">weather_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span><span class="s1">&#39;xeff_demo.csv&#39;</span><span class="p">)</span>
+<span class="n">xeff_weather</span><span class="p">,</span> <span class="n">xeff_meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">weather_file</span><span class="p">,</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span>
+<span class="c1"># Pull measured temperature and calculate theoretical insulated back module temperature and open rack module temperature</span>
+<span class="n">T_0</span><span class="p">,</span> <span class="n">T_inf</span><span class="p">,</span> <span class="n">xeff_poa</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">eff_gap_parameters</span><span class="p">(</span>
+    <span class="n">weather_df</span> <span class="o">=</span> <span class="n">xeff_weather</span><span class="p">,</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">xeff_meta</span><span class="p">,</span>
+    <span class="n">sky_model</span> <span class="o">=</span> <span class="s2">&quot;isotropic&quot;</span><span class="p">,</span>
+    <span class="n">temp_model</span> <span class="o">=</span> <span class="s2">&quot;sapm&quot;</span><span class="p">,</span>
+    <span class="n">conf_0</span> <span class="o">=</span> <span class="s2">&quot;insulated_back_glass_polymer&quot;</span><span class="p">,</span>
+    <span class="n">conf_inf</span> <span class="o">=</span> <span class="s2">&quot;open_rack_glass_polymer&quot;</span><span class="p">,</span>
+    <span class="n">wind_factor</span> <span class="o">=</span> <span class="mf">0.33</span><span class="p">)</span>
+
+<span class="c1"># Now calculate X_eff.</span>
+<span class="n">x_eff</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">eff_gap</span><span class="p">(</span><span class="n">T_0</span><span class="p">,</span> <span class="n">T_inf</span><span class="p">,</span> <span class="n">xeff_weather</span><span class="p">[</span><span class="s1">&#39;module_temperature&#39;</span><span class="p">],</span> <span class="n">xeff_weather</span><span class="p">[</span><span class="s2">&quot;temp_air&quot;</span><span class="p">],</span> <span class="n">xeff_poa</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">poa_min</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">t_amb_min</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;The effective standoff for this system is&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">x_eff</span> <span class="p">,</span> <span class="s1">&#39;cm.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The effective standoff for this system is 2.0 cm.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-t-98-for-a-given-azimuth-tilt-and-x-eff">
+<h2>4. Calculate <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given azimuth, tilt, and <span class="math notranslate nohighlight">\(X_{eff}\)</span>.<a class="headerlink" href="#calculate-t-98-for-a-given-azimuth-tilt-and-x-eff" title="Link to this heading">#</a></h2>
+<p>Equation 2 can be reorganized as,</p>
+<div class="math notranslate nohighlight">
+\[ T_{98} = T_{98,0}  -( T_{98,0}- T_{98,inf}) \left(1-e^{-\frac{x_{eff}}{x_{0}}}\right), Equation 3 \]</div>
+<p>and used to calculate the <span class="math notranslate nohighlight">\(98^{th}\)</span> percential temperature, <span class="math notranslate nohighlight">\(T_{98}\)</span>, for a PV system having a given effective standoff height, <span class="math notranslate nohighlight">\(X_{eff}\)</span>,  for an arbitrarily oriented module. Here, <span class="math notranslate nohighlight">\(T_{98,0}\)</span> is the <span class="math notranslate nohighlight">\(98^{th}\)</span> percentile for an insulated-back module and <span class="math notranslate nohighlight">\(T_{98,inf}\)</span> is the <span class="math notranslate nohighlight">\(98^{th}\)</span> percentile for a rack-mounted module. The input parameter possibilities are the same as shown in Objective #2 above, but the example below uses the default parameters. The actual tilt [degrees], azimuth [degrees] and <span class="math notranslate nohighlight">\(X_{eff}\)</span> [cm] can be modifed as desired.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is the minimal function call using the common default settings to estimate T₉₈.</span>
+<span class="n">T_98</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">T98_estimate</span><span class="p">(</span>
+    <span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER_df</span><span class="p">,</span>
+    <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+    <span class="n">tilt</span><span class="o">=</span><span class="n">META</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span>
+    <span class="n">azimuth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">x_eff</span><span class="o">=</span><span class="mi">0</span><span class="p">,)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;The 98ᵗʰ percential temperature is estimated to be&#39;</span> <span class="p">,</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">T_98</span> <span class="p">,</span> <span class="s1">&#39;°C.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+The 98ᵗʰ percential temperature is estimated to be 89.6 °C.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plot-x-min-for-all-azimuth-and-tilt-for-a-given-t-98">
+<h2>5. Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(T_{98}\)</span>.<a class="headerlink" href="#plot-x-min-for-all-azimuth-and-tilt-for-a-given-t-98" title="Link to this heading">#</a></h2>
+<p>The temperature of a system is affected by the orientation. This section will scan all possible tilts and azimuths calculating the minimum standoff distance for a given <span class="math notranslate nohighlight">\(T_{98}\)</span>. Similar additional factors as above can also be modified but are not included here for simplicity. The tilt_step and azimuth_step are the number of degrees for each step for the 90° and 180° tilt and azimuth spans, respectively. The default for this calculation is for <span class="math notranslate nohighlight">\(T_{98}\)</span>=70°C, the boundary between Level 0 and Level 1 requirements. The temperature model information given below is unnecessary as these are default values that would get populated automatically. However, they were included here for clarity into a standard practice as per IEC TS 63126.</p>
+<div class="math notranslate nohighlight">
+\[ X_{min} = -X_0 \ln\left(1-\frac{T_{98,0}-T}{ T_{98,0}- T_{98,inf}}\right), Equation 2 \]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Scans through all the azimuth and tilt running the minimum standoff calculation</span>
+<span class="c1">#Set up keyword parameters for the calculation</span>
+
+<span class="n">kwarg_x</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span> <span class="n">sky_model</span><span class="o">=</span><span class="s2">&quot;isotropic&quot;</span><span class="p">,</span>
+    <span class="n">temp_model</span><span class="o">=</span><span class="s2">&quot;sapm&quot;</span><span class="p">,</span>
+    <span class="n">conf_0</span><span class="o">=</span><span class="s2">&quot;insulated_back_glass_polymer&quot;</span><span class="p">,</span>
+    <span class="n">conf_inf</span><span class="o">=</span><span class="s2">&quot;open_rack_glass_polymer&quot;</span><span class="p">,</span>
+    <span class="n">T98</span><span class="o">=</span><span class="mi">70</span><span class="p">,</span>
+    <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span>
+    <span class="n">wind_factor</span><span class="o">=</span><span class="mf">0.33</span><span class="p">)</span>
+<span class="c1">#Run the calculation</span>
+<span class="n">x_azimuth_step</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">x_tilt_step</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">standoff_series</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">tilt_azimuth_scan</span><span class="p">(</span><span class="n">weather_df</span> <span class="o">=</span> <span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+    <span class="n">tilt_step</span><span class="o">=</span><span class="n">x_tilt_step</span><span class="p">,</span> <span class="n">azimuth_step</span><span class="o">=</span><span class="n">x_azimuth_step</span><span class="p">,</span> <span class="n">func</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff_x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg_x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The next cell creates a plot of the calculated data. Some of the things you may want to change are:</p>
+<ul class="simple">
+<li><p>cmap=”Spectral_r”: Change to have different colors</p></li>
+<li><p>plt.title : This will change the plot title.</p></li>
+<li><p>figsize=(16,4) : Change the plot dimensions and/or aspect ratio.</p></li>
+<li><p>vmax=None : This can be set to a numeric value to control the depth scale maximum</p></li>
+<li><p>vmin=0 : This controls the minimum of the depth scale.</p></li>
+<li><p>v_ticks=37 : This changes the number of vertical tick marks</p></li>
+<li><p>h_ticks=10 : This changes the number of horizontal tick marks</p></li>
+<li><p>Unblock the last two lines to ouput the plot as an *.png image file</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">standoff_series_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Tilt&#39;</span><span class="p">:</span> <span class="n">standoff_series</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span><span class="s1">&#39;Azimuth&#39;</span><span class="p">:</span> <span class="n">standoff_series</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span><span class="s1">&#39;Xₘᵢₙ&#39;</span><span class="p">:</span> <span class="n">standoff_series</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]})</span>
+<span class="n">x_fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Plot of $\it</span><span class="si">{Xₘᵢₙ}</span><span class="s1">$ for all orientations for $\it</span><span class="si">{T₉₈}</span><span class="s1">$=&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kwarg_x</span><span class="p">[</span><span class="s1">&#39;T98&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;°C.&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.08</span><span class="p">)</span>
+<span class="n">x_fig</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">standoff_series_df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Tilt&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Azimuth&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;Xₘᵢₙ&#39;</span><span class="p">),</span>
+    <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Xₘᵢₙ&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span><span class="p">,</span><span class="s2">&quot;pad&quot;</span><span class="p">:</span><span class="mf">0.02</span> <span class="p">},</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Spectral_r&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">h_ticks</span><span class="o">=</span><span class="mi">37</span>
+<span class="n">x_number</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">360</span><span class="o">/</span><span class="n">x_azimuth_step</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">x_ticks</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="mi">360</span><span class="o">/</span><span class="p">(</span><span class="n">h_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">x_azimuth_step</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">h_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">x_labels</span><span class="o">=</span><span class="p">([(</span><span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="mi">360</span><span class="o">/</span><span class="p">(</span><span class="n">h_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">h_ticks</span><span class="p">)])</span>
+<span class="n">x_ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_number</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">)</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">x_labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+
+<span class="n">v_ticks</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">y_number</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">90</span><span class="o">/</span><span class="n">x_tilt_step</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">y_ticks</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="mi">90</span><span class="o">/</span><span class="p">(</span><span class="n">v_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">x_tilt_step</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">y_labels</span><span class="o">=</span><span class="p">([(</span><span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="mi">90</span><span class="o">/</span><span class="p">(</span><span class="n">v_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_ticks</span><span class="p">)])</span>
+<span class="n">y_ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_number</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">y_ticks</span><span class="p">)</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">y_labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="n">x_fig</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Azimuth [°]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Tilt [°]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;$\it</span><span class="si">{Xₘᵢₙ}</span><span class="s1">$ [cm]&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+<span class="n">x_fig</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+<span class="n">output_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())),</span> <span class="s1">&#39;TEMP&#39;</span><span class="p">,</span> <span class="s1">&#39;results&#39;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">output_folder</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">output_folder</span><span class="o">+</span><span class="s1">&#39;\Standoff_Scan.png&#39;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>  <span class="c1">#Creates an image file of the standoff plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[WinError 183] Cannot create a file when that file already exists: &#39;c:\\Users\\mspringe\\OneDrive - NREL\\msp\\projects\\2023_DegradationTools\\Github\\PVDegradationTools\\TEMP\\results&#39;
+</pre></div>
+</div>
+<img alt="../_images/14c37892c8b58d28a264bc3509c0dff9bd00e18d854f76e1d1ff0d71676be23e.png" src="../_images/14c37892c8b58d28a264bc3509c0dff9bd00e18d854f76e1d1ff0d71676be23e.png" />
+</div>
+</div>
+</section>
+<section id="plot-t-98-for-all-azimuth-and-tilt-for-a-given-x-eff">
+<h2>6. Plot <span class="math notranslate nohighlight">\(T_{98}\)</span>  for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(X_{eff}\)</span>.<a class="headerlink" href="#plot-t-98-for-all-azimuth-and-tilt-for-a-given-x-eff" title="Link to this heading">#</a></h2>
+<p>The temperature of a system is affected by the orientation and the effective standoff, <span class="math notranslate nohighlight">\(X_{eff}\)</span>, of the system. This section will scan all possible tilts and azimuths calculating the <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given <span class="math notranslate nohighlight">\(X_{eff}\)</span>. As above, additional factors can be modified but are not included here for simplicity. The tilt_step and azimuth_step are the number of degrees for each step for the 90° and 180° tilt and azimuth spans, respectively. The default for this calculation is for <span class="math notranslate nohighlight">\(X_{eff}\)</span>=10 cm, a common effective standoff distance on a rooftop system. A value of <span class="math notranslate nohighlight">\(X_{eff}\)</span>=None will run the calculations for an open rack system and <span class="math notranslate nohighlight">\(X_{eff}\)</span>=0 for an insulated-back system.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Scans through all the azimuth and tilt running the 98ᵗʰ percentile temperature calculation.</span>
+<span class="c1">#Set up keyword parameters for the calculation</span>
+<span class="n">kwarg_T</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">sky_model</span><span class="o">=</span><span class="s2">&quot;isotropic&quot;</span><span class="p">,</span> <span class="n">temp_model</span><span class="o">=</span><span class="s2">&quot;sapm&quot;</span><span class="p">,</span> <span class="n">conf_0</span><span class="o">=</span><span class="s2">&quot;insulated_back_glass_polymer&quot;</span><span class="p">,</span> <span class="n">conf_inf</span><span class="o">=</span><span class="s2">&quot;open_rack_glass_polymer&quot;</span><span class="p">,</span>
+    <span class="n">x_eff</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">x_0</span><span class="o">=</span><span class="mf">6.5</span><span class="p">,</span> <span class="n">wind_factor</span><span class="o">=</span><span class="mf">0.33</span><span class="p">)</span>
+<span class="c1">#Run the calculation</span>
+<span class="n">T_azimuth_step</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">T_tilt_step</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">T98_series</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">utilities</span><span class="o">.</span><span class="n">tilt_azimuth_scan</span><span class="p">(</span><span class="n">weather_df</span> <span class="o">=</span> <span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+    <span class="n">tilt_step</span><span class="o">=</span><span class="n">T_tilt_step</span><span class="p">,</span> <span class="n">azimuth_step</span><span class="o">=</span><span class="n">T_azimuth_step</span><span class="p">,</span> <span class="n">func</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">T98_estimate</span><span class="p">,</span> <span class="o">**</span><span class="n">kwarg_T</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The next cell creates a plot of the calculated data. Some of the things you may want to change are:</p>
+<ul class="simple">
+<li><p>cmap=”Spectral_r”: Change to have different colors</p></li>
+<li><p>plt.title : This will change the plot title.</p></li>
+<li><p>figsize=(16,4) : Change the plot dimensions and/or aspect ratio.</p></li>
+<li><p>vmax=None : This can be set to a numeric value to control the depth scale maximum</p></li>
+<li><p>vmin=None : This controls the minimum of the depth scale.</p></li>
+<li><p>v_ticks=37 : This changes the number of vertical tick marks</p></li>
+<li><p>h_ticks=10 : This changes the number of horizontal tick marks</p></li>
+<li><p>Unblock the last two lines to ouput the plot as an *.png image file</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#This produces the plot of the data</span>
+<span class="n">T98_series_df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Tilt&#39;</span><span class="p">:</span> <span class="n">T98_series</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span><span class="s1">&#39;Azimuth&#39;</span><span class="p">:</span> <span class="n">T98_series</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span><span class="s1">&#39;T₉₈&#39;</span><span class="p">:</span> <span class="n">T98_series</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]})</span>
+<span class="n">T98_fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">kwarg_T</span><span class="p">[</span><span class="s1">&#39;x_eff&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">None</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Plot of $\it</span><span class="si">{T₉₈}</span><span class="s1">$ for all orientations for an open-rack mounting.&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.08</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Plot of $\it</span><span class="si">{T₉₈}</span><span class="s1">$ for all orientations for $X_</span><span class="si">{eff}</span><span class="s1">$=&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kwarg_T</span><span class="p">[</span><span class="s1">&#39;x_eff&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39; cm.&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.08</span><span class="p">)</span>
+<span class="n">T98_fig</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">T98_series_df</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">&#39;Tilt&#39;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Azimuth&#39;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">&#39;T₉₈&#39;</span><span class="p">),</span>
+    <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Xₘᵢₙ&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span><span class="p">,</span><span class="s2">&quot;pad&quot;</span><span class="p">:</span><span class="mf">0.02</span> <span class="p">},</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Spectral_r&quot;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="n">h_ticks</span><span class="o">=</span><span class="mi">37</span>
+<span class="n">x_number</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">360</span><span class="o">/</span><span class="n">T_azimuth_step</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">x_ticks</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="mi">360</span><span class="o">/</span><span class="p">(</span><span class="n">h_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">T_azimuth_step</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">h_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">x_labels</span><span class="o">=</span><span class="p">([(</span><span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="mi">360</span><span class="o">/</span><span class="p">(</span><span class="n">h_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">h_ticks</span><span class="p">)])</span>
+<span class="n">x_ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_number</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x_ticks</span><span class="p">)</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">x_labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">);</span>
+
+<span class="n">v_ticks</span><span class="o">=</span><span class="mi">10</span>
+<span class="n">y_number</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">90</span><span class="o">/</span><span class="n">T_tilt_step</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">y_ticks</span><span class="o">=</span><span class="p">[(</span><span class="n">x</span><span class="o">*</span><span class="p">(</span><span class="mi">90</span><span class="o">/</span><span class="p">(</span><span class="n">v_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">T_tilt_step</span><span class="o">+</span><span class="mf">0.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)]</span>
+<span class="n">y_labels</span><span class="o">=</span><span class="p">([(</span><span class="s1">&#39;</span><span class="si">%.0f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="mi">90</span><span class="o">/</span><span class="p">(</span><span class="n">v_ticks</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_ticks</span><span class="p">)])</span>
+<span class="n">y_ticks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_number</span><span class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">y_ticks</span><span class="p">)</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">y_labels</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Azimuth [°]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">labelpad</span><span class="o">=</span><span class="mi">10</span><span class="p">);</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Tilt [°]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;$\it</span><span class="si">{T₉₈}</span><span class="s1">$ [°C]&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">);</span>
+<span class="n">T98_fig</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;T98_Scan.png&#39;</span><span class="p">),</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>  <span class="c1">#Creates an image file of the standoff plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="n">T98_fig</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/289ba833c6ff3492e05e012cae1722ae2fe80ee499727ea3af871df5db449f6a.png" src="../_images/289ba833c6ff3492e05e012cae1722ae2fe80ee499727ea3af871df5db449f6a.png" />
+</div>
+</div>
+</section>
+<section id="plot-x-min-for-level-1-level-2-and-t-98-for-a-given-region">
+<h2>7. Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for Level 1, Level 2, and <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given region.<a class="headerlink" href="#plot-x-min-for-level-1-level-2-and-t-98-for-a-given-region" title="Link to this heading">#</a></h2>
+<p>This last Objective is much more complicated and is set up to utilize acess to a lot of computational power to run many sites simultaneously to create a regional map of standoff distance. This is presented as doing the computations on Amazon Web Services (AWS) for which you will need a paid account, and will be covered on a subsequent journal.</p>
+</section>
+<section id="save-data-outputs">
+<h2>8. Save data outputs.<a class="headerlink" href="#save-data-outputs" title="Link to this heading">#</a></h2>
+<p>This cell contains a number of pre-scripted commands for exporting and saving data. The code to save plots is located after the plot creation and is blocked by default. First check that the output folder exists, then unblock the code for data you would like to save.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;Your results will be stored in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">output_folder</span><span class="p">)</span>
+<span class="nb">print</span> <span class="p">(</span><span class="s1">&#39;The folder must already exist or the file will not be created&#39;</span><span class="p">)</span>
+
+<span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data_df</span><span class="o">=</span><span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">META</span><span class="p">,</span> <span class="n">savefile</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;WeatherFile.csv&#39;</span><span class="p">))</span> <span class="c1">#Writes the meterological data to an *.csv file.</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">standoff_series_df</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;Standoff_Scan.csv&#39;</span><span class="p">))</span> <span class="c1">#Writes a file with the Tilt and Azimuth scan calculations of standoff.</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">T98_series_df</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_folder</span><span class="p">,</span> <span class="s1">&#39;T98_Scan.csv&#39;</span><span class="p">))</span> <span class="c1">#Writes a file with the Tilt Azimuth scan calculations of T98.</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Your results will be stored in c:\Users\mspringe\OneDrive - NREL\msp\projects\2023_DegradationTools\Github\PVDegradationTools\TEMP\results
+The folder must already exist or the file will not be created
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "NREL/PVDegradationTools",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials_and_tools"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+
+
+
+
+
+
+                <footer class="prev-next-footer">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="4%20-%20Weather%20Database%20Access.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">4 - Weather Database Access</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="B-O%20LID%20-%20Accelerated%20Test.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">B-O LID - Accelerated Test</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculation-of-module-standoff-distance-according-to-iec-ts-63126">Calculation of module standoff distance according to IEC TS 63126</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-weather-data">1. Import Weather Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-installation-standoff-minimum-level-1-and-level-2">2. Calculate Installation Standoff Minimum - Level 1 and Level 2</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-x-eff-from-provided-module-temperature-data">3. Calculate <span class="math notranslate nohighlight">\(X_{eff}\)</span> from provided module temperature data.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-t-98-for-a-given-azimuth-tilt-and-x-eff">4. Calculate <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given azimuth, tilt, and <span class="math notranslate nohighlight">\(X_{eff}\)</span>.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-x-min-for-all-azimuth-and-tilt-for-a-given-t-98">5. Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(T_{98}\)</span>.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-t-98-for-all-azimuth-and-tilt-for-a-given-x-eff">6. Plot <span class="math notranslate nohighlight">\(T_{98}\)</span>  for all azimuth and tilt for a given <span class="math notranslate nohighlight">\(X_{eff}\)</span>.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-x-min-for-level-1-level-2-and-t-98-for-a-given-region">7. Plot <span class="math notranslate nohighlight">\(X_{min}\)</span> for Level 1, Level 2, and <span class="math notranslate nohighlight">\(T_{98}\)</span> for a given region.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#save-data-outputs">8. Save data outputs.</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+<div class="bd-footer-content__inner container">
+
+  <div class="footer-item">
+
+<p class="component-author">
+By Matthew Brown, Silvana Ovaitt
+</p>
+
+  </div>
+
+  <div class="footer-item">
+
+
+  <p class="copyright">
+
+      © Copyright 2023.
+      <br/>
+
+  </p>
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+</div>
+          </footer>
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

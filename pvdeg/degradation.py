@@ -742,16 +742,12 @@ def degradation(
 
     return degradation
 
+
 # change it to take pd.DataFrame? instead of np.ndarray
 @njit
 def vecArrhenius(
-    poa_global : np.ndarray, 
-    module_temp : np.ndarray, 
-    ea : float, 
-    x : float, 
-    lnr0 : float
-    ) -> float: 
-
+    poa_global: np.ndarray, module_temp: np.ndarray, ea: float, x: float, lnr0: float
+) -> float:
     """
     Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
 
@@ -775,7 +771,7 @@ def vecArrhenius(
     Returns
     ----------
     degredation : float
-        Degradation Rate [%/h]  
+        Degradation Rate [%/h]
 
     """
 
@@ -783,13 +779,17 @@ def vecArrhenius(
     poa_global = poa_global[mask]
     module_temp = module_temp[mask]
 
-    ea_scaled = ea / 8.31446261815324E-03
+    ea_scaled = ea / 8.31446261815324e-03
     R0 = np.exp(lnr0)
     poa_global_scaled = poa_global / 1000
 
     degredation = 0
     # refactor to list comprehension approach
     for entry in range(len(poa_global_scaled)):
-        degredation += R0 * np.exp(-ea_scaled / (273.15 + module_temp[entry])) * np.power(poa_global_scaled[entry], x)
+        degredation += (
+            R0
+            * np.exp(-ea_scaled / (273.15 + module_temp[entry]))
+            * np.power(poa_global_scaled[entry], x)
+        )
 
-    return (degredation / len(poa_global))
+    return degredation / len(poa_global)

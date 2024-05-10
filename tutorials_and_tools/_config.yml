@@ -1,0 +1,39 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: PVDEG Tutorials
+author: Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Michael Kempe
+logo: PVD_logo.png
+
+# Auto-exclude files not in the toc
+only_build_toc_files        : true
+
+# Force re-execution of notebooks on each build.
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute_notebooks: auto
+
+# Define the name of the latex output file for PDF builds
+latex:
+  latex_documents:
+    targetname: book.tex
+
+# Add a bibtex file so that we can create citations
+bibtex_bibfiles:
+  - references.bib
+
+# Information about where the book exists on the web
+repository:
+  url: https://github.com/NREL/PVDegradationTools
+  path_to_book: tutorials_and_tools  # Optional path to your book, relative to the repository root
+  branch: main
+
+# Add GitHub buttons to your book
+# See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
+html:
+  use_issues_button: true
+  use_repository_button: true
+
+launch_buttons:
+  thebe: true
+  colab_url: "https://colab.research.google.com"

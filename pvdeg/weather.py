@@ -46,7 +46,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
     """
 
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     if type(id) is tuple:
         location = id
@@ -134,7 +134,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         [psm3, tmy3, epw, h5, csv]
     """
 
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "timezone"}
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
@@ -161,6 +161,10 @@ def read(file_in, file_type, map_variables=True, **kwargs):
     if map_variables == True:
         map_weather(weather_df)
         map_meta(meta)
+
+    if weather_df.index.tzinfo is None:
+        tz = "Etc/GMT%+d" % -meta["tz"]
+        weather_df = weather_df.tz_localize(tz)
 
     return weather_df, meta
 
@@ -192,6 +196,13 @@ def csv_read(filename):
     metadata_values = file1.readline().split(",")
     metadata_values[-1] = metadata_values[-1].strip()  # strip trailing newline
     meta = dict(zip(metadata_fields, metadata_values))
+    for (
+        key
+    ) in meta:  # converts everything to a float that is possible to convert to a float
+        try:
+            meta[key] = float(meta[key])
+        except:
+            pass
     # get the column headers
     columns = file1.readline().split(",")
     columns[-1] = columns[-1].strip()  # strip trailing newline
@@ -226,11 +237,7 @@ def csv_read(filename):
                 dtidx = print(
                     "Your data file should have columns for Year, Month, Day, and Hour"
                 )
-    try:
-        tz = "Etc/GMT%+d" % -meta["tz"]
-        weather_df.index = pd.DatetimeIndex(dtidx.tz_localize(tz))
-    except:
-        weather_df.index = pd.DatetimeIndex(dtidx)
+    weather_df.index = pd.DatetimeIndex(dtidx)
     file1.close()
 
     return weather_df, meta
@@ -252,6 +259,7 @@ def map_meta(meta):
         "Elevation": "altitude",
         "Local Time Zone": "tz",
         "Time Zone": "tz",
+        "timezone": "tz",
         "Dew Point": "dew_point",
         "Longitude": "longitude",
         "Latitude": "latitude",
@@ -456,8 +464,8 @@ def ini_h5_geospatial(fps):
     ds = xr.merge(dss)
     ds = xr.decode_cf(ds)
 
-    # Rechunk time axis - TODO: fix this
-    # ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
+    # Rechunk time axis
+    ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
 
@@ -499,7 +507,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
     }
 
     if NREL_HPC:
-        hpc_fp = "/kfs2/datasets/NSRDB/"
+        hpc_fp = "/datasets/NSRDB/"
         hsds = False
     else:
         hpc_fp = "/nrel/nsrdb/v3/"
@@ -565,7 +573,7 @@ def get_NSRDB(
     """
 
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
-    META_MAP = {"elevation": "altitude"}
+    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz", "timezone": "tz"}
 
     if (
         satellite == None
