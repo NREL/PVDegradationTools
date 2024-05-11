@@ -106,6 +106,14 @@ class Scenario:
         self.name = name
 
         if path is None:
+            # DIRECTORY TEST            
+            print(f"self.path : {self.path}")
+            print(f"cwd : {os.getcwd()}")
+            print(f"scenario name : {self.name}")
+            name = f"pvd_job_{self.name}"
+            print(f"newpath : {os.path.join(os.getcwd(), name)}")
+            # END TEST
+
             self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
             if not os.path.exists(self.path):
                 os.makedirs(self.path)
@@ -129,6 +137,7 @@ class Scenario:
             try:
                 shutil.rmtree(path=self.path)
 
+                os.chdir(os.pardir)
             except:
                 raise FileNotFoundError(f"cannot remove {self.name} directory")
         else:
