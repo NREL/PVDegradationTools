@@ -351,7 +351,7 @@ class Scenario:
         # temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
 
         # add the module and parameters
-        self.modules.append({"module_name": module_name, "material_params": mat_params})
+        self.modules.append({"module_name": module_name, "material_params": mat_params, "temp_model" : temperature_model})
         print(f'Module "{module_name}" added.')
 
     def add_material(
@@ -379,8 +379,6 @@ class Scenario:
         """
         Print all scenario information currently stored in the scenario instance
         """
-
-
         pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
         if self.name:
@@ -419,13 +417,10 @@ class Scenario:
         
         if self.weather_data:
             print(f"scenario weather : {self.weather_data}")
-            # pp.pprint(f"sceneario weather : {self.weather_data}")
 
-        return
 
     def updatePipeline(
         self, 
-
         func=None, 
         func_params=None,
         see_added=False,
@@ -483,7 +478,6 @@ class Scenario:
             #     warnings.warn(message, UserWarning)
 
         if self.geospatial:
-
             # check if we can do geospatial analyis on desired function
             try: 
                pvdeg.geospatial.template_parameters(func)
@@ -498,10 +492,6 @@ class Scenario:
                 geo_job_dict.update(func_params)
 
             self.pipeline.append(geo_job_dict)
-
-            # if see_added:
-            #     message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
-            #     warnings.warn(message, UserWarning)
 
         if see_added:
             if self.geospatial:
@@ -519,7 +509,7 @@ class Scenario:
         """
         Runs entire pipeline on scenario object
         """
-        # maybe roundabout approach, be careful of type of nested dict value, may be df or other, 
+        # roundabout approach, be careful of type of nested dict value, may be df or other, 
         results_series = pd.Series(dtype='object')
 
         if not self.geospatial:
@@ -550,14 +540,16 @@ class Scenario:
 
         if self.geospatial:
 
-            # start dask, not sure if this is the right spot
+
+            # TODO : 
+            # move dask client intialization? add dask parameters to runPipeline method
             # add check to see if there is already a dask client running
             pvdeg.geospatial.start_dask()   
 
             for job in self.pipeline:
                 func = job['geospatial_job']
 
-                # shared case, letid may be identical
+                # remove check??? the fuction cant be added to the pipeline if it doesn't have a valid output template
                 if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
                     geo = {
                         'func': func,
@@ -570,10 +562,9 @@ class Scenario:
 
                     analysis_result = pvdeg.geospatial.analysis(**geo)
 
-                    # store xr.ds in pd.Series (might be goofy)
-                    # only works for one geospatial analysis per scenario instance
+                    # bypass pd.Series and store result in result attribute,
+                    # only lets us do one geospatial analysis per scenario
                     self.results = analysis_result
-
            
     def exportScenario(self, file_path=None):
         """
