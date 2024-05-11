@@ -2,15 +2,15 @@
 from datetime import date
 from datetime import datetime as dt
 import os
-import shutil # do we need this
+from shutil import rmtree
 from pvdeg import utilities as utils
 import pvdeg
 import json
 from inspect import signature
-from typing import Callable
 import warnings
 import pandas as pd
-from pvlib.location import Location
+
+import pprint
 
 # TODO: 
 # fix .clear(), currently breaks?
@@ -45,8 +45,10 @@ class Scenario:
         weather_data=None, # xarray ds when geospatial
         meta_data = None, # dataframe when geospatial
 
-        email = None, # only for single location
-        api_key = None,
+        # only usable for a single location
+        # REMOVE THE SAMPLE EMAIL AND API KEY BEFORE FINAL RELEASE
+        email = None, # 'DEMO_KEY'
+        api_key = None, # 'user@mail.com'
         
     ) -> None:
         """
@@ -106,14 +108,6 @@ class Scenario:
         self.name = name
 
         if path is None:
-            # DIRECTORY TEST            
-            print(f"self.path : {self.path}")
-            print(f"cwd : {os.getcwd()}")
-            print(f"scenario name : {self.name}")
-            name = f"pvd_job_{self.name}"
-            print(f"newpath : {os.path.join(os.getcwd(), name)}")
-            # END TEST
-
             self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
             if not os.path.exists(self.path):
                 os.makedirs(self.path)
@@ -135,8 +129,7 @@ class Scenario:
         """
         if self.path:
             try:
-                shutil.rmtree(path=self.path)
-
+                rmtree(path=self.path)
                 os.chdir(os.pardir)
             except:
                 raise FileNotFoundError(f"cannot remove {self.name} directory")
@@ -158,7 +151,7 @@ class Scenario:
         # gids=None, 
 
         lat_long=None, 
-        see_added = False
+        see_added = False,
     ):
         """
         Add a location to the scenario. Generates "gids.csv" and saves the file path within
@@ -216,34 +209,41 @@ class Scenario:
         # untested
         if not self.geospatial:
             weather_db = 'PSM3' # wrong type, move this to func arg
-            # check if lat long is a tuple of 2 floats, may not be a nessecary check
+            # valid coordinate input check
             if isinstance(lat_long, tuple) and all(isinstance(item, float) for item in lat_long) and len(lat_long) == 2:
                 weather_id = lat_long
             else:
                 return ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
 
-            # change email and api key???
-            weather_arg = {'api_key': 'DEMO_KEY',
-                        'email': 'user@mail.com',
-                        'names': 'tmy',
-                        'attributes': [],
-                        'map_variables': True}
+            # create kwargs dictionary
+            try:
+                weather_arg = {'api_key': self.api_key,
+                            'email': self.email,
+                            'names': 'tmy',
+                            'attributes': [],
+                            'map_variables': True}
+            except:
+                raise ValueError(f"email : {self.email} \n api-key : {self.api_key} \n Must provide an email and api key during class initialization")
 
             point_weather, point_meta = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
 
             try:
-                # gid type = str when reading from meta
+                # gid type of str when reading from meta
                 gid = point_meta['Location ID']            
             except KeyError:
                 return UserWarning(f"metadata missing location ID")
 
-            # added location, for single point, this may be misleading
+            # TODO: calculate gid using rex.NSRDBX.lat_long_gis, approach will only work on hpc
+            if self.hpc:
+                pass
+
+            # added location for single point, may be misleading, gid should be calulated above
             self.gids = gid
             self.weather_data[int(gid)] == point_weather
             
         # untested
         if self.geospatial:
-            # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory, need to update this
+            # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory
 
             # Get weather data
             weather_db = 'NSRDB'
@@ -264,18 +264,15 @@ class Scenario:
                 geo_meta = geo_meta[geo_meta['country'].isin( countries )]
             if state:
                 states = toList(state)
-                
                 # convert 2-letter codes to full state names
                 states = [pvdeg.utilities._get_state(entry) if len(entry) == 2
                         else entry 
                         for entry in states]
-                   
                 geo_meta = geo_meta[geo_meta['state'].isin( states )]
             if county:
                 counties = toList(county)
                 geo_meta = geo_meta[geo_meta['county'].isin( counties )]
             
-
             # if factor is 0 generate gids anyway 
             # no downsampling happens but gid_downsampling() generates gids
             geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
@@ -292,7 +289,10 @@ class Scenario:
             warnings.warn(message, UserWarning)
 
         # redo writing gids logic
-        file_name = f"gids_{self.name}"
+        # copied from utils.write_gids (not sure if the current function implementation is what we want)
+        file_name = f"gids_{self.name}.csv"
+        df_gids = pd.DataFrame(self.gids, columns=["gid"])
+        df_gids.to_csv(file_name, index=False)
 
         # gids_path = utils.write_gids(
         #     # nsrdb_fp,
@@ -302,7 +302,6 @@ class Scenario:
         #     gids=gids,
         #     out_fn=file_name,
         # )
-
 
     def addModule(
         self,
@@ -381,7 +380,6 @@ class Scenario:
         Print all scenario information currently stored in the scenario instance
         """
 
-        import pprint
 
         pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
