@@ -2,6 +2,7 @@
 from datetime import date
 from datetime import datetime as dt
 import os
+import shutil # do we need this
 from pvdeg import utilities as utils
 import pvdeg
 import json
@@ -93,7 +94,7 @@ class Scenario:
         self.meta_data = meta_data
 
         if geospatial and api_key:
-            raise ValueError("you cannot use an api key on hpc, NSRDB files exist locally")
+            raise ValueError("Cannot use an api key on hpc, NSRDB files exist locally")
         # only if not geospatial
         self.api_key = api_key
         self.email = email
@@ -110,11 +111,9 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
 
-    # this could be renamed ``reset`` or ``wipe``?
-    # not functional currently (close though)
-    def clear(self):
+    def clean(self):
         """
-        Wipe the Scenario object. This is useful because the Scenario object stores its data in local files outside of the python script.
+        Wipe the Scenario object filetree. This is useful because the Scenario object stores its data in local files outside of the python script.
         This causes issues when two unique scenario instances are created in the same directory, they appear to be seperate instances
         to python but share the same data (if no path is provided). Changes made to one are reflected in both.
 
@@ -126,33 +125,20 @@ class Scenario:
         --------
         None
         """
+        if self.path:
+            try:
+                shutil.rmtree(path=self.path)
 
-        if self:
-            # add recursive search check?
-            if self.file is not None:
-                # may not work properly due to nested nature, need to test
-                # only deletes file, not nested directory structure
-                os.remove(self.file)
-            
-            # update attribute
-            self.file = None
-
-            # blank scenario object
-            self = Scenario
-
+            except:
+                raise FileNotFoundError(f"cannot remove {self.name} directory")
         else:
-            raise ValueError(f"cannot clear scenario object: {self}")
-
-    
+            raise ValueError(f"{self.name} does not have a path attribute")
+   
 # TEST: List of country, state, county
-
 # add two letter state support, theres a mapping function for these already
 # for non geospatial, just use lat_long, ignore weather arg
 # add error checks for arg types?
     def addLocation(self, 
-        # region=None,
-        # region_col="state", 
-
         # geospatial parameters
         country=None,
         state=None,
