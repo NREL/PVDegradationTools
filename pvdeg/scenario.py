@@ -424,6 +424,7 @@ class Scenario:
         func=None, 
         func_params=None,
         see_added=False,
+
         ):
         """
         Add a pvdeg function to the scenario pipeline
@@ -501,7 +502,21 @@ class Scenario:
             elif not self.geospatial:
                 message = f"{func.__name__} added to pipeline as \n {job_dict}"
                 warnings.warn(message, UserWarning)
+        
+        # if self.geospatial:
+        #     func_address = self.pipeline[0]['geospatial_job']
+        #     qualified_name = f"{func_address.__module__}.{func_address.__name__}"
+        #     print(f"qualified func name : {qualified_name}")
 
+        # grabs fully qualified function name from function address
+        get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
+
+        df_pipeline = pd.DataFrame(self.pipeline)
+        # update the first column of the dataframe from func address to function name 
+        df_pipeline.iloc[:,0] = df_pipeline.iloc[:,0].map(get_qualified)
+        
+        file_name = f"pipeline_{self.name}.csv"
+        df_pipeline.to_csv(file_name, index=False)
 
     # TODO: run pipeline on each module added (if releveant)
     # may only work with one geospatial job in the pipeline
