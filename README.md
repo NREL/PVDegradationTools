@@ -1,4 +1,4 @@
-<img src="pvdeg_tutorials/pvdeg_logo.png" width="200">
+<img src="tutorials_and_tools/pvdeg_logo.png" width="200">
 
 <table>
 <tr>
@@ -18,8 +18,8 @@
 <tr>
   <td>Documentation</td>
   <td>
-	<a href='https://pvdegradationtools.readthedocs.io/en/latest/?badge=latest'>
-	    <img src='https://readthedocs.org/projects/pvdegradationtools/badge/?version=latest' alt='Documentation Status' />
+	<a href='https://PVDegradationTools.readthedocs.io'>
+	    <img src='https://readthedocs.org/projects/pvdegradationtools/badge/?version=stable' alt='Documentation Status' />
 	</a>
   </td>
 </tr>
@@ -139,4 +139,4 @@ If you use this functions in a published work, please cite:
 
 And/or the specific release from Zenodo:
 
-	Ovaitt, Silvana, Brown, Matt, Springer, Martin, Karas, Joe, Holsapple, Derek, Kempe, Michael. (2023). NREL/PVDegradationTools: v0.1.0 official release (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.8088403
+	Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Mark Campanelli, Derek M Holsapple, Kevin Anderson, Michael Kempe. (2024). NREL/PVDegradationTools: 0.3.2 (0.3.2). Zenodo. https://doi.org/10.5281/zenodo.11123249

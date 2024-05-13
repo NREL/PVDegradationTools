@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2 - Degradation &#8212; PVDEG Tutorials</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials_and_tools/2 - Degradation';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3 - Spectral Degradation" href="3%20-%20Spectral%20Degradation.html" />
+    <link rel="prev" title="1 - Basics, Humidity, Design" href="1%20-%20Basics%2C%20Humidity%2C%20Design.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <div class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<a class="navbar-brand logo" href="../intro.html">
+
+
+
+
+
+
+
+
+
+
+    <img src="../_static/PVD_logo.png" class="logo__image only-light" alt="PVDEG Tutorials - Home"/>
+    <script>document.write(`<img src="../_static/PVD_logo.png" class="logo__image only-dark" alt="PVDEG Tutorials - Home"/>`);</script>
+
+
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome to the PVDEG Tutorials and Tools
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1%20-%20Basics%2C%20Humidity%2C%20Design.html">1 - Basics, Humidity, Design</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">2 - Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4%20-%20Weather%20Database%20Access.html">4 - Weather Database Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html">Tools - Module Standoff for IEC TS 63126</a></li>
+<li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">LETID - Outdoor Scenario Based on Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Passivated%20Wafer.html">LETID - Passivated Wafer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main">
+
+
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+
+    </div>
+
+
+    <div class="header-article-items__end">
+
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials_and_tools/2 - Degradation.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2Ftutorials_and_tools/2 - Degradation.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="../_sources/tutorials_and_tools/2 - Degradation.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+
+    </div>
+
+</div>
+</div>
+
+
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>2 - Degradation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-in-the-weather-file">1. Read In the Weather File</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-basic-modeling-data">2. Generate Basic Modeling Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vanthoff-degradation">3. VantHoff Degradation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arrhenius">4. Arrhenius</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-method-degradation">5. Quick Method (Degradation)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solder-fatigue">6. Solder Fatigue</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="degradation">
+<h1>2 - Degradation<a class="headerlink" href="#degradation" title="Link to this heading">#</a></h1>
+<p>Degradation and Solder Fatigue</p>
+<p><strong>Requirements</strong>:</p>
+<ul class="simple">
+<li><p>compatible weather file (PSM3, TMY3, EPW)</p></li>
+<li><p>Accelerated testing chamber parameters</p>
+<ul>
+<li><p>chamber irradiance [W/m^2]</p></li>
+<li><p>chamber temperature [C]</p></li>
+<li><p>chamber humidity [%]</p></li>
+</ul>
+</li>
+<li><p>Activation energies for test material [kJ/mol]</p></li>
+</ul>
+<p><strong>Objectives</strong>:</p>
+<ol class="arabic simple">
+<li><p>Read in the weather data</p></li>
+<li><p>Generate basic modeling data</p></li>
+<li><p>Calculate VantHoff degradation acceleration factor</p></li>
+<li><p>Calculate Arrhenius degradation acceleration factor</p></li>
+<li><p>Quick Method</p></li>
+<li><p>Solder Fatigue</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+<span class="c1"># !pip install pvdeg==0.3.3</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">pvdeg</span>
+<span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\mspringe\AppData\Local\Temp\1\ipykernel_18252\3801537021.py:2: DeprecationWarning:
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+
+  import pandas as pd
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">platform</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Working on a &quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python version &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pandas version &quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pvdeg version &quot;</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Windows 10
+Python version  3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]
+Pandas version  2.2.0
+pvdeg version  0.2.4.dev83+ge2ceab9.d20240422
+</pre></div>
+</div>
+</div>
+</div>
+<section id="read-in-the-weather-file">
+<h2>1. Read In the Weather File<a class="headerlink" href="#read-in-the-weather-file" title="Link to this heading">#</a></h2>
+<p>This is usually the first step. Use a PSM3, TMY3, or EPW file. For this demo, use the provided PSM3 weather file.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">PSM_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span><span class="s1">&#39;psm3_demo.csv&#39;</span><span class="p">)</span>
+<span class="n">WEATHER</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">PSM_FILE</span><span class="p">,</span><span class="s1">&#39;psm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="generate-basic-modeling-data">
+<h2>2. Generate Basic Modeling Data<a class="headerlink" href="#generate-basic-modeling-data" title="Link to this heading">#</a></h2>
+<p>For this tutorial we will need solar position, POA, PV cell and module temperature. Let’s gernate those individually with their respective functions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol_pos</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">solar_position</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+
+<span class="n">poa_df</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">poa_irradiance</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span> <span class="n">sol_position</span><span class="o">=</span><span class="n">sol_pos</span><span class="p">)</span>
+
+<span class="n">temp_cell</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span> <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">)</span>
+
+<span class="n">temp_module</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span> <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="vanthoff-degradation">
+<h2>3. VantHoff Degradation<a class="headerlink" href="#vanthoff-degradation" title="Link to this heading">#</a></h2>
+<p>Van ‘t Hoff Irradiance Degradation</p>
+<p>For one year of degredation the controlled environmnet lamp settings will need to be set to IWa.</p>
+<p>As with most <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> functions, the following functions will always require two arguments (weather_df and meta)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># chamber irradiance (W/m^2)</span>
+<span class="n">I_chamber</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="c1"># chamber temperature (C)</span>
+<span class="n">temp_chamber</span> <span class="o">=</span> <span class="mi">60</span>
+
+<span class="c1"># calculate the VantHoff Acceleration factor</span>
+<span class="n">vantHoff_deg</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">vantHoff_deg</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                              <span class="n">I_chamber</span><span class="o">=</span><span class="n">I_chamber</span><span class="p">,</span>
+                                              <span class="n">temp_chamber</span><span class="o">=</span><span class="n">temp_chamber</span><span class="p">,</span>
+                                              <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">,</span>
+                                              <span class="n">temp</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">)</span>
+
+<span class="c1"># calculate the VantHoff weighted irradiance</span>
+<span class="n">irr_weighted_avg_v</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">IwaVantHoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                                   <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">,</span>
+                                                   <span class="n">temp</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="arrhenius">
+<h2>4. Arrhenius<a class="headerlink" href="#arrhenius" title="Link to this heading">#</a></h2>
+<p>Calculate the Acceleration Factor between the rate of degredation of a modeled environmnet versus a modeled controlled environmnet</p>
+<p>Example: “If the AF=25 then 1 year of Controlled Environment exposure is equal to 25 years in the field”</p>
+<p>Equation:
+$<span class="math notranslate nohighlight">\( AF = N * \frac{ I_{chamber}^x * RH_{chamber}^n * e^{\frac{- E_a}{k T_{chamber}}} }{ \Sigma (I_{POA}^x * RH_{outdoor}^n * e^{\frac{-E_a}{k T_outdoor}}) }\)</span>$</p>
+<p>Function to calculate IWa, the Environment Characterization (W/m²). For one year of degredation the controlled environmnet lamp settings will need to be set at IWa.</p>
+<p>Equation:
+$<span class="math notranslate nohighlight">\( I_{WA} = [ \frac{ \Sigma (I_{outdoor}^x * RH_{outdoor}^n e^{\frac{-E_a}{k T_{outdood}}}) }{ N * RH_{WA}^n * e^{- \frac{E_a}{k T_eq}} } ]^{\frac{1}{x}} \)</span>$</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># relative humidity within chamber (%)</span>
+<span class="n">rh_chamber</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="c1"># arrhenius activation energy (kj/mol)</span>
+<span class="n">Ea</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+                                               <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
+                                               <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_module</span><span class="p">)</span>
+
+<span class="n">arrhenius_deg</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">arrhenius_deg</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                                <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">rh_surface</span><span class="p">,</span>
+                                                <span class="n">I_chamber</span><span class="o">=</span><span class="n">I_chamber</span><span class="p">,</span>
+                                                <span class="n">rh_chamber</span><span class="o">=</span><span class="n">rh_chamber</span><span class="p">,</span>
+                                                <span class="n">temp_chamber</span><span class="o">=</span><span class="n">temp_chamber</span><span class="p">,</span>
+                                                <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">,</span>
+                                                <span class="n">temp</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">,</span>
+                                                <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
+
+<span class="n">irr_weighted_avg_a</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">IwaArrhenius</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                                    <span class="n">poa</span><span class="o">=</span><span class="n">poa_df</span><span class="p">,</span>
+                                                    <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+                                                    <span class="n">temp</span><span class="o">=</span><span class="n">temp_cell</span><span class="p">,</span>
+                                                    <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="quick-method-degradation">
+<h2>5. Quick Method (Degradation)<a class="headerlink" href="#quick-method-degradation" title="Link to this heading">#</a></h2>
+<p>For quick calculations, you can omit POA and both module and cell temperature. The function will calculate these figures as needed using the available weather data with the default options for PV module configuration.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># chamber settings</span>
+<span class="n">I_chamber</span><span class="o">=</span> <span class="mi">1000</span>
+<span class="n">temp_chamber</span><span class="o">=</span><span class="mi">60</span>
+<span class="n">rh_chamber</span><span class="o">=</span><span class="mi">15</span>
+
+<span class="c1"># activation energy</span>
+<span class="n">Ea</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="n">vantHoff_deg</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">vantHoff_deg</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                              <span class="n">I_chamber</span><span class="o">=</span><span class="n">I_chamber</span><span class="p">,</span>
+                                              <span class="n">temp_chamber</span><span class="o">=</span><span class="n">temp_chamber</span><span class="p">)</span>
+
+<span class="n">irr_weighted_avg_v</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">IwaVantHoff</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rh_surface</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+                                               <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
+                                               <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_module</span><span class="p">)</span>
+
+<span class="n">arrhenius_deg</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">arrhenius_deg</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                                <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">rh_surface</span><span class="p">,</span>
+                                                <span class="n">I_chamber</span><span class="o">=</span><span class="n">I_chamber</span><span class="p">,</span>
+                                                <span class="n">rh_chamber</span><span class="o">=</span><span class="n">rh_chamber</span><span class="p">,</span>
+                                                <span class="n">temp_chamber</span><span class="o">=</span><span class="n">temp_chamber</span><span class="p">,</span>
+                                                <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
+
+<span class="n">irr_weighted_avg_a</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">degradation</span><span class="o">.</span><span class="n">IwaArrhenius</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                                    <span class="n">rh_outdoor</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+                                                    <span class="n">Ea</span><span class="o">=</span><span class="n">Ea</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="solder-fatigue">
+<h2>6. Solder Fatigue<a class="headerlink" href="#solder-fatigue" title="Link to this heading">#</a></h2>
+<p>Estimate the thermomechanical fatigue of flat plate photovoltaic module solder joints over the time range given using estimated cell temperature. Like other <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> funcitons, the minimal parameters are (weather_df, meta). Running the function with only these two inputs will use default PV module configurations ( open_rack_glass_polymer ) and the ‘sapm’ temperature model over the entire length of the weather data.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fatigue</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">fatigue</span><span class="o">.</span><span class="n">solder_fatigue</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+<p>If you wish to reduce the span of time or use a non-default temperature model, you may specify the parameters manually. Let’s try an explicit example.
+We want the solder fatigue estimated over the month of June for a roof mounted glass-front polymer-back module.</p>
+<ol class="arabic simple">
+<li><p>Lets create a datetime-index for the month of June.</p></li>
+<li><p>Next, generate the cell temperature. Make sure to explicity restrict the weather data to our dt-index for June. Next, declare the PV module configuration.</p></li>
+<li><p>Calculate the fatigue. Explicity specify the time_range (our dt-index for June from step 1) and the cell temperature as we caculated in step 2</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># select the month of June</span>
+<span class="n">time_range</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="mi">6</span><span class="p">]</span>
+
+<span class="c1"># calculate cell temperature over our selected date-time range.</span>
+<span class="c1"># specify the module configuration</span>
+<span class="n">temp_cell</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">cell</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_range</span><span class="p">],</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                   <span class="n">temp_model</span><span class="o">=</span><span class="s1">&#39;sapm&#39;</span><span class="p">,</span>
+                                   <span class="n">conf</span><span class="o">=</span><span class="s1">&#39;insulated_back_glass_polymer&#39;</span><span class="p">)</span>
+
+
+<span class="n">fatigue</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">fatigue</span><span class="o">.</span><span class="n">solder_fatigue</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                       <span class="n">time_range</span> <span class="o">=</span> <span class="n">time_range</span><span class="p">,</span>
+                                       <span class="n">temp_cell</span> <span class="o">=</span> <span class="n">temp_cell</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "NREL/PVDegradationTools",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials_and_tools"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+
+
+
+
+
+
+                <footer class="prev-next-footer">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="1%20-%20Basics%2C%20Humidity%2C%20Design.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">1 - Basics, Humidity, Design</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="3%20-%20Spectral%20Degradation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">3 - Spectral Degradation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-in-the-weather-file">1. Read In the Weather File</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-basic-modeling-data">2. Generate Basic Modeling Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vanthoff-degradation">3. VantHoff Degradation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arrhenius">4. Arrhenius</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-method-degradation">5. Quick Method (Degradation)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solder-fatigue">6. Solder Fatigue</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+<div class="bd-footer-content__inner container">
+
+  <div class="footer-item">
+
+<p class="component-author">
+By Matthew Brown, Silvana Ovaitt
+</p>
+
+  </div>
+
+  <div class="footer-item">
+
+
+  <p class="copyright">
+
+      © Copyright 2023.
+      <br/>
+
+  </p>
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+</div>
+          </footer>
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

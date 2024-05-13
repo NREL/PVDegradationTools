@@ -40,7 +40,7 @@ def _ambient(weather_df):
     """
     temp_air = weather_df["temp_air"]
     # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
-    dew_point = weather_df.get("temp_dew", weather_df.get("Dew Point"))
+    dew_point = weather_df.get("dew_point")
 
     num = np.exp(17.625 * dew_point / (243.04 + dew_point))
     den = np.exp(17.625 * temp_air / (243.04 + temp_air))
@@ -542,7 +542,7 @@ def back_encap(
     Csat = _csat(temp_module=temp_module, So=So, Eas=Eas)
     Ceq = _ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
-    start = Ceq[0]
+    start = Ceq.iloc[0]
 
     # Need to convert these series to numpy arrays for numba function
     temp_module_numba = temp_module.to_numpy()

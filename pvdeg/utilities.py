@@ -3,7 +3,10 @@ import json
 import pandas as pd
 import numpy as np
 from rex import NSRDBX, Outputs
-from pvdeg import DATA_LIBRARY
+from pvdeg import DATA_DIR
+from typing import Callable
+import inspect
+import math
 
 
 def gid_downsampling(meta, n):
@@ -69,7 +72,7 @@ def get_kinetics(name=None, fname="kinetic_parameters.json"):
     parameter_dict : (dict)
         dictionary of kinetic parameters
     """
-    fpath = os.path.join(DATA_LIBRARY, fname)
+    fpath = os.path.join(DATA_DIR, fname)
 
     with open(fpath) as f:
         data = json.load(f)
@@ -284,7 +287,7 @@ def _read_material(name, fname="materials.json"):
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
     # file = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_LIBRARY, fname)
+    fpath = os.path.join(DATA_DIR, fname)
     with open(fpath) as f:
         data = json.load(f)
 
@@ -340,7 +343,7 @@ def _add_material(
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
     # OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_LIBRARY, fname)
+    fpath = os.path.join(DATA_DIR, fname)
 
     material_dict = {
         "alias": alias,
@@ -416,3 +419,55 @@ def ts_gid_df(file, gid):
                 res.lat = meta.latitude[gid]
                 res.lon = meta.longitude[gid]
     return res
+
+
+def tilt_azimuth_scan(
+    weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
+):
+    """
+    Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data for a single location.
+    meta : pd.DataFrame
+        Meta data for a single location.
+    tilt_step : integer
+        Step in degrees of change in tilt angle of PV system between calculations. Will scan from 0 to 90 degrees.
+    azimuth_step : integer
+        Step in degrees of change in Azimuth angle of PV system relative to north. Will scan from 0 to 180 degrees.
+    kwarg : dict
+        All the keywords in a dictionary form that are needed to run the function.
+    calc_function : string
+        The name of the function that will be calculated.
+    Returns
+        standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
+    """
+
+    total_count = (math.ceil(360 / azimuth_step) + 1) * (math.ceil(90 / tilt_step) + 1)
+    tilt_azimuth_series = np.zeros((total_count, 3))
+    count = 0
+    azimuth = -azimuth_step
+    while azimuth < 360:
+        tilt = -tilt_step
+        azimuth = azimuth + azimuth_step
+        if azimuth > 360:
+            azimuth = 360
+        while tilt < 90:
+            tilt = tilt + tilt_step
+            if tilt > 90:
+                tilt = 90
+            tilt_azimuth_series[count][0] = tilt
+            tilt_azimuth_series[count][1] = azimuth
+            tilt_azimuth_series[count][2] = func(
+                weather_df=weather_df, meta=meta, tilt=tilt, azimuth=azimuth, **kwarg
+            )
+            count = count + 1
+            print(
+                "\r", "%.1f" % (100 * count / total_count), "% complete", sep="", end=""
+            )
+
+    print("\r                     ", end="")
+    print("\r", end="")
+    return tilt_azimuth_series

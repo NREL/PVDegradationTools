@@ -1,0 +1,14 @@
+v0.3.1 (2024-05-06)
+=======================
+
+Bug Fixes
+---------
+* Fix logo path in documenation
+
+Documentation
+-------------
+* Updated Zenodo citation in readme.
+
+Contributors
+~~~~~~~~~~~~
+* Martin Springer (:ghuser:`martin-springer`)

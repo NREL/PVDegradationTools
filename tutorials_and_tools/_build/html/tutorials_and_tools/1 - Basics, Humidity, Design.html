@@ -1,0 +1,1956 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>1 - Basics, Humidity, Design &#8212; PVDEG Tutorials</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials_and_tools/1 - Basics, Humidity, Design';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2 - Degradation" href="2%20-%20Degradation.html" />
+    <link rel="prev" title="Welcome to the PVDEG Tutorials and Tools" href="../intro.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <div class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<a class="navbar-brand logo" href="../intro.html">
+
+
+
+
+
+
+
+
+
+
+    <img src="../_static/PVD_logo.png" class="logo__image only-light" alt="PVDEG Tutorials - Home"/>
+    <script>document.write(`<img src="../_static/PVD_logo.png" class="logo__image only-dark" alt="PVDEG Tutorials - Home"/>`);</script>
+
+
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome to the PVDEG Tutorials and Tools
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">1 - Basics, Humidity, Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4%20-%20Weather%20Database%20Access.html">4 - Weather Database Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html">Tools - Module Standoff for IEC TS 63126</a></li>
+<li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">LETID - Outdoor Scenario Based on Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Passivated%20Wafer.html">LETID - Passivated Wafer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main">
+
+
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+
+    </div>
+
+
+    <div class="header-article-items__end">
+
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials_and_tools/1 - Basics, Humidity, Design.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2Ftutorials_and_tools/1 - Basics, Humidity, Design.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="../_sources/tutorials_and_tools/1 - Basics, Humidity, Design.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+
+    </div>
+
+</div>
+</div>
+
+
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>1 - Basics, Humidity, Design</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-humidity-and-edge-seal-width">Module Humidity and Edge Seal Width</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-in-weather-data-and-site-meta-data">1. Reading in Weather Data and Site Meta-Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solar-position-poa-and-module-temperature">2. Solar Position, POA, and Module Temperature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-humidities">3. Module Humidities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-automatic">3.a. Automatic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-manual">3.b. Manual</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-edge-seal-width">4. Design: Edge Seal Width</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternate-edge-seal-width">Alternate Edge Seal Width</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="basics-humidity-design">
+<h1>1 - Basics, Humidity, Design<a class="headerlink" href="#basics-humidity-design" title="Link to this heading">#</a></h1>
+<section id="module-humidity-and-edge-seal-width">
+<h2>Module Humidity and Edge Seal Width<a class="headerlink" href="#module-humidity-and-edge-seal-width" title="Link to this heading">#</a></h2>
+<p><strong>Requirements:</strong></p>
+<ul class="simple">
+<li><p>weather file (psm3 preferred) demo file is provided</p></li>
+</ul>
+<p><strong>Objectives:</strong></p>
+<ol class="arabic simple">
+<li><p>Read in necessary weather data</p></li>
+<li><p>Generate solar position, POA, and module temperature</p></li>
+<li><p>Generate module humidities</p></li>
+<li><p>Calculate edge seal width</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+<span class="c1"># !pip install pvdeg==0.3.3</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">pvdeg</span>
+<span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\mspringe\AppData\Local\Temp\1\ipykernel_22096\3801537021.py:2: DeprecationWarning:
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+
+  import pandas as pd
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">platform</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Working on a &quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python version &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pandas version &quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pvdeg version &quot;</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Windows 10
+Python version  3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]
+Pandas version  2.2.0
+pvdeg version  0.2.4.dev83+ge2ceab9.d20240422
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="reading-in-weather-data-and-site-meta-data">
+<h2>1. Reading in Weather Data and Site Meta-Data<a class="headerlink" href="#reading-in-weather-data-and-site-meta-data" title="Link to this heading">#</a></h2>
+<p>Most <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> functions have been standardized to operate from popular weather files such as TMY3, EPW, and PSM3. For high-performance computer users, NSRDB and other database fetching tools can be used. For these tutorials, we will use local weather files. Unless otherwise stated, functions require the following fields within a weather file:</p>
+<ul class="simple">
+<li><p>date-time index</p></li>
+<li><p>DNI</p></li>
+<li><p>DHI</p></li>
+<li><p>GHI</p></li>
+<li><p>Temperature, Dry-Bulb</p></li>
+<li><p>Temperature, Dew-Point</p></li>
+<li><p>Wind Speed</p></li>
+<li><p>Relative Humidity</p></li>
+</ul>
+<p>And the following site-specific metadata. This should be contained in the weather file header.</p>
+<ul class="simple">
+<li><p>Latitude</p></li>
+<li><p>Longitude</p></li>
+<li><p>Altitude</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">PSM_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span><span class="s1">&#39;psm3_demo.csv&#39;</span><span class="p">)</span>
+
+<span class="n">WEATHER</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">PSM_FILE</span><span class="p">,</span><span class="s1">&#39;psm&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s take a closer look at the dataframe (weather) and dictionary (meta) imported above. The structure will be used by most <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> functions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">WEATHER</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Year</th>
+      <th>Month</th>
+      <th>Day</th>
+      <th>Hour</th>
+      <th>Minute</th>
+      <th>dni</th>
+      <th>dhi</th>
+      <th>ghi</th>
+      <th>temp_air</th>
+      <th>dew_point</th>
+      <th>wind_speed</th>
+      <th>relative_humidity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-01-01 00:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-5.0</td>
+      <td>1.8</td>
+      <td>79.39</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 01:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-4.0</td>
+      <td>1.7</td>
+      <td>80.84</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 02:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>2</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-4.0</td>
+      <td>1.5</td>
+      <td>82.98</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 03:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>3</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-4.0</td>
+      <td>1.3</td>
+      <td>85.01</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 04:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>4</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-4.0</td>
+      <td>1.3</td>
+      <td>85.81</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Meta-Data will vary greatly between weather files. However, at a minimum they should all contain the fields required by <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> listed above. Let’s look at the meta-data generated by our PSM3 weather file. It provides much more information that we need, but at the very end are the three most important fields.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">META</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;Source&#39;: &#39;NSRDB&#39;,
+ &#39;Location ID&#39;: &#39;145809&#39;,
+ &#39;City&#39;: &#39;-&#39;,
+ &#39;State&#39;: &#39;-&#39;,
+ &#39;Country&#39;: &#39;-&#39;,
+ &#39;Clearsky DHI Units&#39;: &#39;w/m2&#39;,
+ &#39;Clearsky DNI Units&#39;: &#39;w/m2&#39;,
+ &#39;Clearsky GHI Units&#39;: &#39;w/m2&#39;,
+ &#39;Dew Point Units&#39;: &#39;c&#39;,
+ &#39;DHI Units&#39;: &#39;w/m2&#39;,
+ &#39;DNI Units&#39;: &#39;w/m2&#39;,
+ &#39;GHI Units&#39;: &#39;w/m2&#39;,
+ &#39;Solar Zenith Angle Units&#39;: &#39;Degree&#39;,
+ &#39;Temperature Units&#39;: &#39;c&#39;,
+ &#39;Pressure Units&#39;: &#39;mbar&#39;,
+ &#39;Relative Humidity Units&#39;: &#39;%&#39;,
+ &#39;Precipitable Water Units&#39;: &#39;cm&#39;,
+ &#39;Wind Direction Units&#39;: &#39;Degrees&#39;,
+ &#39;Wind Speed Units&#39;: &#39;m/s&#39;,
+ &#39;Cloud Type -15&#39;: &#39;N/A&#39;,
+ &#39;Cloud Type 0&#39;: &#39;Clear&#39;,
+ &#39;Cloud Type 1&#39;: &#39;Probably Clear&#39;,
+ &#39;Cloud Type 2&#39;: &#39;Fog&#39;,
+ &#39;Cloud Type 3&#39;: &#39;Water&#39;,
+ &#39;Cloud Type 4&#39;: &#39;Super-Cooled Water&#39;,
+ &#39;Cloud Type 5&#39;: &#39;Mixed&#39;,
+ &#39;Cloud Type 6&#39;: &#39;Opaque Ice&#39;,
+ &#39;Cloud Type 7&#39;: &#39;Cirrus&#39;,
+ &#39;Cloud Type 8&#39;: &#39;Overlapping&#39;,
+ &#39;Cloud Type 9&#39;: &#39;Overshooting&#39;,
+ &#39;Cloud Type 10&#39;: &#39;Unknown&#39;,
+ &#39;Cloud Type 11&#39;: &#39;Dust&#39;,
+ &#39;Cloud Type 12&#39;: &#39;Smoke&#39;,
+ &#39;Fill Flag 0&#39;: &#39;N/A&#39;,
+ &#39;Fill Flag 1&#39;: &#39;Missing Image&#39;,
+ &#39;Fill Flag 2&#39;: &#39;Low Irradiance&#39;,
+ &#39;Fill Flag 3&#39;: &#39;Exceeds Clearsky&#39;,
+ &#39;Fill Flag 4&#39;: &#39;Missing CLoud Properties&#39;,
+ &#39;Fill Flag 5&#39;: &#39;Rayleigh Violation&#39;,
+ &#39;Surface Albedo Units&#39;: &#39;N/A&#39;,
+ &#39;Version&#39;: &#39;3.0.6&#39;,
+ &#39;latitude&#39;: 39.73,
+ &#39;longitude&#39;: -105.18,
+ &#39;altitude&#39;: 1820,
+ &#39;tz&#39;: -7}
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ll be working with a lot of time series data, generally with a date-time index. If you’re
+processing an entire year of data, you don’t need to sort or filter the data. However, you may want
+to filter the data by a few different criteria. Below are some common examples.</p>
+<ul class="simple">
+<li><p>Filter by date</p>
+<ul>
+<li><p>month</p></li>
+<li><p>range of months</p></li>
+</ul>
+</li>
+<li><p>Filter by sun-up hours</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s select the month of June</span>
+<span class="n">june_weather</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="p">[</span> <span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span> <span class="o">==</span> <span class="mi">6</span> <span class="p">]</span>
+<span class="n">june_weather</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Year</th>
+      <th>Month</th>
+      <th>Day</th>
+      <th>Hour</th>
+      <th>Minute</th>
+      <th>dni</th>
+      <th>dhi</th>
+      <th>ghi</th>
+      <th>temp_air</th>
+      <th>dew_point</th>
+      <th>wind_speed</th>
+      <th>relative_humidity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-06-01 00:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>0</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.7</td>
+      <td>79.15</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 01:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.7</td>
+      <td>75.62</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 02:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>2</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.5</td>
+      <td>78.51</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 03:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>3</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>1.3</td>
+      <td>76.90</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 04:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>4</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.3</td>
+      <td>75.75</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1999-06-30 19:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>30</td>
+      <td>19</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>21.0</td>
+      <td>6.0</td>
+      <td>0.6</td>
+      <td>48.54</td>
+    </tr>
+    <tr>
+      <th>1999-06-30 20:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>30</td>
+      <td>20</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>19.0</td>
+      <td>7.0</td>
+      <td>0.4</td>
+      <td>55.36</td>
+    </tr>
+    <tr>
+      <th>1999-06-30 21:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>30</td>
+      <td>21</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>17.0</td>
+      <td>7.0</td>
+      <td>0.5</td>
+      <td>66.32</td>
+    </tr>
+    <tr>
+      <th>1999-06-30 22:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>30</td>
+      <td>22</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>15.0</td>
+      <td>7.0</td>
+      <td>0.8</td>
+      <td>75.74</td>
+    </tr>
+    <tr>
+      <th>1999-06-30 23:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>30</td>
+      <td>23</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>13.0</td>
+      <td>7.0</td>
+      <td>0.8</td>
+      <td>80.16</td>
+    </tr>
+  </tbody>
+</table>
+<p>720 rows × 12 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s filter the summer months for the northern hemisphere</span>
+<span class="n">summer_months</span> <span class="o">=</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
+<span class="n">summer_weather</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="p">[</span> <span class="n">WEATHER</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">month</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span> <span class="n">summer_months</span> <span class="p">)</span> <span class="p">]</span>
+<span class="n">summer_weather</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Year</th>
+      <th>Month</th>
+      <th>Day</th>
+      <th>Hour</th>
+      <th>Minute</th>
+      <th>dni</th>
+      <th>dhi</th>
+      <th>ghi</th>
+      <th>temp_air</th>
+      <th>dew_point</th>
+      <th>wind_speed</th>
+      <th>relative_humidity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-06-01 00:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>0</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.7</td>
+      <td>79.15</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 01:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>1</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.7</td>
+      <td>75.62</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 02:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>2</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.5</td>
+      <td>78.51</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 03:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>3</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>5.0</td>
+      <td>0.0</td>
+      <td>1.3</td>
+      <td>76.90</td>
+    </tr>
+    <tr>
+      <th>1999-06-01 04:30:00-07:00</th>
+      <td>1999</td>
+      <td>6</td>
+      <td>1</td>
+      <td>4</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>6.0</td>
+      <td>0.0</td>
+      <td>1.3</td>
+      <td>75.75</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1999-09-30 19:30:00-07:00</th>
+      <td>1999</td>
+      <td>9</td>
+      <td>30</td>
+      <td>19</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>8.0</td>
+      <td>-1.0</td>
+      <td>2.6</td>
+      <td>58.57</td>
+    </tr>
+    <tr>
+      <th>1999-09-30 20:30:00-07:00</th>
+      <td>1999</td>
+      <td>9</td>
+      <td>30</td>
+      <td>20</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>-2.0</td>
+      <td>2.7</td>
+      <td>58.17</td>
+    </tr>
+    <tr>
+      <th>1999-09-30 21:30:00-07:00</th>
+      <td>1999</td>
+      <td>9</td>
+      <td>30</td>
+      <td>21</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>-3.0</td>
+      <td>2.9</td>
+      <td>54.27</td>
+    </tr>
+    <tr>
+      <th>1999-09-30 22:30:00-07:00</th>
+      <td>1999</td>
+      <td>9</td>
+      <td>30</td>
+      <td>22</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>-4.0</td>
+      <td>3.0</td>
+      <td>50.29</td>
+    </tr>
+    <tr>
+      <th>1999-09-30 23:30:00-07:00</th>
+      <td>1999</td>
+      <td>9</td>
+      <td>30</td>
+      <td>23</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>7.0</td>
+      <td>-5.0</td>
+      <td>3.0</td>
+      <td>46.91</td>
+    </tr>
+  </tbody>
+</table>
+<p>2928 rows × 12 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># lets just select hours from the year where the sun is above the horizon</span>
+<span class="n">sunup_weather</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="p">[</span> <span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;ghi&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">]</span>
+<span class="n">sunup_weather</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Year</th>
+      <th>Month</th>
+      <th>Day</th>
+      <th>Hour</th>
+      <th>Minute</th>
+      <th>dni</th>
+      <th>dhi</th>
+      <th>ghi</th>
+      <th>temp_air</th>
+      <th>dew_point</th>
+      <th>wind_speed</th>
+      <th>relative_humidity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-01-01 08:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>8</td>
+      <td>30</td>
+      <td>65.0</td>
+      <td>65.0</td>
+      <td>76.0</td>
+      <td>1.0</td>
+      <td>-3.0</td>
+      <td>4.7</td>
+      <td>76.86</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 09:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>9</td>
+      <td>30</td>
+      <td>503.0</td>
+      <td>93.0</td>
+      <td>246.0</td>
+      <td>2.0</td>
+      <td>-2.0</td>
+      <td>6.3</td>
+      <td>80.37</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 10:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>10</td>
+      <td>30</td>
+      <td>617.0</td>
+      <td>109.0</td>
+      <td>355.0</td>
+      <td>3.0</td>
+      <td>-2.0</td>
+      <td>7.0</td>
+      <td>74.87</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 11:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>11</td>
+      <td>30</td>
+      <td>497.0</td>
+      <td>161.0</td>
+      <td>385.0</td>
+      <td>4.0</td>
+      <td>-3.0</td>
+      <td>6.8</td>
+      <td>70.73</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 12:30:00-07:00</th>
+      <td>1999</td>
+      <td>1</td>
+      <td>1</td>
+      <td>12</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>128.0</td>
+      <td>128.0</td>
+      <td>4.0</td>
+      <td>-4.0</td>
+      <td>6.5</td>
+      <td>61.80</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 12:30:00-07:00</th>
+      <td>1999</td>
+      <td>12</td>
+      <td>31</td>
+      <td>12</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>20.0</td>
+      <td>20.0</td>
+      <td>9.0</td>
+      <td>-8.0</td>
+      <td>1.6</td>
+      <td>31.45</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 13:30:00-07:00</th>
+      <td>1999</td>
+      <td>12</td>
+      <td>31</td>
+      <td>13</td>
+      <td>30</td>
+      <td>562.0</td>
+      <td>125.0</td>
+      <td>354.0</td>
+      <td>8.0</td>
+      <td>-6.0</td>
+      <td>0.5</td>
+      <td>40.25</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 14:30:00-07:00</th>
+      <td>1999</td>
+      <td>12</td>
+      <td>31</td>
+      <td>14</td>
+      <td>30</td>
+      <td>530.0</td>
+      <td>94.0</td>
+      <td>263.0</td>
+      <td>7.0</td>
+      <td>-4.0</td>
+      <td>0.4</td>
+      <td>53.19</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 15:30:00-07:00</th>
+      <td>1999</td>
+      <td>12</td>
+      <td>31</td>
+      <td>15</td>
+      <td>30</td>
+      <td>636.0</td>
+      <td>38.0</td>
+      <td>159.0</td>
+      <td>5.0</td>
+      <td>-5.0</td>
+      <td>1.0</td>
+      <td>57.10</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 16:30:00-07:00</th>
+      <td>1999</td>
+      <td>12</td>
+      <td>31</td>
+      <td>16</td>
+      <td>30</td>
+      <td>0.0</td>
+      <td>21.0</td>
+      <td>21.0</td>
+      <td>4.0</td>
+      <td>-6.0</td>
+      <td>1.3</td>
+      <td>56.22</td>
+    </tr>
+  </tbody>
+</table>
+<p>4301 rows × 12 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="solar-position-poa-and-module-temperature">
+<h2>2. Solar Position, POA, and Module Temperature<a class="headerlink" href="#solar-position-poa-and-module-temperature" title="Link to this heading">#</a></h2>
+<p>Many operations with <code class="docutils literal notranslate"><span class="pre">PVDEG</span></code> require solar position, POA irradiance, and module temperature. Usually a <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> method will calculate these data sets automatically when it is required, however it will not keep the data for external use. For now, we will calculate them directly. This is helpful when you need to use the data for an external calculation. Here, we generate the solar position (azimuth, elevation, etc), plane of array irradiance (POA), and module temperature. <code class="docutils literal notranslate"><span class="pre">PVDEG</span></code> has wrappers for quickly using <code class="docutils literal notranslate"><span class="pre">PVLIB</span></code> to generate these figures with minimal input</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol_pos</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">solar_position</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+
+<span class="n">poa_df</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">spectral</span><span class="o">.</span><span class="n">poa_irradiance</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span><span class="c1">#, solar_position=sol_pos)</span>
+
+<span class="n">temp_mod</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span><span class="c1">#, poa=poa_df)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+<p>For more advanced usage of these functions, refer to the documentation for <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> and <code class="docutils literal notranslate"><span class="pre">pvlib</span></code>.</p>
+<p>Lets inspect the output from each of these functions</p>
+<p><code class="docutils literal notranslate"><span class="pre">solar_position</span></code> returns a datetime-indexed dataframe of solar position for the length and frequency given by the weather file.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sol_pos</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>apparent_zenith</th>
+      <th>zenith</th>
+      <th>apparent_elevation</th>
+      <th>elevation</th>
+      <th>azimuth</th>
+      <th>equation_of_time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-01-01 00:30:00-07:00</th>
+      <td>162.416069</td>
+      <td>162.416069</td>
+      <td>-72.416069</td>
+      <td>-72.416069</td>
+      <td>20.152470</td>
+      <td>-3.300994</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 01:30:00-07:00</th>
+      <td>155.313029</td>
+      <td>155.313029</td>
+      <td>-65.313029</td>
+      <td>-65.313029</td>
+      <td>53.821029</td>
+      <td>-3.320654</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 02:30:00-07:00</th>
+      <td>144.992553</td>
+      <td>144.992553</td>
+      <td>-54.992553</td>
+      <td>-54.992553</td>
+      <td>72.531199</td>
+      <td>-3.340306</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 03:30:00-07:00</th>
+      <td>133.692678</td>
+      <td>133.692678</td>
+      <td>-43.692678</td>
+      <td>-43.692678</td>
+      <td>84.789909</td>
+      <td>-3.359948</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 04:30:00-07:00</th>
+      <td>122.172658</td>
+      <td>122.172658</td>
+      <td>-32.172658</td>
+      <td>-32.172658</td>
+      <td>94.462003</td>
+      <td>-3.379582</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 19:30:00-07:00</th>
+      <td>120.682889</td>
+      <td>120.682889</td>
+      <td>-30.682889</td>
+      <td>-30.682889</td>
+      <td>264.307279</td>
+      <td>-3.093347</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 20:30:00-07:00</th>
+      <td>132.197914</td>
+      <td>132.197914</td>
+      <td>-42.197914</td>
+      <td>-42.197914</td>
+      <td>273.785399</td>
+      <td>-3.113209</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 21:30:00-07:00</th>
+      <td>143.553813</td>
+      <td>143.553813</td>
+      <td>-53.553813</td>
+      <td>-53.553813</td>
+      <td>285.552685</td>
+      <td>-3.133063</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 22:30:00-07:00</th>
+      <td>154.080531</td>
+      <td>154.080531</td>
+      <td>-64.080531</td>
+      <td>-64.080531</td>
+      <td>303.037057</td>
+      <td>-3.152909</td>
+    </tr>
+    <tr>
+      <th>1999-12-31 23:30:00-07:00</th>
+      <td>161.842482</td>
+      <td>161.842482</td>
+      <td>-71.842482</td>
+      <td>-71.842482</td>
+      <td>334.208238</td>
+      <td>-3.172747</td>
+    </tr>
+  </tbody>
+</table>
+<p>8760 rows × 6 columns</p>
+</div></div></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">poa_irradiance</span></code> returns a datetime-indexed dataframe as well. Each column contains either the global plane of array irradiance or a particular contribition. Lets look at a time in the index we expect to have daylight.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poa_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;1999-01-01 13:30:00-07:00&#39;</span><span class="p">:</span><span class="s1">&#39;1999-01-01 17:30:00-07:00&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>poa_global</th>
+      <th>poa_direct</th>
+      <th>poa_diffuse</th>
+      <th>poa_sky_diffuse</th>
+      <th>poa_ground_diffuse</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-01-01 13:30:00-07:00</th>
+      <td>90.426538</td>
+      <td>0.0</td>
+      <td>90.426538</td>
+      <td>87.568717</td>
+      <td>2.857821</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 14:30:00-07:00</th>
+      <td>21.921585</td>
+      <td>0.0</td>
+      <td>21.921585</td>
+      <td>21.228780</td>
+      <td>0.692805</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 15:30:00-07:00</th>
+      <td>57.544160</td>
+      <td>0.0</td>
+      <td>57.544160</td>
+      <td>55.725547</td>
+      <td>1.818613</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 16:30:00-07:00</th>
+      <td>7.307195</td>
+      <td>0.0</td>
+      <td>7.307195</td>
+      <td>7.076260</td>
+      <td>0.230935</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 17:30:00-07:00</th>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">temperature.module</span></code> has several optional parameters. Below is an example which explicity uses all of the default values. This function will return a datetime-indexed series matching the index of the given weather file. For more options, see the pvlib documentation for temperature models.</p>
+<p><a class="reference external" href="https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html">https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html</a></p>
+<p>The optional arguments are:</p>
+<ul class="simple">
+<li><p>poa : manually enter the POA Irradiance</p></li>
+<li><p>temp_model : choose a PVLIB compatible temperature model</p></li>
+<li><p>conf : choose a recognized module configuration</p></li>
+<li><p>wind_speed_factor : change the empirical wind speed fit paramter</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temp_mod</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">weather_df</span> <span class="o">=</span> <span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">META</span><span class="p">,</span>
+                                    <span class="n">poa</span> <span class="o">=</span> <span class="n">poa_df</span><span class="p">,</span>
+                                    <span class="n">temp_model</span> <span class="o">=</span> <span class="s1">&#39;sapm&#39;</span><span class="p">,</span>
+                                    <span class="n">conf</span><span class="o">=</span> <span class="s1">&#39;open_rack_glass_polymer&#39;</span><span class="p">)</span>
+
+<span class="n">temp_mod</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;1999-01-01 13:30:00-07:00&#39;</span><span class="p">:</span><span class="s1">&#39;1999-01-01 17:30:00-07:00&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1999-01-01 13:30:00-07:00    4.639740
+1999-01-01 14:30:00-07:00    2.425271
+1999-01-01 15:30:00-07:00    1.249262
+1999-01-01 16:30:00-07:00   -0.829008
+1999-01-01 17:30:00-07:00   -2.000000
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="module-humidities">
+<h2>3. Module Humidities<a class="headerlink" href="#module-humidities" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">PVDEG</span></code> can be used to calculate the relative humidity of several layers within a PV module: the outside surface of the module, front ecapsulant, back encapsulant, and backsheet. This can be done with 2 techniques: Automatically and Manually.</p>
+<section id="a-automatic">
+<h3>3.a. Automatic<a class="headerlink" href="#a-automatic" title="Link to this heading">#</a></h3>
+<p>Use the function <code class="docutils literal notranslate"><span class="pre">humidity.module</span></code>. This method does all of the calculations behind the scenes. It requires only 2 inputs (weather data and meta data). It will return a dataframe with all the layers of the module.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rh_module</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+<span class="n">rh_module</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 39.7 was used.
+</pre></div>
+</div>
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>RH_surface_outside</th>
+      <th>RH_front_encap</th>
+      <th>RH_back_encap</th>
+      <th>RH_backsheet</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>1999-01-01 00:30:00-07:00</th>
+      <td>79.39</td>
+      <td>44.198787</td>
+      <td>79.390000</td>
+      <td>79.390000</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 01:30:00-07:00</th>
+      <td>80.84</td>
+      <td>44.198787</td>
+      <td>79.415220</td>
+      <td>80.127610</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 02:30:00-07:00</th>
+      <td>82.98</td>
+      <td>44.198787</td>
+      <td>79.477223</td>
+      <td>81.228611</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 03:30:00-07:00</th>
+      <td>85.01</td>
+      <td>44.198787</td>
+      <td>79.573455</td>
+      <td>82.291727</td>
+    </tr>
+    <tr>
+      <th>1999-01-01 04:30:00-07:00</th>
+      <td>85.81</td>
+      <td>44.198787</td>
+      <td>79.681927</td>
+      <td>82.745964</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="b-manual">
+<h3>3.b. Manual<a class="headerlink" href="#b-manual" title="Link to this heading">#</a></h3>
+<p>Use the individual functions to calculate the RH in each layer. These are named and require more extensive input parameters. This must be done in the correct order:</p>
+<ol class="arabic simple">
+<li><p>Surface Outside</p></li>
+<li><p>Front Encapsulant</p></li>
+<li><p>Back Encapsulant</p></li>
+<li><p>Backsheet</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rh_surface_outside</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">surface_outside</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">],</span>
+                                                       <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
+                                                       <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_mod</span><span class="p">)</span>
+
+<span class="n">rh_front_encap</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">front_encap</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">rh_surface_outside</span><span class="p">,</span>
+                                               <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
+                                               <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_mod</span><span class="p">)</span>
+
+<span class="n">rh_back_encap</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">back_encap</span><span class="p">(</span><span class="n">rh_ambient</span><span class="o">=</span><span class="n">rh_surface_outside</span><span class="p">,</span>
+                                             <span class="n">temp_ambient</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">],</span>
+                                             <span class="n">temp_module</span><span class="o">=</span><span class="n">temp_mod</span><span class="p">)</span>
+
+<span class="n">rh_backsheet</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">backsheet_from_encap</span><span class="p">(</span><span class="n">rh_back_encap</span><span class="o">=</span><span class="n">rh_back_encap</span><span class="p">,</span>
+                                                      <span class="n">rh_surface_outside</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;relative_humidity&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="design-edge-seal-width">
+<h2>4. Design: Edge Seal Width<a class="headerlink" href="#design-edge-seal-width" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pvdeg.design.edge_seal_width</span></code> calculates the width [cm] required for several years of water ingress. If you do not specify the number of years, it will use the default value of 25. As with most <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> functions, we can automatically generate all necessary data if we pass the two arguments (weather_df, meta).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_seal_width</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">edge_seal_width</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">)</span>
+<span class="n">edge_seal_width</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7170984345065904
+</pre></div>
+</div>
+</div>
+</div>
+<p>Lets look at the calculation step by step. To get the estimated edge seal width, we need the following:</p>
+<ol class="arabic simple">
+<li><p>Humidity Saturation Point</p></li>
+<li><p>Edge seal ingress rate ( k ) or the estimated rate of water ingress through edge seal in [cm/hour^0.5]</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">psat</span><span class="p">,</span> <span class="n">psat_avg</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">humidity</span><span class="o">.</span><span class="n">psat</span><span class="p">(</span><span class="n">WEATHER</span><span class="p">[</span><span class="s1">&#39;temp_air&#39;</span><span class="p">])</span>
+
+<span class="n">k</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">edge_seal_ingress_rate</span><span class="p">(</span><span class="n">avg_psat</span><span class="o">=</span><span class="n">psat_avg</span><span class="p">)</span>
+
+<span class="n">edge_seal_width</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">edge_seal_width</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span>
+                                               <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">edge_seal_width</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7170984345065904
+</pre></div>
+</div>
+</div>
+</div>
+<section id="alternate-edge-seal-width">
+<h3>Alternate Edge Seal Width<a class="headerlink" href="#alternate-edge-seal-width" title="Link to this heading">#</a></h3>
+<p>If you have the dew point, or wet-bulb temperature, you can calculate the edge seal width directly.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edge_seal_width</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">edge_seal_width</span><span class="p">(</span><span class="n">weather_df</span><span class="o">=</span><span class="n">WEATHER</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">META</span><span class="p">,</span> <span class="n">from_dew_point</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">edge_seal_width</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.4499535870958669
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "NREL/PVDegradationTools",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials_and_tools"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+
+
+
+
+
+
+                <footer class="prev-next-footer">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intro.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Welcome to the PVDEG Tutorials and Tools</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="2%20-%20Degradation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">2 - Degradation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-humidity-and-edge-seal-width">Module Humidity and Edge Seal Width</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-in-weather-data-and-site-meta-data">1. Reading in Weather Data and Site Meta-Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solar-position-poa-and-module-temperature">2. Solar Position, POA, and Module Temperature</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-humidities">3. Module Humidities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#a-automatic">3.a. Automatic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#b-manual">3.b. Manual</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-edge-seal-width">4. Design: Edge Seal Width</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alternate-edge-seal-width">Alternate Edge Seal Width</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+<div class="bd-footer-content__inner container">
+
+  <div class="footer-item">
+
+<p class="component-author">
+By Matthew Brown, Silvana Ovaitt
+</p>
+
+  </div>
+
+  <div class="footer-item">
+
+
+  <p class="copyright">
+
+      © Copyright 2023.
+      <br/>
+
+  </p>
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+</div>
+          </footer>
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

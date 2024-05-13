@@ -696,7 +696,7 @@ def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
         percentage regeneration to look for. Note that 100% State C will take a very long time,
         whereas in most cases >99% of power is regenerated after NC = ~80%
 
-    rel_tol : float
+    rel_tol : float, default = 1e-05
         The relative tolerance parameter
 
     Returns
@@ -887,6 +887,7 @@ def calc_letid_outdoors(
     tilt=None,
     azimuth=180,
     module_parameters=None,
+    inverter_parameters=None,
     temp_model="sapm",
     temperature_model_parameters="open_rack_glass_polymer",
 ):
@@ -964,6 +965,9 @@ def calc_letid_outdoors(
         full DC power results, so requires either the CEC or SAPM model, (i.e., not PVWatts).
         If None, defaults to "Jinko_Solar_Co___Ltd_JKM260P_60" from the CEC module database.
 
+    inverter_parameters : dict or None, default None
+        pvlib inverter parameters. see pvlib documentation for details. .
+
     temp_model : str, default "sapm"
         pvlib temperature model, either "sapm" or "pvsyst". See pvlib.temperature.
 
@@ -986,7 +990,7 @@ def calc_letid_outdoors(
     # Set up system, run pvlib.modelchain, and get the results we need: cell temp and injection
     lat = float(meta["latitude"])
     lon = float(meta["longitude"])
-    tz = meta["timezone"]
+    tz = meta["tz"]
     elevation = meta["altitude"]
 
     if tilt is None:
@@ -1003,9 +1007,11 @@ def calc_letid_outdoors(
         ]  # a random module from the CEC database
 
     location = pvlib.location.Location(lat, lon, tz, elevation)
-    inverter_parameters = {
-        "pdc0": 1000
-    }  # inverter parameters are hard-coded, because we don't care about AC results
+
+    if inverter_parameters is None:
+        inverter_parameters = {
+            "pdc0": 1000
+        }  # inverter parameters are hard-coded, because we don't care about AC results
 
     system = pvlib.pvsystem.PVSystem(
         surface_tilt=surface_tilt,
