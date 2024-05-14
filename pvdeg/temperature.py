@@ -15,6 +15,41 @@ import pvdeg
 # "fuentes"
 # "ross"
 
+def map_model(temp_model:str, cell_or_mod:str)->callable:
+    """
+    Utility function to map string to pvlib function.
+
+    References
+    ----------
+    https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+    """
+    # sapm_cell_from_module?
+    # prillman diverges from others, used for smoothing/interp      
+
+    # double check that models are in correct maps
+    module = { # only module
+        'sapm' : pvlib.temperature.sapm_module,
+    }
+
+    cell = { # only cell 
+        'sapm' : pvlib.temperature.sapm_cell,
+        'pvsyst' : pvlib.temperature.pvsyst_cell,
+        'ross' : pvlib.temperature.ross,
+        'noct_sam' : pvlib.temperature.noct_sam,  
+        'generic_linear' : pvlib.temperature.generic_linear,
+    }
+
+    agnostic = { # module or cell
+        'faiman' : pvlib.temperature.faiman,
+        'faiman_rad' : pvlib.temperature.faiman_rad,
+        'fuentes' : pvlib.temperature.fuentes,
+    }
+
+    super_map = {'module' : module, 'cell' : cell}
+    combined = agnostic.update(super_map[cell_or_mod])
+
+    return combined[temp_model]
+
 def _wind_speed_factor(temp_model:str, meta:dict, wind_factor:float):
     if temp_model == "sapm":
         wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
@@ -57,7 +92,7 @@ def module(
     weather_df,
     meta,
     poa=None,
-    # model : pvdeg.scenario.TempModel=None,
+    # model : pvdeg.scenario.TempModel=None
     conf="open_rack_glass_polymer",
     temp_model = "sapm",
     wind_factor=0.33,
@@ -97,7 +132,8 @@ def module(
     module_temperature : pandas.DataFrame
         The module temperature in degrees Celsius at each time step.
     """
-    parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
+    if temp_model == 'sapm' or temp_model == 'pvsyst':
+        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
         poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
@@ -111,25 +147,28 @@ def module(
     temp_air=weather_df["temp_air"],
     wind_speed=weather_df["wind_speed"] * wind_speed_factor,
 
+    func = map_model(temp_model)
 
+    from functools import partial
 
-    # TODO put in code for the other models, PVSYS, Faiman,
+    # function may not need all of these parameters, figure out what will be problematic
+    p_func = partial(func, poa_global=poa_global, temp_air=temp_air, wind_speed=wind_speed)
+
+    # determine issues with kwargs?
+    # do they stay in the class or should we pass them in here
     if temp_model == "sapm":
-        module_temperature = pvlib.temperature.sapm_module(
-            poa_global,
-            temp_air,
-            wind_speed,
+        module_temperature = p_func(
+            # add nessecary parameters in here
             a=parameters["a"],
             b=parameters["b"],
-        )
+        )        
 
     else:
         # TODO: add options for temperature model
         print("There are other models but they haven't been implemented yet!")
     return module_temperature
 
-    # function breakdown - required args
-    
+
 
 def cell(
     weather_df,

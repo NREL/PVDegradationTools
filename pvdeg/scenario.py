@@ -131,10 +131,6 @@ class Scenario:
         else:
             raise ValueError(f"{self.name} does not have a path attribute")
    
-# TEST: List of country, state, county
-# add two letter state support, theres a mapping function for these already
-# for non geospatial, just use lat_long, ignore weather arg
-# add error checks for arg types?
     def addLocation(self, 
         # geospatial parameters
         country=None,
@@ -302,7 +298,9 @@ class Scenario:
         module_name,
         racking="open_rack_glass_polymer",  # move ?? split RACKING_CONSTRUCTION
         material="EVA",
-        temperature_model='sapm'
+        temperature_model='sapm',
+        model_coefficients=None,
+        
     ):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
@@ -322,7 +320,10 @@ class Scenario:
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         temp_model : (str)
             select pvlib temperature models. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
-            
+        model_coefficients : (dict), optional
+            provide a dictionary of temperature model coefficents to be used 
+            instead of pvlib defaults. Pvlib temp models: 
+            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
         """
 
         # fetch material parameters (Eas, Ead, So, etc)
@@ -340,9 +341,9 @@ class Scenario:
                 print("Module will be replaced with new instance.")
                 self.modules.pop(i)
 
-        # generate temperature model params
         # TODO: move to temperature based functions
         # temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
+        
 
         # add the module and parameters
         self.modules.append({"module_name": module_name, "material_params": mat_params, "temp_model" : temperature_model})
@@ -505,12 +506,12 @@ class Scenario:
         df_pipeline.to_csv(file_name, index=False)
 
     # TODO: run pipeline on each module added (if releveant)
-    # may only work with one geospatial job in the pipeline
     def runPipeline(self):
         """
-        Runs entire pipeline on scenario object
+        Runs entire pipeline on scenario object. If geospatial, can only run 
+        one job in the pipeline. If not geospatial, can run n jobs 
+        in the pipeline.
         """
-        # roundabout approach, be careful of type of nested dict value, may be df or other, 
         results_series = pd.Series(dtype='object')
 
         if not self.geospatial:
@@ -526,9 +527,7 @@ class Scenario:
                     param_names = set(sig.parameters.keys())
                     return all(param in param_names for param in params)
 
-                # not a compregensive check
-                # will have to dynamically construct kwargs based on function parameters
-                # such as do we need weather or metadata for the function call
+                # not a comprehensive check
                 # if we do this we will need to enforce parameter naming scheme repo wide
 
                 try:
@@ -802,3 +801,16 @@ class Scenario:
         # is cwd the right place?
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
+    
+# abstracts away partial logic
+# move to temperature.py
+class TempModel:
+    def __init__(self, func, kwargs)
+        """Construct partial temperature model function, without poa.
+        Can provide modified coefficients here."""
+        self.func = partial(func, **kwargs)
+
+    def model(self):
+        """Get partial pvlib function from class"""
+
+        return self.func
