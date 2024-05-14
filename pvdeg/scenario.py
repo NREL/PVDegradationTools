@@ -9,10 +9,14 @@ import json
 from inspect import signature
 import warnings
 import pandas as pd
+import xarray as xr
 
 import pprint
 
 # TODO: 
+### WRITE EXPLANATION FOR SINGLE LOCATION STANDOFF TUTORIAL ###
+### TEST PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF ###
+### TEST OTHER FUNCTIONS FOR SINGLE LOCATION TUTORIAL
 # fix .clear(), currently breaks?
 # test adding geospatial data to the secenario
 # combine getValidCounty, getValidState, getValidCounty into one function
@@ -47,8 +51,8 @@ class Scenario:
 
         # only usable for a single location
         # REMOVE THE SAMPLE EMAIL AND API KEY BEFORE FINAL RELEASE
-        email = None, # 'DEMO_KEY'
-        api_key = None, # 'user@mail.com'
+        email = None, 
+        api_key = None, 
         
     ) -> None:
         """
@@ -208,24 +212,24 @@ class Scenario:
 
         # untested
         if not self.geospatial:
-            weather_db = 'PSM3' # wrong type, move this to func arg
-            # valid coordinate input check
+            weather_db = 'PSM3' # should this be PSM3
+
             if isinstance(lat_long, tuple) and all(isinstance(item, float) for item in lat_long) and len(lat_long) == 2:
                 weather_id = lat_long
             else:
                 return ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
 
-            # create kwargs dictionary
             try:
-                weather_arg = {'api_key': self.api_key,
-                            'email': self.email,
-                            'names': 'tmy',
-                            'attributes': [],
-                            'map_variables': True}
+                weather_arg = {
+                    'api_key': self.api_key,
+                    'email': self.email,
+                    'names': 'tmy',
+                    'attributes': [],
+                    'map_variables': True}
             except:
                 raise ValueError(f"email : {self.email} \n api-key : {self.api_key} \n Must provide an email and api key during class initialization")
 
-            point_weather, point_meta = pvdeg.weather.get(weather_db, weather_id, **weather_arg)
+            point_weather, point_meta = pvdeg.weather.get(weather_db, id=weather_id, **weather_arg)
 
             try:
                 # gid type of str when reading from meta
@@ -233,21 +237,20 @@ class Scenario:
             except KeyError:
                 return UserWarning(f"metadata missing location ID")
 
-            # TODO: calculate gid using rex.NSRDBX.lat_long_gis, approach will only work on hpc
+            # TODO: calculate gid using rex.NSRDBX.lat_long_gis, will only work on hpc
             if self.hpc:
                 pass
 
-            # added location for single point, may be misleading, gid should be calulated above
-            self.gids = gid
-            self.weather_data[int(gid)] == point_weather
+            # gid for a single location, may be misleading, should confirm psm3 location id vs nsrdb gid 
+            self.gids = [ int(gid) ]
+            self.meta_data = point_meta
+            self.weather_data = point_weather # just save as a dataframe, give xarray option?
             
-        # untested
         if self.geospatial:
             # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory
 
             # Get weather data
             weather_db = 'NSRDB'
-
             weather_arg = {'satellite': 'Americas',
                         'names': year,
                         'NREL_HPC': True,
@@ -415,16 +418,16 @@ class Scenario:
         for mod in self.modules:
             pp.pprint(mod)
         
-        if self.weather_data:
+        # can't check if dataframe is empty
+        if isinstance(self.weather_data, (pd.DataFrame, xr.Dataset)):
             print(f"scenario weather : {self.weather_data}")
 
-
+    # swapped return values to none
     def updatePipeline(
         self, 
         func=None, 
         func_params=None,
         see_added=False,
-
         ):
         """
         Add a pvdeg function to the scenario pipeline
@@ -449,7 +452,7 @@ class Scenario:
             if func is None or not callable(func):
                 print(f'FAILED: Requested function "{func}" not found')
                 print("Function has not been added to pipeline.")
-                return None
+                return 
 
             params_all = dict(signature(func).parameters)
 
@@ -459,25 +462,22 @@ class Scenario:
             reqs = {name: param for name, param in params_all.items() if param.default is None}
             optional = {name: param for name, param in params_all.items() if name not in reqs}
 
-            ### this should be SUPERSET not subset ###
-            # this will force it to work BUT may cause some parameters to be missed #
-            if not set(func_params.keys()).issubset(set(reqs.keys())):
-                print(func_params.keys())
-                print(reqs.keys())
-                print(f"FAILED: Requestion function {func} did not receive enough parameters")
-                print(f"Requestion function: \n {func} \n ---")
-                print(f"Required Parameters: \n {reqs} \n ---")
-                print(f"Optional Parameters: {optional}")
-                print("Function has not been added to pipeline.")
-                return None
+            if func_params:
+                # this should be SUPERSET not subset #
+                # this will force it to work BUT may cause some parameters to be missed #
+                if not set(func_params.keys()).issubset(set(reqs.keys())):
+                    print(func_params.keys())
+                    print(reqs.keys())
+                    print(f"FAILED: Requestion function {func} did not receive enough parameters")
+                    print(f"Requestion function: \n {func} \n ---")
+                    print(f"Required Parameters: \n {reqs} \n ---")
+                    print(f"Optional Parameters: {optional}")
+                    print("Function has not been added to pipeline.")
+                    return
             
             job_dict = {"job": func, "params": func_params}
             self.pipeline.append(job_dict)
-            
-            # if see_added:
-            #     message = f"{func.__name__} added to pipeline as \n {job_dict}"
-            #     warnings.warn(message, UserWarning)
-
+           
         if self.geospatial:
             # check if we can do geospatial analyis on desired function
             try: 
@@ -503,11 +503,6 @@ class Scenario:
                 message = f"{func.__name__} added to pipeline as \n {job_dict}"
                 warnings.warn(message, UserWarning)
         
-        # if self.geospatial:
-        #     func_address = self.pipeline[0]['geospatial_job']
-        #     qualified_name = f"{func_address.__module__}.{func_address.__name__}"
-        #     print(f"qualified func name : {qualified_name}")
-
         # grabs fully qualified function name from function address
         get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
 
@@ -533,7 +528,21 @@ class Scenario:
             for job in self.pipeline:
                 _func = job['job']
                 _params = job['params']
-                result = _func(**_params)
+
+                # move this to a better place
+                def has_parameters(func, params):
+                    sig = signature(func)
+                    param_names = set(sig.parameters.keys())
+                    return all(param in param_names for param in params)
+
+                if _params:
+                    result = _func(**_params)
+                # note a compregensive check
+                # will have to dynamically construct kwargs based on function parameters
+                # such as do we need weather or metadata for the function call
+                # if we do this we will need to enforce parameter naming scheme
+                elif has_parameters(_func, ['weather_df', 'meta']): 
+                    result = _func(weather_df=self.weather_data, meta=self.meta_data)
 
                 results_dict[job['job'].__name__] = result
 
