@@ -17,15 +17,11 @@ import pprint
 ### WRITE EXPLANATION FOR SINGLE LOCATION STANDOFF TUTORIAL ###
 ### TEST PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF ###
 ### TEST OTHER FUNCTIONS FOR SINGLE LOCATION TUTORIAL
-# fix .clear(), currently breaks?
-# test adding geospatial data to the secenario
-# combine getValidCounty, getValidState, getValidCounty into one function
-# rename see_added_function, see_added_location flags to just flag or see_added
-# dask cluster on initialization? or on pipeline run?
+### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES
+### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
 
-# SOLVE LATER:
-# resolve spillage between class instances
-# how do we save the weather at locations (project points)
+# combine getValidCounty, getValidState, getValidCounty into one function
+# dask cluster on initialization? or on pipeline run?
 
 class Scenario:
     """
@@ -43,18 +39,15 @@ class Scenario:
         pipeline=[],
         file=None,
         results=None,
-        # are these valuable
-        hpc=False,
-        geospatial=False,
-        weather_data=None, # xarray ds when geospatial
-        meta_data = None, # dataframe when geospatial
 
-        # only usable for a single location
-        # REMOVE THE SAMPLE EMAIL AND API KEY BEFORE FINAL RELEASE
+        hpc=False, # may not need the hpc attribute, how to check for hpc environment (kestrel, eagle or aws) at runtime
+        geospatial=False,
+        weather_data=None, # df when single, xr.ds when geospatial
+        meta_data = None, # dict when single, df when geospatial
+
         email = None, 
         api_key = None, 
-        
-    ) -> None:
+    ):
         """
         Initialize the degradation scenario object.
 
@@ -707,71 +700,44 @@ class Scenario:
 
         return weather_ds, meta_df
 
-    def getValidCountries():
-        """
-        Gets all valid of country names in the NSRDB in the year 2022
-
-        Returns
-        -------
-        valid_countries : numpy.ndarray
-            list of strings representing all unique country entries in the NSRDB
-        """
-        discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
-
-        return meta_df['country'].unique()
-
-    def getValidStates(
-        country : str = None
-        ):
-        """
-        Gets all valid of state/province names in the NSRDB in the year 2022
-
-        Parameters
-        ----------
-        country : str
-            select target country to view states/provices in
-
-        Returns
-        -------
-        valid_states : numpy.ndarray
-            list of strings representing all unique state entries in the NSRDB
-        """
-        discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
-
-        # probably a cleaner one liner to do this
-        if country:
-            meta_df=meta_df[meta_df['country'] == country]
-        
-        return meta_df['state'].unique()
-
-    def getValidCounties(
+    def getValidRegions(
+        self,
         country : str = None,
-        state : str = None
+        state : str = None,
+        county : str = None,
+        target_region : str = None,
         ):
         """
-        Gets all valid of county names in the NSRDB in the year 2022
-
-        Parameters
-        ----------
-        country : str
-            target country to view states/provices in
-        state : str
-            target state to view counties in 
+        Gets all valid region names in the NSRDB. Only works on hpc
+        
+        Arguments
+        ---------
+        country : str, optional
+        state : str, optional
+        country : str, optional
+        target_region : str
+            Select return field. Options ``country``, ``state``, ``county``.  
 
         Returns
         -------
-        valid_states : numpy.ndarray
-            list of strings representing all unique county entries in the NSRDB
+        valid_regions : numpy.ndarray
+            list of strings representing all unique region entries in the nsrdb.
         """
+ 
+        if not self.geospatial: # add hpc check
+            return AttributeError(f"self.geospatial should be True. Current value = {self.geospatial}")
+
+        # use rex instead
         discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
 
-        # probably a cleaner one liner to do this
         if country:
             meta_df=meta_df[meta_df['country'] == country]
         if state:
             meta_df=meta_df[meta_df['state'] == state]
-
-        return meta_df['county'].unique()
+        if county:
+            meta_df=meta_df[meta_df['county'] == county]
+        
+        return meta_df[target_region].unique() 
 
     def dump(
         self,
