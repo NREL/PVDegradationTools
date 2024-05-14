@@ -11,6 +11,8 @@ import warnings
 import pandas as pd
 import xarray as xr
 
+from functools import partial
+
 import pprint
 
 # TODO: 
@@ -20,7 +22,6 @@ import pprint
 ### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES
 ### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
 
-# combine getValidCounty, getValidState, getValidCounty into one function
 # dask cluster on initialization? or on pipeline run?
 
 class Scenario:
@@ -94,8 +95,7 @@ class Scenario:
 
         if geospatial and api_key:
             raise ValueError("Cannot use an api key on hpc, NSRDB files exist locally")
-        # only if not geospatial
-        self.api_key = api_key
+        self.api_key = api_key # only if not geospatial
         self.email = email
 
         filedate = dt.strftime(date.today(), "%d%m%y")
@@ -528,35 +528,48 @@ class Scenario:
                     param_names = set(sig.parameters.keys())
                     return all(param in param_names for param in params)
 
-                if _params:
-                    result = _func(**_params)
-                # note a compregensive check
+                # not a compregensive check
                 # will have to dynamically construct kwargs based on function parameters
                 # such as do we need weather or metadata for the function call
-                # if we do this we will need to enforce parameter naming scheme
-                elif has_parameters(_func, ['weather_df', 'meta']): 
-                    result = _func(weather_df=self.weather_data, meta=self.meta_data)
+                # if we do this we will need to enforce parameter naming scheme repo wide
+
+                try:
+                    # try to populate with weather and meta
+                    # could fail if function signature has wrong names or if we
+                    # haven't added a location, can provide weather and meta in
+                    # a kwargs argument
+                    _func = partial(
+                        _func, 
+                        weather_df=self.weather_data, 
+                        meta=self.meta_data
+                        )
+                except:
+                    pass
+
+                result = _func(**_params) if _params else _func()
 
                 results_dict[job['job'].__name__] = result
 
                 # move standard results to single dictionary
                 pipeline_results = results_dict
         
-            # all job results -> pd.Series[pd.DataFrame]
+            # save all results to dataframes and store in a series
             for key in pipeline_results.keys():
                 print(f"results_dict dtype : {type(results_dict[key])}")
                 print(results_dict)
 
-                # properly store dataframe in results series
                 if isinstance(results_dict[key], pd.DataFrame):
                     results_series[key] = results_dict[key]
 
-                # implement instance check and convert to df for other return types
-                # should all be stored as dataframes in results
+                elif isinstance(results_dict[key], (float, int)):
+                    results_series[key] = pd.DataFrame(
+                        [ results_dict[key] ], # convert the single numeric to a list
+                        columns=[key] # name the single column entry in list form
+                        )
+
                 self.results = results_series
 
         if self.geospatial:
-
 
             # TODO : 
             # move dask client intialization? add dask parameters to runPipeline method
