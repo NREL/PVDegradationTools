@@ -15,12 +15,51 @@ import pvdeg
 # "fuentes"
 # "ross"
 
+def _wind_speed_factor(temp_model:str, meta:dict, wind_factor:float):
+    if temp_model == "sapm":
+        wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
+    elif temp_model == "pvsyst":
+        wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
+    elif temp_model == "faiman":
+        wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
+    elif temp_model == "faiman_rad":
+        wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
+    elif temp_model == "fuentes":
+        wind_speed_factor = (5 / float(meta["wind_height"])) ** wind_factor
+    elif temp_model == "ross":
+        wind_speed_factor = (
+            10 / float(meta["wind_height"])
+        ) ** wind_factor  # I had to guess what this one was
+    elif temp_model == "noct_sam":
+        if meta["wind_height"] > 3:
+            wind_speed_factor = 2
+        else:
+            wind_speed_factor = (
+                1  # The wind speed height is managed weirdly for this one.
+            )
+    elif temp_model == "prilliman":
+        wind_speed_factor = (
+            1  # this model will take the wind speed height in and do an adjustment.
+        )
+    elif temp_model == "generic_linear":
+        wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
+    elif temp_model == "GenericLinearModel":
+        wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
+        # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
+        # An appropriate facter will need to be figured out.
+    else:
+        wind_speed_factor = 1  # this is just hear for completeness.
+
+    return wind_speed_factor
+
+
 def module(
     weather_df,
     meta,
     poa=None,
-    temp_model="sapm",
+    # model : pvdeg.scenario.TempModel=None,
     conf="open_rack_glass_polymer",
+    temp_model = "sapm",
     wind_factor=0.33,
     module_kwarg=None
 ):
@@ -31,12 +70,18 @@ def module(
     ----------
     weather_df : (pd.dataframe)
         Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
+    meta : (dict)
+        Weather meta-data dictionary (location info)
     poa : pandas.DataFrame
          Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
          'poa_sky_diffuse', 'poa_ground_diffuse'.
+
+    model : pvdeg.scenario.TempModel
+
     temp_model : str, optional
         The temperature model to use, Sandia Array Performance Model 'sapm'
         from pvlib by default.
+
     conf : str, optional
         The configuration of the PV module architecture and mounting
         configuration.
@@ -59,46 +104,16 @@ def module(
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
-        if temp_model == "sapm":
-            wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
-        elif temp_model == "pvsyst":
-            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-        elif temp_model == "faiman":
-            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-        elif temp_model == "faiman_rad":
-            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-        elif temp_model == "fuentes":
-            wind_speed_factor = (5 / float(meta["wind_height"])) ** wind_factor
-        elif temp_model == "ross":
-            wind_speed_factor = (
-                10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess what this one was
-        elif temp_model == "noct_sam":
-            if meta["wind_height"] > 3:
-                wind_speed_factor = 2
-            else:
-                wind_speed_factor = (
-                    1  # The wind speed height is managed weirdly for this one.
-                )
-        elif temp_model == "prilliman":
-            wind_speed_factor = (
-                1  # this model will take the wind speed height in and do an adjustment.
-            )
-        elif temp_model == "generic_linear":
-            wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
-        elif temp_model == "GenericLinearModel":
-            wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-            # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
-            # An appropriate facter will need to be figured out.
-        else:
-            wind_speed_factor = 1  # this is just hear for completeness.
-    # TODO put in code for the other models, PVSYS, Faiman,
+        wind_speed_factor = _wind_speed_factor(temp_model, meta, wind_factor)
 
     # moved outside of conditionals
     poa_global=poa["poa_global"],
     temp_air=weather_df["temp_air"],
     wind_speed=weather_df["wind_speed"] * wind_speed_factor,
 
+
+
+    # TODO put in code for the other models, PVSYS, Faiman,
     if temp_model == "sapm":
         module_temperature = pvlib.temperature.sapm_module(
             poa_global,
@@ -108,49 +123,13 @@ def module(
             b=parameters["b"],
         )
 
-    # NEW temperature models
-    # elif temp_model == "pvsyst":
-    #     # this wants to be cell not module???
-    #     # module_temperature = pvlib.temperature.
-    #     pass
-
-    # elif temp_model == "faiman":
-    #     module_temperature = pvlib.temperature.faiman(
-    #         poa_global=poa_global, 
-    #         temp_air=temp_air,
-    #         wind_speed=wind_speed,
-    #     )
-
-    # elif temp_model == "faiman_rad":
-    #     module_temperature = pvlib.temperature.faiman_rad(
-    #         poa_global=poa_global, 
-    #         temp_air=temp_air,
-    #         wind_speed=wind_speed,
-    #     )        
-
-    # elif temp_model == "fuentes":
-    #     pass
-
-    # elif temp_model == "ross":
-    #     pass
-
-    # elif temp_model == "noct_sam":
-    #     pass
-
-    # elif temp_model == "prilliman":
-    #     pass
-
-    # elif temp_model == "generic_linear":
-    #     pass
-
-    # elif temp_model == "GenericLinearModel":
-    #     pass
-
     else:
         # TODO: add options for temperature model
         print("There are other models but they haven't been implemented yet!")
     return module_temperature
 
+    # function breakdown - required args
+    
 
 def cell(
     weather_df,
