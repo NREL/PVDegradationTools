@@ -16,10 +16,15 @@ from functools import partial
 import pprint
 
 # TODO: 
-### TEST PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF ###
-### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES
+### FIX PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF, doesn't work right now ###
+### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES, single pipeline job is not correct, we cant save weather dataframe to csv
 ### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
+### TEMPERATURE MODELS on module add ###
 
+### Rename: updatePipeline-> addJob, runPipeline -> run
+
+# @ martin
+# wind factor in class intialization or module?
 # dask cluster on initialization? or on pipeline run?
 
 class Scenario:
@@ -124,8 +129,8 @@ class Scenario:
         """
         if self.path:
             try:
-                rmtree(path=self.path)
-                os.chdir(os.pardir)
+                rmtree(path=self.path) # does this only delete files?
+                os.chdir(os.pardir) # not deleting directory properly?
             except:
                 raise FileNotFoundError(f"cannot remove {self.name} directory")
         else:
@@ -293,14 +298,15 @@ class Scenario:
         #     out_fn=file_name,
         # )
 
+    # how do we know to use cell or module temperature
     def addModule(
         self,
-        module_name,
-        racking="open_rack_glass_polymer",  # move ?? split RACKING_CONSTRUCTION
-        material="EVA",
-        temperature_model='sapm',
-        model_coefficients=None,
-        
+        module_name:str = None,
+        racking:str="open_rack_glass_polymer",  # move ?? split RACKING_CONSTRUCTION
+        material:str="EVA",
+        temperature_model:str='sapm',
+        model_args:dict=None,
+        see_added:bool=False,
     ):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
@@ -320,10 +326,11 @@ class Scenario:
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         temp_model : (str)
             select pvlib temperature models. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
-        model_coefficients : (dict), optional
+        model_args : (dict), optional
             provide a dictionary of temperature model coefficents to be used 
             instead of pvlib defaults. Pvlib temp models: 
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        see_added : (bool), optional
         """
 
         # fetch material parameters (Eas, Ead, So, etc)
@@ -342,13 +349,21 @@ class Scenario:
                 self.modules.pop(i)
 
         # TODO: move to temperature based functions
-        # temp_params = TEMPERATURE_MODEL_PARAMETERS[model][racking]
         
 
         # add the module and parameters
-        self.modules.append({"module_name": module_name, "material_params": mat_params, "temp_model" : temperature_model})
-        print(f'Module "{module_name}" added.')
+        self.modules.append({
+            "module_name": module_name, 
+            "racking" : racking,
+            "material_params": mat_params, 
+            "temp_model" : temperature_model,
+            "model_args" : model_args,
+            })
 
+        if see_added:
+            print(f'Module "{module_name}" added.')
+
+    # test this?
     def add_material(
         self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True
     ):
@@ -369,7 +384,8 @@ class Scenario:
         print("Material has been added.")
         print("To add the material as a module in your current scene, run .addModule()")
 
-    # this is kind of a mess, redo using ironpython special printing like for xarray dataset
+    # kind of a mess
+    # redo using ironpython special printing like for xarray dataset
     def viewScenario(self):
         """
         Print all scenario information currently stored in the scenario instance
@@ -414,7 +430,7 @@ class Scenario:
         if isinstance(self.weather_data, (pd.DataFrame, xr.Dataset)):
             print(f"scenario weather : {self.weather_data}")
 
-    # swapped return values to none
+
     def updatePipeline(
         self, 
         func=None, 
@@ -505,7 +521,7 @@ class Scenario:
         file_name = f"pipeline_{self.name}.csv"
         df_pipeline.to_csv(file_name, index=False)
 
-    # TODO: run pipeline on each module added (if releveant)
+    # TODO: run pipeline on each module 
     def runPipeline(self):
         """
         Runs entire pipeline on scenario object. If geospatial, can only run 
@@ -517,39 +533,47 @@ class Scenario:
         if not self.geospatial:
             results_dict = {}
 
-            for job in self.pipeline:
-                _func = job['job']
-                _params = job['params']
+            # we need do the pipeline for every module available
+            if self.modules:
+                for module in self.modules: # list{dict} with keys module_name, racking, material_params, temp_model, model_args
 
-                # move this to a better place
-                def has_parameters(func, params):
-                    sig = signature(func)
-                    param_names = set(sig.parameters.keys())
-                    return all(param in param_names for param in params)
+                    # need to create tempeature model, could refactor into temperature module
 
-                # not a comprehensive check
-                # if we do this we will need to enforce parameter naming scheme repo wide
-
-                try:
-                    # try to populate with weather and meta
-                    # could fail if function signature has wrong names or if we
-                    # haven't added a location, can provide weather and meta in
-                    # a kwargs argument
-                    _func = partial(
-                        _func, 
-                        weather_df=self.weather_data, 
-                        meta=self.meta_data
-                        )
-                except:
+                    # run entire pipeline
                     pass
 
-                result = _func(**_params) if _params else _func()
 
-                results_dict[job['job'].__name__] = result
+            # no modules case
+            # if there are no modules then we still want to do the pipeline once
+            elif not self.modules:
+                for job in self.pipeline:
+                    _func = job['job']
+                    _params = job['params']
 
-                # move standard results to single dictionary
-                pipeline_results = results_dict
-        
+                    # not a comprehensive check
+                    # if we do this we will need to enforce parameter naming scheme repo wide
+                    try:
+                        # try to populate with weather and meta
+                        # could fail if function signature has wrong names or if we
+                        # haven't added a location, can provide weather and meta in
+                        # a kwargs argument
+
+                        # if 'weather_df' not in _params.keys(): # make sure they havent provided weather in the job arguments
+                        _func = partial(
+                            _func, 
+                            weather_df=self.weather_data, 
+                            meta=self.meta_data
+                            )
+                    except:
+                        pass
+
+                    result = _func(**_params) if _params else _func()
+
+                    results_dict[job['job'].__name__] = result
+
+                    # move standard results to single dictionary
+                    pipeline_results = results_dict
+            
             # save all results to dataframes and store in a series
             for key in pipeline_results.keys():
                 print(f"results_dict dtype : {type(results_dict[key])}")
@@ -801,16 +825,3 @@ class Scenario:
         # is cwd the right place?
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
-    
-# abstracts away partial logic
-# move to temperature.py
-class TempModel:
-    def __init__(self, func, kwargs)
-        """Construct partial temperature model function, without poa.
-        Can provide modified coefficients here."""
-        self.func = partial(func, **kwargs)
-
-    def model(self):
-        """Get partial pvlib function from class"""
-
-        return self.func
