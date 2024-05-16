@@ -5,6 +5,7 @@ Collection of classes and functions to calculate different temperatures.
 import pvlib
 import pvdeg
 from functools import partial
+import inspect
 
 def map_model(temp_model:str, cell_or_mod:str)->callable:
     """
@@ -236,14 +237,17 @@ def cell(
 
     return temp_cell
 
+# move to scenario method?
+# no reason we have to be providing a reference to the scenario could swap for weather and meta params
 def scenario_temperature(
     scenario = pvdeg.scenario.Scenario,
     poa=None,
     temp_model="sapm",
-    conf="open_rack_glass_polymer",
+    conf="open_rack_glass_polymer", # only for sapm and pvsys
     wind_factor=0.33,
     cell_or_mod=None, # 'cell' or 'mod'
-    module_kwarg=None,
+    irradince_kwarg=None,
+    model_kwarg=None,
     ):
 
     weather_df = scenario.weather_data
@@ -254,12 +258,47 @@ def scenario_temperature(
     else:
         wind_speed_factor = _wind_speed_factor(temp_model, meta, wind_factor)
 
-    poa = pvdeg.spectral.poa_irradiance(weather_df, meta) # need seperate kwargs? like poa kwargs for angle, tilt, azimuth, model?
+    if temp_model in ['sapm', 'pvsys']:
+        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
-    poa_global=poa["poa_global"],
-    temp_air=weather_df["temp_air"],
-    wind_speed=weather_df["wind_speed"] * wind_speed_factor,
- 
+    # will break if none in the kwarg
+    poa = pvdeg.spectral.poa_irradiance(weather_df, meta, **irradince_kwarg) # seperate kwargs like poa kwargs for angle, tilt, azimuth, model?
+
+    # ALWAYS try to apply all of these to the temp model, 
+    # irrelevant key,value pair will be ignored (NO ERROR)
+    weather_args = {
+    'poa_global' : poa["poa_global"],
+    'temp_air' : weather_df["temp_air"],
+    'wind_speed' : weather_df["wind_speed"] * wind_speed_factor, # what if we dont always want the wind, can be overwritten by the model_kwarg
+    }
+
+    # only apply nessecary values to the model, 
+    # gets signature for checks
     func = map_model(temp_model, cell_or_mod)
+    sig = inspect.signature(func)
 
-    # not all may need the folllowing but we can throw at them and try
+    # unpack signature into list for merging all dictionaries
+    model_args = {
+        k: (v.default if v.default is not inspect.Parameter.empty else None)
+        for k,v in sig.parameters.items()
+    }
+
+    # if key is present update the value in the function signature
+    for key in model_args:
+        # we only want to update the values with matching keys
+        if key in model_args:
+            model_args[key] = weather_args[key]
+   
+    # calculated based on material for sapm and pvsys
+    if parameters:
+        model_args.update(parameters)
+    
+    # add optional kwargs
+    # rename model_args?
+    model_args.update(**model_kwarg)
+    
+    # temp calc using dynamic model
+    temperature = func(**model_args)
+
+    return temperature
+
