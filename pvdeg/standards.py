@@ -502,12 +502,12 @@ def T98_estimate(
     )
 
     T_inf = temperature.cell(
-        weather_df,
-        meta,
-        poa,
-        temp_model,
-        conf_inf,
-        wind_factor,
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf_inf=conf_inf,
+        wind_factor=wind_factor,
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
@@ -515,12 +515,12 @@ def T98_estimate(
         return T98_inf
     else:
         T_0 = temperature.cell(
-            weather_df,
-            meta,
-            poa,
-            temp_model,
-            conf_0,
-            wind_factor,
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            temp_model=temp_model,
+            conf_0=conf_0,
+            wind_factor=wind_factor,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
         T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
