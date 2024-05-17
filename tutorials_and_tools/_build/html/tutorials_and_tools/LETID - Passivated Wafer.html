@@ -1,0 +1,1626 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LETID - Passivated Wafer &#8212; PVDEG Tutorials</title>
+
+
+
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials_and_tools/LETID - Passivated Wafer';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ASTM Demonstration" href="ASTM%20Live%20Demo.html" />
+    <link rel="prev" title="LETID - Outdoor Scenario Based on Accelerated Test" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+
+
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+
+
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+
+  <div id="pst-scroll-pixel-helper"></div>
+
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+    </header>
+
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+
+
+
+      <div class="bd-sidebar-primary bd-sidebar">
+
+
+
+  <div class="sidebar-header-items sidebar-primary__section">
+
+
+
+
+  </div>
+
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+
+
+<a class="navbar-brand logo" href="../intro.html">
+
+
+
+
+
+
+
+
+
+
+    <img src="../_static/PVD_logo.png" class="logo__image only-light" alt="PVDEG Tutorials - Home"/>
+    <script>document.write(`<img src="../_static/PVD_logo.png" class="logo__image only-dark" alt="PVDEG Tutorials - Home"/>`);</script>
+
+
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome to the PVDEG Tutorials and Tools
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1%20-%20Basics%2C%20Humidity%2C%20Design.html">1 - Basics, Humidity, Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4%20-%20Weather%20Database%20Access.html">4 - Weather Database Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html">Tools - Module Standoff for IEC TS 63126</a></li>
+<li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">LETID - Outdoor Scenario Based on Accelerated Test</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">LETID - Passivated Wafer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+
+
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+
+      <main id="main-content" class="bd-main">
+
+
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+
+    <div class="header-article-items__start">
+
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+
+    </div>
+
+
+    <div class="header-article-items__end">
+
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials_and_tools/LETID - Passivated Wafer.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+
+
+
+
+      <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2Ftutorials_and_tools/LETID - Passivated Wafer.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+
+
+
+      <li><a href="../_sources/tutorials_and_tools/LETID - Passivated Wafer.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+
+
+
+
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+
+    </div>
+
+</div>
+</div>
+
+
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>LETID - Passivated Wafer</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-parameters">Device parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#degradation-parameters">Degradation parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#demonstrate-calculation-of-dn-x-ij">Demonstrate calculation of dn^x_ij</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Degradation parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-timeseries">Set up timeseries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-through-timesteps">Run through timesteps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finish-calculating-degraded-device-parameters">Finish calculating degraded device parameters.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-results">Plot the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-model-results-to-experimental-data">Compare model results to experimental data</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="searchbox"></div>
+                <article class="bd-article">
+
+  <section class="tex2jax_ignore mathjax_ignore" id="letid-passivated-wafer">
+<h1>LETID - Passivated Wafer<a class="headerlink" href="#letid-passivated-wafer" title="Link to this heading">#</a></h1>
+<p>This example shows how to simulate an accelerated test performed on a well-passivated Si wafer, rather than a solar cell.
+In a well-passivated wafer, carrier injection (<span class="math notranslate nohighlight">\(\Delta n\)</span>) is linearly proportional to carrier lifetime, assuming surface recombination velocity can be approximated to be zero.</p>
+<p>LETID and boron-oxygen LID defect transitions are known to accelerate with increased carrier injection, by term <span class="math notranslate nohighlight">\(\Delta n^{x_{ij}}\)</span>, where <span class="math notranslate nohighlight">\(x_{ij}\)</span> is different for each transition <span class="math notranslate nohighlight">\(i \rightarrow j\)</span> and is related to the stoichiometric involvement of excess carriers in the defect reaction.</p>
+<p><strong>Requirements:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pandas</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code></p></li>
+</ul>
+<p><strong>Objectives:</strong></p>
+<ol class="arabic simple">
+<li><p>Define necessary wafer device parameters</p></li>
+<li><p>Define necessary degradation parameters: degraded lifetime and defect states</p></li>
+<li><p>Create timeseries of temperature and injection</p></li>
+<li><p>Run through timeseries, calculating defect states</p></li>
+<li><p>Calculate device degradation and plot</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+<span class="c1"># !pip install pvdeg==0.3.3</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">letid</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">utilities</span><span class="p">,</span> <span class="n">DATA_DIR</span>
+<span class="kn">import</span> <span class="nn">pvdeg</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">platform</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Working on a &quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python version &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pandas version &quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pvdeg version &quot;</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Windows 10
+Python version  3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]
+Pandas version  2.2.0
+pvdeg version  0.2.4.dev83+ge2ceab9.d20240422
+</pre></div>
+</div>
+</div>
+</div>
+<section id="device-parameters">
+<h2>Device parameters<a class="headerlink" href="#device-parameters" title="Link to this heading">#</a></h2>
+<p>For modeling a wafer, we don’t need as many device parameters. Wafer thickness, lifetime, and an optical generation profile, which allows us to calculate generation current, which we take to be device current assuming surface recombination is very low.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wafer_thickness</span> <span class="o">=</span> <span class="mi">180</span> <span class="c1"># um</span>
+<span class="n">tau</span> <span class="o">=</span> <span class="mi">350</span> <span class="c1"># us, lifetime of the wafer for demonstration purposes</span>
+
+<span class="n">generation_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;PVL_GenProfile.xlsx&#39;</span><span class="p">),</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># this is an optical generation profile generated by PVLighthouse&#39;s OPAL2 default model for 1-sun, normal incident AM1.5 sunlight on a 180-um thick SiNx-coated, pyramid-textured wafer.</span>
+<span class="n">generation</span> <span class="o">=</span> <span class="n">generation_df</span><span class="p">[</span><span class="s1">&#39;Generation (cm-3s-1)&#39;</span><span class="p">]</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">generation_df</span><span class="p">[</span><span class="s1">&#39;Depth (um)&#39;</span><span class="p">]</span>
+
+<span class="n">j_gen</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">generation_current</span><span class="p">(</span><span class="n">generation</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="degradation-parameters">
+<h2>Degradation parameters<a class="headerlink" href="#degradation-parameters" title="Link to this heading">#</a></h2>
+<p>Here we’ll model LETID under 0.5-sun, open-circuit injection. In a passivated wafer, recombination per volume (<span class="math notranslate nohighlight">\(\frac{\Delta n}{\tau}\)</span>) must equal generation per volume (<span class="math notranslate nohighlight">\(\frac{Jq}{W}\)</span>), which gives <span class="math notranslate nohighlight">\(\Delta n = \frac{Jq\tau}{W}\)</span></p>
+<p>The term <span class="math notranslate nohighlight">\(\Delta n^{x_{ij}}\)</span> is calculated for wafers by the function <code class="docutils literal notranslate"><span class="pre">letid.carrier_factor_wafer</span></code>, which adjusts the rate of the transition <span class="math notranslate nohighlight">\(i \rightarrow j\)</span> for <span class="math notranslate nohighlight">\(\Delta n\)</span>.</p>
+<p>Since kinetic parameters are taken from literature that may have used different <span class="math notranslate nohighlight">\(\Delta n\)</span>, we adjust transitions by the ratio <span class="math notranslate nohighlight">\(\frac{\Delta n}{\Delta n_{lit}}\)</span>.</p>
+<p>See <a class="reference external" href="https://doi.org/10.1557/s43577-022-00438-8">Repins <em>et al.</em> 2023</a> for more details.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mechanism_params</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_kinetics</span><span class="p">(</span><span class="s1">&#39;repins&#39;</span><span class="p">)</span>
+<span class="n">injection</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1">#</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="demonstrate-calculation-of-dn-x-ij">
+<h3>Demonstrate calculation of dn^x_ij<a class="headerlink" href="#demonstrate-calculation-of-dn-x-ij" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Calculate <span class="math notranslate nohighlight">\(\Delta n\)</span> of the wafer</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">elementary_charge</span> <span class="k">as</span> <span class="n">q</span> <span class="c1"># Elementary charge, C</span>
+
+<span class="n">dn</span> <span class="o">=</span> <span class="p">(((</span><span class="n">j_gen</span> <span class="o">*</span> <span class="mf">0.001</span> <span class="o">*</span> <span class="mi">10000</span> <span class="o">*</span> <span class="n">injection</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">tau</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">))</span><span class="o">/</span> <span class="p">(</span><span class="n">wafer_thickness</span> <span class="o">*</span> <span class="mf">1e-6</span><span class="p">)</span><span class="o">/</span> <span class="n">q</span><span class="p">)</span> <span class="c1"># calculate excess carrier density</span>
+<span class="n">dn</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2.57051594134322e+21
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Calculate <span class="math notranslate nohighlight">\(\Delta n_{lit}\)</span>, the excess carrier density from the literature experiments where kinetic parameters were determined.
+Assuming literature experiments were carried out on cells, this requires using the <code class="docutils literal notranslate"><span class="pre">calc_dn</span></code> function</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">convert_temperature</span>
+
+<span class="n">transition</span> <span class="o">=</span> <span class="s1">&#39;bc&#39;</span> <span class="c1"># for this example we&#39;ll look at the B -&gt; C transition</span>
+
+<span class="n">meas_tau</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;tau_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="n">meas_temp</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;temperature_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="n">meas_temp</span> <span class="o">=</span> <span class="n">convert_temperature</span><span class="p">(</span><span class="n">meas_temp</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">)</span>
+<span class="n">meas_suns</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;suns_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="n">meas_jsc</span> <span class="o">=</span> <span class="mi">40</span>
+<span class="n">meas_wafer_thickness</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;thickness_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="n">meas_srv</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;srv_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="n">meas_structure</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;structure_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+
+<span class="n">dn_lit</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">calc_dn</span><span class="p">(</span>
+                    <span class="n">meas_tau</span><span class="p">,</span>
+                    <span class="n">meas_temp</span><span class="p">,</span>
+                    <span class="n">meas_suns</span><span class="p">,</span>
+                    <span class="n">meas_jsc</span><span class="p">,</span>
+                    <span class="n">wafer_thickness</span><span class="o">=</span><span class="n">meas_wafer_thickness</span><span class="p">,</span>
+                    <span class="n">s_rear</span><span class="o">=</span><span class="n">meas_srv</span><span class="p">,</span>
+                <span class="p">)</span>
+<span class="n">dn_lit</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>7.064647199192719e+20
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="arabic simple" start="3">
+<li><p>Return the exponent <span class="math notranslate nohighlight">\(x_{ij}\)</span> of the transition in question</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">exponent</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;x_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="n">exponent</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.2
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Calculate <span class="math notranslate nohighlight">\((\frac{\Delta n}{\Delta n_{lit}})^{x_{ij}}\)</span>. This is the acceleration factor of the transition due to excess carriers.</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">dn</span><span class="o">/</span><span class="n">dn_lit</span><span class="p">)</span><span class="o">**</span><span class="n">exponent</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.711029107876425
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># the &quot;carrier_factor_wafer&quot; function yields the same result</span>
+
+<span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="n">transition</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4.711029107876425
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="id1">
+<h2>Degradation parameters<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<p>To model the device’s degradation, we need to define several more important quantities about the degradation the device will experience. These include undegraded and degraded lifetime (in <span class="math notranslate nohighlight">\(\mu s\)</span>), and starting defect state percentages</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tau_0</span> <span class="o">=</span> <span class="mi">350</span> <span class="c1"># us, carrier lifetime in non-degraded states, e.g. LETID/LID states A or C</span>
+<span class="n">tau_deg</span> <span class="o">=</span> <span class="mi">41</span> <span class="c1"># us, carrier lifetime in fully-degraded state, e.g. LETID/LID state B</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># starting defect state percentages</span>
+<span class="n">nA_0</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">nB_0</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">nC_0</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">mechanism_params</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_kinetics</span><span class="p">(</span><span class="s1">&#39;repins&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;mechanism&#39;: &#39;LETID&#39;, &#39;v_ab&#39;: 46700000.0, &#39;v_ba&#39;: 4.7e-25, &#39;v_bc&#39;: 19900000.0, &#39;v_cb&#39;: 0.0, &#39;ea_ab&#39;: 0.827, &#39;ea_ba&#39;: -1.15, &#39;ea_bc&#39;: 0.871, &#39;ea_cb&#39;: 0.0, &#39;suns_ab&#39;: 1.0, &#39;suns_bc&#39;: 1.0, &#39;temperature_ab&#39;: 410, &#39;temperature_bc&#39;: 410, &#39;tau_ab&#39;: 75, &#39;tau_bc&#39;: 75, &#39;x_ab&#39;: 1, &#39;x_ba&#39;: 1.7, &#39;x_bc&#39;: 1.2, &#39;structure_ab&#39;: &#39;cell&#39;, &#39;structure_bc&#39;: &#39;cell&#39;, &#39;thickness_ab&#39;: 200, &#39;thickness_bc&#39;: 200, &#39;srv_ab&#39;: 90, &#39;srv_bc&#39;: 90, &#39;doi&#39;: &#39;doi:10.1557/s43577-022-00438-8&#39;, &#39;comments&#39;: &#39;&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="set-up-timeseries">
+<h2>Set up timeseries<a class="headerlink" href="#set-up-timeseries" title="Link to this heading">#</a></h2>
+<p>In this example, we are going to model a wafer exposed to 0.5 suns illumination at <span class="math notranslate nohighlight">\(125\degree C\)</span> for 24 hours, and compare to experimental data from <a class="reference external" href="https://doi.org/10.1109/JPHOTOV.2021.3078367">Wyller <em>et al.</em>  2021</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temperature</span> <span class="o">=</span> <span class="mi">125</span> <span class="c1"># degrees celsius</span>
+<span class="n">suns</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># &quot;suns&quot; of injection, e.g 1-sun illumination at open circuit would be 1; dark current injection is given as a fraction of Isc, e.g., injecting Isc would be 1. For this example we assume injection is 0.1*Isc.</span>
+
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="s1">&#39;2022-01-01 00:00:00&#39;</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s1">&#39;2022-01-02 00:00:00&#39;</span><span class="p">,</span> <span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">)</span> <span class="c1"># three weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span>
+
+<span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">temperature</span><span class="p">)</span>
+<span class="n">injection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">suns</span><span class="p">)</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temps</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Injection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">injection</span>
+
+<span class="n">timesteps</span><span class="p">[[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below</span>
+
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">nA_0</span><span class="p">,</span> <span class="n">nB_0</span><span class="p">,</span> <span class="n">nC_0</span> <span class="c1"># assign first timestep defect state percentages</span>
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">nB_0</span><span class="p">)</span> <span class="c1"># calculate tau for the first timestep</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\mspringe\AppData\Local\Temp\1\ipykernel_39736\530898593.py:4: FutureWarning: &#39;S&#39; is deprecated and will be removed in a future version, please use &#39;s&#39; instead.
+  timesteps = pd.date_range(start = &#39;2022-01-01 00:00:00&#39;, end = &#39;2022-01-02 00:00:00&#39;, freq = &#39;S&#39;) # three weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Datetime</th>
+      <th>Temperature</th>
+      <th>Injection</th>
+      <th>NA</th>
+      <th>NB</th>
+      <th>NC</th>
+      <th>tau</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2022-01-01 00:00:00</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>100.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>350.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2022-01-01 00:00:01</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2022-01-01 00:00:02</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2022-01-01 00:00:03</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2022-01-01 00:00:04</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>86396</th>
+      <td>2022-01-01 23:59:56</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>86397</th>
+      <td>2022-01-01 23:59:57</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>86398</th>
+      <td>2022-01-01 23:59:58</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>86399</th>
+      <td>2022-01-01 23:59:59</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>86400</th>
+      <td>2022-01-02 00:00:00</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>86401 rows × 7 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="run-through-timesteps">
+<h2>Run through timesteps<a class="headerlink" href="#run-through-timesteps" title="Link to this heading">#</a></h2>
+<p>Since each timestep depends on the preceding timestep, we need to calculate in a loop. This will take a few minutes depending on the length of the timeseries.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+    <span class="c1"># first row tau has already been assigned</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span>
+        <span class="n">n_B</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span>
+        <span class="n">n_C</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]</span>
+
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">j_gen</span> <span class="o">=</span> <span class="n">j_gen</span>
+
+        <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">]</span>
+        <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Injection&#39;</span><span class="p">]</span>
+
+        <span class="c1"># calculate defect reaction kinetics: reaction constant and carrier concentration factor.</span>
+        <span class="n">k_AB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_ab&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_ab&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_BA</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_ba&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_ba&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_BC</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_bc&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_bc&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_CB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_cb&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_cb&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+
+        <span class="n">x_ab</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="n">x_ba</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ba&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="n">x_bc</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;bc&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="c1"># x_cb there is no known excess carrier acceleration factor for the c-&gt;b transition</span>
+
+        <span class="c1"># calculate the instantaneous change in NA, NB, and NC</span>
+        <span class="n">dN_Adt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_ba</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span>
+        <span class="n">dN_Bdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">x_ba</span> <span class="o">+</span> <span class="n">k_BC</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
+
+        <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># assign new defect state percentages</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span><span class="o">*</span><span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_C</span> <span class="o">+</span> <span class="n">dN_Cdt</span><span class="o">*</span><span class="n">t_step</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyboardInterrupt</span><span class="g g-Whitespace">                         </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="n">line</span> <span class="mi">25</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="n">k_BC</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_bc&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_bc&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">23</span> <span class="n">k_CB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_cb&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_cb&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+<span class="ne">---&gt; </span><span class="mi">25</span> <span class="n">x_ab</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">26</span> <span class="n">x_ba</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ba&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+<span class="g g-Whitespace">     </span><span class="mi">27</span> <span class="n">x_bc</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;bc&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+
+<span class="nn">File ~\OneDrive - NREL\msp\projects\2023_DegradationTools\Github\PVDegradationTools\pvdeg\letid.py:278,</span> in <span class="ni">carrier_factor_wafer</span><span class="nt">(tau, transition, suns, jsc, wafer_thickness, mechanism_params, dn_lit)</span>
+<span class="g g-Whitespace">    </span><span class="mi">276</span> <span class="n">meas_tau</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;tau_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">277</span> <span class="n">meas_temp</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;temperature_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="ne">--&gt; </span><span class="mi">278</span> <span class="n">meas_temp</span> <span class="o">=</span> <span class="n">convert_temperature</span><span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">279</span>     <span class="n">meas_temp</span><span class="p">,</span> <span class="s2">&quot;K&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">280</span> <span class="p">)</span>  <span class="c1"># convert Kelvin to Celsius</span>
+<span class="g g-Whitespace">    </span><span class="mi">281</span> <span class="n">meas_suns</span> <span class="o">=</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;suns_</span><span class="si">{</span><span class="n">transition</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+<span class="g g-Whitespace">    </span><span class="mi">282</span> <span class="n">meas_jsc</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="nn">File C:\ProgramData\Anaconda3\envs\pvdeg_311\Lib\site-packages\scipy\constants\_constants.py:273,</span> in <span class="ni">convert_temperature</span><span class="nt">(val, old_scale, new_scale)</span>
+<span class="g g-Whitespace">    </span><span class="mi">233</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">234</span><span class="sd"> Convert from a temperature scale to another one among Celsius, Kelvin,</span>
+<span class="g g-Whitespace">    </span><span class="mi">235</span><span class="sd"> Fahrenheit, and Rankine scales.</span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">    </span><span class="mi">270</span><span class="sd"> </span>
+<span class="g g-Whitespace">    </span><span class="mi">271</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">    </span><span class="mi">272</span> <span class="c1"># Convert from `old_scale` to Kelvin</span>
+<span class="ne">--&gt; </span><span class="mi">273</span> <span class="k">if</span> <span class="n">old_scale</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;celsius&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">]:</span>
+<span class="g g-Whitespace">    </span><span class="mi">274</span>     <span class="n">tempo</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">asanyarray</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">+</span> <span class="n">zero_Celsius</span>
+<span class="g g-Whitespace">    </span><span class="mi">275</span> <span class="k">elif</span> <span class="n">old_scale</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;kelvin&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">]:</span>
+
+<span class="ne">KeyboardInterrupt</span>:
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="finish-calculating-degraded-device-parameters">
+<h2>Finish calculating degraded device parameters.<a class="headerlink" href="#finish-calculating-degraded-device-parameters" title="Link to this heading">#</a></h2>
+<p>Now that we have calculated defect states, we can calculate all the quantities that depend on defect states. Since this is a wafer, device parameters like Jsc, Voc, FF, etc., aren’t really appropriate</p>
+<p>For wafers, results are often presented in terms of normalized defect density (NDD), where</p>
+<p><span class="math notranslate nohighlight">\(NDD(t) = \frac{1}{\tau (t)} - \frac{1}{\tau _0}\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NB&#39;</span><span class="p">])</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">calc_ndd</span><span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">])</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="c1"># create a column for seconds elapsed</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Datetime</th>
+      <th>Temperature</th>
+      <th>Injection</th>
+      <th>NA</th>
+      <th>NB</th>
+      <th>NC</th>
+      <th>tau</th>
+      <th>NDD</th>
+      <th>time (s)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2022-01-01 00:00:00</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>1.000000e+02</td>
+      <td>0.000000e+00</td>
+      <td>0.000000</td>
+      <td>350.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2022-01-01 00:00:01</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>9.942178e+01</td>
+      <td>5.782160e-01</td>
+      <td>0.000000</td>
+      <td>335.384693</td>
+      <td>0.000125</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2022-01-01 00:00:02</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>9.887092e+01</td>
+      <td>1.128597e+00</td>
+      <td>0.000486</td>
+      <td>322.563499</td>
+      <td>0.000243</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2022-01-01 00:00:03</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>9.834404e+01</td>
+      <td>1.654564e+00</td>
+      <td>0.001392</td>
+      <td>311.194745</td>
+      <td>0.000356</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2022-01-01 00:00:04</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>9.783845e+01</td>
+      <td>2.158887e+00</td>
+      <td>0.002663</td>
+      <td>301.021824</td>
+      <td>0.000465</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>86396</th>
+      <td>2022-01-01 23:59:56</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>5.800845e-34</td>
+      <td>3.370010e-27</td>
+      <td>100.000000</td>
+      <td>350.000000</td>
+      <td>0.000000</td>
+      <td>86396.0</td>
+    </tr>
+    <tr>
+      <th>86397</th>
+      <td>2022-01-01 23:59:57</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>5.795712e-34</td>
+      <td>3.367028e-27</td>
+      <td>100.000000</td>
+      <td>350.000000</td>
+      <td>0.000000</td>
+      <td>86397.0</td>
+    </tr>
+    <tr>
+      <th>86398</th>
+      <td>2022-01-01 23:59:58</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>5.790584e-34</td>
+      <td>3.364048e-27</td>
+      <td>100.000000</td>
+      <td>350.000000</td>
+      <td>0.000000</td>
+      <td>86398.0</td>
+    </tr>
+    <tr>
+      <th>86399</th>
+      <td>2022-01-01 23:59:59</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>5.785460e-34</td>
+      <td>3.361072e-27</td>
+      <td>100.000000</td>
+      <td>350.000000</td>
+      <td>0.000000</td>
+      <td>86399.0</td>
+    </tr>
+    <tr>
+      <th>86400</th>
+      <td>2022-01-02 00:00:00</td>
+      <td>125</td>
+      <td>0.5</td>
+      <td>5.780341e-34</td>
+      <td>3.358098e-27</td>
+      <td>100.000000</td>
+      <td>350.000000</td>
+      <td>0.000000</td>
+      <td>86400.0</td>
+    </tr>
+  </tbody>
+</table>
+<p>86401 rows × 9 columns</p>
+</div></div></div>
+</div>
+</section>
+<section id="plot-the-results">
+<h2>Plot the results<a class="headerlink" href="#plot-the-results" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">cycler</span> <span class="kn">import</span> <span class="n">cycler</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_prop_cycle</span><span class="p">(</span><span class="n">cycler</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;tab:blue&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:orange&#39;</span><span class="p">,</span> <span class="s1">&#39;tab:green&#39;</span><span class="p">])</span> <span class="o">+</span> <span class="n">cycler</span><span class="p">(</span><span class="s1">&#39;linestyle&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="s1">&#39;-.&#39;</span><span class="p">]))</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">],</span> <span class="n">timesteps</span><span class="p">[[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$N_A$&#39;</span><span class="p">,</span> <span class="s1">&#39;$N_B$&#39;</span><span class="p">,</span> <span class="s1">&#39;$N_C$&#39;</span><span class="p">],</span> <span class="n">loc</span> <span class="o">=</span> <span class="s1">&#39;upper left&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Defect state percentages [%]&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">c_norm</span> <span class="o">=</span> <span class="mf">1.35</span> <span class="c1">#Normalization constants &quot;C_norm&quot;. See Repins 2023 for details</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">],</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NDD&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">c_norm</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;NDD modeled&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;NDD [$\mu s^{-1}$]&#39;</span><span class="p">)</span>
+
+<span class="n">literature_data_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;wyller data.csv&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">literature_data_file</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">filtered</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Series&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0.5 sun 125C&#39;</span><span class="p">]</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">filtered</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="n">filtered</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;NDD data from Wyller&#39;</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s1">&#39;black&#39;</span><span class="p">)</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="s1">&#39;center left&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Accelerated LETID Test (wafer)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="sa">fr</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">temperature</span><span class="si">}</span><span class="s1">$\degree$C, </span><span class="si">{</span><span class="n">suns</span><span class="si">}</span><span class="s1"> suns illumination&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/640486cb8d5836d69776fccd5472e808cd03e0b0679c4caa4b2e126fa443a74d.png" src="../_images/640486cb8d5836d69776fccd5472e808cd03e0b0679c4caa4b2e126fa443a74d.png" />
+</div>
+</div>
+</section>
+<section id="compare-model-results-to-experimental-data">
+<h2>Compare model results to experimental data<a class="headerlink" href="#compare-model-results-to-experimental-data" title="Link to this heading">#</a></h2>
+<p>Experimental data (0.5 suns, 125°C, 150°C, 175°C) from <a class="reference external" href="https://doi.org/10.1109/JPHOTOV.2021.3078367">Wyller 2021</a>.
+Comparison with experimental data requires normalization constant (<span class="math notranslate nohighlight">\(C_{norm}\)</span>), which relates NDD to <span class="math notranslate nohighlight">\(N_B\)</span> as described in <a class="reference external" href="https://doi.org/10.1557/s43577-022-00438-8">Repins 2023</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temperatures</span> <span class="o">=</span> <span class="p">[</span><span class="mi">125</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">175</span><span class="p">]</span> <span class="c1"># degrees celsius</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps125</span> <span class="o">=</span> <span class="n">timesteps</span> <span class="c1">#we already modeled the 125C experiment above</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperatures</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># degrees celsius</span>
+<span class="n">suns</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># &quot;suns&quot; of injection, e.g 1-sun illumination at open circuit would be 1; dark current injection is given as a fraction of Isc, e.g., injecting Isc would be 1. For this example we assume injection is 0.1*Isc.</span>
+
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="s1">&#39;2022-01-01 00:00:00&#39;</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s1">&#39;2022-01-02 00:00:00&#39;</span><span class="p">,</span> <span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">)</span> <span class="c1"># three weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span>
+
+<span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">temperature</span><span class="p">)</span>
+<span class="n">injection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">suns</span><span class="p">)</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temps</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Injection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">injection</span>
+
+<span class="n">timesteps</span><span class="p">[[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below</span>
+
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">nA_0</span><span class="p">,</span> <span class="n">nB_0</span><span class="p">,</span> <span class="n">nC_0</span> <span class="c1"># assign first timestep defect state percentages</span>
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">nB_0</span><span class="p">)</span> <span class="c1"># calculate tau for the first timestep</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\mspringe\AppData\Local\Temp\1\ipykernel_6508\241191725.py:4: FutureWarning: &#39;S&#39; is deprecated and will be removed in a future version, please use &#39;s&#39; instead.
+  timesteps = pd.date_range(start = &#39;2022-01-01 00:00:00&#39;, end = &#39;2022-01-02 00:00:00&#39;, freq = &#39;S&#39;) # three weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+    <span class="c1"># first row tau has already been assigned</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span>
+        <span class="n">n_B</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span>
+        <span class="n">n_C</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]</span>
+
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">j_gen</span> <span class="o">=</span> <span class="n">j_gen</span>
+
+        <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">]</span>
+        <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Injection&#39;</span><span class="p">]</span>
+
+        <span class="c1"># calculate defect reaction kinetics: reaction constant and carrier concentration factor.</span>
+        <span class="n">k_AB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_ab&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_ab&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_BA</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_ba&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_ba&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_BC</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_bc&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_bc&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_CB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_cb&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_cb&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+
+        <span class="n">x_ab</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="n">x_ba</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ba&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="n">x_bc</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;bc&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="c1"># x_cb there is no known excess carrier acceleration factor for the c-&gt;b transition</span>
+
+        <span class="c1"># calculate the instantaneous change in NA, NB, and NC</span>
+        <span class="n">dN_Adt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_ba</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span>
+        <span class="n">dN_Bdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">x_ba</span> <span class="o">+</span> <span class="n">k_BC</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
+
+        <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># assign new defect state percentages</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span><span class="o">*</span><span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_C</span> <span class="o">+</span> <span class="n">dN_Cdt</span><span class="o">*</span><span class="n">t_step</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NB&#39;</span><span class="p">])</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">calc_ndd</span><span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">])</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="c1"># create a column for seconds elapsed</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps150</span> <span class="o">=</span> <span class="n">timesteps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperatures</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># degrees celsius</span>
+<span class="n">suns</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># &quot;suns&quot; of injection, e.g 1-sun illumination at open circuit would be 1; dark current injection is given as a fraction of Isc, e.g., injecting Isc would be 1. For this example we assume injection is 0.1*Isc.</span>
+
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="s1">&#39;2022-01-01 00:00:00&#39;</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="s1">&#39;2022-01-02 00:00:00&#39;</span><span class="p">,</span> <span class="n">freq</span> <span class="o">=</span> <span class="s1">&#39;S&#39;</span><span class="p">)</span> <span class="c1"># three weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span>
+
+<span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">temperature</span><span class="p">)</span>
+<span class="n">injection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">suns</span><span class="p">)</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temps</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Injection&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">injection</span>
+
+<span class="n">timesteps</span><span class="p">[[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="c1"># create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below</span>
+
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">nA_0</span><span class="p">,</span> <span class="n">nB_0</span><span class="p">,</span> <span class="n">nC_0</span> <span class="c1"># assign first timestep defect state percentages</span>
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">nB_0</span><span class="p">)</span> <span class="c1"># calculate tau for the first timestep</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>C:\Users\mspringe\AppData\Local\Temp\1\ipykernel_6508\950821369.py:4: FutureWarning: &#39;S&#39; is deprecated and will be removed in a future version, please use &#39;s&#39; instead.
+  timesteps = pd.date_range(start = &#39;2022-01-01 00:00:00&#39;, end = &#39;2022-01-02 00:00:00&#39;, freq = &#39;S&#39;) # three weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+    <span class="c1"># first row tau has already been assigned</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span>
+        <span class="n">n_B</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span>
+        <span class="n">n_C</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]</span>
+
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">j_gen</span> <span class="o">=</span> <span class="n">j_gen</span>
+
+        <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">]</span>
+        <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Injection&#39;</span><span class="p">]</span>
+
+        <span class="c1"># calculate defect reaction kinetics: reaction constant and carrier concentration factor.</span>
+        <span class="n">k_AB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_ab&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_ab&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_BA</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_ba&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_ba&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_BC</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_bc&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_bc&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+        <span class="n">k_CB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span><span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;v_cb&#39;</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s1">&#39;ea_cb&#39;</span><span class="p">],</span> <span class="n">temperature</span><span class="p">)</span>
+
+        <span class="n">x_ab</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ab&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="n">x_ba</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;ba&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="n">x_bc</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor_wafer</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span> <span class="s1">&#39;bc&#39;</span><span class="p">,</span> <span class="n">injection</span><span class="p">,</span> <span class="n">j_gen</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">mechanism_params</span><span class="p">)</span>
+        <span class="c1"># x_cb there is no known excess carrier acceleration factor for the c-&gt;b transition</span>
+
+        <span class="c1"># calculate the instantaneous change in NA, NB, and NC</span>
+        <span class="n">dN_Adt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_ba</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span>
+        <span class="n">dN_Bdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">x_ba</span> <span class="o">+</span> <span class="n">k_BC</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
+
+        <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># assign new defect state percentages</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span><span class="o">*</span><span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NB&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span><span class="o">*</span><span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;NC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_C</span> <span class="o">+</span> <span class="n">dN_Cdt</span><span class="o">*</span><span class="n">t_step</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NB&#39;</span><span class="p">])</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NDD&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">calc_ndd</span><span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;tau&#39;</span><span class="p">])</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Datetime&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;Datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="c1"># create a column for seconds elapsed</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps175</span> <span class="o">=</span> <span class="n">timesteps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">timesteps125</span><span class="p">,</span> <span class="n">timesteps150</span><span class="p">,</span> <span class="n">timesteps175</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">normalization_constants</span> <span class="o">=</span> <span class="p">{</span><span class="mi">125</span> <span class="p">:</span> <span class="mf">1.35</span><span class="p">,</span> <span class="mi">150</span> <span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mi">175</span> <span class="p">:</span> <span class="mf">0.35</span><span class="p">}</span> <span class="c1">#Normalization constants &quot;C_norm&quot;. See Repins 2023 for details</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Normalization constant&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Temperature&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">normalization_constants</span><span class="p">)</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NDD-normalized&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;NDD&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">timesteps</span><span class="p">[</span><span class="s1">&#39;Normalization constant&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grouped_model</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Temperature&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">literature_data_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;wyller data.csv&#39;</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">literature_data_file</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="n">data</span><span class="p">[</span><span class="s1">&#39;Temperature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;Series&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1">#normalization_constants = {&#39;0.5 sun 125C&#39; : 1/1.35, &#39;0.5 sun 150C&#39; : 1/0.6, &#39;0.5 sun 175C&#39; : 1/0.35}</span>
+<span class="c1">#data[&#39;Normalization constant&#39;] = data[&#39;Series&#39;].map(normalization_constants)</span>
+<span class="c1">#data[&#39;Y-normalized&#39;] = data[&#39;Y&#39;]*data[&#39;Normalization constant&#39;]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grouped_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;Temperature&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_model</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">]</span><span class="o">+</span><span class="mf">.1</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;NDD-normalized&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Modeled NDD </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">$\degree$C&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+
+<span class="n">marker</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Wyller NDD </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">$\degree$C&quot;</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">marker</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;NDD [$\mu s^{-1}$]&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/bb1b5e01b51209571f7c16f07967b106d6b7cfedf39d36bf3b1ed247f7603e34.png" src="../_images/bb1b5e01b51209571f7c16f07967b106d6b7cfedf39d36bf3b1ed247f7603e34.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">colors</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_model</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;time (s)&#39;</span><span class="p">]</span><span class="o">+</span><span class="mf">.1</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;NDD-normalized&#39;</span><span class="p">],</span> <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Modeled </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">$\degree$C&quot;</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+
+
+<span class="n">marker</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">((</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">grouped_data</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Literature data  </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">$\degree$C&quot;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="n">marker</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">marker</span><span class="p">),</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">70</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">12</span><span class="p">})</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;major&#39;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time [s]&#39;</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Normalized defect </span><span class="se">\n</span><span class="s1"> density [$\mu s^{-1}$]&#39;</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Modeled vs. Literature LETID data&#39;</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="c1">#fig.savefig(&#39;wafer data.png&#39;, dpi = 600)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/a4fc985792ddf3301a6a1d2d827a30e4560482ae6f665332ca5c34c00581af44.png" src="../_images/a4fc985792ddf3301a6a1d2d827a30e4560482ae6f665332ca5c34c00581af44.png" />
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "NREL/PVDegradationTools",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials_and_tools"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+
+
+
+
+
+
+                <footer class="prev-next-footer">
+
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">LETID - Outdoor Scenario Based on Accelerated Test</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ASTM%20Live%20Demo.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ASTM Demonstration</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+
+            </div>
+
+
+
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-parameters">Device parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#degradation-parameters">Degradation parameters</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#demonstrate-calculation-of-dn-x-ij">Demonstrate calculation of dn^x_ij</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Degradation parameters</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-timeseries">Set up timeseries</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-through-timesteps">Run through timesteps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#finish-calculating-degraded-device-parameters">Finish calculating degraded device parameters.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-results">Plot the results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compare-model-results-to-experimental-data">Compare model results to experimental data</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+
+
+          </div>
+          <footer class="bd-footer-content">
+
+<div class="bd-footer-content__inner container">
+
+  <div class="footer-item">
+
+<p class="component-author">
+By Matthew Brown, Silvana Ovaitt
+</p>
+
+  </div>
+
+  <div class="footer-item">
+
+
+  <p class="copyright">
+
+      © Copyright 2023.
+      <br/>
+
+  </p>
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+  <div class="footer-item">
+
+  </div>
+
+</div>
+          </footer>
+
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

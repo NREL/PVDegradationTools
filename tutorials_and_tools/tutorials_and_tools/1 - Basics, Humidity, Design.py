@@ -3,11 +3,11 @@
 
 # # 1 - Basics, Humidity, Design
 # ### Module Humidity and Edge Seal Width
-# 
-# 
+#
+#
 # **Requirements:**
 # - weather file (psm3 preferred) demo file is provided
-# 
+#
 # **Objectives:**
 # 1. Read in necessary weather data
 # 2. Generate solar position, POA, and module temperature
@@ -18,7 +18,7 @@
 
 
 # if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent "ModuleNotFoundError" in later cells:
-# !pip install pvdeg==0.3.1
+# !pip install pvdeg==0.3.3
 
 
 # In[1]:
@@ -27,7 +27,7 @@
 import os
 import pandas as pd
 
-import pvdeg 
+import pvdeg
 from pvdeg import DATA_DIR
 
 
@@ -36,6 +36,7 @@ from pvdeg import DATA_DIR
 
 # This information helps with debugging and getting support :)
 import sys, platform
+
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
 print("Pandas version ", pd.__version__)
@@ -44,7 +45,7 @@ print("pvdeg version ", pvdeg.__version__)
 
 # ## 1. Reading in Weather Data and Site Meta-Data
 # Most `pvdeg` functions have been standardized to operate from popular weather files such as TMY3, EPW, and PSM3. For high-performance computer users, NSRDB and other database fetching tools can be used. For these tutorials, we will use local weather files. Unless otherwise stated, functions require the following fields within a weather file:
-# 
+#
 # - date-time index
 # - DNI
 # - DHI
@@ -53,9 +54,9 @@ print("pvdeg version ", pvdeg.__version__)
 # - Temperature, Dew-Point
 # - Wind Speed
 # - Relative Humidity
-# 
+#
 # And the following site-specific metadata. This should be contained in the weather file header.
-# 
+#
 # - Latitude
 # - Longitude
 # - Altitude
@@ -63,9 +64,9 @@ print("pvdeg version ", pvdeg.__version__)
 # In[2]:
 
 
-PSM_FILE = os.path.join(DATA_DIR,'psm3_demo.csv')
+PSM_FILE = os.path.join(DATA_DIR, "psm3_demo.csv")
 
-WEATHER, META = pvdeg.weather.read(PSM_FILE,'psm')
+WEATHER, META = pvdeg.weather.read(PSM_FILE, "psm")
 
 
 # Let's take a closer look at the dataframe (weather) and dictionary (meta) imported above. The structure will be used by most `pvdeg` functions.
@@ -96,7 +97,7 @@ META
 
 
 # Let's select the month of June
-june_weather = WEATHER[ WEATHER.index.month == 6 ]
+june_weather = WEATHER[WEATHER.index.month == 6]
 june_weather
 
 
@@ -104,8 +105,8 @@ june_weather
 
 
 # Let's filter the summer months for the northern hemisphere
-summer_months = [6,7,8,9]
-summer_weather = WEATHER[ WEATHER.index.month.isin( summer_months ) ]
+summer_months = [6, 7, 8, 9]
+summer_weather = WEATHER[WEATHER.index.month.isin(summer_months)]
 summer_weather
 
 
@@ -113,12 +114,12 @@ summer_weather
 
 
 # lets just select hours from the year where the sun is above the horizon
-sunup_weather = WEATHER[ WEATHER['ghi'] > 0 ]
+sunup_weather = WEATHER[WEATHER["ghi"] > 0]
 sunup_weather
 
 
 # ## 2. Solar Position, POA, and Module Temperature
-# 
+#
 # Many operations with `PVDEG` require solar position, POA irradiance, and module temperature. Usually a `pvdeg` method will calculate these data sets automatically when it is required, however it will not keep the data for external use. For now, we will calculate them directly. This is helpful when you need to use the data for an external calculation. Here, we generate the solar position (azimuth, elevation, etc), plane of array irradiance (POA), and module temperature. `PVDEG` has wrappers for quickly using `PVLIB` to generate these figures with minimal input
 
 # In[8]:
@@ -126,17 +127,19 @@ sunup_weather
 
 sol_pos = pvdeg.spectral.solar_position(weather_df=WEATHER, meta=META)
 
-poa_df = pvdeg.spectral.poa_irradiance(weather_df=WEATHER, meta=META)#, solar_position=sol_pos)
+poa_df = pvdeg.spectral.poa_irradiance(
+    weather_df=WEATHER, meta=META
+)  # , solar_position=sol_pos)
 
-temp_mod = pvdeg.temperature.module(weather_df=WEATHER, meta=META)#, poa=poa_df)
+temp_mod = pvdeg.temperature.module(weather_df=WEATHER, meta=META)  # , poa=poa_df)
 
 
 # For more advanced usage of these functions, refer to the documentation for `pvdeg` and `pvlib`.
-# 
+#
 # Lets inspect the output from each of these functions
-# 
+#
 # `solar_position` returns a datetime-indexed dataframe of solar position for the length and frequency given by the weather file.
-# 
+#
 
 # In[9]:
 
@@ -149,13 +152,13 @@ sol_pos
 # In[10]:
 
 
-poa_df.loc['1999-01-01 13:30:00-07:00':'1999-01-01 17:30:00-07:00']
+poa_df.loc["1999-01-01 13:30:00-07:00":"1999-01-01 17:30:00-07:00"]
 
 
 # `temperature.module` has several optional parameters. Below is an example which explicity uses all of the default values. This function will return a datetime-indexed series matching the index of the given weather file. For more options, see the pvlib documentation for temperature models.
-# 
+#
 # https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
-# 
+#
 # The optional arguments are:
 # - poa : manually enter the POA Irradiance
 # - temp_model : choose a PVLIB compatible temperature model
@@ -165,17 +168,20 @@ poa_df.loc['1999-01-01 13:30:00-07:00':'1999-01-01 17:30:00-07:00']
 # In[11]:
 
 
-temp_mod = pvdeg.temperature.module(weather_df = WEATHER, meta = META,
-                                    poa = poa_df,
-                                    temp_model = 'sapm',
-                                    conf= 'open_rack_glass_polymer',
-                                    wind_speed_factor = 1)
+temp_mod = pvdeg.temperature.module(
+    weather_df=WEATHER,
+    meta=META,
+    poa=poa_df,
+    temp_model="sapm",
+    conf="open_rack_glass_polymer",
+    wind_speed_factor=1,
+)
 
-temp_mod.loc['1999-01-01 13:30:00-07:00':'1999-01-01 17:30:00-07:00']
+temp_mod.loc["1999-01-01 13:30:00-07:00":"1999-01-01 17:30:00-07:00"]
 
 
 # ## 3. Module Humidities
-# `PVDEG` can be used to calculate the relative humidity of several layers within a PV module: the outside surface of the module, front ecapsulant, back encapsulant, and backsheet. This can be done with 2 techniques: Automatically and Manually.    
+# `PVDEG` can be used to calculate the relative humidity of several layers within a PV module: the outside surface of the module, front ecapsulant, back encapsulant, and backsheet. This can be done with 2 techniques: Automatically and Manually.
 
 # ### 3.a. Automatic
 # Use the function `humidity.module`. This method does all of the calculations behind the scenes. It requires only 2 inputs (weather data and meta data). It will return a dataframe with all the layers of the module.
@@ -197,20 +203,27 @@ rh_module.head()
 # In[13]:
 
 
-rh_surface_outside = pvdeg.humidity.surface_outside(rh_ambient=WEATHER['relative_humidity'],
-                                                       temp_ambient=WEATHER['temp_air'],
-                                                       temp_module=temp_mod)
+rh_surface_outside = pvdeg.humidity.surface_outside(
+    rh_ambient=WEATHER["relative_humidity"],
+    temp_ambient=WEATHER["temp_air"],
+    temp_module=temp_mod,
+)
 
-rh_front_encap = pvdeg.humidity.front_encap(rh_ambient=rh_surface_outside,
-                                               temp_ambient=WEATHER['temp_air'],
-                                               temp_module=temp_mod)
+rh_front_encap = pvdeg.humidity.front_encap(
+    rh_ambient=rh_surface_outside,
+    temp_ambient=WEATHER["temp_air"],
+    temp_module=temp_mod,
+)
 
-rh_back_encap = pvdeg.humidity.back_encap(rh_ambient=rh_surface_outside,
-                                             temp_ambient=WEATHER['temp_air'],
-                                             temp_module=temp_mod)
+rh_back_encap = pvdeg.humidity.back_encap(
+    rh_ambient=rh_surface_outside,
+    temp_ambient=WEATHER["temp_air"],
+    temp_module=temp_mod,
+)
 
-rh_backsheet = pvdeg.humidity.backsheet_from_encap(rh_back_encap=rh_back_encap,
-                                                      rh_surface_outside=WEATHER['relative_humidity'])
+rh_backsheet = pvdeg.humidity.backsheet_from_encap(
+    rh_back_encap=rh_back_encap, rh_surface_outside=WEATHER["relative_humidity"]
+)
 
 
 # ## 4. Design: Edge Seal Width
@@ -230,12 +243,13 @@ edge_seal_width
 # In[15]:
 
 
-psat, psat_avg = pvdeg.humidity.psat(WEATHER['temp_air'])
+psat, psat_avg = pvdeg.humidity.psat(WEATHER["temp_air"])
 
 k = pvdeg.design.edge_seal_ingress_rate(avg_psat=psat_avg)
 
-edge_seal_width = pvdeg.design.edge_seal_width(weather_df=WEATHER, meta=META,
-                                               k=k, years=25)
+edge_seal_width = pvdeg.design.edge_seal_width(
+    weather_df=WEATHER, meta=META, k=k, years=25
+)
 
 print(edge_seal_width)
 
@@ -246,6 +260,7 @@ print(edge_seal_width)
 # In[17]:
 
 
-edge_seal_width = pvdeg.design.edge_seal_width(weather_df=WEATHER, meta=META, from_dew_point=True)
+edge_seal_width = pvdeg.design.edge_seal_width(
+    weather_df=WEATHER, meta=META, from_dew_point=True
+)
 edge_seal_width
-
