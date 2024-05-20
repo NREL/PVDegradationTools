@@ -107,7 +107,11 @@ def solder_fatigue(
     b=0.33,
     C1=405.6,
     Q=0.12,
-    wind_factor=None,
+    wind_factor=0.33,
+    temp_model='sapm',
+    conf='open_rack_glass_polymer',
+    model_kwarg={},
+    irradiance_kwarg={},
 ):
     """
     Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
@@ -152,6 +156,32 @@ def solder_fatigue(
         scaling constant, see the paper for details on appropriate values
     Q : float
         activation energy [eV]
+    temp_model : (str, optional)
+        Specify which temperature model from pvlib to use. Current options:
+    conf : (str)
+        The configuration of the PV module architecture and mounting
+        configuration. Currently only used for 'sapm' and 'pvsys'.
+        With different options for each. 
+        
+        'sapm' options: ``open_rack_glass_polymer`` (default), 
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``, 
+        ``insulated_back_glass_polymer``
+
+        'pvsys' options: ``freestanding``, ``insulated``
+        
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+    model_kwarg : (dict, optional)
+        keyword argument dictionary used for the pvlib temperature model calculation.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
     Returns
     --------
@@ -177,8 +207,18 @@ def solder_fatigue(
         time_range = weather_df.index
 
     if temp_cell is None:
-        temp_cell = temperature.cell(
-            weather_df=weather_df, meta=meta, wind_factor=wind_factor
+        # temp_cell = temperature.cell(
+        #     weather_df=weather_df, meta=meta, wind_factor=wind_factor
+        # )
+        temp_cell = temperature.temperature( # we just calculate poa inside
+            cell_or_mod='cell',
+            weather_df=weather_df,
+            meta=meta,
+            temp_model=temp_model,
+            conf=conf,
+            wind_factor=wind_factor,
+            irradince_kwarg=irradiance_kwarg,
+            model_kwarg=model_kwarg
         )
 
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)

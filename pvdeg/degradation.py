@@ -636,7 +636,7 @@ def IwaArrhenius(
     conf='open_rack_glass_polymer',
     wind_factor=0.33,
     model_kwarg={},
-    irradiance_kwarg={}
+    irradiance_kwarg={},
 ):
     """
     Function to calculate IWa, the Environment Characterization [W/m²].
