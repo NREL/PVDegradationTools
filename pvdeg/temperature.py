@@ -306,7 +306,6 @@ def temperature(
         Dataframe or series with minimum requirement of 'poa_global'. Will be calculated from weather_df, meta if not provided
     temp_model : (str, optional)
         Specify which temperature model from pvlib to use. Current options:
-        ???
     conf : (str)
         The configuration of the PV module architecture and mounting
         configuration. Currently only used for 'sapm' and 'pvsys'.

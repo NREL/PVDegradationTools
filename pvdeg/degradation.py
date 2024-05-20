@@ -40,7 +40,7 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
                                         for every 10[°C] temperature increase
 
     Returns
-    --------
+    -------/
     degradationrate : float
         rate of Degradation (NEED TO ADD METRIC)
 
@@ -100,7 +100,19 @@ def _acceleration_factor(numerator, denominator):
 
 
 def vantHoff_deg(
-    weather_df, meta, I_chamber, temp_chamber, poa=None, temp=None, p=0.5, Tf=1.41
+    weather_df, 
+    meta, 
+    I_chamber, 
+    temp_chamber, 
+    poa=None, 
+    temp=None, 
+    p=0.5, 
+    Tf=1.41, 
+    temp_model='sapm',
+    conf='open_rack_glass_polymer',
+    wind_factor=0.33,
+    irradiance_kwarg={},
+    model_kwarg={},
 ):
     """
     Van't Hoff Irradiance Degradation
@@ -124,7 +136,34 @@ def vantHoff_deg(
         fit parameter
     Tf : float
         Multiplier for the increase in degradation for every 10[°C] temperature increase
+    temp_model : (str, optional)
+        Specify which temperature model from pvlib to use. Current options:
+    conf : (str)
+        The configuration of the PV module architecture and mounting
+        configuration. Currently only used for 'sapm' and 'pvsys'.
+        With different options for each. 
+        
+        'sapm' options: ``open_rack_glass_polymer`` (default), 
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``, 
+        ``insulated_back_glass_polymer``
 
+        'pvsys' options: ``freestanding``, ``insulated``
+        
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+    model_kwarg : (dict, optional)
+        keyword argument dictionary used for the pvlib temperature model calculation.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+
+    
     Returns
     -------
     accelerationFactor : float or series
@@ -133,13 +172,23 @@ def vantHoff_deg(
     """
 
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if isinstance(poa, pd.DataFrame):
         poa_global = poa["poa_global"]
 
     if temp is None:
-        temp = temperature.cell(weather_df=weather_df, meta=meta, poa=poa)
+        # temp = temperature.cell(weather_df=weather_df, meta=meta, poa=poa)
+        temp = temperature.temperature(
+            cell_or_mod='cell',
+            temp_model='sapm',
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa, 
+            conf=conf,
+            wind_factor=wind_factor,
+            model_kwarg=model_kwarg
+        )
 
     rateOfDegEnv = _deg_rate_env(
         poa_global=poa_global, temp=temp, temp_chamber=temp_chamber, p=p, Tf=Tf
@@ -181,7 +230,20 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-def IwaVantHoff(weather_df, meta, poa=None, temp=None, Teq=None, p=0.5, Tf=1.41):
+def IwaVantHoff(
+    weather_df, 
+    meta, 
+    poa=None, 
+    temp=None, 
+    Teq=None, 
+    p=0.5, 
+    Tf=1.41,
+    temp_model='sapm',
+    conf='open_rack_glass_polymer',
+    wind_factor=0.33,
+    model_kwarg={},
+    irradiance_kwarg={}
+):
     """
     IWa : Environment Characterization [W/m²]
     For one year of degredation the controlled environmnet lamp settings will
@@ -203,6 +265,33 @@ def IwaVantHoff(weather_df, meta, poa=None, temp=None, Teq=None, p=0.5, Tf=1.41)
         Fit parameter
     Tf : float
         Multiplier for the increase in degradation for every 10[°C] temperature increase
+    temp_model : (str, optional)
+        Specify which temperature model from pvlib to use. Current options:
+    conf : (str)
+        The configuration of the PV module architecture and mounting
+        configuration. Currently only used for 'sapm' and 'pvsys'.
+        With different options for each. 
+        
+        'sapm' options: ``open_rack_glass_polymer`` (default), 
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``, 
+        ``insulated_back_glass_polymer``
+
+        'pvsys' options: ``freestanding``, ``insulated``
+        
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+    model_kwarg : (dict, optional)
+        keyword argument dictionary used for the pvlib temperature model calculation.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+
 
     Returns
     --------
@@ -211,10 +300,20 @@ def IwaVantHoff(weather_df, meta, poa=None, temp=None, Teq=None, p=0.5, Tf=1.41)
 
     """
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if temp is None:
-        temp = temperature.cell(weather_df, meta, poa)
+        # temp = temperature.cell(weather_df, meta, poa)
+        temp = temperature.temperature(
+            cell_or_mod='cell',
+            temp_model=temp_model,
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            conf=conf,
+            wind_factor=wind_factor,
+            model_kwarg=model_kwarg,
+        )
 
     if Teq is None:
         Teq = _to_eq_vantHoff(temp, Tf)
@@ -329,6 +428,11 @@ def arrhenius_deg(
     temp=None,
     p=0.5,
     n=1,
+    temp_model='sapm',
+    conf='open_rack_glass_polymer',
+    wind_factor=0.33,
+    model_kwarg={},
+    irradiance_kwarg={}
 ):
     """
     Calculate the Acceleration Factor between the rate of degredation of a
@@ -367,6 +471,32 @@ def arrhenius_deg(
     n : float
         Fit parameter for relative humidity
         When n=0 the degradation rate will not be dependent on humidity.
+    temp_model : (str, optional)
+        Specify which temperature model from pvlib to use. Current options:
+    conf : (str)
+        The configuration of the PV module architecture and mounting
+        configuration. Currently only used for 'sapm' and 'pvsys'.
+        With different options for each. 
+        
+        'sapm' options: ``open_rack_glass_polymer`` (default), 
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``, 
+        ``insulated_back_glass_polymer``
+
+        'pvsys' options: ``freestanding``, ``insulated``
+        
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+    model_kwarg : (dict, optional)
+        keyword argument dictionary used for the pvlib temperature model calculation.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
     Returns
     --------
@@ -376,10 +506,20 @@ def arrhenius_deg(
     """
 
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if temp is None:
-        temp = temperature.cell(weather_df, meta, poa)
+        # temp = temperature.cell(weather_df, meta, poa)
+        temp = temperature.temperature(
+            cell_or_mod='cell',
+            temp_model=temp_model,
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            conf=conf,
+            wind_factor=wind_factor,
+            model_kwarg=model_kwarg,
+        )
 
     if isinstance(poa, pd.DataFrame):
         poa_global = poa["poa_global"]
@@ -492,6 +632,11 @@ def IwaArrhenius(
     Teq=None,
     p=0.5,
     n=1,
+    temp_model='sapm',
+    conf='open_rack_glass_polymer',
+    wind_factor=0.33,
+    model_kwarg={},
+    irradiance_kwarg={}
 ):
     """
     Function to calculate IWa, the Environment Characterization [W/m²].
@@ -523,6 +668,34 @@ def IwaArrhenius(
         Fit parameter
     n : float
         Fit parameter for relative humidity
+    temp_model : (str, optional)
+        Specify which temperature model from pvlib to use. Current options:
+    conf : (str)
+        The configuration of the PV module architecture and mounting
+        configuration. Currently only used for 'sapm' and 'pvsys'.
+        With different options for each. 
+        
+        'sapm' options: ``open_rack_glass_polymer`` (default), 
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``, 
+        ``insulated_back_glass_polymer``
+
+        'pvsys' options: ``freestanding``, ``insulated``
+        
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+    model_kwarg : (dict, optional)
+        keyword argument dictionary used for the pvlib temperature model calculation.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+
+    
 
     Returns
     --------
@@ -530,10 +703,20 @@ def IwaArrhenius(
         Environment Characterization [W/m²]
     """
     if poa is None:
-        poa = spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if temp is None:
-        temp = temperature.cell(weather_df, meta, poa)
+        # temp = temperature.cell(weather_df, meta, poa)
+        temp = temperature.temperature(
+            cell_or_mod='cell',
+            temp_model=temp_model,
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            conf=conf,
+            wind_factor=wind_factor,
+            model_kwarg=model_kwarg,
+        )
 
     if Teq is None:
         Teq = _T_eq_arrhenius(temp, Ea)
@@ -784,8 +967,7 @@ def vecArrhenius(
     poa_global_scaled = poa_global / 1000
 
     degredation = 0
-    # refactor to list comprehension approach
-    for entry in range(len(poa_global_scaled)):
+    for entry in range(len(poa_global_scaled)): # list comprehension not supported by numba
         degredation += (
             R0
             * np.exp(-ea_scaled / (273.15 + module_temp[entry]))
