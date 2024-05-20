@@ -16,6 +16,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from pvdeg import temperature, spectral, utilities, weather
 
+# passing all tests after updating temperature models but this should be checked throughly before final release
 
 def eff_gap_parameters(
     weather_df=None,
@@ -28,6 +29,7 @@ def eff_gap_parameters(
     tilt=None,
     azimuth=None,
     wind_factor=0.33,
+    model_kwarg={}
 ):
     """
     Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system
@@ -105,23 +107,29 @@ def eff_gap_parameters(
         azimuth=azimuth,
         sky_model=sky_model,
     )
-    T_0 = temperature.cell(
+
+    T_0 = temperature.temperature(
+        cell_or_mod='cell',
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg
     )
-    T_inf = temperature.cell(
+
+    T_inf = temperature.temperature(
+        cell_or_mod='cell',
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg
     )
-
+    
     return T_0, T_inf, poa
 
 
@@ -178,8 +186,8 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
                     T_0.iloc[i] - T_inf.iloc[i]
                 )
     try:
-        # x_eff = -x_0 * np.log(1 - summ / n)
-        x_eff = np.multiply(np.negative(x_0), np.log(np.subtract(1, np.divide(summ, n))))
+        x_eff = -x_0 * np.log(1 - summ / n)
+        # x_eff = np.multiply(np.negative(x_0), np.log(np.subtract(1, np.divide(summ, n))))
     except RuntimeWarning as e:
         x_eff = (
             np.nan
@@ -203,6 +211,7 @@ def standoff(
     T98=70,  # [°C]
     x_0=6.5,  # [cm]
     wind_factor=0.33,
+    model_kwarg={},
 ):
     """
     Calculate a minimum standoff distance for roof mounded PV systems.
@@ -244,6 +253,8 @@ def standoff(
         It is recommended that a power-law relationship between height and wind speed of 0.33
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
+    model_kwargs : dict, optional
+        dictionary to provide to the temperature model, see temperature.temperature for more information
 
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
@@ -284,22 +295,28 @@ def standoff(
         azimuth=azimuth,
         sky_model=sky_model,
     )
-    T_0 = temperature.cell(
+
+    T_0 = temperature.temperature(
+        cell_or_mod='cell',
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg
     )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
-    T_inf = temperature.cell(
+
+    T_inf = temperature.temperature(
+        cell_or_mod='cell',
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
@@ -431,6 +448,7 @@ def T98_estimate(
     azimuth=None,
     x_eff=None,
     x_0=6.5,
+    model_kwarg={},
 ):
     """
     Estimate the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
@@ -471,6 +489,9 @@ def T98_estimate(
         It is recommended that a power-law relationship between height and wind speed of 0.33
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
+    model_kwarg : dict, optional
+        keyword argument dictionary to provide other arguments to the temperature model.
+        See temperature.temperature for more information.
 
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
@@ -502,15 +523,17 @@ def T98_estimate(
         azimuth=azimuth,
         sky_model=sky_model,
     )
-
-    T_inf = temperature.cell(
-        weather_df,
-        meta,
-        poa,
-        temp_model,
-        conf_inf,
-        wind_factor,
+    T_inf = temperature.temperature(
+        cell_or_mod='cell',
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_inf,
+        wind_factor=wind_factor,
+        model_kwarg=model_kwarg
     )
+
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     if x_eff == None:
@@ -543,6 +566,7 @@ def standoff_x(
     T98=None,
     x_0=None,
     wind_factor=None,
+    model_kwarg={},
 ):
     """
     Calculate a minimum standoff distance for roof mounded PV systems.
@@ -567,6 +591,7 @@ def standoff_x(
         azimuth=azimuth,
         sky_model=sky_model,
         temp_model=temp_model,
+        model_kwarg=model_kwarg,
         conf_0=conf_0,
         conf_inf=conf_inf,
         T98=T98,
