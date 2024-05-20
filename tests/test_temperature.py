@@ -66,9 +66,16 @@ def test_cell():
 # can we check against pvlib outputs
 def test_temperature():
 
-    weather_args = {'poa_global':poa['poa_global'], 'temp_air':WEATHER['temp_air'], 'wind_speed':WEATHER['wind_speed'], 'wind_factor':0}
+    weather_args = {'poa_global':poa['poa_global'], 'temp_air':WEATHER['temp_air'], 'wind_speed':WEATHER['wind_speed']}
 
+    pvlib_df = pd.DataFrame()
     result_df = pd.DataFrame()
+
+    sapm_parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_polymer']    
+    pvlib_df['sapm_cell'] = pvlib.temperature.sapm_cell(
+        **weather_args,
+        **sapm_parameters
+    )    
 
     result_df['sapm_cell'] = pvdeg.temperature.temperature(
         cell_or_mod='cell',
@@ -78,6 +85,13 @@ def test_temperature():
         meta=META,
         poa=poa,
         wind_factor=0
+    )
+
+    copy_sapm_params = sapm_parameters.copy()
+    copy_sapm_params.pop('deltaT')
+    pvlib_df['sapm_module'] = pvlib.temperature.sapm_module(
+        **weather_args,
+        **copy_sapm_params
     )
 
     result_df['sapm_module'] = pvdeg.temperature.temperature(
@@ -90,6 +104,11 @@ def test_temperature():
         wind_factor=0
     )
 
+    # pvsyst_parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['pvsyst']['freestanding']
+    pvlib_df['pvsyst_cell'] = pvlib.temperature.pvsyst_cell(
+        **weather_args,
+    )
+
     result_df['pvsyst_cell'] = pvdeg.temperature.temperature(
         cell_or_mod='cell',
         temp_model='pvsyst',
@@ -100,12 +119,20 @@ def test_temperature():
         wind_factor=0
     )
 
+    pvlib_df['faiman'] = pvlib.temperature.faiman(
+        **weather_args
+    )
+
     result_df['faiman'] = pvdeg.temperature.temperature(
         temp_model='faiman', 
         weather_df=WEATHER,
         meta=META,
         poa=poa,
         wind_factor=0   
+    )
+
+    pvlib_df['faiman_rad'] = pvlib.temperature.faiman_rad(
+        **weather_args
     )
 
     result_df['faiman_rad'] = pvdeg.temperature.temperature(
@@ -116,7 +143,16 @@ def test_temperature():
         wind_factor=0   
     )
 
+    # calc nominal operating cell temperature 
     noct = pvlib.temperature.sapm_cell(poa_global=800, temp_air=20, wind_speed=1, **pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['sapm']['open_rack_glass_polymer'])
+
+    # continue adding pvlib calls...
+    pvlib_df['ross'] = pvlib.temperature.ross(
+        poa_global=poa['poa_global'],
+        temp_air=WEATHER['temp_air'],
+        noct=noct
+    )
+
     result_df['ross'] = pvdeg.temperature.temperature(
         temp_model='ross',
         weather_df=WEATHER,
@@ -125,6 +161,12 @@ def test_temperature():
         wind_factor=0,
         model_kwarg={'noct' : noct}
     )
+
+    pvlib_df['noct_sam'] = pvlib.temperature.noct_sam(
+        **weather_args,
+        noct=noct,
+        module_efficiency=0.1875
+    )    
 
     result_df['noct_sam'] = pvdeg.temperature.temperature(
         temp_model='noct_sam',
@@ -135,6 +177,11 @@ def test_temperature():
         model_kwarg={'noct' : noct, 'module_efficiency' : 0.1875} # 18.75% at 300 [W] / (1000 [W/m^2] * 1.6 [m^2])
     )
 
+    pvlib_df['fuentes'] = pvlib.temperature.fuentes(
+        **weather_args,
+        noct_installed=45
+    )    
+
     result_df['fuentes'] = pvdeg.temperature.temperature(
         temp_model='fuentes',
         weather_df=WEATHER,
@@ -144,21 +191,22 @@ def test_temperature():
         model_kwarg={'noct_installed' : 45} # 45 [c] for freestanding modules
     )
     
-    # pvlib call for the same function
-    # res = pvlib.temperature.generic_linear(
-    #     poa_global=poa['poa_global'],
-    #     temp_air=WEATHER['temp_air'],
-    #     wind_speed=WEATHER['wind_speed'],
-    #     u_const=glm.__dict__['u_const'],
-    #     du_wind=glm.__dict__['du_wind'],
-    #     module_efficiency=0.1875,
-    #     absorptance=0.85
-    # )
-
+    
+    # create model to find parameters to use for calcs
     glm = pvlib.temperature.GenericLinearModel(
         module_efficiency=0.1875,
         absorptance=0.85)
     glm.use_faiman(16, 8)
+
+    pvlib_df['generic_linear'] = pvlib.temperature.generic_linear(
+        poa_global=poa['poa_global'],
+        temp_air=WEATHER['temp_air'],
+        wind_speed=WEATHER['wind_speed'],
+        u_const=glm.__dict__['u_const'],
+        du_wind=glm.__dict__['du_wind'],
+        module_efficiency=0.1875,
+        absorptance=0.85
+    )
 
     result_df['generic_linear'] = pvdeg.temperature.temperature(
         temp_model='generic_linear',
@@ -174,4 +222,8 @@ def test_temperature():
         }
     )
 
+    # check pvdeg.temperature.tempeature results against saved pvdeg results
     pd.testing.assert_frame_equal(result_df, TEMPERATURE_MODELS_RESULTS, check_dtype=False,check_names=False,check_like=False)
+    
+    # check pvdeg.temperature.temperature results against pvlib directly calculated results
+    pd.testing.assert_frame_equal(result_df, pvlib_df, check_dtype=False,check_names=False,check_like=False)
