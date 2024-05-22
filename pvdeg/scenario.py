@@ -22,9 +22,9 @@ from IPython.display import display, HTML
 ### FIX PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF, doesn't work right now ###
 ### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES, single pipeline job is not correct, we cant save weather dataframe to csv
 ### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
-### TEMPERATURE MODELS on module add ###
 ### dynamic plotting function
 ### Cannot have 2 of the same functions in a pipeline with modules. will overwrite old results in dataarray
+### line 360, loop causes index error when modules are already present in scenario, instead of properly overwriting
 
 # Rename: updatePipeline-> addJob, runPipeline -> run
 
@@ -39,7 +39,6 @@ class Scenario:
     Generally speaking, this will be information such as:
     Scenario Name, Path, Geographic Location, Module Type, Racking Type
     """
-
     def __init__(
         self,
         name=None,
@@ -312,8 +311,8 @@ class Scenario:
         racking:str="open_rack_glass_polymer",  
         material:str="EVA",
         temperature_model:str='sapm',
-        model_args:dict={},
-        irradiance_args:dict={},
+        model_kwarg:dict={},
+        irradiance_kwarg:dict={},
         see_added:bool=False,
     ):
         """
@@ -335,7 +334,7 @@ class Scenario:
         temp_model : (str)
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
             Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
-        model_args : (dict), optional
+        model_kwarg : (dict), optional
             provide a dictionary of temperature model coefficents to be used 
             instead of pvlib defaults. Some models will require additional \n
             arguments such as ``ross`` which requires nominal operating cell \n
@@ -343,7 +342,7 @@ class Scenario:
             should be provided.
             Pvlib temp models: 
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
-        irradiance_args : (dict), optional
+        irradiance_kwarg : (dict), optional
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         see_added : (bool), optional
@@ -358,20 +357,20 @@ class Scenario:
             return
 
         # remove module if found in instance list
-        for i in range(self.modules.__len__()):
-            if self.modules[i]["module_name"] == module_name:
-                print(f'WARNING - Module already found by name "{module_name}"')
-                print("Module will be replaced with new instance.")
-                self.modules.pop(i)
-
+        old_modules = [mod['module_name'] for mod in self.modules]
+        if module_name in old_modules:
+            print(f'WARNING - Module already found by name "{module_name}"')
+            print("Module will be replaced with new instance.")
+            self.modules.pop(old_modules.index(module_name))
+ 
         # add the module and parameters
         self.modules.append({
             "module_name": module_name, 
             "racking" : racking,
             "material_params": mat_params, 
             "temp_model" : temperature_model,
-            "model_args" : model_args,
-            "irradiance_args" : irradiance_args,
+            "model_kwarg" : model_kwarg,
+            "irradiance_kwarg" : irradiance_kwarg,
             })
 
         if see_added:
@@ -447,7 +446,7 @@ class Scenario:
     def updatePipeline(
         self, 
         func=None, 
-        func_params=None,
+        func_params={},
         see_added=False,
         ):
         """
@@ -554,16 +553,8 @@ class Scenario:
 
             # we need do the pipeline for every module available
             if self.modules:
-                results_series = pd.Series() # this may be a weird way to do it
 
-                # functions = [entry['job'].__name__ for entry in self.pipeline]
-                # modules = [module['module_name'] for module in self.modules]
-                # data = np.empty((len(functions), len(modules)), dtype=object)  # Shape needs to match the dimensions length
-                # data_array = xr.DataArray(data=data,
-                #     coords={'function': functions, 'module': modules},
-                #     dims=['function', 'module'])
-
-                for module in self.modules: # list{dict} with keys module_name, racking, material_params, temp_model, model_args
+                for module in self.modules: 
                     module_result = {}
                     
                     try:
@@ -578,23 +569,22 @@ class Scenario:
 
                         temperature_args = {
                             'temp_model' : module['temp_model'],
-                            'model_args' : module['model_args'],
-                            'irradiance_args' : module['irradiance_args'],
+                            'model_kwarg' : module['model_kwarg'], # if func parameters are named incorrecly, ex model_kwargs instead of model_kwarg, this will not work properly
+                            'irradiance_kwarg' : module['irradiance_kwarg'], # same for irradiance kwarg, is there a better way to do this then?
                             'conf' : module['racking'],
+                            **module['irradiance_kwarg'] # some functions dont want irradiance_kwargs arg instead they just want the irradiance_kwargs values as kwargs
                         }
 
                         combined = {**weather_dict, **temperature_args, **module['material_params']} # maybe should not have material params like this, idk what functions need them which changes where they should be implemented
 
                         func_params = signature(func).parameters
                         func_args = {k:v for k,v in combined.items() if k in func_params.keys()} # downselect, only keep arguments that the function will take
-                        # if len(func_args) != (len(weather_dict) + len(temperature_args)):
-                        #     print('warning: some keys have been removed')
+                        # downselecting too many things here? we seem to be removing information we want like irradiance kwargs, this will happen if function doesnt take irradiance kwargs
 
+                        # loosing the irradiance kwargs and probably model kwargs here?
                         res = func(**params, **func_args) # provide user args and module specific args
 
                         module_result[func.__name__] = res
-
-                        # results_series[func.__name__] = res
 
                         # Assign a Pandas Series to a specific location
                         # Access the underlying NumPy array directly to avoid xarray broadcasting rules
@@ -605,16 +595,14 @@ class Scenario:
 
                 self.results = results_dict # 2d dictionary array
 
-                    # run entire pipeline
-                # self.results = results_series
+                print(os.getcwd())
+                for module in self.results.keys(): # what is a cleaner way to iterate over this dictionary
+                    for function in self.results[module]:
+                        result = self.results[module][function]
+                        if isinstance(result, (pd.Series, pd.DataFrame)):
+                            result.to_csv(f"{module}_pipeline_results/{function}.csv")
+                        # add other types, what do we do when it is 
 
-                # move to seperate method?
-                # add other case handling
-                # for entry, value in self.results.items():
-                #     if isinstance(value, (pd.DataFrame, pd.Series)):
-                #         value.to_csv(f"{module['module_name']}_pipeline_results/{entry}.csv") # this is gross, fix the paths
-                #     else:
-                #         print(f"{entry} is not a dataframe, not saved,")
 
             # REFACTOR??? this is really bad 
             # no modules case, all funcs will use default values from functions for module information
@@ -896,15 +884,17 @@ class Scenario:
             cb_title=f'dynamic title : {data_from_result}'
             )
 
-        # is cwd the right place?
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
 
+    # redo so we have a scenario config dropdown that displays all simple attributes, hpc, geospatial, apikey, email, etc.
+    # add recursive dropdowns for results dicitonaries. is there a way to auto complete code from html elements in display
     def _ipython_display_(self):
+        file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 5px; margin-top: 5px;">
             <h2>Scenario Details: {self.name}</h2>
-            <p><strong>Path:</strong> <a href="file://{self.path}" target="_blank">{self.path}</a></p>
+            <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
             <p><strong>GIDs:</strong> {self.gids}</p>
             <div>
                 <h3>Pipeline</h3>
@@ -913,11 +903,20 @@ class Scenario:
             <p><strong>Results:</strong> {self.results}</p>
             <p><strong>HPC Configuration:</strong> {self.hpc}</p>
             <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
-            <p><strong>Weather Data:</strong> {self.weather_data}</p>
-            <p><strong>Meta Data:</strong> {self.meta_data}</p>
             <div>
                 <h3>Modules</h3>
                 {self.format_modules()}
+            </div>
+            <div>
+                <h3>Results</h3>
+            </div>
+            <div>
+                <h3>Weather Data</h3>
+                {self.format_weather()}
+            </div>
+            <div>
+                <h3>Meta Data</h3>
+                {self.meta_data}
             </div>
         </div>
         <script>
@@ -935,10 +934,60 @@ class Scenario:
         </script>
         """
         display(HTML(html_content))
-    
+
+    def format_config(self):
+        config_html =f"""
+
+        attrs = name, path, modules, pipeline, hpc, geospatial, email, api_key
+        <div onclick="toggleVisibility('config')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
+        
+        </div>
+        """
+
+        return config_html
+
+    def format_results(self):
+        results_html = '<div>'
+        for key, in self.results.keys():
+            module_html=f"""f"<pre>{json.dumps(key, indent=2)}</pre>"
+
+            """
+            pipeline_html += module_html
+        pipeline_html += '</div>'
+        return pipeline_html
+
+
+    def format_weather(self):
+        weather_data_html = ""
+        if isinstance(self.weather_data, pd.DataFrame):
+            if len(self.weather_data) > 10:
+                first_five = self.weather_data.head(5)
+                last_five = self.weather_data.tail(5)
+                ellipsis_row = pd.DataFrame(["..."] * len(self.weather_data.columns)).T
+                ellipsis_row.columns = self.weather_data.columns
+                display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+            else:
+                display_data = self.weather_data
+
+            weather_data_html = f"""
+            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
+                <h4><span id="arrow_weather_data">►</span> Weather Data</h4>
+            </div>
+            <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px;">
+                {display_data.to_html()}
+            </div>
+            """
+        
+        elif isinstance(self.weather_data, xr.DataSet):
+            pass
+
+        return weather_data_html
+
     def format_pipeline(self):
         pipeline_html = '<div>'
         for i, step in enumerate(self.pipeline):
+            params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
+
             step_content = f"""
             <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
                 <h4><span id="arrow_pipeline_{i}">►</span> {step['job'].__name__}</h4>
@@ -946,9 +995,9 @@ class Scenario:
             <div id="pipeline_{i}" style="display:none; margin-left: 20px; padding: 5px;">
                 <p>Job: {step['job'].__name__}</p>
                 <p>Parameters:</p>
-                <ul>
-                    {''.join(f"<li>{key}: {value}</li>" for key, value in step['params'].items())}
-                </ul>
+                <div style="margin-left: 20px;">
+                    {params_html}
+                </div>
             </div>
             """
             pipeline_html += step_content
@@ -958,29 +1007,31 @@ class Scenario:
     def format_modules(self):
         modules_html = '<div>'
         for i, module in enumerate(self.modules):
+            material_params_html = f"<pre>{json.dumps(module['material_params'], indent=2)}</pre>"
+            model_kwarg_html = f"<pre>{json.dumps(module['model_kwarg'], indent=2)}</pre>"
+            irradiance_kwarg_html = f"<pre>{json.dumps(module['irradiance_kwarg'], indent=2)}</pre>"
+
             module_content = f"""
             <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
                 <h4><span id="arrow_module_{i}">►</span> {module['module_name']}</h4>
             </div>
             <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px;">
-                <p>Racking: {module['racking']}</p>
-                <p>Temperature Model: {module['temp_model']}</p>
-                <p>Material Parameters:</p>
-                <ul>
-                    {''.join(f"<li>{key}: {value}</li>" for key, value in module['material_params'].items())}
-                </ul>
-                <p>Model Arguments:</p>
-                <ul>
-                    {''.join(f"<li>{key}: {value}</li>" for key, value in module['model_args'].items())}
-                </ul>
-                <p>Irradiance Arguments:</p>
-                <ul>
-                    {''.join(f"<li>{key}: {value}</li>" for key, value in module['irradiance_args'].items())}
-                </ul>
+                <p><strong>Racking:</strong> {module['racking']}</p>
+                <p><strong>Temperature Model:</strong> {module['temp_model']}</p>
+                <p><strong>Material Parameters:</strong></p>
+                <div style="margin-left: 20px;">
+                    {material_params_html}
+                </div>
+                <p><strong>Model Arguments:</strong></p>
+                <div style="margin-left: 20px;">
+                    {model_kwarg_html}
+                </div>
+                <p><strong>Irradiance Arguments:</strong></p>
+                <div style="margin-left: 20px;">
+                    {irradiance_kwarg_html}
+                </div>
             </div>
             """
             modules_html += module_content
         modules_html += '</div>'
         return modules_html
-
-#7a736c

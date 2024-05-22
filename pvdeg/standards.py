@@ -198,6 +198,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
     return x_eff
 
 
+# only works with sapm (maybe pvlib depending on kempe's input)
 def standoff(
     weather_df=None,
     meta=None,
@@ -253,7 +254,7 @@ def standoff(
         It is recommended that a power-law relationship between height and wind speed of 0.33
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
-    model_kwargs : dict, optional
+    model_kwarg : dict, optional
         dictionary to provide to the temperature model, see temperature.temperature for more information
 
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
@@ -275,6 +276,8 @@ def standoff(
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     """
+    if temp_model != 'sapm':
+        raise ValueError(f"temp model is {temp_model} ONLY 'sapm' ALLOWED")
 
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 

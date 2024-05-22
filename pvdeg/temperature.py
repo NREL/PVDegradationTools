@@ -282,7 +282,7 @@ def temperature(
     cell_or_mod=None, 
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
-    irradince_kwarg={}, 
+    irradiance_kwarg={}, 
     model_kwarg={}, 
     ):
     """
@@ -363,7 +363,7 @@ def temperature(
         poa = pvdeg.spectral.poa_irradiance(
             weather_df, 
             meta, 
-            **irradince_kwarg 
+            **irradiance_kwarg # arent getting the irradiance_kwargs passed in from scenario -> standoff -> temperature, this can happen when we do the signature check in scenario or in temperature?
             ) 
 
     # ALWAYS try to apply all of these to the temp model, 
@@ -396,8 +396,8 @@ def temperature(
     except NameError:
         pass
     
-    # add optional kwargs
-    model_args.update(**model_kwarg) 
+    # add optional kwargs, overwrites copies (desired behavior)
+    model_args.update(**model_kwarg)
     
     # we need to filter incase
     # temp calc using dynamic model
