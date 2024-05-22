@@ -10,22 +10,28 @@ from inspect import signature
 import warnings
 import pandas as pd
 import xarray as xr
+import numpy as np
 
 from functools import partial
 
 import pprint
+from IPython.display import display, HTML
+
 
 # TODO: 
 ### FIX PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF, doesn't work right now ###
 ### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES, single pipeline job is not correct, we cant save weather dataframe to csv
 ### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
 ### TEMPERATURE MODELS on module add ###
+### dynamic plotting function
+### Cannot have 2 of the same functions in a pipeline with modules. will overwrite old results in dataarray
 
-### Rename: updatePipeline-> addJob, runPipeline -> run
+# Rename: updatePipeline-> addJob, runPipeline -> run
 
 # @ martin
 # wind factor in class intialization or module?
-# dask cluster on initialization? or on pipeline run?
+# dask client on initialization? or on pipeline run?
+# does it matter if there is already a client running? how do we tell?
 
 class Scenario:
     """
@@ -113,6 +119,8 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
 
+        
+
     def clean(self):
         """
         Wipe the Scenario object filetree. This is useful because the Scenario object stores its data in local files outside of the python script.
@@ -129,8 +137,8 @@ class Scenario:
         """
         if self.path:
             try:
-                rmtree(path=self.path) # does this only delete files?
-                os.chdir(os.pardir) # not deleting directory properly?
+                os.chdir(os.pardir) 
+                rmtree(path=self.path) 
             except:
                 raise FileNotFoundError(f"cannot remove {self.name} directory")
         else:
@@ -298,14 +306,14 @@ class Scenario:
         #     out_fn=file_name,
         # )
 
-    # how do we know to use cell or module temperature
     def addModule(
         self,
         module_name:str = None,
-        racking:str="open_rack_glass_polymer",  # move ?? split RACKING_CONSTRUCTION
+        racking:str="open_rack_glass_polymer",  
         material:str="EVA",
         temperature_model:str='sapm',
-        model_args:dict=None,
+        model_args:dict={},
+        irradiance_args:dict={},
         see_added:bool=False,
     ):
         """
@@ -325,11 +333,19 @@ class Scenario:
             Name of the material desired. For a complete list, see data/materials.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         temp_model : (str)
-            select pvlib temperature models. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
+            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
+            Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
         model_args : (dict), optional
             provide a dictionary of temperature model coefficents to be used 
-            instead of pvlib defaults. Pvlib temp models: 
+            instead of pvlib defaults. Some models will require additional \n
+            arguments such as ``ross`` which requires nominal operating cell \n
+            temperature (``noct``). This is where other values such as noct \n
+            should be provided.
+            Pvlib temp models: 
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        irradiance_args : (dict), optional
+            provide keyword arguments for poa irradiance calculations.
+            Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         see_added : (bool), optional
         """
 
@@ -348,9 +364,6 @@ class Scenario:
                 print("Module will be replaced with new instance.")
                 self.modules.pop(i)
 
-        # TODO: move to temperature based functions
-        
-
         # add the module and parameters
         self.modules.append({
             "module_name": module_name, 
@@ -358,6 +371,7 @@ class Scenario:
             "material_params": mat_params, 
             "temp_model" : temperature_model,
             "model_args" : model_args,
+            "irradiance_args" : irradiance_args,
             })
 
         if see_added:
@@ -429,7 +443,6 @@ class Scenario:
         # can't check if dataframe is empty
         if isinstance(self.weather_data, (pd.DataFrame, xr.Dataset)):
             print(f"scenario weather : {self.weather_data}")
-
 
     def updatePipeline(
         self, 
@@ -521,12 +534,18 @@ class Scenario:
         file_name = f"pipeline_{self.name}.csv"
         df_pipeline.to_csv(file_name, index=False)
 
-    # TODO: run pipeline on each module 
-    def runPipeline(self):
+    def runPipeline(self, hpc=None):
         """
         Runs entire pipeline on scenario object. If geospatial, can only run 
         one job in the pipeline. If not geospatial, can run n jobs 
         in the pipeline.
+
+        Parameters:
+        -----------
+        hpc : (dict), optional, default=None
+            Only for geospatial analysis.
+            dictionary of parameters for dask client intialization. 
+            See ``pvdeg.geospatial.start_dask`` for more information.
         """
         results_series = pd.Series(dtype='object')
 
@@ -535,16 +554,70 @@ class Scenario:
 
             # we need do the pipeline for every module available
             if self.modules:
-                for module in self.modules: # list{dict} with keys module_name, racking, material_params, temp_model, model_args
+                results_series = pd.Series() # this may be a weird way to do it
 
-                    # need to create tempeature model, could refactor into temperature module
+                # functions = [entry['job'].__name__ for entry in self.pipeline]
+                # modules = [module['module_name'] for module in self.modules]
+                # data = np.empty((len(functions), len(modules)), dtype=object)  # Shape needs to match the dimensions length
+                # data_array = xr.DataArray(data=data,
+                #     coords={'function': functions, 'module': modules},
+                #     dims=['function', 'module'])
+
+                for module in self.modules: # list{dict} with keys module_name, racking, material_params, temp_model, model_args
+                    module_result = {}
+                    
+                    try:
+                        os.mkdir(f"{module['module_name']}_pipeline_results")
+                    except FileExistsError:
+                        print("pipeline results directory already exists")
+
+                    for job in self.pipeline:
+                        func, params = job['job'], job['params']
+
+                        weather_dict = {'weather_df' : self.weather_data, 'meta' : self.meta_data} # move outside? doesn't need to be in here, cleaner though?
+
+                        temperature_args = {
+                            'temp_model' : module['temp_model'],
+                            'model_args' : module['model_args'],
+                            'irradiance_args' : module['irradiance_args'],
+                            'conf' : module['racking'],
+                        }
+
+                        combined = {**weather_dict, **temperature_args, **module['material_params']} # maybe should not have material params like this, idk what functions need them which changes where they should be implemented
+
+                        func_params = signature(func).parameters
+                        func_args = {k:v for k,v in combined.items() if k in func_params.keys()} # downselect, only keep arguments that the function will take
+                        # if len(func_args) != (len(weather_dict) + len(temperature_args)):
+                        #     print('warning: some keys have been removed')
+
+                        res = func(**params, **func_args) # provide user args and module specific args
+
+                        module_result[func.__name__] = res
+
+                        # results_series[func.__name__] = res
+
+                        # Assign a Pandas Series to a specific location
+                        # Access the underlying NumPy array directly to avoid xarray broadcasting rules
+                        # data_array.values[functions.index(func.__name__), modules.index(module['module_name'])] = res # this is heinous but idk how else to do this
+                        # instead of using index could save mapping? or other approach?
+
+                    results_dict[module['module_name']] = module_result
+
+                self.results = results_dict # 2d dictionary array
 
                     # run entire pipeline
-                    pass
+                # self.results = results_series
 
+                # move to seperate method?
+                # add other case handling
+                # for entry, value in self.results.items():
+                #     if isinstance(value, (pd.DataFrame, pd.Series)):
+                #         value.to_csv(f"{module['module_name']}_pipeline_results/{entry}.csv") # this is gross, fix the paths
+                #     else:
+                #         print(f"{entry} is not a dataframe, not saved,")
 
-            # no modules case
-            # if there are no modules then we still want to do the pipeline once
+            # REFACTOR??? this is really bad 
+            # no modules case, all funcs will use default values from functions for module information
             elif not self.modules:
                 for job in self.pipeline:
                     _func = job['job']
@@ -574,28 +647,29 @@ class Scenario:
                     # move standard results to single dictionary
                     pipeline_results = results_dict
             
-            # save all results to dataframes and store in a series
-            for key in pipeline_results.keys():
-                print(f"results_dict dtype : {type(results_dict[key])}")
-                print(results_dict)
+                # TEST THIS NOW? AND REDO result series logic?
+                # save all results to dataframes and store in a series
+                for key in pipeline_results.keys():
+                    print(f"results_dict dtype : {type(results_dict[key])}")
+                    print(results_dict)
 
-                if isinstance(results_dict[key], pd.DataFrame):
-                    results_series[key] = results_dict[key]
+                    if isinstance(results_dict[key], pd.DataFrame):
+                        results_series[key] = results_dict[key]
 
-                elif isinstance(results_dict[key], (float, int)):
-                    results_series[key] = pd.DataFrame(
-                        [ results_dict[key] ], # convert the single numeric to a list
-                        columns=[key] # name the single column entry in list form
-                        )
+                    elif isinstance(results_dict[key], (float, int)):
+                        results_series[key] = pd.DataFrame(
+                            [ results_dict[key] ], # convert the single numeric to a list
+                            columns=[key] # name the single column entry in list form
+                            )
 
-                self.results = results_series
+                    self.results = results_series
 
         if self.geospatial:
 
             # TODO : 
-            # move dask client intialization? add dask parameters to runPipeline method
+            # move dask client intialization? 
             # add check to see if there is already a dask client running
-            pvdeg.geospatial.start_dask()   
+            pvdeg.geospatial.start_dask(hpc=hpc)   
 
             for job in self.pipeline:
                 func = job['geospatial_job']
@@ -825,3 +899,88 @@ class Scenario:
         # is cwd the right place?
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
+
+    def _ipython_display_(self):
+        html_content = f"""
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 5px; margin-top: 5px;">
+            <h2>Scenario Details: {self.name}</h2>
+            <p><strong>Path:</strong> <a href="file://{self.path}" target="_blank">{self.path}</a></p>
+            <p><strong>GIDs:</strong> {self.gids}</p>
+            <div>
+                <h3>Pipeline</h3>
+                {self.format_pipeline()}
+            </div>
+            <p><strong>Results:</strong> {self.results}</p>
+            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
+            <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
+            <p><strong>Weather Data:</strong> {self.weather_data}</p>
+            <p><strong>Meta Data:</strong> {self.meta_data}</p>
+            <div>
+                <h3>Modules</h3>
+                {self.format_modules()}
+            </div>
+        </div>
+        <script>
+            function toggleVisibility(id) {{
+                var content = document.getElementById(id);
+                var arrow = document.getElementById('arrow_' + id);
+                if (content.style.display === 'none') {{
+                    content.style.display = 'block';
+                    arrow.innerHTML = '▼';
+                }} else {{
+                    content.style.display = 'none';
+                    arrow.innerHTML = '►';
+                }}
+            }}
+        </script>
+        """
+        display(HTML(html_content))
+    
+    def format_pipeline(self):
+        pipeline_html = '<div>'
+        for i, step in enumerate(self.pipeline):
+            step_content = f"""
+            <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
+                <h4><span id="arrow_pipeline_{i}">►</span> {step['job'].__name__}</h4>
+            </div>
+            <div id="pipeline_{i}" style="display:none; margin-left: 20px; padding: 5px;">
+                <p>Job: {step['job'].__name__}</p>
+                <p>Parameters:</p>
+                <ul>
+                    {''.join(f"<li>{key}: {value}</li>" for key, value in step['params'].items())}
+                </ul>
+            </div>
+            """
+            pipeline_html += step_content
+        pipeline_html += '</div>'
+        return pipeline_html
+
+    def format_modules(self):
+        modules_html = '<div>'
+        for i, module in enumerate(self.modules):
+            module_content = f"""
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
+                <h4><span id="arrow_module_{i}">►</span> {module['module_name']}</h4>
+            </div>
+            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px;">
+                <p>Racking: {module['racking']}</p>
+                <p>Temperature Model: {module['temp_model']}</p>
+                <p>Material Parameters:</p>
+                <ul>
+                    {''.join(f"<li>{key}: {value}</li>" for key, value in module['material_params'].items())}
+                </ul>
+                <p>Model Arguments:</p>
+                <ul>
+                    {''.join(f"<li>{key}: {value}</li>" for key, value in module['model_args'].items())}
+                </ul>
+                <p>Irradiance Arguments:</p>
+                <ul>
+                    {''.join(f"<li>{key}: {value}</li>" for key, value in module['irradiance_args'].items())}
+                </ul>
+            </div>
+            """
+            modules_html += module_content
+        modules_html += '</div>'
+        return modules_html
+
+#7a736c

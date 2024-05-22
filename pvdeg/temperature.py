@@ -356,7 +356,7 @@ def temperature(
 
         # cell or mod doesn't matter for non sapm or pvsys 
         if cell_or_mod!='cell' and temp_model=='sapm':
-            # del parameters['deltaT'] # This is problematic, we are deleting delta t from the original and it is not restored until we restart the kernel, why does this happen
+            # strip the 'deltaT' for calculations that will not need it
             parameters = {k: v for k, v in parameters.items() if k != 'deltaT'}
 
     if poa is None:
@@ -371,11 +371,10 @@ def temperature(
     weather_args = {
     'poa_global' : poa["poa_global"],
     'temp_air' : weather_df["temp_air"],
-    'wind_speed' : weather_df["wind_speed"] * wind_speed_factor, # what if we dont always want the wind, can be overwritten by the model_kwag
-    } # but this will ovewrite the model default always, so will have to provide default wind speed in the kwargs
+    'wind_speed' : weather_df["wind_speed"] * wind_speed_factor, 
+    } # but this will ovewrite the model default always, so will have to provide default wind speed in the kwargs 
 
     # only apply nessecary values to the model, 
-    # gets signature for checks
     func = map_model(temp_model, cell_or_mod)
     sig = inspect.signature(func)
 
