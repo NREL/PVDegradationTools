@@ -19,17 +19,14 @@ from IPython.display import display, HTML
 
 
 # TODO: 
-### FIX PROVIDING WEATHER AND META FOR SINGLE LOCATION STANDOFF, doesn't work right now ###
-### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES, single pipeline job is not correct, we cant save weather dataframe to csv
+### UPDATE SAVING SINGLE LOCATION SCENARIO TO FILES, single pipeline job is not correct, we cant save weather dataframe to csv in the parameters column of csv
 ### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
 ### dynamic plotting function
-### Cannot have 2 of the same functions in a pipeline with modules. will overwrite old results in dataarray
-### line 360, loop causes index error when modules are already present in scenario, instead of properly overwriting
-
-# Rename: updatePipeline-> addJob, runPipeline -> run
+### need to use package wide uniform naming scheme for scenario analysis to work with all funcs
 
 # @ martin
 # wind factor in class intialization or module?
+# how should we handle multiple of the same function, currently names dict key with the address added but this isnt clear and will become a problem quickly
 # dask client on initialization? or on pipeline run?
 # does it matter if there is already a client running? how do we tell?
 
@@ -440,7 +437,7 @@ class Scenario:
         if isinstance(self.weather_data, (pd.DataFrame, xr.Dataset)):
             print(f"scenario weather : {self.weather_data}")
 
-    def updatePipeline(
+    def addJob(
         self, 
         func=None, 
         func_params={},
@@ -513,11 +510,12 @@ class Scenario:
         file_name = f"pipeline_{self.name}.csv"
         df_pipeline.to_csv(file_name, index=False)
 
-    def runPipeline(self, hpc=None):
+    def run(self, hpc=None):
         """
-        Runs entire pipeline on scenario object. If geospatial, can only run 
-        one job in the pipeline. If not geospatial, can run n jobs 
-        in the pipeline.
+        Run all jobs in pipeline on scenario object. If single location,
+        run multiple jobs on multiple pannels or any combination. 
+        If geospatial, can only run one job from the pipeline. Having more
+        than one geospatial job in the pipeline may throw an error.
 
         Parameters:
         -----------
@@ -537,11 +535,6 @@ class Scenario:
                 for module in self.modules: 
                     module_result = {}
                     
-                    try:
-                        os.mkdir(f"{module['module_name']}_pipeline_results")
-                    except FileExistsError:
-                        print("pipeline results directory already exists")
-
                     for job in self.pipeline:
                         func, params = job['job'], job['params']
 
@@ -564,34 +557,32 @@ class Scenario:
                         # loosing the irradiance kwargs and probably model kwargs here?
                         res = func(**params, **func_args) # provide user args and module specific args
 
-                        module_result[func.__name__] = res
+                        if func.__name__ not in module_result.keys(): # this is terrible
+                            module_result[func.__name__] = res
+                        else:
+                            module_result[f"{func.__name__}_{id(func)}"] = res
 
-                        # Assign a Pandas Series to a specific location
-                        # Access the underlying NumPy array directly to avoid xarray broadcasting rules
-                        # data_array.values[functions.index(func.__name__), modules.index(module['module_name'])] = res # this is heinous but idk how else to do this
-                        # instead of using index could save mapping? or other approach?
-
+                   # move standard results to single dictionary
                     results_dict[module['module_name']] = module_result
 
                 self.results = results_dict # 2d dictionary array
 
-                print(os.getcwd())
-                for module in self.results.keys(): # what is a cleaner way to iterate over this dictionary
-                    for function in self.results[module]:
-                        result = self.results[module][function]
+                for module, pipeline_result in self.results.items():
+                    module_dir = f"pipeline_results/{module}_pipeline_results"
+                    os.makedirs(module_dir, exist_ok=True)
+                    for function, result in pipeline_result.items():
                         if isinstance(result, (pd.Series, pd.DataFrame)):
-                            result.to_csv(f"{module}_pipeline_results/{function}.csv")
-                        # add other types, what do we do when it is 
-
+                            result.to_csv(f"{module_dir}/{function}.csv")                            
+                        elif isinstance(result, (int, float)):
+                            with open(f"{module_dir}/{function}.csv", 'w') as file:
+                                file.write(f"{result}\n")
 
             # REFACTOR??? this is really bad 
             # no modules case, all funcs will use default values from functions for module information
             elif not self.modules:
                 for job in self.pipeline:
-                    _func = job['job']
-                    _params = job['params']
+                    _func, _params = job['job'], job['params']
 
-                    # not a comprehensive check
                     # if we do this we will need to enforce parameter naming scheme repo wide
                     try:
                         # try to populate with weather and meta
@@ -610,7 +601,10 @@ class Scenario:
 
                     result = _func(**_params) if _params else _func()
 
-                    results_dict[job['job'].__name__] = result
+                    if job['job'].__name__ not in results_dict.keys():
+                        results_dict[job['job'].__name__] = result
+                    else:
+                        results_dict[f"{job['job'].__name__}_{id(job['job'])}"] = result # this is spagheti
 
                     # move standard results to single dictionary
                     pipeline_results = results_dict
@@ -815,19 +809,27 @@ class Scenario:
         
         return meta_df[target_region].unique() 
 
-    def dump(
-        self,
-        attribute,
-        ):
+    def plot(self, dim=None, tmy=False):
         """
-        Dump desired class attributes to a file (what type???) previously using json, netcdf?
-        Parameters
-        ----------
-        attribute : str or list[str]
-            attribute names to save to csv file
-        """
+        create plots of scenario data against a specific dimension quickly. 
+        When complete this will be able to plot single location and geospatial
+        data.
+        Parameters:
+        -----------
+        dim : str
+            specify whether you want to see a plot with respec to a specific
+            module or function (for single location only)
+            options: ``module``, ``function``
 
-        pass
+        """
+        if self.results == None:
+            raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
+        if self.geospatial:
+            raise ValueError(f"self.geospatial must be false. only single point plotting currently implemented")
+        
+        
+
+
 
     def plot_USA(
         self, 
@@ -867,15 +869,16 @@ class Scenario:
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
 
+    # test on geospatial?
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
-            <h2>Scenario Details: {self.name}</h2>
-            <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
+            <h2>{self.name}: Scenario Analysis</h2>
             <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>GIDs:</strong> {self.gids}</p>
+            <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
             <p><strong>HPC Configuration:</strong> {self.hpc}</p>
+            <p><strong>GIDs:</strong> {self.gids}</p>
             <p><strong>Email:</strong> {self.email}</p>
             <p><strong>API Key:</strong> {self.api_key}</p>
             <div>
@@ -949,7 +952,7 @@ class Scenario:
 
     def format_results(self):
         results_html = '<div>'
-        for module_name, functions in self.results.items():
+        for module_name, functions in sorted(self.results.items()):
             module_id = f"result_module_{module_name}" # 5, 3, 2 ebfore
             module_content = f"""
             <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #a0a88c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
@@ -1014,7 +1017,7 @@ class Scenario:
             params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
 
             step_content = f"""
-            <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
+            <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #cc512f; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
                 <h4><span id="arrow_pipeline_{i}">►</span> {step['job'].__name__}</h4>
             </div>
             <div id="pipeline_{i}" style="display:none; margin-left: 20px; padding: 5px;">

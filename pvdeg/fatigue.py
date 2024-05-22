@@ -217,7 +217,7 @@ def solder_fatigue(
             temp_model=temp_model,
             conf=conf,
             wind_factor=wind_factor,
-            irradince_kwarg=irradiance_kwarg,
+            irradiance_kwarg=irradiance_kwarg,
             model_kwarg=model_kwarg
         )
 
