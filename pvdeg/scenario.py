@@ -422,9 +422,6 @@ class Scenario:
 
         print("Results : ", end='')
         try: 
-            # if this throws an error we have not run the pipeline yet
-            results = self.results.empty
-
             print(f"Pipeline results : ")
 
             for result in self.results:
@@ -476,25 +473,8 @@ class Scenario:
 
             params_all = dict(signature(func).parameters)
 
-            # this is a bad way of doing it 
-            # some values with NONE are still optional
-            # causing if statement below to work improperly, 
-            reqs = {name: param for name, param in params_all.items() if param.default is None}
-            optional = {name: param for name, param in params_all.items() if name not in reqs}
+            # cant check parameters needed by function now bc they come from multiple sources when the pipeline is run.
 
-            if func_params:
-                # this should be SUPERSET not subset #
-                # this will force it to work BUT may cause some parameters to be missed #
-                if not set(func_params.keys()).issubset(set(reqs.keys())):
-                    print(func_params.keys())
-                    print(reqs.keys())
-                    print(f"FAILED: Requestion function {func} did not receive enough parameters")
-                    print(f"Requestion function: \n {func} \n ---")
-                    print(f"Required Parameters: \n {reqs} \n ---")
-                    print(f"Optional Parameters: {optional}")
-                    print("Function has not been added to pipeline.")
-                    return
-            
             job_dict = {"job": func, "params": func_params}
             self.pipeline.append(job_dict)
            
@@ -887,28 +867,28 @@ class Scenario:
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
 
-    # redo so we have a scenario config dropdown that displays all simple attributes, hpc, geospatial, apikey, email, etc.
-    # add recursive dropdowns for results dicitonaries. is there a way to auto complete code from html elements in display
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 5px; margin-top: 5px;">
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
             <h2>Scenario Details: {self.name}</h2>
+            <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
             <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
             <p><strong>GIDs:</strong> {self.gids}</p>
+            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
+            <p><strong>Email:</strong> {self.email}</p>
+            <p><strong>API Key:</strong> {self.api_key}</p>
+            <div>
+                <h3>Results</h3>
+                {self.format_results()}
+            </div>
             <div>
                 <h3>Pipeline</h3>
                 {self.format_pipeline()}
             </div>
-            <p><strong>Results:</strong> {self.results}</p>
-            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
-            <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
             <div>
                 <h3>Modules</h3>
                 {self.format_modules()}
-            </div>
-            <div>
-                <h3>Results</h3>
             </div>
             <div>
                 <h3>Weather Data</h3>
@@ -934,76 +914,7 @@ class Scenario:
         </script>
         """
         display(HTML(html_content))
-
-    def format_config(self):
-        config_html =f"""
-
-        attrs = name, path, modules, pipeline, hpc, geospatial, email, api_key
-        <div onclick="toggleVisibility('config')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
-        
-        </div>
-        """
-
-        return config_html
-
-    def format_results(self):
-        results_html = '<div>'
-        for key, in self.results.keys():
-            module_html=f"""f"<pre>{json.dumps(key, indent=2)}</pre>"
-
-            """
-            pipeline_html += module_html
-        pipeline_html += '</div>'
-        return pipeline_html
-
-
-    def format_weather(self):
-        weather_data_html = ""
-        if isinstance(self.weather_data, pd.DataFrame):
-            if len(self.weather_data) > 10:
-                first_five = self.weather_data.head(5)
-                last_five = self.weather_data.tail(5)
-                ellipsis_row = pd.DataFrame(["..."] * len(self.weather_data.columns)).T
-                ellipsis_row.columns = self.weather_data.columns
-                display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
-            else:
-                display_data = self.weather_data
-
-            weather_data_html = f"""
-            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
-                <h4><span id="arrow_weather_data">►</span> Weather Data</h4>
-            </div>
-            <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px;">
-                {display_data.to_html()}
-            </div>
-            """
-        
-        elif isinstance(self.weather_data, xr.DataSet):
-            pass
-
-        return weather_data_html
-
-    def format_pipeline(self):
-        pipeline_html = '<div>'
-        for i, step in enumerate(self.pipeline):
-            params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
-
-            step_content = f"""
-            <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
-                <h4><span id="arrow_pipeline_{i}">►</span> {step['job'].__name__}</h4>
-            </div>
-            <div id="pipeline_{i}" style="display:none; margin-left: 20px; padding: 5px;">
-                <p>Job: {step['job'].__name__}</p>
-                <p>Parameters:</p>
-                <div style="margin-left: 20px;">
-                    {params_html}
-                </div>
-            </div>
-            """
-            pipeline_html += step_content
-        pipeline_html += '</div>'
-        return pipeline_html
-
+   
     def format_modules(self):
         modules_html = '<div>'
         for i, module in enumerate(self.modules):
@@ -1012,7 +923,7 @@ class Scenario:
             irradiance_kwarg_html = f"<pre>{json.dumps(module['irradiance_kwarg'], indent=2)}</pre>"
 
             module_content = f"""
-            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 5px; border-radius: 3px; margin-bottom: 2px;">
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
                 <h4><span id="arrow_module_{i}">►</span> {module['module_name']}</h4>
             </div>
             <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px;">
@@ -1035,3 +946,85 @@ class Scenario:
             modules_html += module_content
         modules_html += '</div>'
         return modules_html
+
+    def format_results(self):
+        results_html = '<div>'
+        for module_name, functions in self.results.items():
+            module_id = f"result_module_{module_name}" # 5, 3, 2 ebfore
+            module_content = f"""
+            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #a0a88c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
+                <h4><span id="arrow_{module_id}">►</span> {module_name}</h4>
+            </div>
+            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px;">
+            """
+            for function_name, output in functions.items():
+                function_id = f"{module_id}_{function_name}"
+                formatted_output = self.format_output(output)
+                module_content += f"""
+                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #849654; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
+                    <h5><span id="arrow_{function_id}">►</span> {function_name}</h5>
+                </div>
+                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px;">
+                    {formatted_output}
+                </div>
+                """
+            module_content += '</div>'
+            results_html += module_content
+        results_html += '</div>'
+        return results_html
+
+    def format_output(self, output):
+        if isinstance(output, pd.Series):
+            output = pd.DataFrame(output) # cant display series as html so go to dataframe first
+            
+        if isinstance(output, pd.DataFrame):
+            # Display first 10 and last 10 entries
+            head = output.head(10).to_html()
+            tail = output.tail(10).to_html()
+            return f"{head}<br>...<br>{tail}"
+        else:
+            return str(output)
+
+    def format_weather(self):
+        weather_data_html = ""
+        if isinstance(self.weather_data, pd.DataFrame):
+            if len(self.weather_data) > 10:
+                first_five = self.weather_data.head(5)
+                last_five = self.weather_data.tail(5)
+                ellipsis_row = pd.DataFrame(["..."] * len(self.weather_data.columns)).T
+                ellipsis_row.columns = self.weather_data.columns
+                display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+            else:
+                display_data = self.weather_data
+
+            weather_data_html = f"""
+            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #7a736c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
+                <h4><span id="arrow_weather_data">►</span> Weather Data</h4>
+            </div>
+           <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px;">
+                {display_data.to_html()}
+            </div>
+            """
+        
+        return weather_data_html
+
+    def format_pipeline(self):
+        pipeline_html = '<div>'
+        for i, step in enumerate(self.pipeline):
+            params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
+
+            step_content = f"""
+            <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
+                <h4><span id="arrow_pipeline_{i}">►</span> {step['job'].__name__}</h4>
+            </div>
+            <div id="pipeline_{i}" style="display:none; margin-left: 20px; padding: 5px;">
+                <p>Job: {step['job'].__name__}</p>
+                <p>Parameters:</p>
+                <div style="margin-left: 20px;">
+                    {params_html}
+                </div>
+            </div>
+            """
+            pipeline_html += step_content
+        pipeline_html += '</div>'
+        return pipeline_html

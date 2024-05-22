@@ -181,7 +181,7 @@ def vantHoff_deg(
         # temp = temperature.cell(weather_df=weather_df, meta=meta, poa=poa)
         temp = temperature.temperature(
             cell_or_mod='cell',
-            temp_model='sapm',
+            temp_model=temp_model,
             weather_df=weather_df,
             meta=meta,
             poa=poa, 

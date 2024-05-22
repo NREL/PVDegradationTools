@@ -352,7 +352,7 @@ def temperature(
         wind_speed_factor = _wind_speed_factor(temp_model, meta, wind_factor)
 
     if temp_model in ['sapm', 'pvsyst']:
-        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
+        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf] # add checking and error messages for this. would be very helpful, common source of error from racking and temp model options
 
         # cell or mod doesn't matter for non sapm or pvsys 
         if cell_or_mod!='cell' and temp_model=='sapm':
