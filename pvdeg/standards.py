@@ -199,6 +199,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
 
 
 # only works with sapm (maybe pvlib depending on kempe's input)
+# add conf kwargs
 def standoff(
     weather_df=None,
     meta=None,
@@ -543,12 +544,12 @@ def T98_estimate(
         return T98_inf
     else:
         T_0 = temperature.cell(
-            weather_df,
-            meta,
-            poa,
-            temp_model,
-            conf_0,
-            wind_factor,
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            temp_model=temp_model,
+            conf_0=conf_0,
+            wind_factor=wind_factor,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
         # T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
