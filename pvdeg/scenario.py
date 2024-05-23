@@ -11,6 +11,7 @@ import warnings
 import pandas as pd
 import xarray as xr
 import numpy as np
+import matplotlib.pyplot as plt
 
 from functools import partial
 
@@ -212,6 +213,7 @@ class Scenario:
 
             if isinstance(lat_long, tuple) and all(isinstance(item, float) for item in lat_long) and len(lat_long) == 2:
                 weather_id = lat_long
+                self.lat_long = lat_long # save coordinate
             else:
                 return ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
 
@@ -394,11 +396,10 @@ class Scenario:
         print("Material has been added.")
         print("To add the material as a module in your current scene, run .addModule()")
 
-    # kind of a mess
-    # redo using ironpython special printing like for xarray dataset
     def viewScenario(self):
         """
-        Print all scenario information currently stored in the scenario instance
+        Print all scenario information currently stored in the scenario instance. 
+        Does not implement ipython.display. If available, use this.
         """
         pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
 
@@ -809,26 +810,82 @@ class Scenario:
         
         return meta_df[target_region].unique() 
 
-    def plot(self, dim=None, tmy=False):
+    def extract(
+        self, 
+        dim_target, 
+        col_name=None, 
+        tmy=False, 
+        start_time=None, 
+        end_time=None
+        ):
+        if self.results is None:
+            raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
+        if self.geospatial:
+            raise ValueError(f"self.geospatial must be false. only single point plotting currently implemented")
+
+        if not isinstance(dim_target, tuple):
+            raise TypeError(f"dim_target is type: {type(dim_target)} must be tuple")
+        if len(dim_target) != 2:
+            raise ValueError(f"size dim_target={len(dim_target)} must be length 2")
+
+        results = pd.DataFrame()
+
+        if dim_target[0] == 'module':
+            sub_dict = self.results[dim_target[1]] 
+
+            for key, value in sub_dict.items():
+                if isinstance(value, pd.Series): 
+                    results[key] = value
+                elif isinstance(value, pd.DataFrame):
+                    if col_name is not None:
+                        results[key] = value[col_name]
+                    else:
+                        raise ValueError(f"col_name must be provided for DataFrame extraction")
+                
+        elif dim_target[0] == 'function':
+            for module, sub_dict in self.results.items():
+                for function, function_result in sub_dict.items():
+                    if dim_target[1] == function:
+                        if isinstance(function_result, pd.Series): 
+                            results[module] = function_result     
+                        elif isinstance(function_result, pd.DataFrame):
+                            if col_name is not None:
+                                results[module] = function_result[col_name]
+                            else:
+                                raise ValueError(f"col_name must be provided for DataFrame extraction")
+
+        if tmy:
+            results.index = results.index.map(lambda dt: dt.replace(year=1970)) # placeholder year
+
+            if start_time and end_time:
+                results = utils.strip_normalize_tmy(results, start_time, end_time)
+        
+        return results
+
+    def plot(
+        self, 
+        dim_target, 
+        col_name=None, 
+        tmy=False, 
+        start_time=None, 
+        end_time=None,
+        title='',
+        ):
         """
         create plots of scenario data against a specific dimension quickly. 
         When complete this will be able to plot single location and geospatial
         data.
         Parameters:
         -----------
-        dim : str
-            specify whether you want to see a plot with respec to a specific
-            module or function (for single location only)
-            options: ``module``, ``function``
-
+        see extract
         """
-        if self.results == None:
-            raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
-        if self.geospatial:
-            raise ValueError(f"self.geospatial must be false. only single point plotting currently implemented")
-        
-        
 
+        df = self.extract(dim_target=dim_target,col_name=col_name,tmy=tmy,start_time=start_time,end_time=end_time)
+
+        fig, ax = plt.subplots()
+        df.plot(ax=ax)
+        ax.set_title(f"{self.name} : {title}")
+        plt.show()
 
 
     def plot_USA(

@@ -631,3 +631,36 @@ def geospatial_from_csv(
     filtered_meta = filtered_meta.rename({'Location ID' : 'gid'}, axis="columns")
 
     return weather_ds, filtered_meta
+
+def strip_normalize_tmy(df, start_time, end_time):
+    """
+    Normalize the DataFrame to start at 00:00 and extract the data between the 
+    specified start and end times. Then shift back to the original indexes.
+    
+    Parameters:
+    df : pd.Dataframe
+        dataframe with a datetime index and tmy data
+    start_time : datetime.datetime 
+        start time
+    end_time : datetime.datetime 
+        end time
+    
+    Returns:
+    sub_results : pd.DataFrame 
+        extracted subset of tmy data
+    """
+
+    tz = df.index.tz
+    start_time = start_time.replace(tzinfo=tz)
+    end_time = end_time.replace(tzinfo=tz)
+
+    initial_time = df.index[0]
+    shifted_index = df.index - pd.DateOffset(hours=initial_time.hour, minutes=initial_time.minute, seconds=initial_time.second)
+    df.index = shifted_index
+
+    mask = (df.index >= start_time) & (df.index <= end_time)
+    sub_results = df.loc[mask]
+    
+    sub_results.index = sub_results.index + pd.DateOffset(hours=initial_time.hour, minutes=initial_time.minute, seconds=initial_time.second)
+    
+    return sub_results
