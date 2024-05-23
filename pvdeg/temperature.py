@@ -343,8 +343,7 @@ def temperature(
         sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
     """
-    # correct name
-    cell_or_mod = 'module' if cell_or_mod == 'mod' else cell_or_mod 
+    cell_or_mod = 'module' if cell_or_mod == 'mod' else cell_or_mod  #mod->module
 
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
@@ -352,9 +351,8 @@ def temperature(
         wind_speed_factor = _wind_speed_factor(temp_model, meta, wind_factor)
 
     if temp_model in ['sapm', 'pvsyst']:
-        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf] # add checking and error messages for this. would be very helpful, common source of error from racking and temp model options
+        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf] 
 
-        # cell or mod doesn't matter for non sapm or pvsys 
         if cell_or_mod!='cell' and temp_model=='sapm':
             # strip the 'deltaT' for calculations that will not need it
             parameters = {k: v for k, v in parameters.items() if k != 'deltaT'}
@@ -363,10 +361,9 @@ def temperature(
         poa = pvdeg.spectral.poa_irradiance(
             weather_df, 
             meta, 
-            **irradiance_kwarg # arent getting the irradiance_kwargs passed in from scenario -> standoff -> temperature, this can happen when we do the signature check in scenario or in temperature?
+            **irradiance_kwarg 
             ) 
 
-    # ALWAYS try to apply all of these to the temp model, 
     # irrelevant key,value pair will be ignored (NO ERROR)
     weather_args = {
     'poa_global' : poa["poa_global"],
@@ -390,17 +387,14 @@ def temperature(
         if key in weather_args: 
             model_args[key] = weather_args[key]
    
-    # calculated based on material for sapm and pvsys
     try:
         model_args.update(parameters)
     except NameError:
-        pass
+        pass # hits when not sapm or pvsyst
     
-    # add optional kwargs, overwrites copies (desired behavior)
+    # add optional kwargs, overwrites copies 
     model_args.update(**model_kwarg)
     
-    # we need to filter incase
-    # temp calc using dynamic model
     temperature = func(**model_args)
 
     return temperature

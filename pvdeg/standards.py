@@ -197,9 +197,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
 
     return x_eff
 
-
-# only works with sapm (maybe pvlib depending on kempe's input)
-# add conf kwargs
+# test conf for other temperature models
 def standoff(
     weather_df=None,
     meta=None,
@@ -210,9 +208,12 @@ def standoff(
     temp_model="sapm",
     conf_0="insulated_back_glass_polymer",
     conf_inf="open_rack_glass_polymer",
+    conf_0_kwarg={},
+    conf_inf_kwarg={},
     T98=70,  # [°C]
     x_0=6.5,  # [cm]
     wind_factor=0.33,
+    irradiance_kwarg={},
     model_kwarg={},
 ):
     """
@@ -246,6 +247,14 @@ def standoff(
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
+    conf_0_kwarg : dict, optional
+        keyword arguments for the high tempeature module on the exponential
+        decay curve. Use for temperature models other than ``sapm`` model 
+        arguments representing an 'insulated_back_glass_polymer' module.
+    conf_inf_kwarg : dict, optional
+        keyword arguments for the lowest tempeature module on the exponential
+        decay curve. Use for temperature models other than ``sapm`` model 
+        arguments representing an 'open_rack_glass_polymer' module.
     x_0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
     wind_factor : float, optional
@@ -255,6 +264,11 @@ def standoff(
         It is recommended that a power-law relationship between height and wind speed of 0.33
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        Used in place of dedicated arguments in the case of a top down scenario 
+        method call.
     model_kwarg : dict, optional
         dictionary to provide to the temperature model, see temperature.temperature for more information
 
@@ -294,10 +308,13 @@ def standoff(
     poa = spectral.poa_irradiance(
         weather_df=weather_df,
         meta=meta,
-        sol_position=solar_position,
-        tilt=tilt,
-        azimuth=azimuth,
-        sky_model=sky_model,
+        
+        **{**{
+        'sol_position':solar_position,
+        'tilt':tilt,
+        'azimuth':azimuth,
+        'sky_model':sky_model,
+        }, **irradiance_kwarg} # overwrite with irradiance kwarg if any
     )
 
     T_0 = temperature.temperature(
@@ -308,7 +325,7 @@ def standoff(
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
-        model_kwarg=model_kwarg
+        model_kwarg={**model_kwarg, **conf_0_kwarg} # may lead to undesired behavior, test
     )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
 
@@ -320,13 +337,12 @@ def standoff(
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
-        model_kwarg=model_kwarg
+        model_kwarg={**model_kwarg, **conf_inf_kwarg} # test
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     try:
         x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
-        # x = np.multiply( np.negative(x_0), np.log( np.subtract(1, np.divide(np.subtract(T98_0, T98), np.subtract(T98_0, T98_inf)))) )
     except RuntimeWarning as e:
         x = np.nan
         # results if the specified T₉₈ is cooler than an open_rack temperature
@@ -543,17 +559,18 @@ def T98_estimate(
     if x_eff == None:
         return T98_inf
     else:
-        T_0 = temperature.cell(
+        T_0 = temperature.temperature(
+            cell_or_mod='cell',
             weather_df=weather_df,
             meta=meta,
             poa=poa,
             temp_model=temp_model,
             conf_0=conf_0,
             wind_factor=wind_factor,
+            model_kwarg=model_kwarg
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
-        # T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
-        T98 = np.subtract(T98_0, np.multiply(np.subtract(T98_0 - T98_inf), np.subtract(1, np.divide(np.negative(-x_eff), x_0))))
+        T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
 
         return T98
 
