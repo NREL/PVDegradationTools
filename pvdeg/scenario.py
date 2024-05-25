@@ -26,10 +26,8 @@ from IPython.display import display, HTML
 ### need to use package wide uniform naming scheme for scenario analysis to work with all funcs
 
 # @ martin
-# wind factor in class intialization or module?
 # how should we handle multiple of the same function, currently names dict key with the address added but this isnt clear and will become a problem quickly
-# dask client on initialization? or on pipeline run?
-# does it matter if there is already a client running? how do we tell?
+### ANS: use random strings or some other identifier like a memory address
 
 class Scenario:
     """
@@ -47,7 +45,7 @@ class Scenario:
         file=None,
         results=None,
 
-        hpc=False, # may not need the hpc attribute, how to check for hpc environment (kestrel, eagle or aws) at runtime
+        hpc=False,
         geospatial=False,
         weather_data=None, # df when single, xr.ds when geospatial
         meta_data = None, # dict when single, df when geospatial
@@ -78,14 +76,14 @@ class Scenario:
             Full collection of outputs from pipeline execution. Populated by ``scenario.runPipeline()``
         """
 
-        if file is not None:
-            with open(file, "r") as f:
-                data = json.load()
-            name = data["name"]
-            path = data["path"]
-            modules = data["modules"]
-            gids = data["gids"]
-            pipeline = data["pipeline"]
+        # if file is not None:
+        #     with open(file, "r") as f:
+        #         data = json.load()
+        #     name = data["name"]
+        #     path = data["path"]
+        #     modules = data["modules"]
+        #     gids = data["gids"]
+        #     pipeline = data["pipeline"]
             # add results to file
 
         self.name = name
@@ -98,6 +96,7 @@ class Scenario:
         self.geospatial = geospatial
         self.weather_data = weather_data
         self.meta_data = meta_data
+        self.lat_long = None
 
         if geospatial and api_key:
             raise ValueError("Cannot use an api key on hpc, NSRDB files exist locally")
@@ -116,6 +115,8 @@ class Scenario:
                 os.makedirs(self.path)
         os.chdir(self.path)
 
+        if file: 
+            self.importScenario(file_path=file)
         
 
     def clean(self):
@@ -128,10 +129,7 @@ class Scenario:
         -----------
         None
 
-        Returns:
-        --------
-        None
-        """
+       """
         if self.path:
             try:
                 os.chdir(os.pardir) 
@@ -685,24 +683,45 @@ class Scenario:
             json.dump(scene_dict, f, indent=4)
         print(f"{file_name} exported")
 
-    def importScenario(self, file_path=None):
+    def importScenario(self, file_path=None, email=None, api_key=None):
         """
         Import scenario dictionaries from an existing 'scenario.json' file
         """
 
         with open(file_path, "r") as f:
-            data = json.load()
+            data = json.load(f)
         name = data["name"]
         path = data["path"]
+        hpc = data['hpc']        
+        geospatial = data['geospatial']
         modules = data["modules"]
         gids = data["gids"]
         pipeline = data["pipeline"]
+        lat_long = data["lat_long"]
 
         self.name = name
         self.path = path
+        self.hpc = hpc
+        self.geospatial = geospatial
         self.modules = modules
         self.gids = gids
         self.pipeline = pipeline
+        self.file = file_path
+        
+
+        if not geospatial: # test this
+            try:
+                self.email = data['email']
+                self.api_key = data['api_key']
+            except KeyError:
+                print(f"credentials not in json file using arguments")
+                self.email = email
+                self.api_key = api_key
+
+            self.addLocation(lat_long=lat_long)
+        elif geospatial:
+            # self.addLocation(gids=???) 
+            pass
 
     def _verify_function(func_name):
         """
@@ -809,6 +828,71 @@ class Scenario:
             meta_df=meta_df[meta_df['county'] == county]
         
         return meta_df[target_region].unique() 
+
+    def _to_dict(self, api_key=False): 
+        attributes = {
+            'name': self.name,
+            'hpc' : self.hpc,
+            'geospatial' : self.geospatial,
+            'path': self.path,
+            'modules': self.modules, # problem? list of dictionaries
+            'gids': self.gids,
+            'lat_long' : self.lat_long, 
+            'pipeline' : self.pipeline,
+        }
+
+        if api_key:
+            protected = {
+                'email' : self.email,
+                'api_key' : self.api_key
+            }
+            
+            attributes.update(protected)
+
+        return attributes
+
+    def dump(self, api_key=False, path=None):
+        """
+        Serialize the scenario instance as a json. No dataframes will be saved
+        but some attributes like weather_df and results will be stored in 
+        nested file trees as csvs.
+
+        Parameters:
+        -----------
+        api_key : bool, default=``False``
+            Save api credentials to json. Default False. 
+            Use with caution.
+        path : str
+            location to save. If no path provided save to scenario directory.
+        """
+
+        if path is None:
+            path = self.path
+        target = os.path.join(path, f'{self.name}.json') 
+
+        scenario_as_dict = self._to_dict(api_key)
+        scenario_as_json = json.dumps(scenario_as_dict, indent=4) # what is this indent for 
+
+        with open(target, 'w') as f:
+            f.write(scenario_as_json)
+
+        return
+    
+    def restore_credentials(self, email, api_key):
+        """
+        Restore email and api key to scenario. Use after importing
+        scenario if json does not contain email and api key. 
+
+        Parameters:
+        -----------
+        email : str
+            email associated with nsrdb developer account
+        api_key : str
+            api key associated with nsrdb developer account
+        """
+        if not self.email and self.api_key:
+            self.email = email
+            self.api_key = api_key
 
     def extract(
         self, 
@@ -940,7 +1024,7 @@ class Scenario:
             <p><strong>API Key:</strong> {self.api_key}</p>
             <div>
                 <h3>Results</h3>
-                {self.format_results()}
+                {self.format_results() if self.results else None}
             </div>
             <div>
                 <h3>Pipeline</h3>
