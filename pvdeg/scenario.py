@@ -12,6 +12,7 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 
 from functools import partial
 
@@ -42,12 +43,12 @@ class Scenario:
         gids=None,
         modules=[],
         pipeline=[],
-        # 
+        # pipeline=OrderedDict(),
+         
         file=None,
         results=None,
 
         hpc=False,
-        # geospatial=False,
         weather_data=None, # df when single, xr.ds when geospatial
         meta_data = None, # dict when single, df when geospatial
 
@@ -1104,6 +1105,8 @@ class Geospatial_Scenario(Scenario):
     downsample_factor=0,
     nsrdb_attributes=['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity'],
     # gids=None, 
+
+    see_added=False
     ):
 
         if self.gids is not None:
@@ -1145,6 +1148,13 @@ class Geospatial_Scenario(Scenario):
 
         self.weather_data = geo_weather_sub
         self.meta_data = geo_meta # already downselected, bad naming?
+        self.gids = geo_gids
+
+        if see_added:
+            message = f"Gids Added - {self.gids}"
+            warnings.warn(message, UserWarning)
+
+        return
 
     def addJob(
     self, 
@@ -1165,17 +1175,15 @@ class Geospatial_Scenario(Scenario):
         if func_params:
             geo_job_dict.update(func_params)
 
+        self.pipeline.append(geo_job_dict) # will be update when he have a dictionary with keys
+
         if see_added:
             if self.geospatial:
                 message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
                 warnings.warn(message, UserWarning)
 
-    def run(self, hpc_worker_conf=False):
+    def run(self, hpc_worker_conf=None):
         if self.geospatial:
-
-            # TODO : 
-            # move dask client intialization? 
-            # add check to see if there is already a dask client running
             pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)   
 
             for job in self.pipeline:
