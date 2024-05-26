@@ -6,8 +6,8 @@ from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
 import inspect
-import math
-
+from random import choices
+from string import ascii_uppercase
 
 def gid_downsampling(meta, n):
     """
@@ -451,7 +451,7 @@ def tilt_azimuth_scan(
         standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
     """
 
-    total_count = (math.ceil(360 / azimuth_step) + 1) * (math.ceil(90 / tilt_step) + 1)
+    total_count = (np.ceil(360 / azimuth_step) + 1) * (np.ceil(90 / tilt_step) + 1)
     tilt_azimuth_series = np.zeros((total_count, 3))
     count = 0
     azimuth = -azimuth_step
@@ -664,3 +664,14 @@ def strip_normalize_tmy(df, start_time, end_time):
     sub_results.index = sub_results.index + pd.DateOffset(hours=initial_time.hour, minutes=initial_time.minute, seconds=initial_time.second)
     
     return sub_results
+
+def new_id(collection):
+    gen = lambda : choices(ascii_uppercase, k = 5)
+    if isinstance(collection, dict):
+        id = gen()
+        while id in collection.keys(): # no dupes
+            id = gen()
+        
+        return id 
+     
+            
