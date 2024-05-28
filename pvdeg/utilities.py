@@ -540,8 +540,19 @@ def _weather_ds_from_csv(
     Returns
     ----------
     """
+#  ds = xr.open_dataset(
+#             fp,
+#             engine="h5netcdf",
+#             phony_dims="sort",
+#             chunks={"phony_dim_0": chunks[0], "phony_dim_1": chunks[1]},
+#             drop_variables=drop_variables,
+#             mask_and_scale=False,
+#             decode_cf=True,
+#         )
+
     # PROBLEM: all csv do not contain all years but these all appear to have 2004
     # when missing years, xarray will see mismatched coordinates and populate all these values with nan
+    # this is wrong we are using tmy so we ignore the year as it represents a typical meteorological year
     
     # Prepare a list to hold the DataFrames
     dataframes = []
@@ -602,7 +613,7 @@ def geospatial_from_csv(
     year : int # should be able to take a range of years
     ): 
     """
-    Create an xarray dataset contaning geospatial weather data and a pandas dataframe 
+    Create an xarray dataset contaning aeospatial weather data and a pandas dataframe 
     containing geospatial metadata from a list of local csv files. 
     
     Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
