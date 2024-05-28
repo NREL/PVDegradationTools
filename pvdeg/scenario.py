@@ -13,20 +13,20 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
+from importlib import import_module
+from copy import deepcopy
 
 from functools import partial
 
 import pprint
 from IPython.display import display, HTML
 
-### RESTORE SCENARIO FROM pvd_job DIR in constructor ###
-### dynamic plotting function
-### need to use package wide uniform naming scheme for scenario analysis to work with all funcs
+### dynamic plotting function for geospatial
+### premade scenario with locations of interest. Ask Mike?
 
-# @ martin
-# how should we handle multiple of the same function, currently names dict key with the address added but this isnt clear and will become a problem quickly
-### ANS: use random strings or some other identifier like a memory address
-# TODO: IMPLEMENT THIS
+# BUG: Can't expand dropdown on restored object using ipython display. Test and fix?
+
+# need to use package wide uniform naming scheme for scenario analysis to work with all functions
 
 class Scenario:
     """
@@ -40,15 +40,14 @@ class Scenario:
         path=None,
         gids=None,
         modules=[],
-        pipeline=[],
-        # pipeline=OrderedDict(),
+        pipeline=OrderedDict(),
          
         file=None,
         results=None,
 
         hpc=False,
-        weather_data=None, # df when single
-        meta_data = None, # dict when single
+        weather_data=None, # df
+        meta_data = None, # dict
 
         email = None, 
         api_key = None, 
@@ -75,16 +74,6 @@ class Scenario:
         results : (pd.Series)
             Full collection of outputs from pipeline execution. Populated by ``scenario.runPipeline()``
         """
-
-        # if file is not None:
-        #     with open(file, "r") as f:
-        #         data = json.load()
-        #     name = data["name"]
-        #     path = data["path"]
-        #     modules = data["modules"]
-        #     gids = data["gids"]
-        #     pipeline = data["pipeline"]
-            # add results to file
 
         self.name = name
         self.path = path
@@ -113,8 +102,8 @@ class Scenario:
         os.chdir(self.path)
 
         if file: 
-            self.importScenario(file_path=file)
-        
+            self.load_json(file_path=file, email=email, api_key=api_key)
+
 
     def clean(self):
         """
@@ -188,11 +177,15 @@ class Scenario:
 
         weather_db = 'PSM3' # should this be PSM3
 
-        if isinstance(lat_long, tuple) and all(isinstance(item, float) for item in lat_long) and len(lat_long) == 2:
+        if isinstance(lat_long, list): # is a list when reading from json
+            lat_long = tuple(lat_long)
+
+        if isinstance(lat_long, tuple) and all(isinstance(item, (int, float)) for item in lat_long) and len(lat_long) == 2:
+
             weather_id = lat_long
             self.lat_long = lat_long # save coordinate
         else:
-            return ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
+            raise ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
 
         try:
             weather_arg = {
@@ -400,21 +393,30 @@ class Scenario:
 
         # cant check parameters needed by function now bc they come from multiple sources when the pipeline is run.
 
+        job_id = utils.new_id(self.pipeline)
+        # get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
+
         job_dict = {"job": func, "params": func_params}
-        self.pipeline.append(job_dict)
+        self.pipeline[job_id] = job_dict
+
+        # could be helpful up here
+
+        # for restoring from qualified name in string form
+        # func = getattr(pvdeg, str_name)
            
         if see_added:
             message = f"{func.__name__} added to pipeline as \n {job_dict}"
             warnings.warn(message, UserWarning)
 
-        get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
 
-        df_pipeline = pd.DataFrame(self.pipeline)
-        # update the first column of the dataframe from func address to function name 
-        df_pipeline.iloc[:,0] = df_pipeline.iloc[:,0].map(get_qualified)
+        # we dont need to save the pipeline csv anymore, it will be in the json
         
-        file_name = f"pipeline_{self.name}.csv"
-        df_pipeline.to_csv(file_name, index=False)
+        # df_pipeline = pd.DataFrame(self.pipeline)
+        # update the first column of the dataframe from func address to function name 
+        # df_pipeline.iloc[:,0] = df_pipeline.iloc[:,0].map(get_qualified)
+        
+        # file_name = f"pipeline_{self.name}.csv"
+        # df_pipeline.to_csv(file_name, index=False)
         # we dont need to save the pipeline anymore we have json dump
 
     def run(self, hpc=None):
@@ -433,138 +435,108 @@ class Scenario:
         """
         results_series = pd.Series(dtype='object')
 
-        if not self.geospatial:
-            results_dict = {}
+        results_dict = {}
 
-            # we need do the pipeline for every module available
-            if self.modules:
+        # we need do the pipeline for every module available
+        if self.modules:
 
-                for module in self.modules: 
-                    module_result = {}
-                    
-                    for job in self.pipeline:
-                        func, params = job['job'], job['params']
+            for module in self.modules: 
+                module_result = {}
+                
+                for id, job in self.pipeline.items():
+                    func, params = job['job'], job['params']
 
-                        weather_dict = {'weather_df' : self.weather_data, 'meta' : self.meta_data} # move outside? doesn't need to be in here, cleaner though?
+                    weather_dict = {'weather_df' : self.weather_data, 'meta' : self.meta_data} # move outside? doesn't need to be in here, cleaner though?
 
-                        temperature_args = {
-                            'temp_model' : module['temp_model'],
-                            'model_kwarg' : module['model_kwarg'], # if func parameters are named incorrecly, ex model_kwargs instead of model_kwarg, this will not work properly
-                            'irradiance_kwarg' : module['irradiance_kwarg'], # same for irradiance kwarg, is there a better way to do this then?
-                            'conf' : module['racking'],
-                            **module['irradiance_kwarg'] # some functions dont want irradiance_kwargs arg instead they just want the irradiance_kwargs values as kwargs
-                        }
+                    temperature_args = {
+                        'temp_model' : module['temp_model'],
+                        'model_kwarg' : module['model_kwarg'], # if func parameters are named incorrecly, ex model_kwargs instead of model_kwarg, this will not work properly
+                        'irradiance_kwarg' : module['irradiance_kwarg'], # same for irradiance kwarg, is there a better way to do this then?
+                        'conf' : module['racking'],
+                        **module['irradiance_kwarg'] # some functions dont want irradiance_kwargs arg instead they just want the irradiance_kwargs values as kwargs
+                    }
 
-                        combined = {**weather_dict, **temperature_args, **module['material_params']} # maybe should not have material params like this, idk what functions need them which changes where they should be implemented
+                    combined = {**weather_dict, **temperature_args, **module['material_params']} # maybe should not have material params like this, idk what functions need them which changes where they should be implemented
 
-                        func_params = signature(func).parameters
-                        func_args = {k:v for k,v in combined.items() if k in func_params.keys()} # downselect, only keep arguments that the function will take
-                        # downselecting too many things here? we seem to be removing information we want like irradiance kwargs, this will happen if function doesnt take irradiance kwargs
+                    func_params = signature(func).parameters
+                    func_args = {k:v for k,v in combined.items() if k in func_params.keys()} # downselect, only keep arguments that the function will take
+                    # downselecting too many things here? we seem to be removing information we want like irradiance kwargs, this will happen if function doesnt take irradiance kwargs
 
-                        # loosing the irradiance kwargs and probably model kwargs here?
-                        res = func(**params, **func_args) # provide user args and module specific args
+                    res = func(**params, **func_args) # provide user args and module specific args
 
-                        if func.__name__ not in module_result.keys(): # this is terrible
-                            module_result[func.__name__] = res
-                        else:
-                            module_result[f"{func.__name__}_{id(func)}"] = res
+                    if id not in module_result.keys(): 
+                        module_result[id] = res
+                    # else:
+                    #     module_result[f"{func.__name__}_{id(func)}"] = res
 
-                   # move standard results to single dictionary
-                    results_dict[module['module_name']] = module_result
+                # move standard results to single dictionary
+                results_dict[module['module_name']] = module_result
 
-                self.results = results_dict # 2d dictionary array
+            self.results = results_dict # 2d dictionary array
 
-                for module, pipeline_result in self.results.items():
-                    module_dir = f"pipeline_results/{module}_pipeline_results"
-                    os.makedirs(module_dir, exist_ok=True)
-                    for function, result in pipeline_result.items():
-                        if isinstance(result, (pd.Series, pd.DataFrame)):
-                            result.to_csv(f"{module_dir}/{function}.csv")                            
-                        elif isinstance(result, (int, float)):
-                            with open(f"{module_dir}/{function}.csv", 'w') as file:
-                                file.write(f"{result}\n")
+            for module, pipeline_result in self.results.items():
+                module_dir = f"pipeline_results/{module}_pipeline_results"
+                os.makedirs(module_dir, exist_ok=True)
+                for function, result in pipeline_result.items():
+                    if isinstance(result, (pd.Series, pd.DataFrame)):
+                        result.to_csv(f"{module_dir}/{function}.csv")                            
+                    elif isinstance(result, (int, float)):
+                        with open(f"{module_dir}/{function}.csv", 'w') as file:
+                            file.write(f"{result}\n")
 
-            # REFACTOR??? this is really bad 
-            # no modules case, all funcs will use default values from functions for module information
-            elif not self.modules:
-                for job in self.pipeline:
-                    _func, _params = job['job'], job['params']
+        # REFACTOR??? this is really bad 
+        # no modules case, all funcs will use default values from functions for module information
+        elif not self.modules:
 
-                    # if we do this we will need to enforce parameter naming scheme repo wide
-                    try:
-                        # try to populate with weather and meta
-                        # could fail if function signature has wrong names or if we
-                        # haven't added a location, can provide weather and meta in
-                        # a kwargs argument
+            for id, job in self.pipeline.items():
+                _func, _params = job['job'], job['params']
 
-                        # if 'weather_df' not in _params.keys(): # make sure they havent provided weather in the job arguments
-                        _func = partial(
-                            _func, 
-                            weather_df=self.weather_data, 
-                            meta=self.meta_data
-                            )
-                    except:
-                        pass
+                # if we do this we will need to enforce parameter naming scheme repo wide
+                try:
+                    # try to populate with weather and meta
+                    # could fail if function signature has wrong names or if we
+                    # haven't added a location, can provide weather and meta in
+                    # a kwargs argument
 
-                    result = _func(**_params) if _params else _func()
+                    # if 'weather_df' not in _params.keys(): # make sure they havent provided weather in the job arguments
+                    _func = partial(
+                        _func, 
+                        weather_df=self.weather_data, 
+                        meta=self.meta_data
+                        )
+                except:
+                    pass
 
-                    if job['job'].__name__ not in results_dict.keys():
-                        results_dict[job['job'].__name__] = result
-                    else:
-                        results_dict[f"{job['job'].__name__}_{id(job['job'])}"] = result # this is spagheti
+                result = _func(**_params) if _params else _func()
 
-                    # move standard results to single dictionary
-                    pipeline_results = results_dict
-            
-                # TEST THIS NOW? AND REDO result series logic?
-                # save all results to dataframes and store in a series
-                for key in pipeline_results.keys():
-                    print(f"results_dict dtype : {type(results_dict[key])}")
-                    print(results_dict)
+                # if job['job'].__name__ not in results_dict.keys():
+                    # results_dict[job['job'].__name__] = result
+                if id not in module_result.keys(): 
+                    results_dict[id] = result
 
-                    if isinstance(results_dict[key], pd.DataFrame):
-                        results_series[key] = results_dict[key]
+                # move standard results to single dictionary
+                pipeline_results = results_dict
+        
+            # TEST THIS NOW? AND REDO result series logic?
+            # save all results to dataframes and store in a series
+            for key in pipeline_results.keys():
+                print(f"results_dict dtype : {type(results_dict[key])}")
+                print(results_dict)
 
-                    elif isinstance(results_dict[key], (float, int)):
-                        results_series[key] = pd.DataFrame(
-                            [ results_dict[key] ], # convert the single numeric to a list
-                            columns=[key] # name the single column entry in list form
-                            )
+                if isinstance(results_dict[key], pd.DataFrame):
+                    results_series[key] = results_dict[key]
 
-                    self.results = results_series
+                elif isinstance(results_dict[key], (float, int)):
+                    results_series[key] = pd.DataFrame(
+                        [ results_dict[key] ], # convert the single numeric to a list
+                        columns=[key] # name the single column entry in list form
+                        )
+
+                self.results = results_series
           
-    def exportScenario(self, file_path=None):
-        """
-        Export the scenario dictionaries to a json configuration file
-
-        TODO exporting functions as name string within pipeline. cannot .json dump <pvdeg.func>
-             Need to make sure name is verified > stored > export > import > re-verify > converted.
-             This could get messy. Need to streamline the process or make it bullet proof
-
-        Parameters:
-        -----------
-        file_path : (str, default = None)
-            Desired file path to save the scenario.json file
-        """
-
-        if not file_path:
-            file_path = self.path
-        file_name = f"config_{self.name}.json"
-        out_file = os.path.join(file_path, file_name)
-
-        scene_dict = {
-            "name": self.name,
-            "path": self.path,
-            "pipeline": self.pipeline,
-            "gid_file": self.gids,
-            "test_modules": self.modules,
-        }
-
-        with open(out_file, "w") as f:
-            json.dump(scene_dict, f, indent=4)
-        print(f"{file_name} exported")
-
-    def importScenario(self, file_path=None, email=None, api_key=None):
+    # handle converting qualified function name back to function reference with getattr
+    # func, throwaway_params = self._verify_function(task['qualified_function'])
+    def load_json(self, file_path=None, email=None, api_key=None):
         """
         Import scenario dictionaries from an existing 'scenario.json' file
         """
@@ -574,35 +546,37 @@ class Scenario:
         name = data["name"]
         path = data["path"]
         hpc = data['hpc']        
-        geospatial = data['geospatial']
         modules = data["modules"]
         gids = data["gids"]
-        pipeline = data["pipeline"]
+        process_pipeline = data["pipeline"]
         lat_long = data["lat_long"]
+
+        # loop over and bring back function refernece from qualified function
+        # deep copy here?
+        for task in process_pipeline.values():
+            module_name, func_name = task['qualified_function'].rsplit('.', 1)
+            module = import_module(module_name)
+            func = getattr(module, func_name)
+            task['job'] = func
+            del task['qualified_function']
 
         self.name = name
         self.path = path
         self.hpc = hpc
-        self.geospatial = geospatial
         self.modules = modules
         self.gids = gids
-        self.pipeline = pipeline
+        self.pipeline = process_pipeline
         self.file = file_path
         
+        try:
+            self.email = data['email']
+            self.api_key = data['api_key']
+        except KeyError:
+            print(f"credentials not in json file using arguments")
+            self.email = email
+            self.api_key = api_key
 
-        if not geospatial: # test this
-            try:
-                self.email = data['email']
-                self.api_key = data['api_key']
-            except KeyError:
-                print(f"credentials not in json file using arguments")
-                self.email = email
-                self.api_key = api_key
-
-            self.addLocation(lat_long=lat_long)
-        elif geospatial:
-            # self.addLocation(gids=???) 
-            pass
+        self.addLocation(lat_long=lat_long)
 
     def _verify_function(func_name):
         """
@@ -644,15 +618,22 @@ class Scenario:
 
 
     def _to_dict(self, api_key=False): 
+        # pipeline is a special case, we need to remove the 'job' function reference at every entry
+        modified_pipeline = deepcopy(self.pipeline)
+        for task in modified_pipeline.values():
+            function_ref = task['job']
+            get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
+            task['qualified_function'] = get_qualified(function_ref)
+            task.pop('job')
+
         attributes = {
             'name': self.name,
             'hpc' : self.hpc,
-            'geospatial' : self.geospatial,
             'path': self.path,
-            'modules': self.modules, # problem? list of dictionaries
+            'modules': self.modules, 
             'gids': self.gids,
             'lat_long' : self.lat_long, 
-            'pipeline' : self.pipeline,
+            'pipeline' : modified_pipeline,
         }
 
         if api_key:
@@ -716,10 +697,14 @@ class Scenario:
         start_time=None, 
         end_time=None
         ):
+        """
+        User should provide function id not funtion name in dim_target
+        Ex: ('function' : 'AKWMC)
+        """
         if self.results is None:
             raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
-        if self.geospatial:
-            raise ValueError(f"self.geospatial must be false. only single point plotting currently implemented")
+        # if self.geospatial:
+        #     raise ValueError(f"self.geospatial must be false. only single point plotting currently implemented")
 
         if not isinstance(dim_target, tuple):
             raise TypeError(f"dim_target is type: {type(dim_target)} must be tuple")
@@ -785,14 +770,13 @@ class Scenario:
         ax.set_title(f"{self.name} : {title}")
         plt.show()
 
-    # override in geospatial class?
+
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
             <h2>{self.name}: Scenario Analysis</h2>
             <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>Geospatial Data:</strong> {self.geospatial}</p>
             <p><strong>HPC Configuration:</strong> {self.hpc}</p>
             <p><strong>GIDs:</strong> {self.gids}</p>
             <p><strong>Email:</strong> {self.email}</p>
@@ -833,7 +817,7 @@ class Scenario:
         </script>
         """
         display(HTML(html_content))
-   
+
     def format_modules(self):
         modules_html = '<div>'
         for i, module in enumerate(self.modules):
@@ -842,10 +826,13 @@ class Scenario:
             irradiance_kwarg_html = f"<pre>{json.dumps(module['irradiance_kwarg'], indent=2)}</pre>"
 
             module_content = f"""
-            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #7a736c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
-                <h4><span id="arrow_module_{i}">►</span> {module['module_name']}</h4>
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span> 
+                    {module['module_name']}
+                </h4>
             </div>
-            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px;">
+            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
                 <p><strong>Racking:</strong> {module['racking']}</p>
                 <p><strong>Temperature Model:</strong> {module['temp_model']}</p>
                 <p><strong>Material Parameters:</strong></p>
@@ -869,21 +856,27 @@ class Scenario:
     def format_results(self):
         results_html = '<div>'
         for module_name, functions in sorted(self.results.items()):
-            module_id = f"result_module_{module_name}" # 5, 3, 2 ebfore
+            module_id = f"result_module_{module_name}"
             module_content = f"""
-            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #a0a88c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
-                <h4><span id="arrow_{module_id}">►</span> {module_name}</h4>
+            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span> 
+                    {module_name}
+                </h4>
             </div>
-            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px;">
+            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
             """
             for function_name, output in functions.items():
                 function_id = f"{module_id}_{function_name}"
                 formatted_output = self.format_output(output)
                 module_content += f"""
-                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #849654; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
-                    <h5><span id="arrow_{function_id}">►</span> {function_name}</h5>
+                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                    <h5 style="font-family: monospace; margin: 0;">
+                        <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span> 
+                        {function_name}
+                    </h5>
                 </div>
-                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px;">
+                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
                     {formatted_output}
                 </div>
                 """
@@ -894,17 +887,15 @@ class Scenario:
 
     def format_output(self, output):
         if isinstance(output, pd.Series):
-            output = pd.DataFrame(output) # cant display series as html so go to dataframe first
-            
+            output = pd.DataFrame(output)  # convert Series to DataFrame for HTML display
         if isinstance(output, pd.DataFrame):
-            # Display first 10 and last 10 entries
             head = output.head(10).to_html()
             tail = output.tail(10).to_html()
             return f"{head}<br>...<br>{tail}"
         else:
             return str(output)
 
-    def format_weather(self):
+    def format_weather(self): # fix column names
         weather_data_html = ""
         if isinstance(self.weather_data, pd.DataFrame):
             if len(self.weather_data) > 10:
@@ -917,26 +908,36 @@ class Scenario:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #7a736c; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
-                <h4><span id="arrow_weather_data">►</span> Weather Data</h4>
+            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_weather_data" style="color: #E6E6FA;">►</span> 
+                    Weather Data
+                </h4>
             </div>
-           <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px;">
+        <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
                 {display_data.to_html()}
             </div>
             """
         
-        return weather_data_html
+        elif isinstance(self.weather_data, xr.DataSet):
+            # Handle xarray DataSet similarly if needed
+            display(self.weather_data)
+            pass
 
+        return weather_data_html
     def format_pipeline(self):
         pipeline_html = '<div>'
-        for i, step in enumerate(self.pipeline):
+        for step_name, step in self.pipeline.items():
             params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
 
             step_content = f"""
-            <div onclick="toggleVisibility('pipeline_{i}')" style="cursor: pointer; background-color: #cc512f; padding: 1px; border-radius: 1px; margin-bottom: 1px;">
-                <h4><span id="arrow_pipeline_{i}">►</span> {step['job'].__name__}</h4>
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> 
+                    {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
+                </h4>
             </div>
-            <div id="pipeline_{i}" style="display:none; margin-left: 20px; padding: 5px;">
+            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
                 <p>Job: {step['job'].__name__}</p>
                 <p>Parameters:</p>
                 <div style="margin-left: 20px;">
@@ -947,6 +948,8 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += '</div>'
         return pipeline_html
+
+    
 
 class Geospatial_Scenario(Scenario):
     def __init__(
@@ -988,6 +991,8 @@ class Geospatial_Scenario(Scenario):
     downsample_factor=0,
     nsrdb_attributes=['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity'],
     # gids=None, 
+
+    see_added=False,
     ):
 
         if self.gids is not None:

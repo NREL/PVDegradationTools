@@ -596,6 +596,7 @@ def _weather_ds_from_csv(
 
     return weather_ds
 
+# not functional
 def geospatial_from_csv(
     file_path : list[str],
     year : int # should be able to take a range of years
@@ -638,6 +639,7 @@ def strip_normalize_tmy(df, start_time, end_time):
     specified start and end times. Then shift back to the original indexes.
     
     Parameters:
+    -----------
     df : pd.Dataframe
         dataframe with a datetime index and tmy data
     start_time : datetime.datetime 
@@ -646,6 +648,7 @@ def strip_normalize_tmy(df, start_time, end_time):
         end time
     
     Returns:
+    --------
     sub_results : pd.DataFrame 
         extracted subset of tmy data
     """
@@ -666,12 +669,13 @@ def strip_normalize_tmy(df, start_time, end_time):
     return sub_results
 
 def new_id(collection):
-    gen = lambda : choices(ascii_uppercase, k = 5)
+    gen = lambda : ''.join(choices(ascii_uppercase, k = 5))
     if isinstance(collection, dict):
         id = gen()
         while id in collection.keys(): # no dupes
             id = gen()
         
-        return id 
+    # add error check
+    return id 
      
             
