@@ -26,6 +26,8 @@ from IPython.display import display, HTML
 
 # BUG: Can't expand dropdown on restored object using ipython display. Test and fix?
 
+# TODO: geospatial reset weather and addLocation from gids.
+
 # need to use package wide uniform naming scheme for scenario analysis to work with all functions
 
 class Scenario:
@@ -982,16 +984,18 @@ class Geospatial_Scenario(Scenario):
         self.geospatial = geospatial
 
     # add restoring from gids functionality from nsrdb
+    # add bounding box coordinates
     def addLocation(
     self,
     country=None,
     state=None,
     county=None,
     year=2022,
-    downsample_factor=0,
+    satellite='Americas',
     nsrdb_attributes=['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity'],
-    # gids=None, 
-
+    downsample_factor=0,
+    gids=None, # int, list(int), np.array(int)
+    bbox_kwarg={},
     see_added=False,
     ):
 
@@ -1003,13 +1007,20 @@ class Geospatial_Scenario(Scenario):
             return
 
         weather_db = 'NSRDB'
-        weather_arg = {'satellite': 'Americas',
+        weather_arg = {'satellite': satellite,
                     'names': year,
                     'NREL_HPC': True,
                     'attributes': nsrdb_attributes}
 
         # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory
         geo_weather, geo_meta = pvdeg.weather.get(weather_db, geospatial=True, **weather_arg)
+
+        if gids:
+            geo_meta = geo_meta.loc[gids]
+
+        if bbox_kwarg:
+            bbox_gids = pvdeg.geospatial.apply_bounding_box(geo_meta, **bbox_kwarg)
+            geo_meta = geo_meta.loc[bbox_gids]
 
         # string to list whole word list or keep list
         toList = lambda s : s if isinstance(s, list)  else [s]
@@ -1025,15 +1036,17 @@ class Geospatial_Scenario(Scenario):
                     for entry in states]
             geo_meta = geo_meta[geo_meta['state'].isin( states )]
         if county:
-            counties = toList(county)
-            geo_meta = geo_meta[geo_meta['county'].isin( counties )]
+            if isinstance(county, str):
+                county = toList(county)
+
+            geo_meta = geo_meta[geo_meta['county'].isin( county )]
         
         geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
 
-        geo_weather_sub = geo_weather.sel(gid=geo_meta.index)
+        # geo_weather_sub = geo_weather.sel(gid=geo_meta.index) # move to run()
 
-        self.weather_data = geo_weather_sub
-        self.meta_data = geo_meta # already downselected, bad naming?
+        self.weather_data = geo_weather
+        self.meta_data = geo_meta 
         self.gids = geo_gids
 
         if see_added:
@@ -1041,6 +1054,27 @@ class Geospatial_Scenario(Scenario):
             warnings.warn(message, UserWarning)
 
         return
+
+    def location_bounding_box(self, coord_1=None, coord_2=None, coord_2d=None):
+        bbox_gids = pvdeg.geospatial.apply_bounding_box(
+            self.meta_data, 
+            coord_1, 
+            coord_2, 
+            coord_2d) 
+
+        self.meta_data = self.meta_data.loc[bbox_gids]
+    
+    def downselect_mountains():    
+        pass
+
+    def downselect_feature():
+        pass    
+
+    def gids_tonumpy(self):
+        return self.meta_data.index
+
+    def gids_tolist(self):
+        return list(self.meta_data.index)
 
     def addJob(
     self, 
@@ -1064,31 +1098,27 @@ class Geospatial_Scenario(Scenario):
         self.pipeline.append(geo_job_dict) # will be update when he have a dictionary with keys
 
         if see_added:
-            if self.geospatial:
-                message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
-                warnings.warn(message, UserWarning)
+            message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
+            warnings.warn(message, UserWarning)
 
     def run(self, hpc_worker_conf=None):
         if self.geospatial:
             pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)   
 
+            geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index) # move to run()
+
             for job in self.pipeline:
                 func = job['geospatial_job']
 
-                # remove check??? the fuction cant be added to the pipeline if it doesn't have a valid output template
                 if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
                     geo = {
                         'func': func,
-                        'weather_ds': self.weather_data,
+                        'weather_ds': geo_weather_sub,
                         'meta_df': self.meta_data
                         }
-               
-                    # update geo dictionary with kwargs from job
-                    # geo.update(job[''])
 
                     analysis_result = pvdeg.geospatial.analysis(**geo)
 
-                    # bypass pd.Series and store result in result attribute,
                     # only lets us do one geospatial analysis per scenario
                     self.results = analysis_result
            

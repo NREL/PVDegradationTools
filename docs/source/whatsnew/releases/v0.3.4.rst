@@ -1,0 +1,15 @@
+v0.3.4 (2024-..-..)
+=======================
+
+Enhancements
+------------
+* Unified Cell and Module Temperature function.
+* Added support for pvlib temperature models. `see pvlib docs <https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html>`
+* Overhauled scenario class for pv system analysis. Scenario object for single point analysis and GeospatialScenario object for geospatial analysis.
+* Created Scenario tutorials to showcase new scenario functionality.
+* Added a number of geospatial downselection functions. Find coordinates near mountains, rivers, coastlines and lakes from NSRDB data.
+* Added geospatial bounding box support. Clip unwanted data with rectangular bounding boxes.
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
