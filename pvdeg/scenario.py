@@ -921,12 +921,8 @@ class Scenario:
             </div>
             """
         
-        elif isinstance(self.weather_data, xr.DataSet):
-            # Handle xarray DataSet similarly if needed
-            display(self.weather_data)
-            pass
-
         return weather_data_html
+
     def format_pipeline(self):
         pipeline_html = '<div>'
         for step_name, step in self.pipeline.items():
@@ -953,14 +949,14 @@ class Scenario:
 
     
 
-class Geospatial_Scenario(Scenario):
+class GeospatialScenario(Scenario):
     def __init__(
         self,
         name=None,
         path=None,
         gids=None,
         modules=[],
-        pipeline=[],
+        pipeline={},
         file=None,
         results=None,
 
@@ -1089,38 +1085,59 @@ class Geospatial_Scenario(Scenario):
             return ValueError(f"{func.__name__} does does not have a valid geospatial results template or does not exist")
 
         # standards.standoff only needs weather, meta, and func
-        geo_job_dict = {f"geospatial_job" : func} 
+        geo_job_dict = {"geospatial_job" : {'job' : func, 'params' : func_params}} 
 
-        # UNTESTED
-        if func_params:
-            geo_job_dict.update(func_params)
+        # # UNTESTED
+        # if func_params:
+        #     geo_job_dict.update(func_params)
 
-        self.pipeline.append(geo_job_dict) # will be update when he have a dictionary with keys
+        # self.pipeline.append(geo_job_dict) # will be update when he have a dictionary with keys
+        self.pipeline = geo_job_dict
 
         if see_added:
             message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
             warnings.warn(message, UserWarning)
 
     def run(self, hpc_worker_conf=None):
-        if self.geospatial:
-            pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)   
+        client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)   
 
-            geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index) # move to run()
+        geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index)
 
-            for job in self.pipeline:
-                func = job['geospatial_job']
+        func = self.pipeline['geospatial_job']['job']
 
-                if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
-                    geo = {
-                        'func': func,
-                        'weather_ds': geo_weather_sub,
-                        'meta_df': self.meta_data
-                        }
+        if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
+            geo = {
+                'func': func,
+                'weather_ds': geo_weather_sub,
+                'meta_df': self.meta_data
+                }
 
-                    analysis_result = pvdeg.geospatial.analysis(**geo)
+            analysis_result = pvdeg.geospatial.analysis(**geo)
 
-                    # only lets us do one geospatial analysis per scenario
-                    self.results = analysis_result
+            # only lets us do one geospatial analysis per scenario
+            self.results = analysis_result
+
+        client.shutdown()
+
+    def restore_result_gids(self):
+        """
+        Restore gids to result Dataset as datavariable from original metadata.
+        Assumes results will be in the same order as input metadata rows.
+        Otherwise will fail silently and restore incorrect gids
+        """        
+
+        flattened = self.results.stack(points=('latitude', 'longitude'))
+
+        gids = self.meta_data.index.values
+
+        # Create a DataArray with the gids and assign it to the Dataset
+        gids_da = xr.DataArray(gids, coords=[flattened['points']], name='gids')
+
+        # Unstack the DataArray to match the original dimensions of the Dataset
+        gids_da = gids_da.unstack('points')
+
+        self.results = self.results.assign(gids=gids_da)
+        
            
     def _get_geospatial_data(year : int):
         """
@@ -1228,3 +1245,94 @@ class Geospatial_Scenario(Scenario):
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
 
+    def format_pipeline(self):
+        pipeline_html = '<div>'
+        if "geospatial_job" in self.pipeline:
+            step_name = "geospatial_job"
+            step = self.pipeline[step_name]
+            params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
+
+            step_content = f"""
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> 
+                    {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
+                </h4>
+            </div>
+            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+                <p>Job: {step['job'].__name__}</p>
+                <p>Parameters:</p>
+                <div style="margin-left: 20px;">
+                    {params_html}
+                </div>
+            </div>
+            """
+            pipeline_html += step_content
+        pipeline_html += '</div>'
+        return pipeline_html
+
+    def _ipython_display_(self):
+        file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
+        html_content = f"""
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
+            <h2>{self.name}: Scenario Analysis</h2>
+            <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
+            <p><strong>GIDs:</strong> {self.gids}</p>
+            <div>
+                <h3>Results</h3>
+                {self.format_results() if self.results else None}
+            </div>
+            <div>
+                <h3>Pipeline</h3>
+                {self.format_pipeline()}
+            </div>
+            <div>
+                <h3>Modules</h3>
+                {super().format_modules()}
+            </div>
+            <div>
+                <h3>Weather Dataset</h3>
+                {self.format_weather()}
+            </div>
+            <div>
+                <h3>Meta Dataframe</h3>
+                {self.meta_data}
+            </div>
+        </div>
+        <script>
+            function toggleVisibility(id) {{
+                var content = document.getElementById(id);
+                var arrow = document.getElementById('arrow_' + id);
+                if (content.style.display === 'none') {{
+                    content.style.display = 'block';
+                    arrow.innerHTML = '▼';
+                }} else {{
+                    content.style.display = 'none';
+                    arrow.innerHTML = '►';
+                }}
+            }}
+        </script>
+        """
+        display(HTML(html_content))
+
+    def format_results(self):
+        results_html = '<div>'
+        if "geospatial_job" in self.results:
+            result = self.results["geospatial_job"]
+            result_id = "geospatial_result"
+            formatted_output = self.format_output(result)
+            result_content = f"""
+            <div id="{result_id}" onclick="toggleVisibility('content_{result_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span> 
+                    Geospatial Result
+                </h4>
+            </div>
+            <div id="content_{result_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+                {formatted_output}
+            </div>
+            """
+            results_html += result_content
+        results_html += '</div>'
+        return results_html
