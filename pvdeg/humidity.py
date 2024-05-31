@@ -729,8 +729,8 @@ def module(
     )
 
     temp_module = temperature.module(
-        weather_df,
-        meta,
+        weather_df=weather_df,
+        meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf,

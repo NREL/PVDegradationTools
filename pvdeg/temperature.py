@@ -60,7 +60,7 @@ def module(
         elif temp_model == "ross":
             wind_speed_factor = (
                 10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess what this one was
+            ) ** wind_factor  # I had to guess the temperature model height on this one, Kempe
         elif temp_model == "noct_sam":
             if meta["wind_height"] > 3:
                 wind_speed_factor = 2
@@ -158,7 +158,7 @@ def cell(
         elif temp_model == "ross":
             wind_speed_factor = (
                 10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess what this one was
+            ) ** wind_factor  # I had to guess what the wind height for this temperature model was on this one, Kempe.
         elif temp_model == "notc_sam":
             if float(meta["wind_height"]) > 3:
                 wind_speed_factor = 2
