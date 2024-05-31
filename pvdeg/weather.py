@@ -308,6 +308,7 @@ def map_weather(weather_df):
         "Wind Direction": "wind_direction",
         "Surface Albedo": "albedo",
         "Precipitable Water": "precipitable_water",
+        "Module_Temperature": "module_temperature",
     }
 
     for column_name in weather_df.columns:
