@@ -78,16 +78,24 @@ def test_standoff():
     pd.testing.assert_frame_equal(result_l2, df_expected_result_l2)
 
 def test_eff_gap(): 
-    T_0=25
-    T_inf=20
-    T_measured=25
-    T_ambient=20
-    poa=700
-    x_0=6.5
-    poa_min=100
-    t_amb_min=0
-    eff_gap=pvdeg.standards.eff_gap(T_0=T_0, T_inf=T_inf, T_measured=T_measured, T_ambient=T_ambient, poa=poa, x_0=x_0, poa_min=poa_min, t_amb_min=t_amb_min) 
-    assert eff_gap==
+    weather_file = os.path.join(TEST_DATA_DIR,'xeff_test.csv')
+    xeff_weather, xeff_meta = pvdeg.weather.read(weather_file,'csv')
+    print(xeff_meta)
+    print(xeff_weather)
+    T_0, T_inf, xeff_poa = pvdeg.standards.eff_gap_parameters(
+        weather_df = xeff_weather,
+        meta = xeff_meta,
+        sky_model = "isotropic",
+        temp_model = "sapm",
+        conf_0 = "insulated_back_glass_polymer",
+        conf_inf = "open_rack_glass_polymer",
+        wind_factor = 0.33)
+    T_0
+     #display(T_0) # T_inf, xeff_weather['module_temperature'], xeff_weather["temp_air"], xeff_poa)
+
+    eff_gap = pvdeg.standards.eff_gap(T_0, T_inf, xeff_weather['module_temperature'], xeff_weather["temp_air"], xeff_poa, x_0=6.5, poa_min=100, t_amb_min=0)
+    print(eff_gap)
+    assert eff_gap==0.3
 
 
 
