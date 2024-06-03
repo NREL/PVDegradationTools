@@ -28,8 +28,6 @@ from IPython.display import display, HTML
 
 # TODO: geospatial reset weather and addLocation from gids.
 
-# need to use package wide uniform naming scheme for scenario analysis to work with all functions
-
 class Scenario:
     """
     The scenario object contains all necessary parameters and criteria for a given scenario.
@@ -428,6 +426,9 @@ class Scenario:
         If geospatial, can only run one job from the pipeline. Having more
         than one geospatial job in the pipeline may throw an error.
 
+        Note: if a pipeline job contains a function not adhering to package
+        wide pv parameter naming scheme, the job will raise a fatal error.
+
         Parameters:
         -----------
         hpc : (dict), optional, default=None
@@ -553,8 +554,6 @@ class Scenario:
         process_pipeline = data["pipeline"]
         lat_long = data["lat_long"]
 
-        # loop over and bring back function refernece from qualified function
-        # deep copy here?
         for task in process_pipeline.values():
             module_name, func_name = task['qualified_function'].rsplit('.', 1)
             module = import_module(module_name)
@@ -668,7 +667,7 @@ class Scenario:
         target = os.path.join(path, f'{self.name}.json') 
 
         scenario_as_dict = self._to_dict(api_key)
-        scenario_as_json = json.dumps(scenario_as_dict, indent=4) # what is this indent for 
+        scenario_as_json = json.dumps(scenario_as_dict, indent=4) 
 
         with open(target, 'w') as f:
             f.write(scenario_as_json)
@@ -705,8 +704,6 @@ class Scenario:
         """
         if self.results is None:
             raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
-        # if self.geospatial:
-        #     raise ValueError(f"self.geospatial must be false. only single point plotting currently implemented")
 
         if not isinstance(dim_target, tuple):
             raise TypeError(f"dim_target is type: {type(dim_target)} must be tuple")

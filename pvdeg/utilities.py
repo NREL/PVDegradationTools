@@ -8,6 +8,8 @@ from typing import Callable
 import inspect
 from random import choices
 from string import ascii_uppercase
+from collections import OrderedDict
+import xarray as xr
 
 def gid_downsampling(meta, n):
     """
@@ -28,10 +30,8 @@ def gid_downsampling(meta, n):
         List of GIDs for the downsampled NSRDB meta data
     """
 
-    # no downsample case, used to generate gids for scenario
     if n == 0:
         gids_sub = meta.index.values
-
         return meta, gids_sub
 
     lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
@@ -680,13 +680,63 @@ def strip_normalize_tmy(df, start_time, end_time):
     return sub_results
 
 def new_id(collection):
+    """
+    Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
+
+    Parameters:
+    -----------
+    Collection : dict, ordereddict
+        dictionary with keys as strings
+
+    Returns : str
+    -------------
+        Unique 5 letter string of uppercase characters.
+    """
+    if not isinstance(collection, (dict,OrderedDict)):
+        raise TypeError(f"{collection.__name__} type {type(collection)} expected dict")
+
     gen = lambda : ''.join(choices(ascii_uppercase, k = 5))
-    if isinstance(collection, dict):
+    id = gen()
+    while id in collection.keys(): 
         id = gen()
-        while id in collection.keys(): # no dupes
-            id = gen()
-        
-    # add error check
+    
     return id 
-     
             
+def restore_gids(
+    original_meta_df : pd.DataFrame,
+    analysis_result_ds : xr.Dataset
+    )->xr.Dataset:  
+    """
+    Restore gids to results dataset. For desired behavior output data must
+    have identical ordering to input data, otherwise will fail silently by
+    misassigning gids to lat-long coordinates in returned dataset.
+
+    Parameters:
+    -----------
+    original_meta_df : pd.DataFrame
+        Metadata dataframe as returned by geospatial ``pvdeg.weather.get``
+    analysis_result_ds : xr.Dataset
+        geospatial result data as returned by ``pvdeg.geospatial.analysis``
+
+    Returns:
+    --------
+    restored_gids_ds : xr.Dataset
+        dataset like ``analysis_result_ds`` with new datavariable, ``gid``
+        holding the original gids of each result from the input metadata.
+        Warning: if meta order is different than result ordering gids will
+        be assigned incorrectly. 
+    """
+
+    flattened = analysis_result_ds.stack(points=('latitude', 'longitude'))
+
+    gids = original_meta_df.index.values
+
+    # Create a DataArray with the gids and assign it to the Dataset
+    gids_da = xr.DataArray(gids, coords=[flattened['points']], name='gid')
+
+    # Unstack the DataArray to match the original dimensions of the Dataset
+    gids_da = gids_da.unstack('points')
+
+    restored_gids_ds = analysis_result_ds.assign(gid=gids_da)
+
+    return restored_gids_ds

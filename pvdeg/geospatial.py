@@ -481,6 +481,7 @@ def _mountains(meta_df, kdtree, index, rad_1, rad_2, threshold_factor, elevation
     return False
 
 # TODO: coordinate bounding box
+# fix coastline detection, query points instead of radius?
 def identify_mountains(meta_df, kdtree, rad_1=12, rad_2=1, threshold_factor=1.25, elevation_floor=0):
     """
     Find mountains from elevation metadata using sklearn kdtree for fast lookup.
@@ -520,7 +521,7 @@ def identify_mountains(meta_df, kdtree, rad_1=12, rad_2=1, threshold_factor=1.25
         each entry in the dataframe characterizing mountainous vs flat.
     """
 
-    meta_df.loc[:,'mountain'] = [_mountains(meta_df, kdtree, i, rad_1, rad_2, threshold_factor) for i in range(len(meta_df))]
+    meta_df.loc[:,'mountain'] = [_mountains(meta_df, kdtree, i, rad_1, rad_2, threshold_factor, elevation_floor) for i in range(len(meta_df))]
 
     return meta_df
 
@@ -534,7 +535,7 @@ def feature_downselect(meta_df, kdtree=None, feature_name=None, resolution='10m'
         kdtree containing latitude-longitude pairs for quick lookups
         Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
         kdtree as a path to the .pkl file.
-    feature : str
+    feature_name : str
         cartopy.feature.NaturalEarthFeature feature key.
         Options: ``'lakes'``, ``'rivers_lake_centerlines'``, ``'coastline'``
     resolution : str
@@ -563,7 +564,7 @@ def feature_downselect(meta_df, kdtree=None, feature_name=None, resolution='10m'
         if isinstance(geom, LineString):
             feature_geometries.append(geom)
         elif isinstance(geom, MultiLineString):
-            for line in geom.geoms:  # Correctly access the LineString objects
+            for line in geom.geoms:  
                 feature_geometries.append(line)
 
     # Extract points from geometries
@@ -606,8 +607,10 @@ def apply_bounding_box(meta_df, coord_1=None, coord_2=None, coord_2d=None):
         or tuple.
     coord_2d : np.array
         2d tall numpy array of [lat, long] pairs. Bounding box around the most
-        extreme entries of the array. Alternative to providing box corners.
-
+        extreme entries of the array. Alternative to providing top left and 
+        bottom right box corners. Could be used to select amongst a subset of
+        data points. ex) Given all points for the planet, downselect based on 
+        the most extreme coordinates for the United States coastline information.
     Returns:
     --------
     gids : np.array
@@ -630,3 +633,4 @@ def apply_bounding_box(meta_df, coord_1=None, coord_2=None, coord_2d=None):
     box_mask = latitude_mask & longitude_mask
 
     return meta_df[box_mask].index
+
