@@ -21,6 +21,7 @@ from functools import partial
 import pprint
 from IPython.display import display, HTML
 
+
 ### dynamic plotting function for geospatial
 ### premade scenario with locations of interest. Ask Mike?
 
@@ -977,7 +978,6 @@ class GeospatialScenario(Scenario):
         self.geospatial = geospatial
 
     # add restoring from gids functionality from nsrdb
-    # add bounding box coordinates
     def addLocation(
     self,
     country=None,
@@ -1023,7 +1023,6 @@ class GeospatialScenario(Scenario):
             geo_meta = geo_meta[geo_meta['country'].isin( countries )]
         if state:
             states = toList(state)
-            # convert 2-letter codes to full state names
             states = [pvdeg.utilities._get_state(entry) if len(entry) == 2
                     else entry 
                     for entry in states]
@@ -1035,8 +1034,6 @@ class GeospatialScenario(Scenario):
             geo_meta = geo_meta[geo_meta['county'].isin( county )]
         
         geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(geo_meta, downsample_factor) 
-
-        # geo_weather_sub = geo_weather.sel(gid=geo_meta.index) # move to run()
 
         self.weather_data = geo_weather
         self.meta_data = geo_meta 
@@ -1061,7 +1058,52 @@ class GeospatialScenario(Scenario):
         pass
 
     def downselect_feature():
-        pass    
+        pass   
+
+    def downselect_elevation_stochastic(
+        self,
+        kdtree, 
+        downselect_prop,
+        k_neighbors=3,
+        method='mean',
+        ):
+        """
+        Prefenetially downselect data points based on elevation and update 
+        scenario metadata.
+       
+        Parameters:
+        -----------
+        kdtree : sklearn.neighbors.KDTree or str
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+            kdtree as a path to the .pkl file.
+        downselect_prop : float
+            proportion of original datapoints to keep in output gids list
+        k_neighbors : int, (default = 3)
+            number of neighbors to check for elevation data in nearest neighbors        
+        method : str, (default = 'mean')
+            method to calculate elevation weights for each point. 
+            Options : `'mean'`, `'sum'`
+
+        Returns:
+        --------
+        None
+
+        See Also:
+        ---------
+        `pvdeg.geospatial.elevation_stochastic_downselect` for more info/docs
+        """
+        gids = pvdeg.geospatial.elevation_stochastic_downselect(
+            meta_df=self.meta_data,
+            kdtree=kdtree,
+            downselect_prop=downselect_prop,
+            k_neighbors=k_neighbors,
+            method=method
+        )
+
+        self.meta_data = self.meta_data.iloc[gids]
+        return 
+
 
     def gids_tonumpy(self):
         return self.meta_data.index
@@ -1111,7 +1153,6 @@ class GeospatialScenario(Scenario):
 
             analysis_result = pvdeg.geospatial.analysis(**geo)
 
-            # only lets us do one geospatial analysis per scenario
             self.results = analysis_result
 
         client.shutdown()
@@ -1192,7 +1233,6 @@ class GeospatialScenario(Scenario):
         if not self.geospatial: # add hpc check
             return AttributeError(f"self.geospatial should be True. Current value = {self.geospatial}")
 
-        # use rex instead
         discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
 
         if country:
@@ -1203,6 +1243,58 @@ class GeospatialScenario(Scenario):
             meta_df=meta_df[meta_df['county'] == county]
         
         return meta_df[target_region].unique() 
+
+    def plot_coords(
+        self,
+        coord_1=None,
+        coord_2=None,
+        coords=None,
+        size=1
+        ):
+        """
+        Plot lat-long coordinate pairs on blank map. Quickly view 
+        geospatial datapoints before your analysis.
+
+        Parameters:
+        -----------
+        coord_1 : list, tuple
+            Top left corner of bounding box as lat-long coordinate pair as list or
+            tuple.
+        coord_2 : list, tuple
+            Bottom right corner of bounding box as lat-long coordinate pair in list 
+            or tuple.
+        coords : np.array
+            2d tall numpy array of [lat, long] pairs. Bounding box around the most
+            extreme entries of the array. Alternative to providing top left and 
+            bottom right box corners. Could be used to select amongst a subset of
+            data points. ex) Given all points for the planet, downselect based on 
+            the most extreme coordinates for the United States coastline information.
+        size : float    
+            matplotlib scatter point size. Without any downsampling NSRDB 
+            points will siginficantly overlap.
+        """
+        import matplotlib.pylab as plt
+        import cartopy.crs as ccrs
+        import cartopy.feature as cfeature
+
+        fig = plt.figure(figsize=(15, 10))
+        ax = plt.axes(projection=ccrs.PlateCarree())
+
+        if (coord_1 and coord_2) or (coords != None):
+            utils._plot_bbox_corners(
+                ax=ax,
+                coord_1=coord_1,
+                coord_2=coord_2,
+                coords=coords
+            )
+
+        utils._add_cartopy_features(ax=ax)
+
+        ax.scatter(self.meta_data['longitude'], self.meta_data['latitude'], color='black', s=size, transform=ccrs.PlateCarree())
+
+        plt.title(f"Coordinate Pairs from '{self.name}' Meta Data")
+        plt.legend()
+        plt.show()
 
     def plot_USA(
         self, 

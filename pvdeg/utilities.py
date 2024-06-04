@@ -740,3 +740,79 @@ def restore_gids(
     restored_gids_ds = analysis_result_ds.assign(gid=gids_da)
 
     return restored_gids_ds
+
+def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
+    """
+    find the min and max latitude and longitude values from 2 lists 
+    or a tall numpy array of the shape [[lat, long], ...]
+
+    Parameters:
+    -----------
+    coord_1 : list, tuple
+        Top left corner of bounding box as lat-long coordinate pair as list or
+        tuple.
+    coord_2 : list, tuple
+        Bottom right corner of bounding box as lat-long coordinate pair in list 
+        or tuple.
+    coords : np.array
+        2d tall numpy array of [lat, long] pairs. Bounding box around the most
+        extreme entries of the array. Alternative to providing top left and 
+        bottom right box corners. Could be used to select amongst a subset of
+        data points. ex) Given all points for the planet, downselect based on 
+        the most extreme coordinates for the United States coastline information.
+    Returns:
+    --------
+    lats, longs : tuple(list)
+        min and max latitude and longitudes. Minimum latitude at lats[0].
+        Maximum latitude at lats[1]. Same pattern for longs.
+    """
+    if coord_1 and coord_2:
+        lats = [coord_1[0], coord_2[0]]
+        longs = [coord_1[1], coord_2[1]]
+    elif coords.any():
+        lats = coords[:,0]
+        longs = coords[:,1]
+
+    min_lat, max_lat = np.min(lats), np.max(lats)
+    min_long, max_long = np.min(longs), np.max(longs)
+
+    lats = [min_lat, max_lat]
+    longs = [min_long, max_long]
+
+    return lats, longs
+
+
+def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
+    """
+    Set matplotlib axis limits to the values from a bounding box.
+    See Also:
+    --------
+    pvdeg.utilities._find_bbox_corners for more information
+    """
+
+    lats, longs = _find_bbox_corners(coord_1, coord_2, coords)
+
+    ax.set_xlim([longs[0], longs[1]])
+    ax.set_ylim([lats[0], lats[1]])
+    return
+
+def _add_cartopy_features(ax):
+    """
+    Add cartopy features to an existing matplotlib.pyplot axis.
+    """
+    import cartopy.feature as cfeature
+    features = [
+        cfeature.BORDERS,
+        cfeature.COASTLINE,
+        cfeature.LAND,
+        cfeature.OCEAN,
+        cfeature.LAKES,
+        cfeature.RIVERS
+        ]
+
+    for i in features:
+        if i == cfeature.BORDERS:
+            ax.add_feature(i, linestyle=':')
+        else:
+            ax.add_feature(i)
+
