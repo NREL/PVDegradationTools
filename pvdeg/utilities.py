@@ -816,3 +816,71 @@ def _add_cartopy_features(ax):
         else:
             ax.add_feature(i)
 
+def _calc_elevation_weights(
+    elevations : np.array,
+    coords : np.array,
+    k_neighbors : int,
+    method : str,
+    normalization : str,
+    kdtree, 
+    )->np.array:
+    """
+    utility function. caluclate a weight for each point in a dataset 
+    to use for probabalistic downselection.
+
+    Parameters:
+    -----------
+    elevations : np.ndarray
+        one dimensional numpy array of elevations at each gid in the metadata
+    coords : np.ndarray
+        tall 2d numpy array of lat-long pairs like [[lat, long], ...]
+    k_neighbors : int
+        number of neighbors to use in local elevation calculation at each point
+    method : str, (default = 'mean')
+        method to calculate elevation weights for each point. 
+        Options : `'mean'`, `'sum'`, `'median'`
+    normalization : str, (default = 'linear')
+        function to apply when normalizing weights. Logarithmic uses log_e/ln
+        options : `'linear'`, `'logarithmic'`, '`exponential'`
+    kdtree : sklearn.neighbors.KDTree or str
+        kdtree containing latitude-longitude pairs for quick lookups
+        Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+        kdtree as a path to the .pkl file.
+
+    Returns:
+    --------
+    gids : np.array
+        1d numpy array of weights corresponding to each lat-long pair
+        in coordinates and respectively in metadata.
+    """
+    weights = np.empty_like(elevations)
+
+    for i, coord in enumerate(coords):
+        indicies = kdtree.query(coord.reshape(1,-1), k=k_neighbors+1)[1][0] # +1 to include current point 
+        delta_elevation = np.abs(elevations[indicies[1:]] - elevations[i]) 
+        
+        if method == 'mean':
+            delta = np.mean(delta_elevation)
+        elif method == 'sum':
+            delta = np.sum(delta_elevation)
+        elif method == 'median':
+            delta = np.median(delta_elevation)
+        weights[i] = delta
+
+
+    if normalization == 'linear':
+        pass # do nothing
+    elif normalization == 'exponential':
+        weights = np.exp(weights)
+    elif normalization == 'logarithmic':
+        weights = np.log(weights)
+
+    normalized_weights = np.divide( 
+        np.subtract(weights, np.min(weights)), 
+        np.subtract(np.max(weights), np.min(weights)) 
+        )
+    
+    return normalized_weights
+
+    
+
