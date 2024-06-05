@@ -21,6 +21,9 @@ from functools import partial
 import pprint
 from IPython.display import display, HTML
 
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+
 
 ### dynamic plotting function for geospatial
 ### premade scenario with locations of interest. Ask Mike?
@@ -895,30 +898,38 @@ class Scenario:
         else:
             return str(output)
 
-    def format_weather(self): # fix column names
+    def format_weather(self): 
         weather_data_html = ""
         if isinstance(self.weather_data, pd.DataFrame):
             if len(self.weather_data) > 10:
                 first_five = self.weather_data.head(5)
                 last_five = self.weather_data.tail(5)
-                ellipsis_row = pd.DataFrame(["..."] * len(self.weather_data.columns)).T
-                ellipsis_row.columns = self.weather_data.columns
+                ellipsis_row = pd.DataFrame([["..."] * len(self.weather_data.columns)], columns=self.weather_data.columns)
+
+                # Create the custom index with ellipses
+                custom_index = np.concatenate([
+                    np.arange(0, 5, dtype=object).astype(str),
+                    ['...'],
+                    np.arange(len(self.weather_data) - 5, len(self.weather_data), dtype=object).astype(str)
+                ])
+
+                # Concatenate the DataFrames
                 display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+                display_data.index = custom_index
             else:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_weather_data" style="color: #E6E6FA;">►</span> 
+                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span> 
                     Weather Data
                 </h4>
             </div>
-        <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
                 {display_data.to_html()}
             </div>
             """
-        
         return weather_data_html
 
     def format_pipeline(self):
@@ -944,7 +955,6 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += '</div>'
         return pipeline_html
-
     
 
 class GeospatialScenario(Scenario):
@@ -1054,7 +1064,7 @@ class GeospatialScenario(Scenario):
 
         self.meta_data = self.meta_data.loc[bbox_gids]
     
-    def downselect_mountains_radii(
+    def classify_mountains_radii(
         self,
         kdtree, 
         rad_1=12, 
@@ -1113,7 +1123,7 @@ class GeospatialScenario(Scenario):
         self.meta_data['mountain'] = (self.meta_data.index).isin(gids)
         return
     
-    def downselect_mountains_weights(
+    def classify_mountains_weights(
         self,
         kdtree,
         threshold: int = 0,
@@ -1171,8 +1181,51 @@ class GeospatialScenario(Scenario):
         return
 
 
-    def downselect_feature():
-        pass   
+    def classify_feature(
+        self,
+        kdtree=None, 
+        feature_name=None, 
+        resolution='10m', 
+        radius=None, 
+        bbox_kwarg={},
+        ):
+        """
+        kdtree : sklearn.neighbors.KDTree or str
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+            kdtree as a path to the .pkl file.
+        feature_name : str
+            cartopy.feature.NaturalEarthFeature feature key.
+            Options: ``'lakes'``, ``'rivers_lake_centerlines'``, ``'coastline'``
+        resolution : str
+            cartopy.feature.NaturalEarthFeature resolution.
+            Options: ``'10m'``, ``'50m'``, ``'110m'``
+        radius : float
+            Area around feature coordinates to include in the downsampled result. 
+            Bigger area means larger radius and more samples included.
+            pass   
+
+        Returns:
+        --------
+        None, strictly updates meta_data attribute of scenario.
+        
+        See Also:
+        ---------
+        `pvdeg.geospatial.feature_downselect`
+        """
+
+        feature_gids = pvdeg.geospatial.feature_downselect(
+            meta_df=self.meta_data,
+            kdtree=kdtree,
+            feature_name=feature_name,
+            resolution=resolution,
+            radius=radius,
+            bbox_kwarg=bbox_kwarg
+        )
+
+        self.meta_data[feature_name] = (self.meta_data.index).isin(feature_gids)
+        return
+
 
     def downselect_elevation_stochastic(
         self,
@@ -1374,6 +1427,14 @@ class GeospatialScenario(Scenario):
         
         return meta_df[target_region].unique() 
 
+    def plot(self):
+        """
+        Not Usable in GeospatialScenario class instance, only in Scenario instance.
+        python has no way to hide a parent class method in the child,
+        so this only exists to prevent access
+        """
+        raise AttributeError("The 'plot' method is not accessible in GeospatialScenario, only in Scenario")
+
     def plot_coords(
         self,
         coord_1=None,
@@ -1403,10 +1464,6 @@ class GeospatialScenario(Scenario):
             matplotlib scatter point size. Without any downsampling NSRDB 
             points will siginficantly overlap.
         """
-        import matplotlib.pylab as plt
-        import cartopy.crs as ccrs
-        import cartopy.feature as cfeature
-
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
 
@@ -1426,6 +1483,73 @@ class GeospatialScenario(Scenario):
         plt.legend()
         plt.show()
 
+    def plot_meta_classification(
+        self,
+        col_name: str = None,
+        coord_1=None,
+        coord_2=None,
+        coords=None,
+        size=1
+        ):
+        """
+        Plot classified lat-long coordinate pairs on map. Quicly view
+        geospatial datapoints with binary classification in a meta_data 
+        dataframe column before your analysis.
+
+        Parameters:
+        -----------
+        col_name : str
+            Column containing binary classification data. Ex: `mountain` after
+            running ``downselect_mountains_weights``.
+        coord_1 : list, tuple
+            Top left corner of bounding box as lat-long coordinate pair as list or
+            tuple.
+        coord_2 : list, tuple
+            Bottom right corner of bounding box as lat-long coordinate pair in list 
+            or tuple.
+        coords : np.array
+            2d tall numpy array of [lat, long] pairs. Bounding box around the most
+            extreme entries of the array. Alternative to providing top left and 
+            bottom right box corners. Could be used to select amongst a subset of
+            data points. ex) Given all points for the planet, downselect based on 
+            the most extreme coordinates for the United States coastline information.
+        size : float    
+            matplotlib scatter point size. Without any downsampling NSRDB 
+            points will siginficantly overlap.
+        """
+        if not col_name:
+            raise ValueError(f"col_name cannot be none")
+
+        if col_name not in self.meta_data.columns:
+            raise ValueError(f"{col_name} not in self.meta_data columns as follows {self.meta_data.columns}")
+
+        col_dtype = self.meta_data[col_name].dtype
+        if col_dtype != bool:
+            raise ValueError(f"meta_data column {col_name} expected dtype bool not {col_dtype}")
+
+        near = self.meta_data[self.meta_data[col_name] == True]
+        not_near = self.meta_data[self.meta_data[col_name] == False]
+
+        fig = plt.figure(figsize=(15, 10))
+        ax = plt.axes(projection=ccrs.PlateCarree())
+
+        if (coord_1 and coord_2) or (coords != None):
+            utils._plot_bbox_corners(
+                ax=ax,
+                coord_1=coord_1,
+                coord_2=coord_2,
+                coords=coords
+            )
+        utils._add_cartopy_features(ax=ax)
+
+        ax.scatter(not_near['longitude'], not_near['latitude'], color='red', s=size, transform=ccrs.PlateCarree(), label=f'Not Near {col_name}')
+        ax.scatter(near['longitude'], near['latitude'], color='blue', s=size, transform=ccrs.PlateCarree(), label=f'Near {col_name}')
+
+        plt.title(f'Geographic Points with Proximity to {col_name} Highlighted')
+        plt.legend()
+        plt.show()
+
+    # test this
     def plot_USA(
         self, 
         data_from_result : str, 
@@ -1516,7 +1640,7 @@ class GeospatialScenario(Scenario):
             </div>
             <div>
                 <h3>Meta Dataframe</h3>
-                {self.meta_data}
+                {self.format_meta()}
             </div>
         </div>
         <script>
@@ -1555,3 +1679,62 @@ class GeospatialScenario(Scenario):
             results_html += result_content
         results_html += '</div>'
         return results_html
+
+    def format_meta(self):
+        meta_data_html = ""
+        if isinstance(self.meta_data, pd.DataFrame):
+            if len(self.meta_data) > 10:
+                first_five = self.meta_data.head(5)
+                last_five = self.meta_data.tail(5)
+                ellipsis_row = pd.DataFrame([["..."] * len(self.meta_data.columns)], columns=self.meta_data.columns)
+
+                # Create the custom index with ellipses
+                custom_index = np.concatenate([
+                    np.arange(0, 5, dtype=object).astype(str),
+                    ['...'],
+                    np.arange(len(self.meta_data) - 5, len(self.meta_data), dtype=object).astype(str)
+                ])
+
+                # Concatenate the DataFrames
+                display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+                display_data.index = custom_index
+            else:
+                display_data = self.meta_data
+
+            meta_data_html = f"""
+            <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_meta_data" style="color: #b676c2;">►</span> 
+                    Meta Data
+                </h4>
+            </div>
+            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+                {display_data.to_html()}
+            </div>
+            """
+        return meta_data_html
+
+    # def format_meta(self):
+    #     meta_data_html = ""
+    #     if isinstance(self.meta_data, pd.DataFrame):
+    #         if len(self.meta_data) > 10:
+    #             first_five = self.meta_data.head(5)
+    #             last_five = self.meta_data.tail(5)
+    #             ellipsis_row = pd.DataFrame(["..."] * len(self.meta_data.columns)).T
+    #             ellipsis_row.columns = self.meta_data.columns
+    #             display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+    #         else:
+    #             display_data = self.weather_data
+
+    #         meta_data_html = f"""
+    #         <div id="weather_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+    #             <h4 style="font-family: monospace; margin: 0;">
+    #                 <span id="arrow_content_meta_data" style="color: #b676c2;">►</span> 
+    #                 Meta Data
+    #             </h4>
+    #         </div>
+    #        <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+    #             {display_data.to_html()}
+    #         </div>
+    #         """
+    #     return meta_data_html

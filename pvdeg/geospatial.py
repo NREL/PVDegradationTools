@@ -536,7 +536,7 @@ def identify_mountains_radii(
         meta_df.loc[outside_bbox, 'mountain'] = False 
 
     # new...
-    gids = meta_df.index[meta_df['mountain']].tonumpy()
+    gids = meta_df.index[meta_df['mountain']].to_numpy()
     return gids
 
     # return meta_df
@@ -681,11 +681,9 @@ def feature_downselect(
         gids_in_bbox = apply_bounding_box(meta_df=meta_df, **bbox_kwarg) 
         include_arr = np.union1d(include_arr, gids_in_bbox)
 
-    # meta_df.loc[include_arr, feature_name] = True
-    # return meta_df
+    include_gids = meta_df.index[include_arr]
 
-    # assuming include arr is gids not iteger indexes bc .loc above
-    return include_arr
+    return include_gids
 
 def apply_bounding_box(
     meta_df: pd.DataFrame, 
