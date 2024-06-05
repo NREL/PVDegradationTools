@@ -10,7 +10,7 @@ authors = [{name = "Pvdeg Python Developers", email = "Michael.Kempe@nrel.gov"}]
 maintainers = [{email = "Silvana.Ovaitt@nrel.gov"}]
 license = {text = "BSD-3"}
 readme = "README.md"
-requires-python = ">=3.9.0, <3.12"
+requires-python = ">=3.9.0"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
@@ -28,10 +28,12 @@ keywords = [
     "PV",
 ]
 dependencies = [
+    "aiohttp==3.9.5",
     "NREL-rex",
     "cartopy",
-    "dask",
+    "dask[dataframe]",
     "dask-jobqueue",
+    "bokeh",
     "h5netcdf",
     "h5py",
     "jupyterlab",
