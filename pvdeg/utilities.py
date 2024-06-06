@@ -6,8 +6,10 @@ from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
 import inspect
-import math
-
+from random import choices
+from string import ascii_uppercase
+from collections import OrderedDict
+import xarray as xr
 
 def gid_downsampling(meta, n):
     """
@@ -27,6 +29,10 @@ def gid_downsampling(meta, n):
     gids_sub : (list)
         List of GIDs for the downsampled NSRDB meta data
     """
+
+    if n == 0:
+        gids_sub = meta.index.values
+        return meta, gids_sub
 
     lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
     lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
@@ -445,7 +451,7 @@ def tilt_azimuth_scan(
         standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
     """
 
-    total_count = (math.ceil(360 / azimuth_step) + 1) * (math.ceil(90 / tilt_step) + 1)
+    total_count = (np.ceil(360 / azimuth_step) + 1) * (np.ceil(90 / tilt_step) + 1)
     tilt_azimuth_series = np.zeros((total_count, 3))
     count = 0
     azimuth = -azimuth_step
@@ -471,3 +477,410 @@ def tilt_azimuth_scan(
     print("\r                     ", end="")
     print("\r", end="")
     return tilt_azimuth_series
+
+def _meta_df_from_csv(
+    file_paths : list[str]
+    ):
+    """
+    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
+
+    Parameters
+    ----------
+    file_paths : list[str]
+        List of local weather csv files to strip metadata from. For example: download a collection of weather files from the NSRDB web viewer. 
+
+    Returns
+    -------
+    metadata_df : pandas.DataFrame
+        Dataframe of stripped metadata from csv. Columns represent attribute names while rows represent a unique file.
+    """
+    # TODO: functionality
+    # list[path] instead of just string
+    # or a directory, just use csv from provided directory
+
+
+    def read_meta(path):
+        df = pd.read_csv(path, nrows=1)
+        listed = df.to_dict(orient='list')
+        stripped = {key: value[0] for key, value in listed.items()}
+
+        return stripped
+
+    metadata_df = pd.DataFrame()
+
+    for i in range(len(file_paths)):
+        metadata_df[i] = read_meta(file_paths[i])
+
+    metadata_df = metadata_df.T
+
+    # correct level of precision??
+    conversions = {
+        'Location ID' : np.int32,
+        'Latitude' : np.double,
+        'Longitude' : np.double,
+        'Time Zone' : np.int8,
+        'Elevation' : np.int16,
+        'Local Time Zone' : np.int8
+    }
+
+    metadata_df = metadata_df.astype(conversions)
+    return metadata_df
+
+def _weather_ds_from_csv(
+    file_paths : list[str],
+    year : int,
+    # select year, should be able to provide single year, or list of years 
+    ):
+    """
+    Helper Function: Create a geospatial xarray dataset from local csv files.
+
+    Parameters
+    ----------
+
+    Returns
+    ----------
+    """
+#  ds = xr.open_dataset(
+#             fp,
+#             engine="h5netcdf",
+#             phony_dims="sort",
+#             chunks={"phony_dim_0": chunks[0], "phony_dim_1": chunks[1]},
+#             drop_variables=drop_variables,
+#             mask_and_scale=False,
+#             decode_cf=True,
+#         )
+
+    # PROBLEM: all csv do not contain all years but these all appear to have 2004
+    # when missing years, xarray will see mismatched coordinates and populate all these values with nan
+    # this is wrong we are using tmy so we ignore the year as it represents a typical meteorological year
+    
+    # Prepare a list to hold the DataFrames
+    dataframes = []
+
+    # Process each file
+    for file_path in file_paths:
+        # Extract GID from the filename
+        header = pd.read_csv(file_path, nrows=1)
+        gid = header['Location ID'][0]
+        
+        # Read the CSV, skipping rows to get to the relevant data
+        df = pd.read_csv(file_path, skiprows=2)
+        
+        # Add GID and Time columns
+        df['gid'] = gid
+
+        df['time'] = pd.to_datetime(df[['Year', 'Month', 'Day', 'Hour', 'Minute']])
+
+        # make allow this to take list of years
+        df = df[df['time'].dt.year == year]
+
+        # add generic approach, dont manually do this, could change based on user selections  
+
+        # Select relevant columns and append to the list
+        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Direction', 'Wind Speed']]
+        df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Speed']]
+        dataframes.append(df)
+
+    # Combine all DataFrames into one
+    combined_df = pd.concat(dataframes)
+
+    # Convert the combined DataFrame to an xarray Dataset
+    weather_ds = combined_df.set_index(['time', 'gid']).to_xarray()
+
+    # combined_df = combined_df.set_index(['time', 'gid']).sort_index()
+    # weather_ds = combined_df.set_index(['time', 'gid']).to_xarray()
+
+    # GHI             (gid, time) int64 12kB 0 0 0 0 0 0 ... 507 439 393 238 54 20
+    # Temperature     (gid, time) float64 12kB -12.6 -13.3 -13.6 ... -3.4 -4.6
+    # DHI             (gid, time) int64 12kB 0 0 0 0 0 0 0 ... 56 113 94 129 54 20
+    # DNI             (gid, time) int64 12kB 0 0 0 0 0 0 ... 1004 718 728 337 0 0
+    # Surface Albedo  (gid, time) float64 12kB 0.8 0.8 0.8 0.8 ... 0.8 0.8 0.8 0.8
+    # Wind Speed     
+
+    weather_ds = weather_ds.rename_vars({
+        'GHI' : 'ghi',
+        'Temperature' : 'temp_air',
+        'DHI' : 'dhi',
+        'DNI' : 'dni',
+        'Wind Speed' : 'wind_speed',
+    })
+
+    return weather_ds
+
+# not functional
+def geospatial_from_csv(
+    file_path : list[str],
+    year : int # should be able to take a range of years
+    ): 
+    """
+    Create an xarray dataset contaning aeospatial weather data and a pandas dataframe 
+    containing geospatial metadata from a list of local csv files. 
+    
+    Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
+    when downloaded locally as csv
+
+    Parameters
+    ----------
+    file_path : list[str]
+        List of absolute paths to csv files in string form.
+    year : int
+        Single year of data to use from local csv files. 
+    """
+
+    weather_ds, meta_df = _weather_ds_from_csv(file_path, year), _meta_df_from_csv(file_path)
+
+    # only want to keep meta from given file using GIDs from DS
+    # gather included files' gids from xarray
+    included_gids = weather_ds.coords['gid'].values
+
+    # filter the metadate to only include gid values found above
+    filtered_meta = meta_df[meta_df['Location ID'].isin(included_gids)]
+
+    # reset the indecies of updated dataframe (might not be nessecary)
+    filtered_meta = filtered_meta.reset_index(drop=True)
+
+    # rename Location ID column to gid
+    filtered_meta = filtered_meta.rename({'Location ID' : 'gid'}, axis="columns")
+
+    return weather_ds, filtered_meta
+
+def strip_normalize_tmy(df, start_time, end_time):
+    """
+    Normalize the DataFrame to start at 00:00 and extract the data between the 
+    specified start and end times. Then shift back to the original indexes.
+    
+    Parameters:
+    -----------
+    df : pd.Dataframe
+        dataframe with a datetime index and tmy data
+    start_time : datetime.datetime 
+        start time
+    end_time : datetime.datetime 
+        end time
+    
+    Returns:
+    --------
+    sub_results : pd.DataFrame 
+        extracted subset of tmy data
+    """
+
+    tz = df.index.tz
+    start_time = start_time.replace(tzinfo=tz)
+    end_time = end_time.replace(tzinfo=tz)
+
+    initial_time = df.index[0]
+    shifted_index = df.index - pd.DateOffset(hours=initial_time.hour, minutes=initial_time.minute, seconds=initial_time.second)
+    df.index = shifted_index
+
+    mask = (df.index >= start_time) & (df.index <= end_time)
+    sub_results = df.loc[mask]
+    
+    sub_results.index = sub_results.index + pd.DateOffset(hours=initial_time.hour, minutes=initial_time.minute, seconds=initial_time.second)
+    
+    return sub_results
+
+def new_id(collection):
+    """
+    Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
+
+    Parameters:
+    -----------
+    Collection : dict, ordereddict
+        dictionary with keys as strings
+
+    Returns : str
+    -------------
+        Unique 5 letter string of uppercase characters.
+    """
+    if not isinstance(collection, (dict,OrderedDict)):
+        raise TypeError(f"{collection.__name__} type {type(collection)} expected dict")
+
+    gen = lambda : ''.join(choices(ascii_uppercase, k = 5))
+    id = gen()
+    while id in collection.keys(): 
+        id = gen()
+    
+    return id 
+            
+def restore_gids(
+    original_meta_df : pd.DataFrame,
+    analysis_result_ds : xr.Dataset
+    )->xr.Dataset:  
+    """
+    Restore gids to results dataset. For desired behavior output data must
+    have identical ordering to input data, otherwise will fail silently by
+    misassigning gids to lat-long coordinates in returned dataset.
+
+    Parameters:
+    -----------
+    original_meta_df : pd.DataFrame
+        Metadata dataframe as returned by geospatial ``pvdeg.weather.get``
+    analysis_result_ds : xr.Dataset
+        geospatial result data as returned by ``pvdeg.geospatial.analysis``
+
+    Returns:
+    --------
+    restored_gids_ds : xr.Dataset
+        dataset like ``analysis_result_ds`` with new datavariable, ``gid``
+        holding the original gids of each result from the input metadata.
+        Warning: if meta order is different than result ordering gids will
+        be assigned incorrectly. 
+    """
+
+    flattened = analysis_result_ds.stack(points=('latitude', 'longitude'))
+
+    gids = original_meta_df.index.values
+
+    # Create a DataArray with the gids and assign it to the Dataset
+    gids_da = xr.DataArray(gids, coords=[flattened['points']], name='gid')
+
+    # Unstack the DataArray to match the original dimensions of the Dataset
+    gids_da = gids_da.unstack('points')
+
+    restored_gids_ds = analysis_result_ds.assign(gid=gids_da)
+
+    return restored_gids_ds
+
+def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
+    """
+    find the min and max latitude and longitude values from 2 lists 
+    or a tall numpy array of the shape [[lat, long], ...]
+
+    Parameters:
+    -----------
+    coord_1 : list, tuple
+        Top left corner of bounding box as lat-long coordinate pair as list or
+        tuple.
+    coord_2 : list, tuple
+        Bottom right corner of bounding box as lat-long coordinate pair in list 
+        or tuple.
+    coords : np.array
+        2d tall numpy array of [lat, long] pairs. Bounding box around the most
+        extreme entries of the array. Alternative to providing top left and 
+        bottom right box corners. Could be used to select amongst a subset of
+        data points. ex) Given all points for the planet, downselect based on 
+        the most extreme coordinates for the United States coastline information.
+    Returns:
+    --------
+    lats, longs : tuple(list)
+        min and max latitude and longitudes. Minimum latitude at lats[0].
+        Maximum latitude at lats[1]. Same pattern for longs.
+    """
+    if coord_1 and coord_2:
+        lats = [coord_1[0], coord_2[0]]
+        longs = [coord_1[1], coord_2[1]]
+    elif coords.any():
+        lats = coords[:,0]
+        longs = coords[:,1]
+
+    min_lat, max_lat = np.min(lats), np.max(lats)
+    min_long, max_long = np.min(longs), np.max(longs)
+
+    lats = [min_lat, max_lat]
+    longs = [min_long, max_long]
+
+    return lats, longs
+
+
+def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
+    """
+    Set matplotlib axis limits to the values from a bounding box.
+    See Also:
+    --------
+    pvdeg.utilities._find_bbox_corners for more information
+    """
+
+    lats, longs = _find_bbox_corners(coord_1, coord_2, coords)
+
+    ax.set_xlim([longs[0], longs[1]])
+    ax.set_ylim([lats[0], lats[1]])
+    return
+
+def _add_cartopy_features(ax):
+    """
+    Add cartopy features to an existing matplotlib.pyplot axis.
+    """
+    import cartopy.feature as cfeature
+    features = [
+        cfeature.BORDERS,
+        cfeature.COASTLINE,
+        cfeature.LAND,
+        cfeature.OCEAN,
+        cfeature.LAKES,
+        cfeature.RIVERS
+        ]
+
+    for i in features:
+        if i == cfeature.BORDERS:
+            ax.add_feature(i, linestyle=':')
+        else:
+            ax.add_feature(i)
+
+def _calc_elevation_weights(
+    elevations : np.array,
+    coords : np.array,
+    k_neighbors : int,
+    method : str,
+    normalization : str,
+    kdtree, 
+    )->np.array:
+    """
+    utility function. caluclate a weight for each point in a dataset 
+    to use for probabalistic downselection.
+
+    Parameters:
+    -----------
+    elevations : np.ndarray
+        one dimensional numpy array of elevations at each gid in the metadata
+    coords : np.ndarray
+        tall 2d numpy array of lat-long pairs like [[lat, long], ...]
+    k_neighbors : int
+        number of neighbors to use in local elevation calculation at each point
+    method : str, (default = 'mean')
+        method to calculate elevation weights for each point. 
+        Options : `'mean'`, `'sum'`, `'median'`
+    normalization : str, (default = 'linear')
+        function to apply when normalizing weights. Logarithmic uses log_e/ln
+        options : `'linear'`, `'logarithmic'`, '`exponential'`
+    kdtree : sklearn.neighbors.KDTree or str
+        kdtree containing latitude-longitude pairs for quick lookups
+        Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+        kdtree as a path to the .pkl file.
+
+    Returns:
+    --------
+    gids : np.array
+        1d numpy array of weights corresponding to each lat-long pair
+        in coordinates and respectively in metadata.
+    """
+    weights = np.empty_like(elevations)
+
+    for i, coord in enumerate(coords):
+        indicies = kdtree.query(coord.reshape(1,-1), k=k_neighbors+1)[1][0] # +1 to include current point 
+        delta_elevation = np.abs(elevations[indicies[1:]] - elevations[i]) 
+        
+        if method == 'mean':
+            delta = np.mean(delta_elevation)
+        elif method == 'sum':
+            delta = np.sum(delta_elevation)
+        elif method == 'median':
+            delta = np.median(delta_elevation)
+        weights[i] = delta
+
+
+    if normalization == 'linear':
+        pass # do nothing
+    elif normalization == 'exponential':
+        weights = np.exp(weights)
+    elif normalization == 'logarithmic':
+        weights = np.log(weights)
+
+    normalized_weights = np.divide( 
+        np.subtract(weights, np.min(weights)), 
+        np.subtract(np.max(weights), np.min(weights)) 
+        )
+    
+    return normalized_weights
+
+    
+

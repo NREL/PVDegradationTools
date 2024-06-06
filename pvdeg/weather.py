@@ -27,7 +27,7 @@ def get(database, id=None, geospatial=False, **kwargs):
     database : (str)
         'NSRDB' or 'PVGIS'
     id : (int or tuple)
-        If NSRDB, id is the gid for the desired location
+        If NSRDB, id is the gid for the desired location. 
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
     geospatial : (bool)
         If True, initialize weather data via xarray dataset and meta data via
