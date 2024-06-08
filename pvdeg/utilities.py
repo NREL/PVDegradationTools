@@ -452,7 +452,7 @@ def tilt_azimuth_scan(
     """
 
     total_count = (np.ceil(360 / azimuth_step) + 1) * (np.ceil(90 / tilt_step) + 1)
-    tilt_azimuth_series = np.zeros((total_count, 3))
+    tilt_azimuth_series = np.zeros((int(total_count), 3))
     count = 0
     azimuth = -azimuth_step
     while azimuth < 360:

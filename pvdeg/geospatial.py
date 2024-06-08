@@ -733,7 +733,7 @@ def apply_bounding_box(
 def elevation_stochastic_downselect(
     meta_df: pd.DataFrame,
     kdtree, 
-    downselect_prop: int | float,
+    downselect_prop: float,
     k_neighbors: int = 3,
     method: str = 'mean',
     normalization: str = 'linear',

@@ -569,7 +569,7 @@ def T98_estimate(
             meta=meta,
             poa=poa,
             temp_model=temp_model,
-            conf_0=conf_0,
+            conf=conf_0,
             wind_factor=wind_factor,
             model_kwarg=model_kwarg
         )
