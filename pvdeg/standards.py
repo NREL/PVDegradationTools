@@ -309,16 +309,18 @@ def standoff(
         weather_df, meta = weather.get(**weather_kwarg)
 
     solar_position = spectral.solar_position(weather_df, meta)
-    poa = spectral.poa_irradiance(
-        weather_df=weather_df,
-        meta=meta,
-        
-        **{**{
+
+    irradiance_dict = {
         'sol_position':solar_position,
         'tilt':tilt,
         'azimuth':azimuth,
         'sky_model':sky_model,
-        }, **irradiance_kwarg} # overwrite with irradiance kwarg if any
+        }
+
+    poa = spectral.poa_irradiance(
+        weather_df=weather_df,
+        meta=meta,
+        ** irradiance_dict | irradiance_kwarg
     )
 
     T_0 = temperature.temperature(
@@ -329,7 +331,7 @@ def standoff(
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
-        model_kwarg={**model_kwarg, **conf_0_kwarg} # may lead to undesired behavior, test
+        model_kwarg= model_kwarg | conf_0_kwarg # may lead to undesired behavior, test
     )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
 
@@ -341,7 +343,7 @@ def standoff(
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
-        model_kwarg={**model_kwarg, **conf_inf_kwarg} # test
+        model_kwarg= model_kwarg | conf_inf_kwarg # may lead to undesired behavior, test
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
