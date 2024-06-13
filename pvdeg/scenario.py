@@ -1028,7 +1028,7 @@ class GeospatialScenario(Scenario):
         self,
         name: str = None,
         path: str = None,
-        gids: list | np.ndarray =None,
+        gids: Optional[Union[list, np.ndarray]] = None,
         modules: list = [],
         pipeline: dict = {},
         file=None,
