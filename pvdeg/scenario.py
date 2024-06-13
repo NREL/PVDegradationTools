@@ -592,7 +592,6 @@ class Scenario:
 
         attributes = {
             'name': self.name,
-            'hpc' : self.hpc,
             'path': self.path,
             'modules': self.modules, 
             'gids': self.gids,
