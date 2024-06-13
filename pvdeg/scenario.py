@@ -1,10 +1,12 @@
 """Class to define an analysis scenario."""
+
+import pvdeg
+from pvdeg import utilities
+
 from datetime import date
 from datetime import datetime as dt
 import os
 from shutil import rmtree
-from pvdeg import utilities as utils
-import pvdeg
 import json
 from inspect import signature
 import warnings
@@ -15,18 +17,14 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from importlib import import_module
 from copy import deepcopy
-
+from typing import List, Union, Optional, Tuple, Callable
 from functools import partial
-
 import pprint
 from IPython.display import display, HTML
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
-
-### dynamic plotting function for geospatial
 ### premade scenario with locations of interest. Ask Mike?
-
-# BUG: Can't expand dropdown on restored object using ipython display. Test and fix?
-
 # TODO: geospatial reset weather and addLocation from gids.
 
 class Scenario:
@@ -37,21 +35,17 @@ class Scenario:
     """
     def __init__(
         self,
-        name=None,
-        path=None,
-        gids=None,
-        modules=[],
-        pipeline=OrderedDict(),
-         
-        file=None,
+        name: Optional[str] = None,
+        path: Optional[str] = None,
+        gids: Optional[Union[int, List[int], np.ndarray[int]]] = None,
+        modules: Optional[list] = [],
+        pipeline = OrderedDict(),
+        file: Optional[str] = None,
         results=None,
-
-        hpc=False,
-        weather_data=None, # df
-        meta_data = None, # dict
-
-        email = None, 
-        api_key = None, 
+        weather_data: Optional[pd.DataFrame] = None, # df
+        meta_data: Optional[dict] = None, # dict
+        email: Optional[str] = None, 
+        api_key: Optional[str] = None, 
     ):
         """
         Initialize the degradation scenario object.
@@ -82,11 +76,10 @@ class Scenario:
         self.gids = gids
         self.pipeline = pipeline
         self.results = results
-        self.hpc = hpc
+        # self.hpc = hpc
         self.weather_data = weather_data
         self.meta_data = meta_data
         self.lat_long = None
-
         self.api_key = api_key 
         self.email = email
 
@@ -108,15 +101,22 @@ class Scenario:
 
     def clean(self):
         """
-        Wipe the Scenario object filetree. This is useful because the Scenario object stores its data in local files outside of the python script.
-        This causes issues when two unique scenario instances are created in the same directory, they appear to be seperate instances
-        to python but share the same data (if no path is provided). Changes made to one are reflected in both.
+        Wipe the Scenario object filetree. This is useful because the Scenario
+        object stores its data in local files outside of the python script.
+        This causes issues when two unique scenario instances are created in
+        the same directory, they appear to be seperate instances to python but
+        share the same data (if no path is provided). 
+        Changes made to one are reflected in both.
 
         Parameters:
         -----------
         None
 
-       """
+        See Also:
+        --------
+        `pvdeg.utilties.remove_scenario_filetree`
+        to remove all pvd_job_* directories and children from a directory
+        """
         if self.path:
             try:
                 os.chdir(os.pardir) 
@@ -127,57 +127,29 @@ class Scenario:
             raise ValueError(f"{self.name} does not have a path attribute")
    
     def addLocation(self, 
-        lat_long=None, 
-        see_added = False,
-    ):
+        lat_long: tuple = None, 
+        weather_db: str = 'PSM3',
+        see_added: bool = False,
+        ):
         """
-        Add a location to the scenario. Generates "gids.csv" and saves the file path within
-        Scenario dictionary. This can be done in three ways: Pass (region, region_col) for gid list,
-        pass (gid) for a single location, pass (lat, long) for a single location.
+        Add a location to the scenario using a latitude-longitude pair.
+        
+        The scenario object instance must already be populated with 
+        credentials when making a call to the NSRBD. Provide credentials 
+        during class intialization or using `Scenario.restore_credentials`
 
         Parameters:
         -----------
-        country : str
-            country to include from NSRDB. Currently supports full string names only.
-            Either single string form or list of strings form.
-            Examples:
-            - ``country='United States'``
-            - ``country=['United States']``
-            - ``country=['Mexico', 'Canada']``
-            
-        state : str
-            combination of states or provinces to include from NSRDB.  
-            Supports two-letter codes for American states. Can mix two-letter
-            codes with full length strings. Can take single string, or list of strings (len >= 1)
-            Examples:
-            - ``state='Washington'``
-            - ``state=WA`` (state abbr is case insensitive)
-            - ``state=['CO', 'British Columbia']``
-
-        county : str
-            county to include from NSRDB. If duplicate county exists in two
-            states present in the ``state`` argument, both will be included. 
-            If no state is provided 
-        downsample_factor : int
-            downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
-        year : int
-            year of data to use from NSRDB, default = ``2022``
-        nsrdb_attributes : list(str)
-            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).\
-            Default = ``['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']``
-        lat_long : (tuple - float)
-            latitute and longitude of a single location
-
+        lat-long : tuple
+            tuple of floats representing a latitude longitude coordinate.
+            >>> (24.7136, 46.6753) #Riyadh, Saudi Arabia
+        weather_db : str    
+            source of data for provided location.
+            - For NSRDB data use `weather_db = 'PSM3'`  
+            - For PVGIS data use `weather_db = 'PVGIS'`
         see_added : bool
             flag true if you want to see a runtime notification for added location/gids
-
-        weather_fp : (str, path_obj, pd.Dataframe)  
-            File path to the source dataframe for weather and spatial data. Default should be NSRDB. 
-            Additionally, takes weather dataframe generated by ``pvdeg.weather.get()`` for a single location.
         """
-
-        weather_db = 'PSM3' # should this be PSM3
-
         if isinstance(lat_long, list): # is a list when reading from json
             lat_long = tuple(lat_long)
 
@@ -187,46 +159,57 @@ class Scenario:
             self.lat_long = lat_long # save coordinate
         else:
             raise ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
+       
+        # this wont work, pvgis doesnt need an api key
+        # try:
+        #     weather_arg = {
+        #         'api_key': self.api_key,
+        #         'email': self.email,
+        #         'names': 'tmy',
+        #         'attributes': [],
+        #         'map_variables': True}
+        # except:
+        #     raise ValueError(f"email : {self.email} \n api-key : {self.api_key} \n Must provide an email and api key during class initialization")
 
-        try:
+        weather_arg = {}
+
+        if weather_db == 'PSM3':
             weather_arg = {
+                    'names': 'tmy',
+                    'attributes': [],
+                    'map_variables': True
+                }
+
+        if self.email != None and self.api_key != None and weather_db == 'PSM3':
+            credentials = {
                 'api_key': self.api_key,
                 'email': self.email,
-                'names': 'tmy',
-                'attributes': [],
-                'map_variables': True}
-        except:
-            raise ValueError(f"email : {self.email} \n api-key : {self.api_key} \n Must provide an email and api key during class initialization")
-
+                }
+            weather_arg = weather_arg | credentials
+        elif weather_db == 'PVGIS':
+            pass
+        else:
+            raise ValueError(f"""
+                email : {self.email} \n api-key : {self.api_key}  
+                Must provide an email and api key during class initialization 
+                when using NDSRDB : {weather_db} == 'PSM3'
+                """)
+            
         point_weather, point_meta = pvdeg.weather.get(weather_db, id=weather_id, **weather_arg)
 
         try:
-            gid = point_meta['Location ID']            
+            if weather_db == 'PSM3':
+                gid = point_meta['Location ID']            
+                self.gids = [ int(gid) ]
         except KeyError:
             return UserWarning(f"metadata missing location ID")
 
-        # TODO: calculate gid using rex.NSRDBX.lat_long_gis, will only work on hpc
-        if self.hpc:
-            pass
-
-        # gid for a single location, may be misleading, should confirm psm3 location id vs nsrdb gid 
-        self.gids = [ int(gid) ]
         self.meta_data = point_meta
-        self.weather_data = point_weather # just save as a dataframe, give xarray option?
+        self.weather_data = point_weather 
         
-        if see_added:
+        if see_added and weather_db == 'PSM3':
             message = f"Gids Added - {self.gids}"
             warnings.warn(message, UserWarning)
-
-        # save gids in json dump
-        # gids_path = utils.write_gids(
-        #     # nsrdb_fp,
-        #     region=region,
-        #     region_col=region_col,
-        #     lat_long=lat_long,
-        #     gids=gids,
-        #     out_fn=file_name,
-        # )
 
     def addModule(
         self,
@@ -259,9 +242,9 @@ class Scenario:
             Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
         model_kwarg : (dict), optional
             provide a dictionary of temperature model coefficents to be used 
-            instead of pvlib defaults. Some models will require additional \n
-            arguments such as ``ross`` which requires nominal operating cell \n
-            temperature (``noct``). This is where other values such as noct \n
+            instead of pvlib defaults. Some models will require additional 
+            arguments such as ``ross`` which requires nominal operating cell
+            temperature (``noct``). This is where other values such as noct
             should be provided.
             Pvlib temp models: 
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
@@ -272,7 +255,7 @@ class Scenario:
         """
 
         try:
-            mat_params = utils._read_material(name=material)
+            mat_params = utilities._read_material(name=material)
         except:
             print("Material Not Found - No module added to scenario.")
             print("If you need to add a custom material, use .add_material()")
@@ -284,7 +267,6 @@ class Scenario:
             print("Module will be replaced with new instance.")
             self.modules.pop(old_modules.index(module_name))
  
-        # add the module and parameters
         self.modules.append({
             "module_name": module_name, 
             "racking" : racking,
@@ -302,9 +284,9 @@ class Scenario:
         self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True
     ):
         """
-        add a new material type to master list
+        add a new material type to main list
         """
-        utils._add_material(
+        utilities._add_material(
             name=name,
             alias=alias,
             Ead=Ead,
@@ -328,15 +310,12 @@ class Scenario:
         if self.name:
             print(f"Name : {self.name}")
 
-        if self.geospatial:
-            print("\033[1;32mGEOSPATIAL = True\033[0m")
-
         if self.pipeline:
             print('Pipeline : ')
 
             # pipeline is a list of dictionaries, each list entry is one pipeline job
             df_pipeline = pd.json_normalize(self.pipeline)
-            print(df_pipeline.to_string()) # should this be display?
+            print(df_pipeline.to_string()) 
         else:
             print("Pipeline : no jobs in pipeline")
 
@@ -363,7 +342,7 @@ class Scenario:
     def addJob(
         self, 
         func=None, 
-        func_params={},
+        func_kwarg={},
         see_added=False,
         ):
         """
@@ -372,14 +351,10 @@ class Scenario:
         Parameters:
         -----------
         func : function
-            pvdeg function to use for single point calculation or geospatial analysis.
+            pvdeg function to use for single point calculation.
             All regular pvdeg functions will work at a single point when ``Scenario.geospatial == False``  
-            *Note: geospatial analysis is only available with a limited subset of pvdeg 
-            functions*   
-            Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``, 
-            ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
         func_params : dict  
-            TODO
+            job specific keyword argument dictionary to provide to the function
         see_added : bool
             set flag to get a userWarning notifying the user of the job added  
            to the pipeline in method call. ``default = False``
@@ -390,58 +365,34 @@ class Scenario:
             print("Function has not been added to pipeline.")
             return 
 
-        params_all = dict(signature(func).parameters)
+        job_id = utilities.new_id(self.pipeline)
 
-        # cant check parameters needed by function now bc they come from multiple sources when the pipeline is run.
-
-        job_id = utils.new_id(self.pipeline)
-        # get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
-
-        job_dict = {"job": func, "params": func_params}
+        job_dict = {"job": func, "params": func_kwarg}
         self.pipeline[job_id] = job_dict
-
-        # could be helpful up here
-
-        # for restoring from qualified name in string form
-        # func = getattr(pvdeg, str_name)
-           
+          
         if see_added:
             message = f"{func.__name__} added to pipeline as \n {job_dict}"
             warnings.warn(message, UserWarning)
 
 
-        # we dont need to save the pipeline csv anymore, it will be in the json
-        
-        # df_pipeline = pd.DataFrame(self.pipeline)
-        # update the first column of the dataframe from func address to function name 
-        # df_pipeline.iloc[:,0] = df_pipeline.iloc[:,0].map(get_qualified)
-        
-        # file_name = f"pipeline_{self.name}.csv"
-        # df_pipeline.to_csv(file_name, index=False)
-        # we dont need to save the pipeline anymore we have json dump
-
-    def run(self, hpc=None):
+    def run(self):
         """
-        Run all jobs in pipeline on scenario object. If single location,
-        run multiple jobs on multiple pannels or any combination. 
-        If geospatial, can only run one job from the pipeline. Having more
-        than one geospatial job in the pipeline may throw an error.
-
+        Run all jobs in pipeline on scenario object for each module in the scenario.
         Note: if a pipeline job contains a function not adhering to package
         wide pv parameter naming scheme, the job will raise a fatal error.
 
         Parameters:
         -----------
-        hpc : (dict), optional, default=None
-            Only for geospatial analysis.
-            dictionary of parameters for dask client intialization. 
-            See ``pvdeg.geospatial.start_dask`` for more information.
+        None 
+
+        Returns:
+        --------
+        None
         """
         results_series = pd.Series(dtype='object')
 
         results_dict = {}
 
-        # we need do the pipeline for every module available
         if self.modules:
 
             for module in self.modules: 
@@ -450,30 +401,26 @@ class Scenario:
                 for id, job in self.pipeline.items():
                     func, params = job['job'], job['params']
 
-                    weather_dict = {'weather_df' : self.weather_data, 'meta' : self.meta_data} # move outside? doesn't need to be in here, cleaner though?
+                    weather_dict = {'weather_df' : self.weather_data, 'meta' : self.meta_data} 
 
                     temperature_args = {
                         'temp_model' : module['temp_model'],
-                        'model_kwarg' : module['model_kwarg'], # if func parameters are named incorrecly, ex model_kwargs instead of model_kwarg, this will not work properly
-                        'irradiance_kwarg' : module['irradiance_kwarg'], # same for irradiance kwarg, is there a better way to do this then?
+                        'model_kwarg' : module['model_kwarg'], 
+                        'irradiance_kwarg' : module['irradiance_kwarg'],
                         'conf' : module['racking'],
-                        **module['irradiance_kwarg'] # some functions dont want irradiance_kwargs arg instead they just want the irradiance_kwargs values as kwargs
+                        **module['irradiance_kwarg'] # overwrite existing irradiance kwarg
                     }
 
-                    combined = {**weather_dict, **temperature_args, **module['material_params']} # maybe should not have material params like this, idk what functions need them which changes where they should be implemented
+                    combined = weather_dict | temperature_args | module['material_params']
 
                     func_params = signature(func).parameters
-                    func_args = {k:v for k,v in combined.items() if k in func_params.keys()} # downselect, only keep arguments that the function will take
-                    # downselecting too many things here? we seem to be removing information we want like irradiance kwargs, this will happen if function doesnt take irradiance kwargs
+                    func_args = {k:v for k,v in combined.items() if k in func_params.keys()} # downselect func args
 
-                    res = func(**params, **func_args) # provide user args and module specific args
+                    res = func(**params, **func_args) 
 
                     if id not in module_result.keys(): 
                         module_result[id] = res
-                    # else:
-                    #     module_result[f"{func.__name__}_{id(func)}"] = res
 
-                # move standard results to single dictionary
                 results_dict[module['module_name']] = module_result
 
             self.results = results_dict # 2d dictionary array
@@ -488,44 +435,34 @@ class Scenario:
                         with open(f"{module_dir}/{function}.csv", 'w') as file:
                             file.write(f"{result}\n")
 
-        # REFACTOR??? this is really bad 
-        # no modules case, all funcs will use default values from functions for module information
         elif not self.modules:
+            pipeline_results = {}
 
             for id, job in self.pipeline.items():
-                _func, _params = job['job'], job['params']
+                func, params = job['job'], job['params']
 
-                # if we do this we will need to enforce parameter naming scheme repo wide
                 try:
-                    # try to populate with weather and meta
-                    # could fail if function signature has wrong names or if we
-                    # haven't added a location, can provide weather and meta in
-                    # a kwargs argument
-
-                    # if 'weather_df' not in _params.keys(): # make sure they havent provided weather in the job arguments
-                    _func = partial(
-                        _func, 
+                    func = partial(
+                        func, 
                         weather_df=self.weather_data, 
                         meta=self.meta_data
                         )
                 except:
                     pass
 
-                result = _func(**_params) if _params else _func()
+                result = func(**params) if params else func()
 
-                # if job['job'].__name__ not in results_dict.keys():
-                    # results_dict[job['job'].__name__] = result
-                if id not in module_result.keys(): 
-                    results_dict[id] = result
+                # if id not in module_result.keys(): 
+                    # results_dict[id] = result
+                # pipeline_results = results_dict
+                # pipeline_results[id] = result
 
-                # move standard results to single dictionary
-                pipeline_results = results_dict
+                results_dict[id] = result
+                pipeline_results = results_dict # this is weird 
         
-            # TEST THIS NOW? AND REDO result series logic?
-            # save all results to dataframes and store in a series
             for key in pipeline_results.keys():
-                print(f"results_dict dtype : {type(results_dict[key])}")
-                print(results_dict)
+                # print(f"results_dict dtype : {type(results_dict[key])}")
+                # print(results_dict)
 
                 if isinstance(results_dict[key], pd.DataFrame):
                     results_series[key] = results_dict[key]
@@ -538,13 +475,16 @@ class Scenario:
 
                 self.results = results_series
           
-    # handle converting qualified function name back to function reference with getattr
-    # func, throwaway_params = self._verify_function(task['qualified_function'])
-    def load_json(self, file_path=None, email=None, api_key=None):
+    @classmethod
+    def load_json(
+        cls, 
+        file_path: str = None, 
+        email: Optional[str] = None, 
+        api_key: Optional[str] = None
+        ):
         """
         Import scenario dictionaries from an existing 'scenario.json' file
         """
-
         with open(file_path, "r") as f:
             data = json.load(f)
         name = data["name"]
@@ -552,35 +492,35 @@ class Scenario:
         hpc = data['hpc']        
         modules = data["modules"]
         gids = data["gids"]
-        process_pipeline = data["pipeline"]
+        process_pipeline = OrderedDict(data["pipeline"])
         lat_long = data["lat_long"]
 
         for task in process_pipeline.values():
-            module_name, func_name = task['qualified_function'].rsplit('.', 1)
-            module = import_module(module_name)
-            func = getattr(module, func_name)
-            task['job'] = func
-            del task['qualified_function']
-
-        self.name = name
-        self.path = path
-        self.hpc = hpc
-        self.modules = modules
-        self.gids = gids
-        self.pipeline = process_pipeline
-        self.file = file_path
+            utilities._update_pipeline_task(task=task)
+    
+        instance = cls()
+        instance.name = name
+        instance.path = path
+        instance.hpc = hpc
+        instance.modules = modules
+        instance.gids = gids
+        instance.pipeline = process_pipeline
+        instance.file = file_path
         
         try:
-            self.email = data['email']
-            self.api_key = data['api_key']
+            instance.email = data['email']
+            instance.api_key = data['api_key']
         except KeyError:
             print(f"credentials not in json file using arguments")
-            self.email = email
-            self.api_key = api_key
+            instance.email = email
+            instance.api_key = api_key
 
-        self.addLocation(lat_long=lat_long)
+        instance.addLocation(lat_long=lat_long)
+        return instance
 
-    def _verify_function(func_name):
+    def _verify_function(
+        func_name: str
+        )-> Tuple[Callable, List]:
         """
         Check all classes in pvdeg for a function of the name "func_name". Returns a callable function
         and list of all function parameters with no default values.
@@ -648,7 +588,11 @@ class Scenario:
 
         return attributes
 
-    def dump(self, api_key=False, path=None):
+    def dump(
+        self, 
+        api_key: bool = False, 
+        path: Optional[str] = None
+        )-> None:
         """
         Serialize the scenario instance as a json. No dataframes will be saved
         but some attributes like weather_df and results will be stored in 
@@ -675,7 +619,11 @@ class Scenario:
 
         return
     
-    def restore_credentials(self, email, api_key):
+    def restore_credentials(
+        self, 
+        email: str, 
+        api_key: str,
+        )-> None:
         """
         Restore email and api key to scenario. Use after importing
         scenario if json does not contain email and api key. 
@@ -687,21 +635,64 @@ class Scenario:
         api_key : str
             api key associated with nsrdb developer account
         """
-        if not self.email and self.api_key:
+        if self.email is None and self.api_key is None:
             self.email = email
             self.api_key = api_key
 
+    
     def extract(
         self, 
-        dim_target, 
-        col_name=None, 
-        tmy=False, 
-        start_time=None, 
-        end_time=None
-        ):
+        dim_target: Tuple[str, str], 
+        col_name: Optional[str] = None, 
+        tmy: bool = False, 
+        start_time: Optional[dt] = None, 
+        end_time: Optional[dt] = None
+        )-> pd.DataFrame:
         """
-        User should provide function id not funtion name in dim_target
+        Extract scenario results along an axis. 
+        
+        Note: 
+        --------
+        only works if results are of the same shape. 
+        Ex) running 5 different temperature calculations on the same module.
+        Counter Ex) running a standoff and tempeature calc on the same module. 
+
         Ex: ('function' : 'AKWMC)
+
+        Parameters:
+        -----------
+        dim_target : tuple of str
+            Define a tuple of `(dimension, name)` to select results.
+            The dimension is either 'function' or 'module', and the name
+            is the name of the function or module to grab results from.
+            
+            Note: Receives job ID, not function name in `dim_target`.
+
+            Dimension options: `'function'`, `'module'`
+            
+            Examples:
+
+            To grab 'standoff' result from all modules in the scenario:
+            Determine the name of the standoff job using `display(Scenario)`.
+            If the job is called `AJCWL`, the result would be:
+            `dim_target = ('function', 'AJCWL')`
+
+            To grab all results from a module named 'mod_a':
+            `dim_target = ('module', 'mod_a')`
+
+        col_name: Optional[str], default = None
+            The column name to extract. 
+            Only use when results contain dataframes with multiple columns.
+            Extranious if results are pd.Series or single numeric values.
+
+        tmy: bool, default False
+            Whether to use typical meteorological year data.
+
+        start_time: Optional[dt.datetime], default None
+            The start time for the data extraction.
+
+        end_time: Optional[dt.datetime], default None
+            The end time for the data extraction.
         """
         if self.results is None:
             raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
@@ -741,26 +732,77 @@ class Scenario:
             results.index = results.index.map(lambda dt: dt.replace(year=1970)) # placeholder year
 
             if start_time and end_time:
-                results = utils.strip_normalize_tmy(results, start_time, end_time)
+                results = utilities.strip_normalize_tmy(results, start_time, end_time)
         
         return results
 
     def plot(
         self, 
-        dim_target, 
-        col_name=None, 
-        tmy=False, 
-        start_time=None, 
-        end_time=None,
-        title='',
-        ):
+        dim_target: Tuple[str, str], 
+        col_name: Optional[str] = None, 
+        tmy: bool = False, 
+        start_time: Optional[dt] = None, 
+        end_time: Optional[dt] = None,
+        title: str = '',
+        )-> None:
         """
-        create plots of scenario data against a specific dimension quickly. 
-        When complete this will be able to plot single location and geospatial
-        data.
+        Plot scenario results along an axis using `Scenario.extract`
+        
+        Note: 
+        --------
+        only works if results are of the same shape. 
+        Ex) running 5 different temperature calculations on the same module.
+        Counter Ex) running a standoff and tempeature calc on the same module. 
+
+        Ex: ('function' : 'AKWMC)
+
         Parameters:
         -----------
-        see extract
+        dim_target : tuple of str
+            Define a tuple of `(dimension, name)` to select results.
+            The dimension is either 'function' or 'module', and the name
+            is the name of the function or module to grab results from.
+            
+            Note: Receives job ID, not function name in `dim_target`.
+
+            Dimension options: `'function'`, `'module'`
+            
+            Examples:
+
+            To grab 'standoff' result from all modules in the scenario:
+            Determine the name of the standoff job using `display(Scenario)`.
+            If the job is called `AJCWL`, the result would be:
+            `dim_target = ('function', 'AJCWL')`
+
+            To grab all results from a module named 'mod_a':
+            `dim_target = ('module', 'mod_a')`
+
+        col_name: Optional[str], default = None
+            The column name to extract. 
+            Only use when results contain dataframes with multiple columns.
+            Extranious if results are pd.Series or single numeric values.
+
+        tmy: bool, default False
+            Whether to use typical meteorological year data.
+
+        start_time: Optional[dt.datetime], default None
+            The start time for the data extraction.
+
+        end_time: Optional[dt.datetime], default None
+            The end time for the data extraction.
+
+        title: Optional[str], default ''
+            Name of the matplotlib plot
+
+        Returns:
+        -------
+        None
+
+        See Also:
+        ---------
+        `Scenario.extract` 
+        To have more control over a plot simply extract the data and then use
+        more specific plotting logic
         """
 
         df = self.extract(dim_target=dim_target,col_name=col_name,tmy=tmy,start_time=start_time,end_time=end_time)
@@ -777,7 +819,6 @@ class Scenario:
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
             <h2>{self.name}: Scenario Analysis</h2>
             <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
             <p><strong>GIDs:</strong> {self.gids}</p>
             <p><strong>Email:</strong> {self.email}</p>
             <p><strong>API Key:</strong> {self.api_key}</p>
@@ -895,36 +936,51 @@ class Scenario:
         else:
             return str(output)
 
-    def format_weather(self): # fix column names
+    def format_weather(self): 
         weather_data_html = ""
         if isinstance(self.weather_data, pd.DataFrame):
             if len(self.weather_data) > 10:
                 first_five = self.weather_data.head(5)
                 last_five = self.weather_data.tail(5)
-                ellipsis_row = pd.DataFrame(["..."] * len(self.weather_data.columns)).T
-                ellipsis_row.columns = self.weather_data.columns
+                ellipsis_row = pd.DataFrame([["..."] * len(self.weather_data.columns)], columns=self.weather_data.columns)
+
+                # Create the custom index with ellipses
+                custom_index = np.concatenate([
+                    np.arange(0, 5, dtype=object).astype(str),
+                    ['...'],
+                    np.arange(len(self.weather_data) - 5, len(self.weather_data), dtype=object).astype(str)
+                ])
+
+                # Concatenate the DataFrames
                 display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+                display_data.index = custom_index
             else:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div onclick="toggleVisibility('weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_weather_data" style="color: #E6E6FA;">►</span> 
+                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span> 
                     Weather Data
                 </h4>
             </div>
-        <div id="weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
                 {display_data.to_html()}
             </div>
             """
-        
         return weather_data_html
 
     def format_pipeline(self):
         pipeline_html = '<div>'
         for step_name, step in self.pipeline.items():
-            params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
+
+            try:
+                if isinstance(step['params'], pd.DataFrame):
+                    params_html = "<pre>DataFrame (not displayed)</pre>"
+                else:
+                    params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
+            except TypeError: # json dumps fails
+                params_html = "<pre>Unserializable data type</pre>"
 
             step_content = f"""
             <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
@@ -944,24 +1000,22 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += '</div>'
         return pipeline_html
-
     
 
 class GeospatialScenario(Scenario):
     def __init__(
         self,
-        name=None,
-        path=None,
-        gids=None,
-        modules=[],
-        pipeline={},
+        name: str = None,
+        path: str = None,
+        gids: list | np.ndarray =None,
+        modules: list = [],
+        pipeline: dict = {},
         file=None,
         results=None,
-
         hpc=False,
         geospatial=False,
-        weather_data=None, #  xr.ds when geospatial
-        meta_data = None, # df when geospatial
+        weather_data: xr.Dataset = None,
+        meta_data: pd.DataFrame = None, 
         ):
 
         super().__init__(name=name,
@@ -971,26 +1025,64 @@ class GeospatialScenario(Scenario):
                          pipeline=pipeline,
                          file=file,
                          results=results,
-                         hpc=hpc,
                          weather_data=weather_data,
                          meta_data=meta_data,
                          )
         self.geospatial = geospatial
+        self.hpc = hpc
+
+        utilities.nrel_kestrel_check() # remove this in the future?
 
     # add restoring from gids functionality from nsrdb
     def addLocation(
-    self,
-    country=None,
-    state=None,
-    county=None,
-    year=2022,
-    satellite='Americas',
-    nsrdb_attributes=['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity'],
-    downsample_factor=0,
-    gids=None, # int, list(int), np.array(int)
-    bbox_kwarg={},
-    see_added=False,
-    ):
+        self,
+        country: Optional[str] = None,
+        state: Optional[str] = None,
+        county: Optional[str] = None,
+        year: int = 2022,
+        satellite: str ='Americas',
+        nsrdb_attributes: List[str] =['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity'],
+        downsample_factor: int = 0,
+        gids: Optional[Union[int, List[int], np.ndarray]] = None,
+        bbox_kwarg: Optional[dict] = {},
+        see_added: bool = False,
+        )-> None:
+        """
+        Add a location to the scenario. This can be done in three ways: Pass (region, region_col) for gid list. 
+
+        Parameters:
+        -----------
+        country : str
+            country to include from NSRDB. Currently supports full string names only.
+            Either single string form or list of strings form.
+            Examples:
+            - ``country='United States'``
+            - ``country=['United States']``
+            - ``country=['Mexico', 'Canada']``
+            
+        state : str
+            combination of states or provinces to include from NSRDB.  
+            Supports two-letter codes for American states. Can mix two-letter
+            codes with full length strings. Can take single string, or list of strings (len >= 1)
+            Examples:
+            - ``state='Washington'``
+            - ``state=WA`` (state abbr is case insensitive)
+            - ``state=['CO', 'British Columbia']``
+
+        county : str
+            county to include from NSRDB. If duplicate county exists in two
+            states present in the ``state`` argument, both will be included. 
+            If no state is provided 
+        downsample_factor : int
+            downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
+        year : int
+            year of data to use from NSRDB, default = ``2022``
+        nsrdb_attributes : list(str)
+            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).\
+            Default = ``['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']``
+        see_added : bool
+            flag true if you want to see a runtime notification for added location/gids
+        """
 
         if self.gids is not None:
             print(
@@ -1045,23 +1137,52 @@ class GeospatialScenario(Scenario):
 
         return
 
-    def location_bounding_box(self, coord_1=None, coord_2=None, coord_2d=None):
+    def location_bounding_box(
+        self, 
+        coord_1: Optional[tuple[float]] = None, 
+        coord_2: Optional[tuple[float]] = None, 
+        coords: Optional[np.ndarray[float]] = None
+        )-> None:
+        """
+
+        Apply a latitude-longitude rectangular bounding box to 
+        geospatial scenario metadata.
+
+        Parameters:
+        -----------
+        coord_1 : list, tuple
+            Top left corner of bounding box as lat-long coordinate pair as list or
+            tuple.
+        coord_2 : list, tuple
+            Bottom right corner of bounding box as lat-long coordinate pair in list 
+            or tuple.
+        coords : np.array
+            2d tall numpy array of [lat, long] pairs. Bounding box around the most
+            extreme entries of the array. Alternative to providing top left and 
+            bottom right box corners. Could be used to select amongst a subset of
+            data points. ex) Given all points for the planet, downselect based on 
+            the most extreme coordinates for the United States coastline information.
+
+        Returns:
+        --------
+        None
+        """
         bbox_gids = pvdeg.geospatial.apply_bounding_box(
             self.meta_data, 
             coord_1, 
             coord_2, 
-            coord_2d) 
+            coords) 
 
         self.meta_data = self.meta_data.loc[bbox_gids]
     
-    def downselect_mountains_radii(
+    def classify_mountains_radii(
         self,
         kdtree, 
-        rad_1=12, 
-        rad_2=1, 
-        threshold_factor=1.25, 
-        elevation_floor=0, 
-        bbox_kwarg={}
+        rad_1: Union[float, int] = 12, 
+        rad_2: Union[float, int] = 1, 
+        threshold_factor: Union[float, int] = 1.25, 
+        elevation_floor: Union[float, int] = 0, 
+        bbox_kwarg: Optional[dict] = {}
         ):
         """
         Find mountains from elevation metadata using sklearn kdtree for fast lookup.
@@ -1113,7 +1234,7 @@ class GeospatialScenario(Scenario):
         self.meta_data['mountain'] = (self.meta_data.index).isin(gids)
         return
     
-    def downselect_mountains_weights(
+    def classify_mountains_weights(
         self,
         kdtree,
         threshold: int = 0,
@@ -1171,8 +1292,51 @@ class GeospatialScenario(Scenario):
         return
 
 
-    def downselect_feature():
-        pass   
+    def classify_feature(
+        self,
+        kdtree=None, 
+        feature_name=None, 
+        resolution='10m', 
+        radius=None, 
+        bbox_kwarg={},
+        ):
+        """
+        kdtree : sklearn.neighbors.KDTree or str
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+            kdtree as a path to the .pkl file.
+        feature_name : str
+            cartopy.feature.NaturalEarthFeature feature key.
+            Options: ``'lakes'``, ``'rivers_lake_centerlines'``, ``'coastline'``
+        resolution : str
+            cartopy.feature.NaturalEarthFeature resolution.
+            Options: ``'10m'``, ``'50m'``, ``'110m'``
+        radius : float
+            Area around feature coordinates to include in the downsampled result. 
+            Bigger area means larger radius and more samples included.
+            pass   
+
+        Returns:
+        --------
+        None, strictly updates meta_data attribute of scenario.
+        
+        See Also:
+        ---------
+        `pvdeg.geospatial.feature_downselect`
+        """
+
+        feature_gids = pvdeg.geospatial.feature_downselect(
+            meta_df=self.meta_data,
+            kdtree=kdtree,
+            feature_name=feature_name,
+            resolution=resolution,
+            radius=radius,
+            bbox_kwarg=bbox_kwarg
+        )
+
+        self.meta_data[feature_name] = (self.meta_data.index).isin(feature_gids)
+        return
+
 
     def downselect_elevation_stochastic(
         self,
@@ -1223,51 +1387,133 @@ class GeospatialScenario(Scenario):
         self.meta_data = self.meta_data.iloc[gids]
         return 
 
-    def gids_tonumpy(self):
+    def gids_tonumpy(self)->np.array:
         """
         Convert the scenario's gids to a numpy array 
         Returns:
-        gids : np.ndarray
+        --------
+        gids : np.array
             all nsrdb gids from the scenario's metadata
         """
         return self.meta_data.index
 
-    def gids_tolist(self):
+    def gids_tolist(self)->np.array:
         """
         Convert the scenario's gids to a python list 
         Returns:
-        gids : np.ndarray
+        --------
+        gids : np.array
             all nsrdb gids from the scenario's metadata
         """
         return list(self.meta_data.index)
 
+    def coords_tonumpy(self)->np.array:
+        """
+        Create a tall 2d numpy array of gids of the shape
+        ```
+        [
+            [lat, long],
+                ...
+            [lat, long]
+        ]
+        ```
+        Returns:
+        --------
+        coords : np.array
+            tall numpy array of lat-long pairs
+        """
+        coords = np.column_stack(
+            self.meta_data['latitude'], self.meta_data['longitude'] 
+            )
+
+        return coords
+
+
     def addJob(
-    self, 
-    func=None, 
-    func_params={},
-    see_added=False,
-    ):
+        self, 
+        func: Callable = None, 
+        func_params: dict = {},
+        see_added: bool = False,
+        ):
+        """
+        Add a pvdeg function to the scenario pipeline
+
+        Parameters:
+        -----------
+        func : function
+            pvdeg function to use for geospatial analysis.
+            *Note: geospatial analysis is only available with a limited subset of pvdeg 
+            functions*   
+            Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``, 
+            ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
+        func_params : dict  
+            job specific keyword argument dictionary to provide to the function
+        see_added : bool
+            set flag to get a userWarning notifying the user of the job added  
+           to the pipeline in method call. ``default = False``
+        """
         # check if we can do geospatial analyis on desired function
         try: 
            pvdeg.geospatial.template_parameters(func)
         except ValueError: 
             return ValueError(f"{func.__name__} does does not have a valid geospatial results template or does not exist")
 
-        # standards.standoff only needs weather, meta, and func
         geo_job_dict = {"geospatial_job" : {'job' : func, 'params' : func_params}} 
 
         # # UNTESTED
         # if func_params:
         #     geo_job_dict.update(func_params)
 
-        # self.pipeline.append(geo_job_dict) # will be update when he have a dictionary with keys
         self.pipeline = geo_job_dict
 
         if see_added:
             message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
             warnings.warn(message, UserWarning)
 
-    def run(self, hpc_worker_conf=None):
+    def run(
+        self, 
+        hpc_worker_conf: Optional[dict] = None
+        )-> None:
+        """
+        Run the function in the geospatial pipeline. 
+        GeospatialScenario only supports one geospatial pipeline job at a time
+        unlike Scenario which supports unlimited conventional pipeline jobs.
+        Results are stored in the `GeospatialScenario.results` attribute.
+
+        Creates a dask cluster or client using the hpc_worker_conf parameter.
+
+        Parameters:
+        -----------
+        hpc_worker_conf : dict
+            Dictionary containing dask hpc settings (see examples below).
+
+            Examples
+            --------
+            Local cluster:
+
+            .. code-block:: python
+
+                hpc = {'manager': 'local',
+                    'n_workers': 1,
+                    'threads_per_worker': 8,
+                    'memory_limit': '10GB'}
+
+            SLURM cluster:
+
+            .. code-block:: python
+
+                kestrel = {
+                    'manager': 'slurm',
+                    'n_jobs': 1,  # Max number of nodes used for parallel processing
+                    'cores': 104,
+                    'memory': '246GB',
+                    'account': 'pvsoiling',
+                    'walltime': '4:00:00',
+                    'processes': 52,
+                    'local_directory': '/tmp/scratch',
+                    'job_extra_directives': ['-o ./logs/slurm-%j.out'],
+                    'death_timeout': 600,}
+        """
         client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)   
 
         geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index)
@@ -1307,7 +1553,9 @@ class GeospatialScenario(Scenario):
         self.results = self.results.assign(gids=gids_da)
         
            
-    def _get_geospatial_data(year : int):
+    def _get_geospatial_data(
+        year : int
+        ):
         """
         Helper function. gets geospatial weather dataset and metadata dictionary.
 
@@ -1338,10 +1586,10 @@ class GeospatialScenario(Scenario):
 
     def getValidRegions(
         self,
-        country : str = None,
-        state : str = None,
-        county : str = None,
-        target_region : str = None,
+        country: Optional[str] = None,
+        state: Optional[str] = None,
+        county: Optional[str] = None,
+        target_region: Optional[str] = None,
         ):
         """
         Gets all valid region names in the NSRDB. Only works on hpc
@@ -1374,13 +1622,21 @@ class GeospatialScenario(Scenario):
         
         return meta_df[target_region].unique() 
 
+    def plot(self):
+        """
+        Not Usable in GeospatialScenario class instance, only in Scenario instance.
+        python has no way to hide a parent class method in the child,
+        so this only exists to prevent access
+        """
+        raise AttributeError("The 'plot' method is not accessible in GeospatialScenario, only in Scenario")
+
     def plot_coords(
         self,
-        coord_1=None,
-        coord_2=None,
-        coords=None,
-        size=1
-        ):
+        coord_1: Optional[tuple[float]] = None, 
+        coord_2: Optional[tuple[float]] = None, 
+        coords: Optional[np.ndarray[float]] = None,
+        size: Union[int, float] = 1
+        )-> None:
         """
         Plot lat-long coordinate pairs on blank map. Quickly view 
         geospatial datapoints before your analysis.
@@ -1403,36 +1659,97 @@ class GeospatialScenario(Scenario):
             matplotlib scatter point size. Without any downsampling NSRDB 
             points will siginficantly overlap.
         """
-        import matplotlib.pylab as plt
-        import cartopy.crs as ccrs
-        import cartopy.feature as cfeature
-
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
 
         if (coord_1 and coord_2) or (coords != None):
-            utils._plot_bbox_corners(
+            utilities._plot_bbox_corners(
                 ax=ax,
                 coord_1=coord_1,
                 coord_2=coord_2,
                 coords=coords
             )
 
-        utils._add_cartopy_features(ax=ax)
+        utilities._add_cartopy_features(ax=ax)
 
         ax.scatter(self.meta_data['longitude'], self.meta_data['latitude'], color='black', s=size, transform=ccrs.PlateCarree())
 
         plt.title(f"Coordinate Pairs from '{self.name}' Meta Data")
+        plt.show()
+
+    def plot_meta_classification(
+        self,
+        col_name: str = None,
+        coord_1: Optional[tuple[float]] = None, 
+        coord_2: Optional[tuple[float]] = None, 
+        coords: Optional[np.ndarray[float]] = None,
+        size: Union[int, float] = 1):
+        """
+        Plot classified lat-long coordinate pairs on map. Quicly view
+        geospatial datapoints with binary classification in a meta_data 
+        dataframe column before your analysis.
+
+        Parameters:
+        -----------
+        col_name : str
+            Column containing binary classification data. Ex: `mountain` after
+            running ``downselect_mountains_weights``.
+        coord_1 : list, tuple
+            Top left corner of bounding box as lat-long coordinate pair as list or
+            tuple.
+        coord_2 : list, tuple
+            Bottom right corner of bounding box as lat-long coordinate pair in list 
+            or tuple.
+        coords : np.array
+            2d tall numpy array of [lat, long] pairs. Bounding box around the most
+            extreme entries of the array. Alternative to providing top left and 
+            bottom right box corners. Could be used to select amongst a subset of
+            data points. ex) Given all points for the planet, downselect based on 
+            the most extreme coordinates for the United States coastline information.
+        size : float    
+            matplotlib scatter point size. Without any downsampling NSRDB 
+            points will siginficantly overlap.
+        """
+        if not col_name:
+            raise ValueError(f"col_name cannot be none")
+
+        if col_name not in self.meta_data.columns:
+            raise ValueError(f"{col_name} not in self.meta_data columns as follows {self.meta_data.columns}")
+
+        col_dtype = self.meta_data[col_name].dtype
+        if col_dtype != bool:
+            raise ValueError(f"meta_data column {col_name} expected dtype bool not {col_dtype}")
+
+        near = self.meta_data[self.meta_data[col_name] == True]
+        not_near = self.meta_data[self.meta_data[col_name] == False]
+
+        fig = plt.figure(figsize=(15, 10))
+        ax = plt.axes(projection=ccrs.PlateCarree())
+
+        if (coord_1 and coord_2) or (coords != None):
+            utilities._plot_bbox_corners(
+                ax=ax,
+                coord_1=coord_1,
+                coord_2=coord_2,
+                coords=coords
+            )
+        utilities._add_cartopy_features(ax=ax)
+
+        ax.scatter(not_near['longitude'], not_near['latitude'], color='red', s=size, transform=ccrs.PlateCarree(), label=f'Not Near {col_name}')
+        ax.scatter(near['longitude'], near['latitude'], color='blue', s=size, transform=ccrs.PlateCarree(), label=f'Near {col_name}')
+
+        plt.title(f'Geographic Points with Proximity to {col_name} Highlighted')
         plt.legend()
         plt.show()
 
+    # test this
     def plot_USA(
         self, 
-        data_from_result : str, 
-        fpath : str = None, 
-        cmap = 'viridis',
-        vmin = 0,
-        vmax = None,
+        data_from_result: str, 
+        fpath: str = None, 
+        cmap: str = 'viridis',
+        vmin: Union[int, float] = 0,
+        vmax: Optional[Union[int, float]] = None,
         ):
         """
         Plot a vizualization of the geospatial scenario result. 
@@ -1516,7 +1833,7 @@ class GeospatialScenario(Scenario):
             </div>
             <div>
                 <h3>Meta Dataframe</h3>
-                {self.meta_data}
+                {self.format_meta()}
             </div>
         </div>
         <script>
@@ -1555,3 +1872,37 @@ class GeospatialScenario(Scenario):
             results_html += result_content
         results_html += '</div>'
         return results_html
+
+    def format_meta(self):
+        meta_data_html = ""
+        if isinstance(self.meta_data, pd.DataFrame):
+            if len(self.meta_data) > 10:
+                first_five = self.meta_data.head(5)
+                last_five = self.meta_data.tail(5)
+                ellipsis_row = pd.DataFrame([["..."] * len(self.meta_data.columns)], columns=self.meta_data.columns)
+
+                # Create the custom index with ellipses
+                custom_index = np.concatenate([
+                    np.arange(0, 5, dtype=object).astype(str),
+                    ['...'],
+                    np.arange(len(self.meta_data) - 5, len(self.meta_data), dtype=object).astype(str)
+                ])
+
+                # Concatenate the DataFrames
+                display_data = pd.concat([first_five, ellipsis_row, last_five], ignore_index=True)
+                display_data.index = custom_index
+            else:
+                display_data = self.meta_data
+
+            meta_data_html = f"""
+            <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_meta_data" style="color: #b676c2;">►</span> 
+                    Meta Data
+                </h4>
+            </div>
+            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+                {display_data.to_html()}
+            </div>
+            """
+        return meta_data_html

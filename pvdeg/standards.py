@@ -237,8 +237,14 @@ def standoff(
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
-        Options: 'sapm'.  'pvsyst' and 'faiman' will be added later.
-        Performs the calculations for the cell temperature.
+        Performs the calculations for the cell temperature. 
+        Options:
+        `'sapm_cell'`,`'sapm_module'`,`'pvsyst_cell'`,`'faiman'`,`'faiman_rad'`,
+        `'ross'`,`'noct_sam'`, `'fuentes'`, `'generic_linear'`.
+        Note: we cannot simply drop in `pvsyst` using `conf_0=insulated` and 
+        `conf_inf=freestanding`. This will yield erroneous results as these 
+        configurtions represent different cases. Must provide equivalent 
+        `conf_0_kwarg` and `conf_inf_kwarg` between temperature models.
     conf_0 : str, optional
         Model for the high temperature module on the exponential decay curve.
         Default: 'insulated_back_glass_polymer'
@@ -289,8 +295,6 @@ def standoff(
     M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
     to IEC TS 63126, PVSC Proceedings 2023
     """
-    if temp_model != 'sapm':
-        raise ValueError(f"temp model is {temp_model} ONLY 'sapm' ALLOWED")
 
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
@@ -303,16 +307,18 @@ def standoff(
         weather_df, meta = weather.get(**weather_kwarg)
 
     solar_position = spectral.solar_position(weather_df, meta)
-    poa = spectral.poa_irradiance(
-        weather_df=weather_df,
-        meta=meta,
-        
-        **{**{
+
+    irradiance_dict = {
         'sol_position':solar_position,
         'tilt':tilt,
         'azimuth':azimuth,
         'sky_model':sky_model,
-        }, **irradiance_kwarg} # overwrite with irradiance kwarg if any
+        }
+
+    poa = spectral.poa_irradiance(
+        weather_df=weather_df,
+        meta=meta,
+        ** irradiance_dict | irradiance_kwarg
     )
 
     T_0 = temperature.temperature(
@@ -323,7 +329,7 @@ def standoff(
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
-        model_kwarg={**model_kwarg, **conf_0_kwarg} # may lead to undesired behavior, test
+        model_kwarg= model_kwarg | conf_0_kwarg # may lead to undesired behavior, test
     )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
 
@@ -335,7 +341,7 @@ def standoff(
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
-        model_kwarg={**model_kwarg, **conf_inf_kwarg} # test
+        model_kwarg= model_kwarg | conf_inf_kwarg # may lead to undesired behavior, test
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 

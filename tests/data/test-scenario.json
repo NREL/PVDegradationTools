@@ -1,0 +1,41 @@
+{
+    "name": "test",
+    "hpc": false,
+    "path": "/home/tford/dev/PVDegradationTools/tests/pvd_job_test/pvd_job_100624/pvd_job_100624/pvd_job_100624/pvd_job_test",
+    "modules": [
+        {
+            "module_name": "test-module",
+            "racking": "open_rack_glass_polymer",
+            "material_params": {
+                "alias": "EVA",
+                "Fickian": true,
+                "Ead": 29.43,
+                "Do": 0.13,
+                "Eas": 32.31,
+                "So": 87.8,
+                "Eap": 61.74,
+                "Po": 97900000000.0
+            },
+            "temp_model": "sapm",
+            "model_kwarg": {},
+            "irradiance_kwarg": {}
+        }
+    ],
+    "gids": [
+        1245357
+    ],
+    "lat_long": [
+        40.63336,
+        -73.99458
+    ],
+    "pipeline": {
+        "GLUSE": {
+            "params": {
+                "wind_factor": 0.35
+            },
+            "qualified_function": "pvdeg.standards.standoff"
+        }
+    },
+    "email": "user@mail.com",
+    "api_key": "DEMO_KEY"
+}

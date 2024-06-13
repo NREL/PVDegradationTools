@@ -21,7 +21,6 @@ import cartopy.feature as cfeature
 from shapely import LineString, MultiLineString
 
 
-
 def start_dask(hpc=None):
     """
     Starts a dask cluster for parallel processing.
@@ -105,7 +104,15 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
         Dataset with results for a single gid.
     """
 
-    df_weather = ds_gid.to_dataframe()
+    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), not a perminant fix
+    # hopefully this isn't too slow, what is causing this? how meta is being read from dataset? @ martin?
+    if type(meta_gid['latitude']) == dict:
+        meta_gid = utilities.fix_metadata(meta_gid) 
+
+    df_weather = ds_gid.to_dataframe() # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    if isinstance(df_weather.index, pd.MultiIndex): # check for multiindex and convert to just time index, don't know what was causing this
+        df_weather = df_weather.reset_index().set_index('time')
+
     df_res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
     ds_res = xr.Dataset.from_dataframe(df_res)
 
@@ -113,7 +120,6 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
         ds_res = ds_res.isel(index=0, drop=True)
 
     return ds_res
-
 
 def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
     """
@@ -170,6 +176,8 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
         Dataset with results for a block of gids.
     """
 
+    utilities.nrel_kestrel_check()
+
     if template is None:
         param = template_parameters(func)
         template = output_template(weather_ds, **param)
@@ -211,7 +219,8 @@ def output_template(
     Parameters
     ----------
     ds_gids : xarray.Dataset
-        Dataset containing the gids and their associated dimensions.
+        Dataset containing the gids and their associated dimensions. 
+        Dataset should already be chunked.
     shapes : dict
         Dictionary of variable names and their associated dimensions.
     attr : dict
@@ -226,6 +235,9 @@ def output_template(
     """
     dims = set([d for dim in shapes.values() for d in dim])
     dims_size = dict(ds_gids.sizes) | add_dims
+
+    if len(ds_gids.chunks) == 0:
+        raise ValueError(f"argument ds_gids must contain chunks")
 
     output_template = xr.Dataset(
         data_vars={
@@ -564,7 +576,7 @@ def identify_mountains_radii(
         meta_df.loc[outside_bbox, 'mountain'] = False 
 
     # new...
-    gids = meta_df.index[meta_df['mountain']].tonumpy()
+    gids = meta_df.index[meta_df['mountain']].to_numpy()
     return gids
 
     # return meta_df
@@ -709,11 +721,9 @@ def feature_downselect(
         gids_in_bbox = apply_bounding_box(meta_df=meta_df, **bbox_kwarg) 
         include_arr = np.union1d(include_arr, gids_in_bbox)
 
-    # meta_df.loc[include_arr, feature_name] = True
-    # return meta_df
+    include_gids = meta_df.index[include_arr]
 
-    # assuming include arr is gids not iteger indexes bc .loc above
-    return include_arr
+    return include_gids
 
 def apply_bounding_box(
     meta_df: pd.DataFrame, 
@@ -763,7 +773,7 @@ def apply_bounding_box(
 def elevation_stochastic_downselect(
     meta_df: pd.DataFrame,
     kdtree, 
-    downselect_prop: int | float,
+    downselect_prop: float,
     k_neighbors: int = 3,
     method: str = 'mean',
     normalization: str = 'linear',

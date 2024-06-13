@@ -10,6 +10,7 @@ from random import choices
 from string import ascii_uppercase
 from collections import OrderedDict
 import xarray as xr
+from subprocess import run
 
 def gid_downsampling(meta, n):
     """
@@ -882,5 +883,98 @@ def _calc_elevation_weights(
     
     return normalized_weights
 
-    
+def fix_metadata(meta):
+    """
+    meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
+    remove each subdict and replace with value for each key
 
+    Parameters:
+    -----------
+    meta : dict
+        dictionary of metadata with key : dict pairs
+
+    Returns 
+    fixed_meta : dict
+        dictionary of metadata with key : value pairs
+    """
+    fixed_metadata = {key : list(subdict.values())[0] for key, subdict in meta.items()}
+    return fixed_metadata
+
+# we want this to only exist for things that can be run on kestrel 
+# moving away from hpc tools so this may not be useful in the future
+def nrel_kestrel_check():
+    """
+    Check if the user is on Kestrel HPC environment.
+    Passes silently or raises a ConnectionError if not running on Kestrel.
+    This will fail on AWS 
+
+    Returns:
+    --------
+    None
+
+    See Also:
+    ---------
+    NREL HPC : https://www.nrel.gov/hpc/
+    Kestrel Documentation : https://nrel.github.io/HPC/Documentation/
+    """
+
+    kestrel_hostname = 'kestrel.hpc.nrel.gov'
+
+    host = run(
+        args=['hostname', '-f'], 
+        shell=False, 
+        capture_output=True, 
+        text=True
+        )
+    device_domain = '.'.join(host.stdout.split('.')[-4:])[:-1]
+
+    if kestrel_hostname != device_domain:
+        raise ConnectionError(
+            f"""
+            connected to {device_domain} 
+            not a node of {kestrel_hostname}")
+            """
+            )
+
+def remove_scenario_filetrees(
+    fp, 
+    pattern='pvd_job_*'
+    ):
+    """
+    Move `cwd` to fp and remove all scenario file trees from fp directory.
+    Permanently deletes all scenario file trees. USE WITH CAUTION.
+
+    Parameters:
+    -----------
+    fp : string
+        file path to directory where all scenario files should be removed
+    pattern : str
+        pattern to search for using glob. Default value of `pvd_job_` is 
+        equvilent to `pvd_job_*` in bash.
+    """
+    import shutil
+    import glob
+
+    os.chdir(fp)
+
+    items = glob.glob(pattern)
+    for item in items:
+        if os.path.isdir(item):
+            shutil.rmtree(item)
+
+
+def _update_pipeline_task(task):
+    """
+    Convert qualified name to callable function reference
+    and matain odict items ordering. Use to restore scenario from json.
+    """
+    from importlib import import_module
+
+    module_name, func_name = task['qualified_function'].rsplit('.', 1)
+    params = task['params'] # need to do this to maintain ordering
+    module = import_module(module_name)
+    func = getattr(module, func_name)
+    task['job'] = func
+    del task['qualified_function']
+    del task['params'] # maintain ordering, 
+    task['params'] = params

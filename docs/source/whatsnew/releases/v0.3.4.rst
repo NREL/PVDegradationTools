@@ -11,8 +11,7 @@ Enhancements
 * Added geospatial bounding box support. Clip unwanted data with rectangular bounding boxes. See: `geospatial.apply_bounding_box`
 * Added stochastic non-uniform density downselection function to preferentially select for mountains (higher point density with changes in elevation, lower density when flatter.) See:  `geospatial.elevation_stochastic_downselection`
 * Updated non-uniform downselection with thresholding and non-linear normalization (support for logarithmic and exponential normalization) See: `geospatial.identify_mountains_weights`
-* Added Scenario and GeospatialScenario methods for quick plotting and downselection. See: `GeospatialScenario.plot_coords`, `GeospatialScenario.plot_USA`, `Scenario.extract`, `Scenario.plot`, 
-`GeospatialScenario.downselect_mountain_weights`, `GeospatialScenario.downselect_elevation_stochastic`
+* Added Scenario and GeospatialScenario methods for quick plotting and downselection. See: `GeospatialScenario.plot_coords`, `GeospatialScenario.plot_meta_classification` `GeospatialScenario.plot_USA`, `Scenario.extract`, `Scenario.plot`, `GeospatialScenario.classify_mountain_weights`, `GeospatialScenario.classify_mountain_radii`, `GeospatialScenario.downselect_elevation_stochastic`
 
 Contributors
 ~~~~~~~~~~~~
