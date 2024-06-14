@@ -46,7 +46,7 @@ class Scenario:
         meta_data: Optional[dict] = None, # dict
         email: Optional[str] = None, 
         api_key: Optional[str] = None, 
-    ):
+        ):
         """
         Initialize the degradation scenario object.
 
@@ -76,7 +76,6 @@ class Scenario:
         self.gids = gids
         self.pipeline = pipeline
         self.results = results
-        # self.hpc = hpc
         self.weather_data = weather_data
         self.meta_data = meta_data
         self.lat_long = None
@@ -98,6 +97,31 @@ class Scenario:
         if file: 
             self.load_json(file_path=file, email=email, api_key=api_key)
 
+    def __eq__(self, other):
+        """
+        Define the behavior of the `==` operator between two Scenario instances.
+        Does not check credentials.
+        """
+        if not isinstance(other, Scenario):
+            print('wrong type')
+            return False
+
+        def compare_ordereddict_values(od1, od2):
+            return list(od1.values()) == list(od2.values())
+
+        return ( 
+            self.name == other.name and
+            self.path == other.path and
+            np.array_equal(self.gids, other.gids) and
+            self.modules == other.modules and
+            compare_ordereddict_values(self.pipeline, other.pipeline) and
+            self.file == other.file and
+            self.results == other.results and
+            (self.weather_data.equals(other.weather_data) if self.weather_data is not None and other.weather_data is not None else self.weather_data is other.weather_data) and
+            self.meta_data == other.meta_data and
+            self.email == other.email and
+            self.api_key == other.api_key
+        )
 
     def clean(self):
         """
@@ -488,8 +512,7 @@ class Scenario:
         with open(file_path, "r") as f:
             data = json.load(f)
         name = data["name"]
-        path = data["path"]
-        hpc = data['hpc']        
+        path = data["path"]      
         modules = data["modules"]
         gids = data["gids"]
         process_pipeline = OrderedDict(data["pipeline"])
@@ -501,7 +524,6 @@ class Scenario:
         instance = cls()
         instance.name = name
         instance.path = path
-        instance.hpc = hpc
         instance.modules = modules
         instance.gids = gids
         instance.pipeline = process_pipeline
@@ -570,7 +592,6 @@ class Scenario:
 
         attributes = {
             'name': self.name,
-            'hpc' : self.hpc,
             'path': self.path,
             'modules': self.modules, 
             'gids': self.gids,
@@ -1007,7 +1028,7 @@ class GeospatialScenario(Scenario):
         self,
         name: str = None,
         path: str = None,
-        gids: list | np.ndarray =None,
+        gids: Optional[Union[list, np.ndarray]] = None,
         modules: list = [],
         pipeline: dict = {},
         file=None,
@@ -1032,6 +1053,9 @@ class GeospatialScenario(Scenario):
         self.hpc = hpc
 
         utilities.nrel_kestrel_check() # remove this in the future?
+
+    def __eq__(self, other):
+        raise NotImplementedError("cannot directly compare geospatial scenario objects")
 
     # add restoring from gids functionality from nsrdb
     def addLocation(

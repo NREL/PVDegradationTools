@@ -1,6 +1,5 @@
 {
     "name": "test",
-    "hpc": false,
     "path": "/home/tford/dev/PVDegradationTools/tests/pvd_job_test/pvd_job_100624/pvd_job_100624/pvd_job_100624/pvd_job_test",
     "modules": [
         {
