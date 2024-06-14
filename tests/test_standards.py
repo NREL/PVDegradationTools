@@ -90,9 +90,25 @@ def test_eff_gap():
     eff_gap = pvdeg.standards.eff_gap(T_0, T_inf, xeff_weather['module_temperature'], xeff_weather["temp_air"], xeff_poa["poa_global"], x_0=6.5, poa_min=400, t_amb_min=0)
   
     assert eff_gap==pytest.approx(3.6767284845789825)
-
-
-
-
     # assert expected_result_l1 == pytest.approx(result_l1)
     # assert expected_result_l2 == pytest.approx(result_l2, abs=1e-5)
+
+
+def test_T98():
+    weather_db = 'PVGIS' #This pulls data for most of the world.
+    weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia
+    #weather_id = (35.6754, 139.65) #Tokyo, Japan
+    weather_arg = {'map_variables': True}
+    WEATHER_df, META = pvdeg.weather.get(weather_db, weather_id)
+    df, meta_data=pvdeg.weather.read(
+        os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),"csv"
+    )
+    standoff = pvdeg.standards.standoff(weather_df=WEATHER_df, meta=META)
+    standoff_1 = pvdeg.standards.standoff(weather_df=WEATHER_df, meta=META,
+                                      T98=70, tilt=META['latitude'], azimuth=None,
+                                      sky_model='isotropic', temp_model='sapm', conf_0='insulated_back_glass_polymer', conf_inf='open_rack_glass_polymer',
+                                      x_0=6.5, wind_factor=0.33)
+    assert standoff.x[0]== pytest.approx(9.261615)
+    assert standoff.T98_0[0]== pytest.approx(89.5806502251565)
+    assert standoff.T98_inf[0]== pytest.approx(63.79827740597881)
+
