@@ -184,17 +184,6 @@ class Scenario:
         else:
             raise ValueError(f"arg: lat_long is type = {type(lat_long)}, must be tuple(float)")
        
-        # this wont work, pvgis doesnt need an api key
-        # try:
-        #     weather_arg = {
-        #         'api_key': self.api_key,
-        #         'email': self.email,
-        #         'names': 'tmy',
-        #         'attributes': [],
-        #         'map_variables': True}
-        # except:
-        #     raise ValueError(f"email : {self.email} \n api-key : {self.api_key} \n Must provide an email and api key during class initialization")
-
         weather_arg = {}
 
         if weather_db == 'PSM3':
