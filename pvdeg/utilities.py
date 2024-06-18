@@ -422,8 +422,13 @@ def ts_gid_df(file, gid):
 
 
 def tilt_azimuth_scan(
-    weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
-):
+    weather_df=None, 
+    meta=None, 
+    tilt_step=5, 
+    azimuth_step=5, 
+    func=Callable, 
+    **kwarg
+    ):
     """
     Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
 

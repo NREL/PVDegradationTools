@@ -4,8 +4,12 @@ Collection of Classes and Functions To Create Chamber Exposure Stressor Conditio
 
 import numpy as np
 import pandas as pd
-from typing import Union
 from numba import njit
+
+from typing import (
+    Union, 
+    List
+)
 
 @njit
 def num_steps(
@@ -91,40 +95,150 @@ def fill_linear_region(
         set_points = np.concatenate((set_points, set_points_flat))
 
     return set_points
-        
 
-def add_previous_setpoints(df):
+# could add intial conditions instead of nans where for previous values at row 0
+def add_previous_setpoints(
+    df: pd.DataFrame
+    )-> pd.DataFrame:
     """
     Update the setpoint dataframe to contain previous setpoint information in current row
     """
     mapping = ['temperature', 'relative_humidity','irradiance','voltage']
     col_names = ['previous_temperature', 'previous_relative_humidity', 'previous_irradiance', 'previous_voltage']
-    df[col_names] = df[mapping].shift(1)    # .fillna(method='bfill')   
+    df[col_names] = df[mapping].shift(1) 
     return df
 
-def _apply_fill_linear_region(row):
-    return fill_linear_region(
+# instant change or linear change
+def _apply_fill_linear_region(
+    row,
+    column_name: str,
+    )-> np.ndarray:
+    """
+    Create a 1d numpy array containing a linear region of setpoint values
+
+    Parameters:
+    -----------
+    row: 
+        row of a dataframe using df.apply
+    column_name: str
+        name of the column to target in the dataframe
+    """
+
+    values = fill_linear_region(
         step_time=row['step_length'],
         step_time_resolution=row['time_resolution'],
-        set_0=row['previous_temperature'],
-        set_f=row['temperature'],
-        rate=row['temperature_ramp']
+        set_0=row[f'previous_{column_name}'],
+        set_f=row[column_name],
+        rate=row[f'{column_name}_ramp']
     )
+    return values
 
-def chamber_set_points_timeseries(df)->np.array:
+def series_index(
+    start_time: Union[int, float], 
+    step_length: Union[int, float], 
+    resoultion: Union[int, float]
+    )-> np.ndarray[int, float]:
+    """
+    Generate time indexes in a fixed resoultion for a setpoint.
+
+    Parameters:
+    -----------
+    start_time: Union[int, float]
+    step_length: Union[int, float]
+    resolution: Union[int, float]
+
+    Return:
+    -------
+    values : np.ndarray
+    """
+    values = np.arange(
+        start=start_time,
+        stop=start_time + step_length,
+        step=resoultion
+        )
+
+    return values
+
+def flat_restore_index(series):
+    indicies = np.array([])
+    for index, sub_series in series.items():
+        indicies = np.append(indicies, sub_series.index.values)
+
+    flat_setpoints = series.explode()
+
+    flat_setpoints.index = indicies
+
+    return flat_setpoints 
+
+
+def chamber_set_points_timeseries(
+    df: pd.DataFrame,
+    setpoint_name: str,
+    )-> np.array:
+    """
+    Create a pandas series containing values for a specific setpoint using 
+    set points and ramp values.
+
+    Parameters:
+    -----------
+    df: pd.DataFrame
+        pandas dataframe containing columns named for each setpoint and previous setpoint and setpoint ramp values
+        >>> ex) temperature set point series:
+        >>> dataframe should contain the following columns 
+        >>> 'temperature', 'previous_temperature', 'temperature_ramp'
+    """
     df = add_previous_setpoints(df)
 
-    setpoints_series = df.apply(lambda row: _apply_fill_linear_region(row), axis=1)
+    setpoints_np_series = df.apply(lambda row: _apply_fill_linear_region(row, column_name=setpoint_name), axis=1)
 
-    flattened_setpoints = np.concatenate(setpoints_series.values) # we are loosing the timeseries precision here. if its all the same it doesnt matter but otherwise this is a problem.
+    setpoints_series = pd.Series()
 
-    return flattened_setpoints # we want these to be a series with an index. rather than an array
+    for index, row in setpoints_np_series.items():
+        if row.any():
+            new_index = series_index(
+                start_time=df.loc[index, 'start_time'],
+                step_length=df.loc[index, 'step_length'],
+                resoultion=df.loc[index, 'time_resolution']
+            )
+            setpoints_series[index] = pd.Series(row, index=new_index)
 
+    setpoints_timesereies = flat_restore_index(setpoints_series)
 
+    return setpoints_timesereies
 
+# RENAME THIS, everything up to here should be encapsulated in one function 
+def _apply_chamber_set_points(
+    df: pd.DataFrame,
+    setpoint_names: List[str] = ['temperature', 'relative_humidity', 'irradiance', 'voltage']
+    )-> pd.DataFrame:
+    """
+    Apply the chamber_set_points_timeseries function for multiple setpoints.
 
-def ramp(x_0, x_f, rate, time):
-    ...
+    Parameters:
+    -----------
+    df: pd.DataFrame
+        pandas dataframe containing the setpoint data.
+    setpoint_names: List[str]
+        List of setpoint names to process.
+
+    Returns:
+    ---------
+    setpoints_time_df: pd.DataFrame
+        dataframe of linearly ramped and instant change setpoints from
+        user defined set points.
+    """
+
+    setpoints_time_df = pd.DataFrame()
+
+    for name in setpoint_names:
+        series = chamber_set_points_timeseries(df=df, setpoint_name=name)
+        series.name = name # i hate this
+        setpoint_df = series.to_frame()
+    
+        setpoints_time_df = pd.concat([setpoints_time_df, setpoint_df], axis=1)
+
+    return setpoints_time_df
+
 
 # TODO: add initial conditions check, can come from csv or args
 def create_set_point_df(
