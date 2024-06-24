@@ -4,11 +4,12 @@
 import numpy as np
 import pandas as pd
 import pvlib
-from numba import jit
+from numba import jit, njit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Union
 
 from . import temperature
 from . import spectral
@@ -775,6 +776,143 @@ def module(
     results = pd.DataFrame(data=data)
     return results
 
+# check these constants and update docstring
+# come from Kats Profile in kempe spreadsheet
+@njit
+def water_vapor_pressure(
+    temp: float, 
+    rh: float, 
+    )-> float:
+    """
+    Calculate water vapor pressure at a temp and relative humidity pairing.
+
+    Parameters:
+    -----------
+    temp: numeric
+        temperature [C]
+    rh: numeric
+        percent relative humidity [%]
+
+    Returns:
+    -------
+    water_vapor_pressure: numeric
+        pressure of water vapor [kPa]
+    """
+
+    # where do these constants come from?
+    water_vapor_pressure = np.exp(
+        -0.580109 + temp * 0.078001 - 0.0003782525 * temp**2 
+        + 0.000001420179 * temp**3 - 0.000000002447042 * temp**4 
+        ) * rh / 100
+
+    return water_vapor_pressure
+
+# source of constants?
+@njit 
+def chamber_dew_point_from_vapor_pressure(
+    water_vap_pres: float
+    )-> float:
+    """
+    Calculate chamber dew point from water vapor pressure.
+    
+    Parameters:
+    -----------
+    water_vap_pres: float
+        chamber water vapor pressure [kPa]
+
+    Returns:
+    --------
+    dew_point: float
+        chamber dew point [C]
+    """
+
+    # where do these constants come from
+    dew_point = (
+        - 0.000011449014849 * (np.log(water_vap_pres))**6 
+        + 0.001637341324 * (np.log(water_vap_pres))**5 
+        - 0.0077181540713 * (np.log(water_vap_pres))**4 
+        + 0.045794594572 * (np.log(water_vap_pres))**3 
+        + 1.1472781751 * (np.log(water_vap_pres))**2 
+        + 13.892250408 * (np.log(water_vap_pres)) 
+        + 7.1381806922
+    )
+
+    return dew_point
+
+# where do these constants come from
+@njit
+def chamber_dew_point_from_t_rh(
+    temp: float,
+    rh: float,
+    )-> float:
+    """
+    Calculate chamber dew point from temperature and relative humidity
+
+    Parameters:
+    -----------
+    temp: numeric
+        temperature [C]
+    rh: numeric
+        percent relative humidity [%]
+
+    Returns:
+    --------
+    dew_point: float
+        chamber dew point [C]
+    """
+
+    water_vap_pressure = water_vapor_pressure(temp=temp, rh=rh)
+
+    dew_point = chamber_dew_point_from_vapor_pressure(water_vap_pressure)
+
+    return dew_point
+
+@njit
+def rh_at_sample_temperature(
+    temp_set: float,
+    rh_set: float,
+    sample_temp: float,
+    )-> float:
+    """
+    Calculate relative sample relative humidity using
+    sample temperature and chamber set points
+    
+    Parameters:
+    -----------
+    temp_set: float
+        temperature setpoint of chamber 
+        (not actual chamber air temp just an approximation)
+    rh_set: float
+        relative humidity setpoint of chamber
+        (not actual chamber relative humidity)
+    sample_temp: float
+        temperature of the sample in the chamber
+    
+    Returns:
+    --------
+    rh: float
+        relative humidity of sample in chamber (approx)
+    """
+
+    rh = (
+        np.exp(
+            -0.580109
+            + temp_set * 0.078001
+            - 0.0003782525 * temp_set ** 2
+            + 0.000001420179 * temp_set ** 3
+            - 0.000000002447042 * temp_set ** 4
+        ) * rh_set / 100
+    ) / (
+        np.exp(
+            -0.580109
+            + sample_temp * 0.078001
+            - 0.0003782525 * sample_temp ** 2
+            + 0.000001420179 * sample_temp ** 3
+            - 0.000000002447042 * sample_temp ** 4
+        )
+    ) * 100
+
+    return rh
 
 # def run_module(
 #     project_points,

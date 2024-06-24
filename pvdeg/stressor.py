@@ -6,10 +6,28 @@ import numpy as np
 import pandas as pd
 from numba import njit
 
+from pvdeg.humidity import (
+    water_vapor_pressure, 
+    chamber_dew_point_from_vapor_pressure,
+    rh_at_sample_temperature,
+)
+
+from pvdeg.temperature import chamber_sample_temperature
+from pvdeg.utilities import _shift
+
 from typing import (
     Union, 
     List
 )
+
+# TODO: vectorize numpy calcs
+
+### Questions for Mike:
+
+# Where do the constants in the water vapor pressure equation come from 
+
+# do we need set point temp -> real chamber temp -> real sample temp?
+# what is special about 0.4 w/m^2/nm at 340 nm in the temperature.chamber_sample_temp function also should there be a seconary air temperature function?
 
 @njit
 def num_steps(
@@ -207,7 +225,6 @@ def chamber_set_points_timeseries(
 
     return setpoints_timesereies
 
-# RENAME THIS, everything up to here should be encapsulated in one function 
 def apply_chamber_set_points(
     df: pd.DataFrame,
     setpoint_names: List[str] = ['temperature', 'relative_humidity', 'irradiance', 'voltage']
@@ -297,7 +314,6 @@ def start_times(
 
     return df
 
-# TODO: change to datetime or timedelta index?
 def chamber_setpoints(
     fp: str,
     t_0: Union[int, float], 
@@ -340,4 +356,181 @@ def chamber_setpoints(
         setpoint_names=setpoint_names
     )
 
+    minutes = set_values_df.index.values.astype(int)
+    timedeltas_index = minutes.astype('timedelta64[m]')
+    set_values_df.index = timedeltas_index
+
     return set_values_df
+
+@njit
+def _calc_water_vap_pres(
+    temp_numpy: np.ndarray, 
+    rh_numpy: np.ndarray
+    )-> np.ndarray:
+
+    water_vap_pres = np.empty_like(temp_numpy)
+
+    for i in range(water_vap_pres.shape[0]):
+        water_vap_pres[i] = water_vapor_pressure(
+            temp=temp_numpy[i],
+            rh=rh_numpy[i]
+            )
+
+    return water_vap_pres
+
+@njit
+def _calc_dew_point(
+    water_vap_pres_numpy: np.ndarray
+    )-> np.ndarray:
+
+    dew_point = np.empty_like(water_vap_pres_numpy)
+
+    for i in range(dew_point.shape[0]):
+        dew_point[i] = chamber_dew_point_from_vapor_pressure(
+            water_vap_pres=water_vap_pres_numpy[i]
+        )
+
+    return dew_point
+
+# tau and times should both be in minutes
+# this cannot be vectorized but the others could
+def _calc_sample_temperature(
+    irradiance_340: np.ndarray[float],
+    temp_set: np.ndarray[float],
+    times: np.ndarray[np.timedelta64],
+    tau: float,
+    chamber_irrad_0: float,
+    sample_temp_0: float,
+    )->np.ndarray[float]:
+
+    """
+    Apply finite difference temperatures to chamber conditions.
+
+    Parameters:
+    -----------
+    irradiance_340: np.ndarray[float]
+        UV irradiance [W/m^2/nm at 340 nm]
+    temp_set: np.ndarray[float]
+        chamber temperature setpoint
+    times: np.ndarray[float]
+        length of timestep (end time - start time) [min]
+    tau: float
+        Characteristic thermal equilibration time [min]
+    chamber_irrad_0: float
+        inital chamber UV irradiance [W/m^2/nm at 340 nm]
+    sample_temp_0: float
+        intial sample temperature [C]
+
+    Returns:
+    --------
+    sample_temperatures: np.ndarray[float]
+        array of sample temperatures
+
+    """
+
+    previous_times = _shift(times, 1)
+    differences = np.subtract(times, previous_times)
+    minute_times = differences.astype('timedelta64[m]').astype(int) # do we want to do this, they might be in minutes already so we can drop this part
+
+    sample_temperatures = np.empty_like(minute_times)
+
+    sample_temperatures[0] = sample_temp_0
+    irradiance_340[0] = chamber_irrad_0
+
+    for i in range(1, minute_times.shape[0]):
+        sample_temperatures[i] = chamber_sample_temperature(
+            irradiance_340=irradiance_340[i],
+            previous_sample_temp=sample_temperatures[i-1],
+            temp_set=temp_set[i],
+            delta_t=minute_times[i],
+            tau=tau
+        )
+
+    return sample_temperatures
+
+@njit
+def _calc_rh(
+    temp_set: np.ndarray[float],
+    rh_set: np.ndarray[float],
+    sample_temp: np.ndarray[float]
+    )-> np.ndarray[float]:
+
+    rh = np.empty_like(sample_temp)
+
+    for i in range(sample_temp.shape[0]):
+        rh[i] = rh_at_sample_temperature(
+            temp_set=temp_set[i],
+            rh_set=rh_set[i],
+            sample_temp=sample_temp[i]
+        )
+
+    return rh
+
+# TODO: fix intial conditons entered during the set point dataframe, they could just be moved here instead of having them above.
+# could also combine into one function it would be much easier that way potentially. explore this as an option.
+def chamber_properties(
+    set_point_df: pd.DataFrame,
+    tau: float,
+    chamber_irrad_0: float,
+    sample_temp_0: float,
+    )-> pd.DataFrame:
+
+    """
+    Create a dataframe with sample properties at each time step.
+    Includes `'water_vapor_pressure'`, `'dew_point'`, '`sample_temperature'`
+
+    Parameters:
+    -----------
+    set_point_df: pd.DataFrame
+        dataframe containing a setpoint timeseries with a timdelta index.
+        generated using `pvdeg.stressor.chamber_setpoints`
+    tau: float
+        Characteristic thermal equilibration time [min]
+    chamber_irrad_0: float
+        inital chamber UV irradiance [W/m^2/nm at 340 nm]
+    sample_temp_0: float
+        intial sample temperature [C]
+
+    Returns:
+    --------
+    properties_df: pd.DataFrame
+        DataFrame containing chamber properties at each timedelta present
+        in the setpoints dataframe. Contains columns for:
+        >>> 'water_vapor_pressure', 'dew_point', 'sample_temperature'
+    """
+
+    properties_df = pd.DataFrame(index=set_point_df.index) 
+
+    water_vapor_pressures = _calc_water_vap_pres(
+        temp_numpy=set_point_df['temperature'].to_numpy(dtype=np.float64),
+        rh_numpy=set_point_df['relative_humidity'].to_numpy(dtype=np.float64)
+    )
+
+    dew_points = _calc_dew_point(
+        water_vap_pres_numpy=water_vapor_pressures
+    )
+
+    sample_temperatures = _calc_sample_temperature(
+        irradiance_340=set_point_df['irradiance'].to_numpy(dtype=np.float64),
+        temp_set=set_point_df['temperature'].to_numpy(dtype=np.float64),
+        times=set_point_df.index.to_numpy().astype('timedelta64[m]'),
+        sample_temp_0=sample_temp_0,
+        chamber_irrad_0=chamber_irrad_0,
+        tau=tau,
+    )
+
+    rh_sample_temp = _calc_rh(
+        temp_set=set_point_df['temperature'].to_numpy(dtype=np.float64),
+        rh_set=set_point_df['relative_humidity'].to_numpy(dtype=np.float64),
+        sample_temp=sample_temperatures
+    )
+
+    properties_df['water_vapor_pressure'] = water_vapor_pressures
+    properties_df['dew_point'] = dew_points
+    properties_df['sample_temperature'] = sample_temperatures
+    properties_df['rh_at_sample_temp'] = rh_sample_temp
+
+    return properties_df
+
+
+    

@@ -199,32 +199,81 @@ def cell(
 
     return temp_cell
 
+# @njit
+# def finite_diff_temperature(
+#     t_0: Union[int, float], 
+#     t_1: Union[int, float], 
+#     delta_t: Union[int, float], 
+#     tau: Union[int, float]
+#     )->Union[int, float]:
+#     """
+#     Finite Difference Method for 2 step temperature for next timestep.
+
+#     Parameters:
+#     -----------
+#     t_0:  Union[int, float]
+#         2nd previous step temperature
+#     t_1: Union[int, float]
+#         previous step temperature 
+#     delta_t: Union[int, float]
+#         change in time between steps
+#     tau: Union[int, float]
+#         Characteristic Thermal Equilibration Time `Ƭ` in minutes
+
+#     Returns:
+#     --------
+#     t_2: Union[int, float]
+#         current step temperature as a result of finite difference 
+#         of two previous steps
+#     """
+
+#     return t_0 + (t_1 - t_0) * np.exp( delta_t / tau)
+
+
+# these equations came from row K in the spreadsheet, is there somewhere else or something to cite
+# there should be some other irradiance factor/term in the equation
 @njit
-def finite_diff_temperature(
-    t_0: Union[int, float], 
-    t_1: Union[int, float], 
-    delta_t: Union[int, float], 
-    tau: Union[int, float]
-    )->Union[int, float]:
+def chamber_sample_temperature(
+    irradiance_340: float,
+    temp_set: float,
+    previous_sample_temp: float,
+    delta_t: float,
+    tau: float
+    )-> float:
     """
-    Finite Difference Method for 2 step temperature for next timestep.
+    Finite difference method for chamber sample temperature.
 
     Parameters:
     -----------
-    t_0:  Union[int, float]
-        2nd previous step temperature
-    t_1: Union[int, float]
-        previous step temperature 
-    delta_t: Union[int, float]
-        change in time between steps
-    tau: Union[int, float]
-        Characteristic Thermal Equilibration Time `Ƭ` in minutes
-
-    Returns:
-    --------
-    t_2: Union[int, float]
-        current step temperature as a result of finite difference 
-        of two previous steps
+    irradiance_340: float
+        UV irradiance [W/m^2/nm at 340 nm]
+    temp_set: float
+        chamber temperature setpoint
+    previous_sample_temp: float
+        temperature of chamber sample during previous timestep [C]
+    delta_t: float
+        length of timestep (end time - start time) [min]
+    tau: float
+        Characteristic thermal equilibration time [min]
     """
 
-    return t_0 + (t_1 - t_0) * np.exp( delta_t / tau)
+    if irradiance_340 == 0:
+        sample_temp = (
+            temp_set + (previous_sample_temp-temp_set) 
+            * np.exp(-(delta_t) / tau) 
+        )
+    
+    else:
+        if irradiance_340 == 0.4: # what is specical about 0.4
+            sample_temp = (
+                temp_set + 16 + (previous_sample_temp-temp_set-16)
+                * np.exp(-(delta_t) / tau) 
+            )
+
+        else:
+            sample_temp = (
+                temp_set + 40 + (previous_sample_temp-temp_set-40) 
+                * np.exp(-(delta_t) / tau) 
+            )
+
+    return sample_temp

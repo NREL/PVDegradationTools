@@ -5,9 +5,8 @@ import numpy as np
 from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
-import inspect
 import math
-
+from numba import njit
 
 def gid_downsampling(meta, n):
     """
@@ -268,6 +267,20 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
             dtype=np.int64,
         )
 
+def _shift(arr, num, fill_value=np.timedelta64(0,'m')):
+    """
+    Fast numpy shift. 
+    """
+    result = np.empty_like(arr)
+    if num > 0:
+        result[:num] = fill_value
+        result[num:] = arr[:-num]
+    elif num < 0:
+        result[num:] = fill_value # mad bceause cant fill nan into a timdelta homogenous array, what is a workaround??? 0 values are not valid
+        result[:num] = arr[-num:]
+    else:
+        result[:] = arr
+    return result
 
 def _read_material(name, fname="materials.json"):
     """
