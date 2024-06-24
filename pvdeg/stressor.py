@@ -194,7 +194,8 @@ def chamber_set_points_timeseries(
     setpoints_series = pd.Series()
 
     for index, row in setpoints_np_series.items():
-        if row.any():
+        # if row.any(): # maybe failing because of zeros
+        if row.size > 0:
             new_index = series_index(
                 start_time=df.loc[index, 'start_time'],
                 step_length=df.loc[index, 'step_length'],
@@ -207,7 +208,7 @@ def chamber_set_points_timeseries(
     return setpoints_timesereies
 
 # RENAME THIS, everything up to here should be encapsulated in one function 
-def _apply_chamber_set_points(
+def apply_chamber_set_points(
     df: pd.DataFrame,
     setpoint_names: List[str] = ['temperature', 'relative_humidity', 'irradiance', 'voltage']
     )-> pd.DataFrame:
@@ -242,12 +243,12 @@ def _apply_chamber_set_points(
 
 # TODO: add initial conditions check, can come from csv or args
 def create_set_point_df(
-        t_0: Union[int, float], 
-        rh_0: Union[int, float], 
-        irrad_0: Union[int, float], 
-        v_0: Union[int, float], 
-        fp: str
-        )->pd.DataFrame:
+    t_0: Union[int, float], 
+    rh_0: Union[int, float], 
+    irrad_0: Union[int, float], 
+    v_0: Union[int, float], 
+    fp: str
+    )-> pd.DataFrame:
     """
     Create a dataframe of chamber set points from a csv and set of initial conditions.
 
@@ -295,3 +296,48 @@ def start_times(
         df.loc[i, 'start_time'] = df.loc[i - 1, 'start_time'] + df.loc[i - 1, 'step_length']
 
     return df
+
+# TODO: change to datetime or timedelta index?
+def chamber_setpoints(
+    fp: str,
+    t_0: Union[int, float], 
+    rh_0: Union[int, float], 
+    irrad_0: Union[int, float], 
+    v_0: Union[int, float], 
+    setpoint_names: List[str] = ['temperature', 'relative_humidity', 'irradiance', 'voltage']
+    )-> pd.DataFrame:
+
+    """
+    Parameters:
+    -----------
+    fp : str
+        file path to csv with set points
+    t_0 : Union[int, float]
+        inital temperature [C]
+    rh_0 : Union[int, float]
+        inital relative humidity [unitless]
+    irrad_0 : Union[int, float]
+        inital irradiance at 340 nm [?]
+    v_0 : Union[int, float]
+        intial voltage [V]
+    setpoint_names: List[str]
+        list of column names to create setpoint timeseries for.
+        all list entries must exist in dataframe/csv/intial values.
+    """
+
+    set_point_df = create_set_point_df(
+        t_0=t_0,
+        rh_0=rh_0,
+        irrad_0=irrad_0,
+        v_0=v_0,
+        fp=fp
+    )
+
+    set_point_starts_df = start_times(set_point_df)
+
+    set_values_df = apply_chamber_set_points(
+        df=set_point_starts_df,
+        setpoint_names=setpoint_names
+    )
+
+    return set_values_df
