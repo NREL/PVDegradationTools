@@ -10,11 +10,9 @@ import os
 import glob
 import pandas as pd
 from rex import NSRDBX, Outputs
-from pvdeg import humidity
 import datetime
 import numpy as np
 import h5py
-import dask.dataframe as dd
 import xarray as xr
 
 
@@ -50,12 +48,12 @@ def get(database, id=None, geospatial=False, **kwargs):
 
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
-    if type(id) is tuple:
+    if isinstance(id, tuple):
         location = id
         gid = None
         lat = location[0]
         lon = location[1]
-    elif type(id) is int:
+    elif isinstance(id, int):
         gid = id
         location = None
     elif id is None:
@@ -138,8 +136,6 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         [psm3, tmy3, epw, h5, csv]
     """
 
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
-
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
 
@@ -162,7 +158,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         meta = meta.to_dict()
 
     # map meta-names as needed
-    if map_variables == True:
+    if map_variables:
         map_weather(weather_df)
         map_meta(meta)
 
@@ -205,7 +201,7 @@ def csv_read(filename):
     ) in meta:  # converts everything to a float that is possible to convert to a float
         try:
             meta[key] = float(meta[key])
-        except:
+        except (ValueError, TypeError):
             pass
     # get the column headers
     columns = file1.readline().split(",")
@@ -356,7 +352,7 @@ def read_h5(gid, file, attributes=None, **_):
         dattr = f.attrs
 
     # TODO: put into utilities
-    if attributes == None:
+    if attributes is None:
         attributes = list(dattr.keys())
         try:
             attributes.remove("meta")
@@ -580,7 +576,7 @@ def get_NSRDB(
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz", "timezone": "tz"}
 
     if (
-        satellite == None
+        satellite is None
     ):  # TODO: This function is not fully written as of January 3, 2024
         satellite, gid = get_satellite(location)
         print("the satellite is ", satellite)
@@ -602,7 +598,7 @@ def get_NSRDB(
                 for attr in lattr:
                     dattr[attr] = file
 
-        if attributes == None:
+        if attributes is None:
             attributes = list(dattr.keys())
             try:
                 attributes.remove("meta")
