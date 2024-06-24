@@ -15,12 +15,14 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
+from importlib import import_module
 from copy import deepcopy
 from typing import List, Union, Optional, Tuple, Callable
 from functools import partial
 import pprint
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 ### premade scenario with locations of interest. Ask Mike?
 # TODO: geospatial reset weather and addLocation from gids.
@@ -143,7 +145,7 @@ class Scenario:
             try:
                 os.chdir(os.pardir) 
                 rmtree(path=self.path) 
-            except FileNotFoundError:
+            except:
                 raise FileNotFoundError(f"cannot remove {self.name} directory")
         else:
             raise ValueError(f"{self.name} does not have a path attribute")
@@ -191,7 +193,7 @@ class Scenario:
                     'map_variables': True
                 }
 
-        if self.email is not None and self.api_key is not None and weather_db == 'PSM3':
+        if self.email != None and self.api_key != None and weather_db == 'PSM3':
             credentials = {
                 'api_key': self.api_key,
                 'email': self.email,
@@ -213,7 +215,7 @@ class Scenario:
                 gid = point_meta['Location ID']            
                 self.gids = [ int(gid) ]
         except KeyError:
-            return UserWarning("metadata missing location ID")
+            return UserWarning(f"metadata missing location ID")
 
         self.meta_data = point_meta
         self.weather_data = point_weather 
@@ -267,7 +269,7 @@ class Scenario:
 
         try:
             mat_params = utilities._read_material(name=material)
-        except KeyError:
+        except:
             print("Material Not Found - No module added to scenario.")
             print("If you need to add a custom material, use .add_material()")
             return
@@ -332,7 +334,7 @@ class Scenario:
 
         print("Results : ", end='')
         try: 
-            print("Pipeline results : ")
+            print(f"Pipeline results : ")
 
             for result in self.results:
                 if isinstance(result, pd.DataFrame):
@@ -520,7 +522,7 @@ class Scenario:
             instance.email = data['email']
             instance.api_key = data['api_key']
         except KeyError:
-            print("credentials not in json file using arguments")
+            print(f"credentials not in json file using arguments")
             instance.email = email
             instance.api_key = api_key
 
@@ -550,11 +552,12 @@ class Scenario:
 
         # find the function in pvdeg
         class_list = [c for c in dir(pvdeg) if not c.startswith("_")]
+        func_list = []
         for c in class_list:
             _class = getattr(pvdeg, c)
             if func_name in dir(_class):
                 _func = getattr(_class, func_name)
-        if _func is None:
+        if _func == None:
             return (None, None)
 
         # check if necessary parameters given
@@ -566,17 +569,14 @@ class Scenario:
 
         return (_func, reqs)
 
-    def get_qualified(x):
-        return f"{x.__module__}.{x.__name__}"
-    
 
     def _to_dict(self, api_key=False): 
         # pipeline is a special case, we need to remove the 'job' function reference at every entry
         modified_pipeline = deepcopy(self.pipeline)
         for task in modified_pipeline.values():
             function_ref = task['job']
-            # get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
-            task['qualified_function'] = self.get_qualified(function_ref)
+            get_qualified = lambda x : f"{x.__module__}.{x.__name__}"
+            task['qualified_function'] = get_qualified(function_ref)
             task.pop('job')
 
         attributes = {
@@ -705,7 +705,7 @@ class Scenario:
             The end time for the data extraction.
         """
         if self.results is None:
-            raise ValueError("No scenario results. Run pipeline with ``.run()``")
+            raise ValueError(f"No scenario results. Run pipeline with ``.run()``")
 
         if not isinstance(dim_target, tuple):
             raise TypeError(f"dim_target is type: {type(dim_target)} must be tuple")
@@ -724,7 +724,7 @@ class Scenario:
                     if col_name is not None:
                         results[key] = value[col_name]
                     else:
-                        raise ValueError("col_name must be provided for DataFrame extraction")
+                        raise ValueError(f"col_name must be provided for DataFrame extraction")
                 
         elif dim_target[0] == 'function':
             for module, sub_dict in self.results.items():
@@ -736,7 +736,7 @@ class Scenario:
                             if col_name is not None:
                                 results[module] = function_result[col_name]
                             else:
-                                raise ValueError("col_name must be provided for DataFrame extraction")
+                                raise ValueError(f"col_name must be provided for DataFrame extraction")
 
         if tmy:
             results.index = results.index.map(lambda dt: dt.replace(year=1970)) # placeholder year
@@ -1121,7 +1121,7 @@ class GeospatialScenario(Scenario):
             geo_meta = geo_meta.loc[bbox_gids]
 
         # string to list whole word list or keep list
-        toList = lambda s : s if isinstance(s, list) else [s]
+        toList = lambda s : s if isinstance(s, list)  else [s]
         
         if country:
             countries = toList(country)
@@ -1724,7 +1724,7 @@ class GeospatialScenario(Scenario):
             points will siginficantly overlap.
         """
         if not col_name:
-            raise ValueError("col_name cannot be none")
+            raise ValueError(f"col_name cannot be none")
 
         if col_name not in self.meta_data.columns:
             raise ValueError(f"{col_name} not in self.meta_data columns as follows {self.meta_data.columns}")

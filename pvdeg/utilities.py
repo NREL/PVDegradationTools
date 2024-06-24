@@ -5,6 +5,7 @@ import numpy as np
 from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
+import inspect
 from random import choices
 from string import ascii_uppercase
 from collections import OrderedDict
@@ -679,9 +680,6 @@ def strip_normalize_tmy(df, start_time, end_time):
     
     return sub_results
 
-def _random_id():
-    return ''.join(choices(ascii_uppercase, k = 5))
-
 def new_id(collection):
     """
     Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
@@ -698,10 +696,10 @@ def new_id(collection):
     if not isinstance(collection, (dict,OrderedDict)):
         raise TypeError(f"{collection.__name__} type {type(collection)} expected dict")
 
-    # gen = lambda : ''.join(choices(ascii_uppercase, k = 5))
-    id = _random_id()
+    gen = lambda : ''.join(choices(ascii_uppercase, k = 5))
+    id = gen()
     while id in collection.keys(): 
-        id = _random_id()
+        id = gen()
     
     return id 
             
