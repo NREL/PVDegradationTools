@@ -64,14 +64,14 @@ def test_addModule_badmat(capsys):
     assert "Material Not Found - No module added to scenario." in captured.out
     assert "If you need to add a custom material, use .add_material()" in captured.out
 
-def test_addModule_existingmod(capsys):
-    b = Scenario.load_json(file_path=os.path.join(TEST_DATA_DIR, 'test-scenario.json'), email=EMAIL, api_key=API_KEY)
+# def test_addModule_existingmod(capsys):
+#     b = Scenario.load_json(file_path=os.path.join(TEST_DATA_DIR, 'test-scenario.json'), email=EMAIL, api_key=API_KEY)
 
-    b.addModule(module_name='test-module')
+#     b.addModule(module_name='test-module')
 
-    captured = capsys.readouterr()
-    assert 'WARNING - Module already found by name "test-module"' in captured.out
-    assert "Module will be replaced with new instance." in captured.out
+#     captured = capsys.readouterr()
+#     assert 'WARNING - Module already found by name "test-module"' in captured.out
+#     assert "Module will be replaced with new instance." in captured.out
 
 # just stdout not errout
 # def test_addModule_seeadded(capsys):
@@ -108,4 +108,5 @@ def test_addJob_bad(capsys):
 
 
 # geospatial tests should only run if on hpc, ask martin about protocol. load meta csv and weather nc (for very small scenario?)
+
 

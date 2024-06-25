@@ -951,6 +951,10 @@ def remove_scenario_filetrees(
     pattern : str
         pattern to search for using glob. Default value of `pvd_job_` is 
         equvilent to `pvd_job_*` in bash.
+
+    Returns:
+    --------
+    None
     """
     import shutil
     import glob
