@@ -27,7 +27,6 @@ pvdeg.humidity
       pvdeg.humidity.front_encap
       pvdeg.humidity.module
       pvdeg.humidity.psat
-      pvdeg.humidity.run_module
       pvdeg.humidity.surface_outside
 
    
@@ -98,13 +97,6 @@ pvdeg.humidity
    .. _sphx_glr_backref_pvdeg.humidity.psat:
 
    .. minigallery:: pvdeg.humidity.psat
-       :add-heading:
-
-   .. autofunction:: run_module
-
-   .. _sphx_glr_backref_pvdeg.humidity.run_module:
-
-   .. minigallery:: pvdeg.humidity.run_module
        :add-heading:
 
    .. autofunction:: surface_outside
