@@ -1,19 +1,13 @@
-"""Collection of classes and functions for humidity calculations.
-"""
+"""Collection of classes and functions for humidity calculations."""
 
 import numpy as np
 import pandas as pd
-import pvlib
 from numba import jit, njit
-from rex import NSRDBX
-from rex import Outputs
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Union
+from scipy.constants import Boltzmann
 
 from . import temperature
 from . import spectral
-from . import weather
 
 
 def _ambient(weather_df):
@@ -776,13 +770,14 @@ def module(
     results = pd.DataFrame(data=data)
     return results
 
+
 # check these constants and update docstring
 # come from Kats Profile in kempe spreadsheet
 @njit
 def water_vapor_pressure(
-    temp: float, 
-    rh: float, 
-    )-> float:
+    temp: float,
+    rh: float,
+) -> float:
     """
     Calculate water vapor pressure at a temp and relative humidity pairing.
 
@@ -800,21 +795,191 @@ def water_vapor_pressure(
     """
 
     # where do these constants come from?
-    water_vapor_pressure = np.exp(
-        -0.580109 + temp * 0.078001 - 0.0003782525 * temp**2 
-        + 0.000001420179 * temp**3 - 0.000000002447042 * temp**4 
-        ) * rh / 100
+    water_vapor_pressure = (
+        np.exp(
+            -0.580109
+            + temp * 0.078001
+            - 0.0003782525 * temp**2
+            + 0.000001420179 * temp**3
+            - 0.000000002447042 * temp**4
+        )
+        * rh
+        / 100
+    )
 
     return water_vapor_pressure
 
+
+@njit
+def equilibrium_eva_water(
+    sample_temp: Union[float, np.ndarray],
+    rh_at_sample_temp: Union[float, np.ndarray],
+    eva_solubility: float,
+    solubility_prefactor: float,
+) -> Union[float, np.ndarray[float]]:
+    """
+    Calculate Equlibirum EVA H20 content [g/cm^3]
+
+    Parameters:
+    -----------
+    sample_temp:
+        temperature of the sample [C]
+    rh_at_sample_temp:
+        relative humidity at the sample temperature [%, unitless]
+    eva_solubility:
+        activation energy for solubility in EVA [eV]
+    solubility_prefactor:
+        amount of substance already present [g/cm^3]
+        >>> should this just say water present at t=0
+    """
+
+    return (
+        (
+            solubility_prefactor
+            * np.exp(-eva_solubility / 0.0000861733241 / (273.15 + sample_temp))
+        )
+        * rh_at_sample_temp
+        / 100
+    )
+
+
+# equilibrum moisture content and rh both = 0, shouldn't happen
+@njit
+def _moisture_eva_back_dry(
+    current_moisture_eva_back,
+    current_temp,
+    current_eq_eva_water,
+    pet_prefactor,
+    ea_pet,
+    n_steps,
+    thickness_eva,
+    thickness_pet,
+) -> float:
+    next = (
+        current_moisture_eva_back
+        + pet_prefactor
+        / thickness_pet
+        * np.exp(-ea_pet / current_temp)
+        / 100
+        / thickness_eva
+        * (current_eq_eva_water - current_moisture_eva_back)
+        / 24000
+        / n_steps
+    )
+
+    return next
+
+
+# case where rh > 100 on outside of cell
+@njit
+def _moisture_eva_back_superwet(
+    current_moisture_eva_back,
+    current_temp,
+    current_eq_eva_water,
+    pet_prefactor,
+    ea_pet,
+    n_steps,
+    thickness_eva,
+    thickness_pet,
+) -> float:
+
+    next = (
+        current_moisture_eva_back
+        + pet_prefactor
+        / thickness_pet
+        * np.exp(-ea_pet / current_temp)
+        / current_eq_eva_water
+        / thickness_eva
+        * (current_eq_eva_water - current_moisture_eva_back)
+        / 24000
+        / n_steps
+    )
+
+    return next
+
+# standard case
+@njit
+def _moisture_eva_back_normal(
+    current_moisture_eva_back,
+    current_temp,
+    current_eq_eva_water,
+    current_rh_at_sample_temp,
+    pet_prefactor,
+    ea_pet,
+    n_steps,
+    thickness_eva,
+    thickness_pet,
+) -> float:
+
+    next = (
+        current_moisture_eva_back
+        + pet_prefactor
+        / thickness_pet
+        * np.exp(-ea_pet / current_temp)
+        / current_eq_eva_water
+        * current_rh_at_sample_temp
+        / 100
+        / thickness_eva
+        * (current_eq_eva_water - current_moisture_eva_back)
+        / 24000
+        / n_steps
+    )
+
+    return next
+
+# qss calculation macro ported
+@njit
+def moisture_eva_back(
+    eva_moisture_0,  # starting concentration
+    sample_temp,
+    rh_at_sample_temp,  # this could be renamed to rh_external?
+    equilibrium_eva_water,
+    pet_permiability,
+    pet_prefactor,
+    thickness_eva,  # [mm]
+    thickness_pet,  # [mm]
+    n_steps=20,  # each time step is broken up into small steps so that the equations remain stable
+) -> Union[float, np.ndarray]:
+    ea_pet = pet_permiability / Boltzmann
+
+    moisture = np.empty_like(sample_temp)
+    moisture[0] = eva_moisture_0
+
+    # loops and conditionals here
+
+@njit
+def rh_internal_cell_backside(
+    back_eva_moisture: Union[float, np.ndarray],
+    equilibrium_eva_water: Union[float, np.ndarray],
+    rh_at_sample_temp: Union[float, np.ndarray],
+) -> Union[float, np.ndarray]:
+    """
+    Calculate relative humidity inside the module on the backside of the cells
+
+    Parameters:
+    -----------
+    back_eva_moisture: Union[float, np.ndarray]
+        back EVA moisture content [g/cm^3]
+    equilibrium_eva_water: Union[float, np.ndarray]
+        EVA equilibrium water content [g/cm^3]
+    rh_at_sample_temp: Union[float, np.ndarray]
+        relative humidity of sample in chamber [%, unitless]
+
+    Returns:
+    --------
+    rh_internal_cell_backside: Union[float, np.ndarray]
+        relative humidity inside the module on the backside of the cells [%, unitless]
+    """
+
+    return back_eva_moisture / equilibrium_eva_water * rh_at_sample_temp
+
+
 # source of constants?
-@njit 
-def chamber_dew_point_from_vapor_pressure(
-    water_vap_pres: float
-    )-> float:
+@njit
+def chamber_dew_point_from_vapor_pressure(water_vap_pres: float) -> float:
     """
     Calculate chamber dew point from water vapor pressure.
-    
+
     Parameters:
     -----------
     water_vap_pres: float
@@ -828,23 +993,24 @@ def chamber_dew_point_from_vapor_pressure(
 
     # where do these constants come from
     dew_point = (
-        - 0.000011449014849 * (np.log(water_vap_pres))**6 
-        + 0.001637341324 * (np.log(water_vap_pres))**5 
-        - 0.0077181540713 * (np.log(water_vap_pres))**4 
-        + 0.045794594572 * (np.log(water_vap_pres))**3 
-        + 1.1472781751 * (np.log(water_vap_pres))**2 
-        + 13.892250408 * (np.log(water_vap_pres)) 
+        -0.000011449014849 * (np.log(water_vap_pres)) ** 6
+        + 0.001637341324 * (np.log(water_vap_pres)) ** 5
+        - 0.0077181540713 * (np.log(water_vap_pres)) ** 4
+        + 0.045794594572 * (np.log(water_vap_pres)) ** 3
+        + 1.1472781751 * (np.log(water_vap_pres)) ** 2
+        + 13.892250408 * (np.log(water_vap_pres))
         + 7.1381806922
     )
 
     return dew_point
+
 
 # where do these constants come from
 @njit
 def chamber_dew_point_from_t_rh(
     temp: float,
     rh: float,
-    )-> float:
+) -> float:
     """
     Calculate chamber dew point from temperature and relative humidity
 
@@ -867,27 +1033,28 @@ def chamber_dew_point_from_t_rh(
 
     return dew_point
 
+
 @njit
 def rh_at_sample_temperature(
     temp_set: float,
     rh_set: float,
     sample_temp: float,
-    )-> float:
+) -> float:
     """
     Calculate relative sample relative humidity using
     sample temperature and chamber set points
-    
+
     Parameters:
     -----------
     temp_set: float
-        temperature setpoint of chamber 
+        temperature setpoint of chamber
         (not actual chamber air temp just an approximation)
     rh_set: float
         relative humidity setpoint of chamber
         (not actual chamber relative humidity)
     sample_temp: float
         temperature of the sample in the chamber
-    
+
     Returns:
     --------
     rh: float
@@ -895,24 +1062,31 @@ def rh_at_sample_temperature(
     """
 
     rh = (
-        np.exp(
-            -0.580109
-            + temp_set * 0.078001
-            - 0.0003782525 * temp_set ** 2
-            + 0.000001420179 * temp_set ** 3
-            - 0.000000002447042 * temp_set ** 4
-        ) * rh_set / 100
-    ) / (
-        np.exp(
-            -0.580109
-            + sample_temp * 0.078001
-            - 0.0003782525 * sample_temp ** 2
-            + 0.000001420179 * sample_temp ** 3
-            - 0.000000002447042 * sample_temp ** 4
+        (
+            np.exp(
+                -0.580109
+                + temp_set * 0.078001
+                - 0.0003782525 * temp_set**2
+                + 0.000001420179 * temp_set**3
+                - 0.000000002447042 * temp_set**4
+            )
+            * rh_set
+            / 100
         )
-    ) * 100
+        / (
+            np.exp(
+                -0.580109
+                + sample_temp * 0.078001
+                - 0.0003782525 * sample_temp**2
+                + 0.000001420179 * sample_temp**3
+                - 0.000000002447042 * sample_temp**4
+            )
+        )
+        * 100
+    )
 
     return rh
+
 
 # def run_module(
 #     project_points,
