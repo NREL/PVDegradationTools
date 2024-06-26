@@ -671,7 +671,7 @@ def vertical_POA(
            'day':list(weather_df.index.day),
            'hour':list(weather_df.index.hour),
            'minute':list(weather_df.index.minute),
-           'alb':list(weather_df.surface_albedo)}
+           'alb':list(weather_df.albedo)}
 
     pv4.value('solar_resource_data', data)
 
