@@ -611,6 +611,8 @@ def vertical_POA(
     import PySAM.Utilityrate5 as UtilityRate
     import PySAM.Cashloan as Cashloan
     import json
+    import os
+    import sys
     
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
