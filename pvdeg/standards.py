@@ -571,3 +571,99 @@ def standoff_x(
     ).x[0]
 
     return temp_df
+
+
+def vertical_POA(
+    weather_df,
+    meta,
+    jsonfolder,
+    samjsonname='vertical',
+    weather_kwarg=None,
+):
+    """
+    Run a SAM
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data for a single location.
+    meta : pd.DataFrame
+        Meta data for a single location.
+    weather_kwarg : dict
+        other variables needed to access a particular weather dataset.
+    jsonfolder : string
+        Location and base name for the json files, i.e.  r'C:\Users\sayala\Documents\GitHub\Studies\High-Latitude-PV\pvdeg\jsons'
+        or '/home/sayala/highlat/jsons/'
+    
+
+    Returns
+    -------
+    x : float [cm]
+        Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
+        Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
+    T98_0 : float [°C]
+        This is the 98ᵗʰ percential temperature of a theoretical module with no standoff.
+    T98_inf : float [°C]
+        This is the 98ᵗʰ percential temperature of a theoretical rack mounted module.
+
+    References
+    ----------
+    M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
+    to IEC TS 63126, PVSC Proceedings 2023
+    """
+
+    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
+
+    if isinstance(weather_df, dd.DataFrame):
+        weather_df = weather_df[parameters].compute()
+        weather_df.set_index("time", inplace=True)
+    elif isinstance(weather_df, pd.DataFrame):
+        weather_df = weather_df[parameters]
+    elif weather_df is None:
+        weather_df, meta = weather.get(**weather_kwarg)
+
+
+    file_names = ["pvsamv1", "grid", "utilityrate5", "cashloan"]
+    pv4 = PV.new()  # also tried PVWattsSingleOwner
+    grid4 = Grid.from_existing(pv4)
+    ur4 = UtilityRate.from_existing(pv4)
+    so4 = Cashloan.from_existing(grid4, 'FlatPlatePVCommercial')
+
+    # LOAD Values
+    for count, module in enumerate([pv4, grid4, ur4, so4]):
+        filetitle= samjsonname + '_' + file_names[count] + ".json"
+        with open(os.path.join(jsonfolder,filetitle), 'r') as file:
+            data = json.load(file)
+            for k, v in data.items():
+                if k == 'number_inputs':
+                    continue
+                try:
+                    if sys.version.split(' ')[0] == '3.11.7': 
+                        # Check needed for python 3.10.7 and perhaps other releases above 3.10.4.
+                        # This prevents the failure "UnicodeDecodeError: 'utf-8' codec can't decode byte... 
+                        # This bug will be fixed on a newer version of pysam (currently not working on 5.1.0)
+                        if 'adjust_' in k:  # This check is needed for Python 3.10.7 and some others. Not needed for 3.7.4
+                            print(k)
+                            k = k.split('adjust_')[1]
+                    module.value(k, v)
+                except AttributeError:
+                    # there is an error is setting the value for ppa_escalation
+                    print(module, k, v)
+                
+    pv4.execute()
+    grid4.execute()
+    ur4.execute()
+    so4.execute()
+    
+    # SAVE RESULTS|
+    results = pv4.Outputs.export()
+    economicresults = so4.Outputs.export()
+    
+    annual_gh = results['annual_gh']
+    annual_energy = results['annual_ac_gross']
+    lcoe = economicresults['lcoe_nom']
+    
+    res = {"annual_gh": x, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
+    df_res = pd.DataFrame.from_dict(res, orient="index").T
+
+    return df_res
