@@ -664,7 +664,7 @@ def vertical_POA(
            'wspd':list(weather_df.wind_speed),
            'lat':meta['latitude'],
            'lon':meta['longitude'],
-           'tz':meta['timezone'],
+           'tz':meta['tz'],
            'elev':meta['elevation'],
            'year':list(weather_df.index.year),
            'month':list(weather_df.index.month),
