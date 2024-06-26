@@ -616,7 +616,7 @@ def vertical_POA(
     
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
     print("weather_df KEYs", weather_df.keys())
-    print("meta KEYs", weather_df.keys())
+    print("meta KEYs", meta.keys())
 
     
     if isinstance(weather_df, dd.DataFrame):
@@ -660,7 +660,7 @@ def vertical_POA(
     data = {'dn':list(weather_df.dni),
            'df':list(weather_df.dhi),
             'gh':list(weather_df.ghi),
-           'tdry':list(weather_df.air_temperature),
+           'tdry':list(weather_df.temp_air),
            'wspd':list(weather_df.wind_speed),
            'lat':meta['latitude'],
            'lon':meta['longitude'],
