@@ -615,7 +615,10 @@ def vertical_POA(
     import sys
     
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
+    print("weather_df KEYs", weather_df.keys())
+    print("meta KEYs", weather_df.keys())
 
+    
     if isinstance(weather_df, dd.DataFrame):
         weather_df = weather_df[parameters].compute()
         weather_df.set_index("time", inplace=True)
@@ -651,7 +654,27 @@ def vertical_POA(
                 except AttributeError:
                     # there is an error is setting the value for ppa_escalation
                     print(module, k, v)
+
+    pv4.unassign('solar_resource_file')
                 
+    data = {'dn':list(weather_df.dni),
+           'df':list(weather_df.dhi),
+            'gh':list(weather_df.ghi),
+           'tdry':list(weather_df.air_temperature),
+           'wspd':list(weather_df.wind_speed),
+           'lat':meta['latitude'],
+           'lon':meta['longitude'],
+           'tz':meta['timezone'],
+           'elev':meta['elevation'],
+           'year':list(weather_df.index.year),
+           'month':list(weather_df.index.month),
+           'day':list(weather_df.index.day),
+           'hour':list(weather_df.index.hour),
+           'minute':list(weather_df.index.minute),
+           'alb':list(weather_df.surface_albedo)}
+
+    pv4.value('solar_resource_data', data)
+
     pv4.execute()
     grid4.execute()
     ur4.execute()
