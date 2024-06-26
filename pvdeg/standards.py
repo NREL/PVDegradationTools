@@ -592,24 +592,17 @@ def vertical_POA(
     weather_kwarg : dict
         other variables needed to access a particular weather dataset.
     jsonfolder : string
-        Location and base name for the json files, i.e.  r'C:\Users\sayala\Documents\GitHub\Studies\High-Latitude-PV\pvdeg\jsons'
-        or '/home/sayala/highlat/jsons/'
-    
+        Location and base name for the json files
 
     Returns
     -------
-    x : float [cm]
-        Minimum installation distance in centimeter per IEC TS 63126 when the default settings are used.
-        Effective gap "x" for the lower limit for Level 1 or Level 0 modules (IEC TS 63216)
-    T98_0 : float [°C]
-        This is the 98ᵗʰ percential temperature of a theoretical module with no standoff.
-    T98_inf : float [°C]
-        This is the 98ᵗʰ percential temperature of a theoretical rack mounted module.
+    annual_gh : float [Wh/m2/y]
+        Annual GHI
+    annual_energy : float [kWh]
+        Annual AC energy
+    lcoa_nom : float [cents/kWh]
+        LCOE Levelized cost of energy nominal
 
-    References
-    ----------
-    M. Kempe, et al. Close Roof Mounted System Temperature Estimation for Compliance
-    to IEC TS 63126, PVSC Proceedings 2023
     """
 
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
