@@ -605,6 +605,13 @@ def vertical_POA(
 
     """
 
+    import PySAM
+    import PySAM.Pvsamv1 as PV
+    import PySAM.Grid as Grid
+    import PySAM.Utilityrate5 as UtilityRate
+    import PySAM.Cashloan as Cashloan
+    import json
+    
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):
