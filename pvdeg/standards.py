@@ -665,7 +665,7 @@ def vertical_POA(
            'lat':meta['latitude'],
            'lon':meta['longitude'],
            'tz':meta['tz'],
-           'elev':meta['elevation'],
+           'elev':meta['altitude'],
            'year':list(weather_df.index.year),
            'month':list(weather_df.index.month),
            'day':list(weather_df.index.day),
