@@ -576,7 +576,7 @@ def standoff_x(
 def vertical_POA(
     weather_df,
     meta,
-    jsonfolder,
+    jsonfolder='/projects/pvsoiling/pvdeg/analysis/northern_lat/jsons',
     samjsonname='vertical',
     weather_kwarg=None,
 ):
