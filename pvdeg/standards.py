@@ -641,13 +641,18 @@ def vertical_POA(
                 if k == 'number_inputs':
                     continue
                 try:
-                    if sys.version.split(' ')[0] == '3.11.7': 
+                    #if sys.version.split(' ')[0] == '3.11.7':  
+                        # Bypassing this as it's not working with my pandas. the printouts
+                        # like "<Pvsamv1 object at 0x7f0f01339cf0> dc_adjust_periods [[0, 0, 0]]" 
+                        # means it is going to the except. !!!! 
+                        
+                    
                         # Check needed for python 3.10.7 and perhaps other releases above 3.10.4.
                         # This prevents the failure "UnicodeDecodeError: 'utf-8' codec can't decode byte... 
                         # This bug will be fixed on a newer version of pysam (currently not working on 5.1.0)
-                        if 'adjust_' in k:  # This check is needed for Python 3.10.7 and some others. Not needed for 3.7.4
-                            #print(k)
-                            k = k.split('adjust_')[1]
+                    if 'adjust_' in k:  # This check is needed for Python 3.10.7 and some others. Not needed for 3.7.4
+                        #print(k)
+                        k = k.split('adjust_')[1]
                     module.value(k, v)
                 except AttributeError:
                     # there is an error is setting the value for ppa_escalation
