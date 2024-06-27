@@ -658,7 +658,7 @@ def vertical_POA(
     print("Type meta ", type(meta))
 
     if meta.get('tz') == None: 
-        meta['tz'] = '+0'
+        meta.loc[:,'tz'] = '+0'
 
     if "albedo" not in weather_df.columns:
         #weather_df['albedo'] = 0.2 # new pandas cries with this. dumb.
