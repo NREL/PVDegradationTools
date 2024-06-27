@@ -690,7 +690,7 @@ def vertical_POA(
     
     annual_gh = results['annual_gh']
     annual_energy = results['annual_ac_gross']
-    lcoe = economicresults['lcoe_nom']
+    lcoe_nom = economicresults['lcoe_nom']
     
     res = {"annual_gh": annual_gh, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
     df_res = pd.DataFrame.from_dict(res, orient="index").T
