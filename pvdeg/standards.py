@@ -655,6 +655,9 @@ def vertical_POA(
 
     pv4.unassign('solar_resource_file')
                 
+    if meta.get('tz') == None: 
+        meta['tz'] = '+0'
+
     data = {'dn':list(weather_df.dni),
            'df':list(weather_df.dhi),
             'gh':list(weather_df.ghi),
