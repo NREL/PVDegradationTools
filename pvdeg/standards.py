@@ -613,8 +613,8 @@ def vertical_POA(
     import sys
     
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
-    print("weather_df KEYs", weather_df.keys())
-    print("meta KEYs", meta.keys())
+    #print("weather_df KEYs", weather_df.keys())
+    #print("meta KEYs", meta.keys())
 
     
     if isinstance(weather_df, dd.DataFrame):
@@ -646,7 +646,7 @@ def vertical_POA(
                         # This prevents the failure "UnicodeDecodeError: 'utf-8' codec can't decode byte... 
                         # This bug will be fixed on a newer version of pysam (currently not working on 5.1.0)
                         if 'adjust_' in k:  # This check is needed for Python 3.10.7 and some others. Not needed for 3.7.4
-                            print(k)
+                            #print(k)
                             k = k.split('adjust_')[1]
                     module.value(k, v)
                 except AttributeError:
@@ -658,6 +658,7 @@ def vertical_POA(
     if meta.get('tz') == None: 
         meta['tz'] = '+0'
 
+    type("type !!!" , weather_df)
     if "albedo" not in weather_df.columns:
         weather_df['albedo'] = 0.2
 
