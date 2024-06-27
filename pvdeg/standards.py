@@ -655,6 +655,8 @@ def vertical_POA(
 
     pv4.unassign('solar_resource_file')
                 
+    print("Type meta ", type(meta))
+
     if meta.get('tz') == None: 
         meta['tz'] = '+0'
 
