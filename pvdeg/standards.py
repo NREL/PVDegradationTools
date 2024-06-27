@@ -660,7 +660,7 @@ def vertical_POA(
 
     if "albedo" not in weather_df.columns:
         weather_df['albedo'] = 0.2
-    
+
     data = {'dn':list(weather_df.dni),
            'df':list(weather_df.dhi),
             'gh':list(weather_df.ghi),
@@ -692,7 +692,7 @@ def vertical_POA(
     annual_energy = results['annual_ac_gross']
     lcoe = economicresults['lcoe_nom']
     
-    res = {"annual_gh": x, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
+    res = {"annual_gh": annual_gh, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
