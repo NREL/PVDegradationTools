@@ -133,27 +133,25 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
 
     Parameters
     ----------
-    T_0 : float
+    T_0 : pd.series
         An array of temperature values for a module with an insulated back or an
         alternatively desired small or zero standoff. Used as the basis for the
         maximum achievable temperature, [°C].
-    T_inf : float
+    T_inf : pd.series
         An array of temperature values for a module that is rack mounted, [°C].
-    T_measured : float
+    T_measured : pd.series
         An array of values for the measured module temperature, [°C].
-    T_ambient : float
+    T_ambient : pd.series
         An array of values for the ambient temperature, [°C].
-    poa : float
-        An array of values for the plane of array irradiance, [W/m²].
+    poa : pd.series
+        An array of values for the plane of array irradiance, [W/m²]
     x_0 : float, optional
         Thermal decay constant [cm], [Kempe, PVSC Proceedings 2023].
         According to edition 2 of IEC TS 63126 a value of 6.5 cm is recommended.
-    poa_min : float
-        The minimum value for which the data will be used, [W/m²].
-        400 W/m² is recommended.
-    t_amb_min : float
-        The minimum ambient temperature for which the calculation will be made, [°C].
-        A value of 0 °C is recommended to avoid data where snow might be present.
+    poa_min : float, optional
+        Minimum iradiance 
+    t_ambient_min : floa, optional
+        Minimum am
 
     Returns
     -------
@@ -172,7 +170,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
     summ = 0
     for i in range(0, len(T_0)):
         if T_ambient.iloc[i] > t_amb_min:
-            if poa.poa_global.iloc[i] > poa_min:
+            if poa.iloc[i] > poa_min:
                 n = n + 1
                 summ = summ + (T_0.iloc[i] - T_measured.iloc[i]) / (
                     T_0.iloc[i] - T_inf.iloc[i]
@@ -502,12 +500,12 @@ def T98_estimate(
     )
 
     T_inf = temperature.cell(
-        weather_df,
-        meta,
-        poa,
-        temp_model,
-        conf_inf,
-        wind_factor,
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf_inf=conf_inf,
+        wind_factor=wind_factor,
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
@@ -515,12 +513,12 @@ def T98_estimate(
         return T98_inf
     else:
         T_0 = temperature.cell(
-            weather_df,
-            meta,
-            poa,
-            temp_model,
-            conf_0,
-            wind_factor,
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            temp_model=temp_model,
+            conf_0=conf_0,
+            wind_factor=wind_factor,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
         T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))

@@ -308,6 +308,7 @@ def map_weather(weather_df):
         "Wind Direction": "wind_direction",
         "Surface Albedo": "albedo",
         "Precipitable Water": "precipitable_water",
+        "Module_Temperature": "module_temperature",
     }
 
     for column_name in weather_df.columns:
@@ -465,6 +466,7 @@ def ini_h5_geospatial(fps):
     ds = xr.decode_cf(ds)
 
     # Rechunk time axis
+    ds = ds.unify_chunks()
     ds = ds.chunk(chunks={"time": -1, "gid": ds.chunks["gid"]})
 
     weather_ds = ds
