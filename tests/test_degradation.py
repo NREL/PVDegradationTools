@@ -33,6 +33,10 @@ def test_iwa_vantHoff():
     irr_weighted_avg = pvdeg.degradation.IwaVantHoff(weather_df=weather_df, meta=meta)
     assert irr_weighted_avg == pytest.approx(240.28, abs=0.05)
 
+def test_iwa_vantHoff_no_poa():
+    poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
+    irr_weighted_avg_match = pvdeg.degradation.IwaVantHoff(weather_df=weather_df, meta=meta, poa=poa)
+    assert irr_weighted_avg_match == pytest.approx(240.28, abs=0.05)
 
 def test_arrhenius_deg():
     # test the arrhenius degradation acceleration factor
@@ -62,6 +66,29 @@ def test_arrhenius_deg():
     )
     assert arrhenius_deg == pytest.approx(12.804, abs=0.1)
 
+def test_arrhenius_deg_no_poa():
+    rh_chamber = 15
+    temp_chamber = 60
+    I_chamber = 1e3
+    Ea = 40
+
+    temp_module = pvdeg.temperature.module(weather_df, meta)
+
+    rh_surface = pvdeg.humidity.surface_outside(
+        rh_ambient=weather_df["relative_humidity"],
+        temp_ambient=weather_df["temp_air"],
+        temp_module=temp_module,
+    )
+    arrhenius_deg = pvdeg.degradation.arrhenius_deg(
+        weather_df=weather_df,
+        meta=meta,
+        I_chamber=I_chamber,
+        rh_chamber=rh_chamber,
+        rh_outdoor=rh_surface,
+        temp_chamber=temp_chamber,
+        Ea=Ea,
+    )
+    assert arrhenius_deg == pytest.approx(12.804, abs=0.1)
 
 def test_iwa_arrhenius():
     # test arrhenius equivalent weighted average irradiance
@@ -76,6 +103,18 @@ def test_iwa_arrhenius():
     )
     assert irr_weighted_avg == pytest.approx(199.42, abs=0.1)
 
+def test_iwa_arrhenius_poa():
+    poa = pvdeg.spectral.poa_irradiance(weather_df=weather_df, meta=meta)
+
+    Ea = 40
+    irr_weighted_avg = pvdeg.degradation.IwaArrhenius(
+        weather_df=weather_df,
+        meta=meta,
+        rh_outdoor=weather_df["relative_humidity"],
+        Ea=Ea,
+        poa=poa
+    )
+    assert irr_weighted_avg == pytest.approx(199.42, abs=0.1)
 
 def test_degradation():
     # test RH, Temp, Spectral Irradiance sensitive degradation
@@ -91,3 +130,24 @@ def test_degradation():
         wavelengths=wavelengths,
     )
     assert degradation == pytest.approx(4.4969e-38, abs=0.02e-38)
+
+# def test_hours_rh_above_85():
+#     values = np.arange(0,100)
+#     rh_linear_df = pd.DataFrame(values, columns=['rh'])
+
+#     hours_above_85 = pvdeg.degradation._hoursRH_Above85(rh_linear_df)
+
+#     assert hours_above_85 == 14
+
+def test_wh_to_gj():
+    gj = pvdeg.degradation._whToGJ(wh=1)
+
+    assert gj == 3.6e-6
+
+def test_vecArrhenius():
+    poa_global = pvdeg.spectral.poa_irradiance(weather_df=weather_df, meta=meta)['poa_global'].to_numpy()
+    module_temp = pvdeg.temperature.temperature(weather_df=weather_df, meta=meta, cell_or_mod='mod').to_numpy()
+
+    degradation = pvdeg.degradation.vecArrhenius(poa_global=poa_global, module_temp=module_temp, ea=30, x=2, lnr0=15)
+
+    pytest.approx(degradation, 6.603006830204657)
