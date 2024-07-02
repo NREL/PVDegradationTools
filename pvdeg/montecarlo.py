@@ -125,7 +125,6 @@ def _createStats(
         stats_df = pd.DataFrame(stats)
         return stats_df
 
-
     # incomplete dataset
     for mc in stats:
         if 'mean' not in stats[mc] or 'stdev' not in stats[mc]:

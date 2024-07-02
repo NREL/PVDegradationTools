@@ -1,0 +1,149 @@
+{
+    "name": "temperature and degradation",
+    "path": "c:\\Users\\tford\\dev\\PVDegradationTools\\tutorials_and_tools\\tutorials_and_tools\\pvd_job_temperature and degradation",
+    "modules": [
+        {
+            "module_name": "sapm_1",
+            "racking": "open_rack_glass_polymer",
+            "material_params": {
+                "alias": "EVA",
+                "Fickian": true,
+                "Ead": 29.43,
+                "Do": 0.13,
+                "Eas": 32.31,
+                "So": 87.8,
+                "Eap": 61.74,
+                "Po": 97900000000.0
+            },
+            "temp_model": "sapm",
+            "model_kwarg": {
+                "irrad_ref": 1100
+            },
+            "irradiance_kwarg": {
+                "azimuth": 120,
+                "tilt": 30
+            }
+        },
+        {
+            "module_name": "pvsyst_1",
+            "racking": "freestanding",
+            "material_params": {
+                "alias": "EVA",
+                "Fickian": true,
+                "Ead": 29.43,
+                "Do": 0.13,
+                "Eas": 32.31,
+                "So": 87.8,
+                "Eap": 61.74,
+                "Po": 97900000000.0
+            },
+            "temp_model": "pvsyst",
+            "model_kwarg": {
+                "module_efficiency": 0.15
+            },
+            "irradiance_kwarg": {
+                "azimuth": 180,
+                "tilt": 0
+            }
+        },
+        {
+            "module_name": "sapm_2",
+            "racking": "open_rack_glass_polymer",
+            "material_params": {
+                "alias": "EVA",
+                "Fickian": true,
+                "Ead": 29.43,
+                "Do": 0.13,
+                "Eas": 32.31,
+                "So": 87.8,
+                "Eap": 61.74,
+                "Po": 97900000000.0
+            },
+            "temp_model": "sapm",
+            "model_kwarg": {
+                "irrad_ref": 1000
+            },
+            "irradiance_kwarg": {
+                "azimuth": 120,
+                "tilt": 30
+            }
+        },
+        {
+            "module_name": "sapm_3",
+            "racking": "open_rack_glass_polymer",
+            "material_params": {
+                "alias": "EVA",
+                "Fickian": true,
+                "Ead": 29.43,
+                "Do": 0.13,
+                "Eas": 32.31,
+                "So": 87.8,
+                "Eap": 61.74,
+                "Po": 97900000000.0
+            },
+            "temp_model": "sapm",
+            "model_kwarg": {
+                "irrad_ref": 1000
+            },
+            "irradiance_kwarg": {
+                "azimuth": 180,
+                "tilt": 0
+            }
+        },
+        {
+            "module_name": "pvsyst_2",
+            "racking": "freestanding",
+            "material_params": {
+                "alias": "EVA",
+                "Fickian": true,
+                "Ead": 29.43,
+                "Do": 0.13,
+                "Eas": 32.31,
+                "So": 87.8,
+                "Eap": 61.74,
+                "Po": 97900000000.0
+            },
+            "temp_model": "pvsyst",
+            "model_kwarg": {
+                "module_efficiency": 0.2
+            },
+            "irradiance_kwarg": {
+                "azimuth": 180,
+                "tilt": 0
+            }
+        }
+    ],
+    "gids": [
+        1060699
+    ],
+    "lat_long": [
+        25.783388,
+        -80.189029
+    ],
+    "pipeline": {
+        "HKXVD": {
+            "params": {
+                "cell_or_mod": "cell"
+            },
+            "qualified_function": "pvdeg.temperature.temperature"
+        },
+        "JUBNK": {
+            "params": {
+                "I_chamber": 1000,
+                "temp_chamber": 25
+            },
+            "qualified_function": "pvdeg.degradation.vantHoff_deg"
+        },
+        "GLDTX": {
+            "params": {
+                "I_chamber": 1000,
+                "temp_chamber": 30
+            },
+            "qualified_function": "pvdeg.degradation.vantHoff_deg"
+        },
+        "DJFXB": {
+            "params": {},
+            "qualified_function": "pvdeg.degradation.IwaVantHoff"
+        }
+    }
+}
