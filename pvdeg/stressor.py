@@ -12,6 +12,7 @@ from pvdeg.humidity import (
     rh_at_sample_temperature,
     rh_internal_cell_backside,
     equilibrium_eva_water,
+    moisture_eva_back,
 )
 
 from pvdeg.temperature import chamber_sample_temperature
@@ -488,6 +489,11 @@ def chamber_properties(
     sample_temp_0: float,
     eva_solubility: float,
     solubility_prefactor: float,
+
+    pet_permiability: float,
+    pet_prefactor: float,
+    thickness_eva: float,
+    thickness_pet: float,
 ) -> pd.DataFrame:
     """
     Create a dataframe with sample properties at each time step.
@@ -509,7 +515,16 @@ def chamber_properties(
     solubility_prefactor:
         amount of substance already present [g/cm^3]
         >>> should this just say water present at t=0
-
+    pet_permiability: float
+        PET encapsulant permiability [eV]
+    pet_prefactor: float
+        PET prefactor concentration, nonzero amount of water already
+        present in the encapsulant because of physical and chemical
+        processes throughout its early life [g * mm / m^2 / day]
+    thickness_pet: float
+        thickness of PET encapsulant [mm]
+    thickness_eva: float
+        thickness of EVA backsheet [mm]
 
     Returns:
     --------
@@ -551,14 +566,23 @@ def chamber_properties(
     )
 
     # where does this come from
-    back_eva_moisture_content = ...
+    # backsheet_eva_moisture_content = moisture_eva_back(
+    #     eva_moisture_0=eq_eva_water[0], # see excel comes from cell N9 as inital conditiono
+    #     sample_temp=sample_temperatures,
+    #     rh_at_sample_temp=rh_sample_temp,
+    #     equilibrium_eva_water=eq_eva_water,
+    #     pet_permiability=pet_permiability,
+    #     pet_prefactor=pet_prefactor,
+    #     thickness_eva=thickness_eva,
+    #     thickness_pet=thickness_pet,
+    #     n_steps=20 # remove this when we make it dynamic
+    # )
 
-    rh_backside_cells = rh_internal_cell_backside(
-        back_eva_moisture=back_eva_moisture_content, # this line wont work
-        equilibrium_eva_water=eq_eva_water,
-        rh_at_sample_temp=rh_sample_temp
-    )
-
+    # rh_backside_cells = rh_internal_cell_backside(
+    #     back_eva_moisture=backsheet_eva_moisture_content,
+    #     equilibrium_eva_water=eq_eva_water,
+    #     rh_at_sample_temp=rh_sample_temp
+    # )
 
     properties_df["water_vapor_pressure"] = water_vapor_pressures
     properties_df["dew_point"] = dew_points
@@ -566,8 +590,10 @@ def chamber_properties(
     properties_df["rh_at_sample_temp"] = rh_sample_temp
     properties_df["equilibrium_eva_water"] = eq_eva_water
 
-    # this is not right, where do these values come from 
-    properties_df["back_eva_moisture_content"] = ... # eq_eva_water 
+    # TEST this
+    # properties_df["back_eva_moisture_content"] = backsheet_eva_moisture_content
+    # properties_df['rh_backside_cells_internal'] = rh_backside_cells
+
 
     return properties_df
 

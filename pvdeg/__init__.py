@@ -21,6 +21,16 @@ from . import weather
 
 __version__ = version("pvdeg")
 
+# default python logger
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 logger.setLevel("DEBUG")
+
+
+# numba_logger = logging.getLogger('numba')
+# numba_logger.setLevel(logging.WARNING)
+# numba_console_handler = logging.StreamHandler()
+# numba_console_handler.setLevel(logging.DEBUG)
+# numba_console_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# numba_console_handler.setFormatter(numba_console_formatter)
+# numba_logger.addHandler(numba_console_handler)

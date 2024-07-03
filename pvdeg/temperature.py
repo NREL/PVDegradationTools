@@ -243,6 +243,10 @@ def chamber_sample_temperature(
     """
     Finite difference method for chamber sample temperature.
 
+    .. math::
+        
+        T_2 = T_0 + (T_1 - T_0)e^\frac{- \Delta t}{\tau}
+
     Parameters:
     -----------
     irradiance_340: float
