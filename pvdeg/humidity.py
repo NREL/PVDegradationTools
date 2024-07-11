@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from numba import jit, njit
 from typing import Union
-from scipy.constants import Boltzmann
 
 from . import temperature
 from . import spectral
@@ -843,88 +842,6 @@ def equilibrium_eva_water(
         / 100
     )
 
-
-# equilibrum moisture content and rh both = 0, shouldn't happen
-# @njit
-def _moisture_eva_back_dry(
-    current_moisture_eva_back: np.float64,
-    current_temp: np.float64,
-    current_eq_eva_water: np.float64,
-    pet_prefactor: np.float64,
-    ea_pet: np.float64,
-    thickness_eva: np.float64,
-    thickness_pet: np.float64,
-    n_steps: np.int8, # max of 127 because signed 8 bit
-) -> np.float64:
-
-    # if divide by zero error you messed up, temp in kelvin so we should never be at 0 K
-    return (
-        current_moisture_eva_back
-        + pet_prefactor
-        / thickness_pet
-        * np.exp(-ea_pet / current_temp) 
-        / 100
-        / thickness_eva
-        * (current_eq_eva_water - current_moisture_eva_back)
-        / 24000
-        / n_steps
-    )
-
-# case where rh > 100 on outside of cell
-# @njit
-def _moisture_eva_back_superwet(
-    current_moisture_eva_back: np.float64,
-    current_temp: np.float64,
-    current_eq_eva_water: np.float64,
-    pet_prefactor: np.float64,
-    ea_pet: np.float64,
-    thickness_eva: np.float64,
-    thickness_pet: np.float64,
-    n_steps: np.int8,
-) -> np.float64:
-
-    return (
-        current_moisture_eva_back
-        + pet_prefactor
-        / thickness_pet
-        * np.exp(-ea_pet / current_temp)
-        / current_eq_eva_water
-        / thickness_eva
-        * (current_eq_eva_water - current_moisture_eva_back)
-        / 24000
-        / n_steps
-    )
-
-
-# standard case
-# @njit
-def _moisture_eva_back_normal(
-    current_moisture_eva_back,
-    current_temp,
-    current_eq_eva_water,
-    current_rh_at_sample_temp,
-    pet_prefactor,
-    ea_pet,
-    n_steps,
-    thickness_eva,
-    thickness_pet,
-) -> float:
-
-    return (
-        current_moisture_eva_back
-        + pet_prefactor
-        / thickness_pet
-        * np.exp(-ea_pet / current_temp)
-        / current_eq_eva_water
-        * current_rh_at_sample_temp
-        / 100
-        / thickness_eva
-        * (current_eq_eva_water - current_moisture_eva_back)
-        / 24000
-        / n_steps
-    )
-
-
 @njit
 def _stable_min_steps(
     delta_t: float,
@@ -963,114 +880,69 @@ def _stable_min_steps(
 
     return numerator * delta_t / denominator
 
-# values arent updating
-# @njit
-def calculate_qss_substeps(
-    n_steps: np.int8,
-    backsheet_moisture_prev: np.float64,
-    sample_temp: np.float64,
-    rh_at_sample_temp: np.float64,  # this could be renamed to rh_external?
-    equilibrium_eva_water: np.float64,
-    pet_prefactor: np.float64,
-    thickness_eva: np.float64,  # [mm]
-    thickness_pet: np.float64,  # [mm]
-    ea_pet: np.float64,
-) -> np.float64:
-    """
-    Run back moisture content steady state step using substeps for numerical stability.
-
-    .. math::
-
-        \frac{WVTR_{B,sat}}{C_{E,sat} L_{E}} \cdot [C_{E,Eq} - C_{E}]
-
-    """
-    # backsheet_moisture_prev = backsheet_moisture_prev
-    # print(backsheet_moisture_prev)
-
-    for i in range(n_steps):  # substeps so we dont blow up
-
-        print(f"Substep {i}, current moisture: {backsheet_moisture_prev}")
-
-        if equilibrium_eva_water == 0 and rh_at_sample_temp == 0:
-            backsheet_moisture_prev = _moisture_eva_back_dry(
-                current_moisture_eva_back=backsheet_moisture_prev,
-                current_temp=sample_temp,
-                current_eq_eva_water=equilibrium_eva_water,
-                pet_prefactor=pet_prefactor,
-                ea_pet=ea_pet,
-                thickness_eva=thickness_eva,
-                thickness_pet=thickness_pet,
-                n_steps=n_steps,
-            )
-        else:
-            if rh_at_sample_temp < 100:  # normal case rh (0,100)
-                backsheet_moisture_prev = _moisture_eva_back_normal(
-                    current_moisture_eva_back=backsheet_moisture_prev,
-                    current_temp=sample_temp,
-                    current_eq_eva_water=equilibrium_eva_water,
-                    current_rh_at_sample_temp=rh_at_sample_temp,
-                    pet_prefactor=pet_prefactor,
-                    ea_pet=ea_pet,
-                    thickness_eva=thickness_eva,
-                    thickness_pet=thickness_pet,
-                    n_steps=n_steps,
-                )
-            else:  # superwet case rh > 100
-                backsheet_moisture_prev = _moisture_eva_back_superwet(
-                    current_moisture_eva_back=backsheet_moisture_prev,
-                    current_temp=sample_temp,
-                    current_eq_eva_water=equilibrium_eva_water,
-                    pet_prefactor=pet_prefactor,
-                    ea_pet=ea_pet,
-                    thickness_eva=thickness_eva,
-                    thickness_pet=thickness_pet,
-                    n_steps=n_steps,
-                )
-
-    return backsheet_moisture_prev
-
-
 # qss calculation macro ported
-# @njit
-def moisture_eva_back(
-    eva_moisture_0: np.float64,  # starting concentration
-    sample_temp: np.ndarray[np.float64], # [C] here, but needs to be in K
-    rh_at_sample_temp: np.ndarray[np.float64],  # this could be renamed to rh_external?
-    equilibrium_eva_water: np.ndarray[np.float64] ,
-    pet_permiability: np.float64,
-    pet_prefactor: np.float64,
-    thickness_eva: np.float64,  # [mm]
-    thickness_pet: np.float64,  # [mm]
-    n_steps:np.int8 = 20,  # each time step is broken up into small steps so that the equations remain stable
-) -> Union[float, np.ndarray]:
+def moisture_eva_back( 
+    eva_moisture_0: float,
+    sample_temp: pd.Series,
+    rh_at_sample_temp: pd.Series,
+    equilibrium_eva_water: pd.Series,
+    pet_permiability: float,
+    pet_prefactor: float,
+    thickness_eva: float,
+    thickness_pet: float,
+    n_steps: int, 
+) -> np.ndarray:
 
-    ea_pet = pet_permiability / Boltzmann
-    moisture = np.empty_like(sample_temp, dtype=np.float64)
-    moisture[0] = eva_moisture_0
+    sample_temp = sample_temp.to_numpy()
+    rh_at_sample_temp = rh_at_sample_temp.to_numpy()
+    equilibrium_eva_water = equilibrium_eva_water.to_numpy()
+
     sample_temp = np.add(sample_temp, 273.15) # C -> K
+    ea_pet = pet_permiability / 0.0000861733241 # boltzmann in eV/K
 
-    # loops and conditionals here
-    for i in range(1, len(sample_temp)):
+    moisture = np.empty_like(sample_temp)
+    moisture[0] = eva_moisture_0
 
-        print(f"superstep: {i}")
-
-        moisture[i] = calculate_qss_substeps(
-            backsheet_moisture_prev=moisture[i - 1],
-            sample_temp=sample_temp[i],
-            rh_at_sample_temp=rh_at_sample_temp[i],
-            equilibrium_eva_water=equilibrium_eva_water[i],
-            pet_prefactor=pet_prefactor,
-            ea_pet=ea_pet,
+    for i in range(1, sample_temp.shape[0]):
+        moisture[i] = _calc_qss_substeps(
+            moisture=moisture[i-1],
+            temperature=sample_temp[i],
+            rh=rh_at_sample_temp[i],
+            eq_eva_water=equilibrium_eva_water[i],
             thickness_eva=thickness_eva,
             thickness_pet=thickness_pet,
-            # nsteps can be dyamically determined based on unitless number as a
-            # function of change in time for more efficient calcs
-            # (approx 5x speed up), o(20n) to o(~4n) because usually we only
-            # need 4 substeps per calc to maintain stability
-            # this could also be vectorized and calculated outside of the loop
-            # for an additional speedup at the cost of o(n) extra space
+            pet_prefactor=pet_prefactor,
+            ea_pet=ea_pet,
             n_steps=n_steps,
         )
+
+    return moisture
+
+@njit
+def _calc_qss_substeps(
+    moisture,
+    pet_prefactor,
+    thickness_eva,
+    thickness_pet,
+    ea_pet,
+    temperature,
+    eq_eva_water,
+    rh,
+    n_steps,
+)->float:
+    for _ in range(20):
+        if 0 < moisture < 100: # normal case 
+            moisture = (moisture + pet_prefactor / thickness_pet * np.exp(-ea_pet / temperature) / eq_eva_water 
+                            * rh / 100 / thickness_eva * (eq_eva_water - moisture) / 24000 / n_steps)
+
+        elif rh == 0 and eq_eva_water == 0: # dry case
+            moisture = (moisture + pet_prefactor / thickness_pet * np.exp(-ea_pet / temperature) / 100 / thickness_eva 
+                            * (eq_eva_water - moisture) / 24000 / n_steps)
+
+        else: # superwet case rh >= 100
+            moisture = (moisture + pet_prefactor / thickness_pet * np.exp(-ea_pet / temperature) 
+                            / eq_eva_water / thickness_eva * (eq_eva_water - moisture) / 24000 / n_steps
+                            )
 
     return moisture
 
