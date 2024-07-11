@@ -1,5 +1,13 @@
 import pytest
-from pvdeg import weather, letid, utilities, collection, DATA_DIR, TEST_DATA_DIR
+from pvdeg import (
+    weather, 
+    letid, 
+    utilities, 
+    collection, 
+    DATA_DIR, 
+    TEST_DATA_DIR
+)
+
 import os
 import pandas as pd
 import numpy as np
@@ -186,7 +194,9 @@ def test_calc_device_params():
     pd.testing.assert_frame_equal(results, DEVICE_PARAMS, check_index_type=False)
 
 def test_calc_energy_loss():
-    result = letid.calc_energy_loss(REPINS_TIMESTEPS)
+    # result = letid.calc_energy_loss(REPINS_TIMESTEPS) # old and just fixed in bug fix 
+    timesteps = letid.calc_device_params(REPINS_TIMESTEPS)
+    result = letid.calc_energy_loss(timesteps)
 
     assert result == pytest.approx(8.873902787132071e-05, abs = 0.000005)
 

@@ -12,12 +12,15 @@ import dask.array as da
 import pandas as pd
 import numpy as np
 from dask.distributed import Client, LocalCluster
+from scipy.interpolate import griddata
+from copy import deepcopy
 
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
 import cartopy.feature as cfeature
 
+from typing import Tuple
 from shapely import LineString, MultiLineString
 
 
@@ -236,8 +239,8 @@ def output_template(
     dims = set([d for dim in shapes.values() for d in dim])
     dims_size = dict(ds_gids.sizes) | add_dims
 
-    if len(ds_gids.chunks) == 0:
-        raise ValueError(f"argument ds_gids must contain chunks")
+    # if len(ds_gids.chunks) == 0:
+    #     raise ValueError(f"argument ds_gids must contain chunks")
 
     output_template = xr.Dataset(
         data_vars={
@@ -246,7 +249,7 @@ def output_template(
         },
         coords={dim: ds_gids[dim] for dim in dims},
         attrs=global_attrs,
-    ).chunk({dim: ds_gids.chunks[dim] for dim in dims})
+    )#.chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
     return output_template
 
@@ -802,3 +805,66 @@ def elevation_stochastic_downselect(
         )
 
     return selected_indicies
+
+def interpolate_analysis(result: xr.Dataset, data_var: str, method='nearest')->Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Interpolate sparse spatial result data against DataArray coordinates.
+    Takes DataArray instead of Dataset, index one variable of a dataset to get a dataarray.
+
+    Parameters:
+    -----------
+
+    Result:
+    -------
+    """
+
+    da_copy = deepcopy(result[data_var])
+
+    df = da_copy.to_dataframe().reset_index()
+    df = df.dropna(subset=[data_var]) # there may be a better way to do this, why are we making a dataframe, not good
+    data = np.column_stack((df['latitude'], df['longitude'], df[data_var])) # probably a nicer way to do this
+
+    grid_lat, grid_lon = np.mgrid[df['latitude'].min():df['latitude'].max():100j, 
+                                df['longitude'].min():df['longitude'].max():100j]
+
+    grid_z = griddata(data[:,0:2], data[:,2], xi=(grid_lat, grid_lon), method=method)
+
+    return grid_z, grid_lat, grid_lon
+
+def plot_sparse_analysis(
+    result: xr.Dataset, data_var: str, method='nearest'
+)-> None:
+    
+    grid_values, lat, lon = interpolate_analysis(
+        result=result,
+        data_var=data_var,
+        method=method
+    )
+
+    fig = plt.figure()
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
+    ax.patch.set_visible(False)
+
+    extent = [lon.min(), lon.max(), lat.min(), lat.max()]
+    ax.set_extent(extent)
+    img = ax.imshow(grid_values, extent=extent, origin='lower', cmap='viridis', transform=ccrs.PlateCarree()) # should this be trnsposed
+
+    shapename = "admin_1_states_provinces_lakes"
+    states_shp = shpreader.natural_earth(
+        resolution="110m", category="cultural", name=shapename
+    )
+
+    ax.add_geometries(
+        shpreader.Reader(states_shp).geometries(),
+        ccrs.PlateCarree(),
+        facecolor="none",
+        edgecolor="gray",
+    )
+
+    cbar = plt.colorbar(img, ax=ax, orientation='vertical', fraction=0.02, pad=0.04)
+    cbar.set_label('Value')
+
+    plt.title('Interpolated Heatmap')
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
+    plt.show()
