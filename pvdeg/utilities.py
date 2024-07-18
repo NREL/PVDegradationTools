@@ -489,3 +489,13 @@ def tilt_azimuth_scan(
     print("\r                     ", end="")
     print("\r", end="")
     return tilt_azimuth_series
+
+def plot_water_2d(water:np.ndarray[float]):
+    """
+    Plot a heatmap of water module using a 2d numpy array.
+    """
+    import matplotlib.pyplot as plt
+    plt.matshow(water, cmap='viridis', vmin=-10, vmax=np.max(water)) # dont try to make triangular.
+    plt.title("Water in Module Nodes")
+    plt.colorbar()
+    plt.show()

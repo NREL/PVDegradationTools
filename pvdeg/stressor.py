@@ -346,6 +346,7 @@ def chamber_setpoints(
         "irradiance",
         "voltage",
     ],
+    sequence: list = None, # not inplemented yet
 ) -> pd.DataFrame:
     """
     Parameters:
@@ -365,22 +366,64 @@ def chamber_setpoints(
         all list entries must exist in dataframe/csv/intial values.
     """
 
-    set_point_df = create_set_point_df(
-        t_0=t_0, rh_0=rh_0, irrad_0=irrad_0, v_0=v_0, fp=fp
-    )
+    if sequence:
+        raise NotImplementedError(f"seqences from present components coming soon")
+        
+    if fp is not None:
+        set_point_df = create_set_point_df(
+            t_0=t_0, rh_0=rh_0, irrad_0=irrad_0, v_0=v_0, fp=fp
+        )
 
-    set_point_starts_df = start_times(set_point_df)
+        set_point_starts_df = start_times(set_point_df)
 
-    set_values_df = apply_chamber_set_points(
-        df=set_point_starts_df, setpoint_names=setpoint_names
-    )
+        set_values_df = apply_chamber_set_points(
+            df=set_point_starts_df, setpoint_names=setpoint_names
+        )
 
-    minutes = set_values_df.index.values.astype(int)
-    timedeltas_index = minutes.astype("timedelta64[m]")
-    set_values_df.index = timedeltas_index
+        minutes = set_values_df.index.values.astype(int)
+        timedeltas_index = minutes.astype("timedelta64[m]")
+        set_values_df.index = timedeltas_index
 
-    return set_values_df
+    return set_values_df.astype(int)
 
+# this will not be able to repeat specific setpoints
+# need new utility function as a part of the chamber_setpoints dataframe generation
+def repeat(
+    points_df: pd.DataFrame,
+    n: int,
+)-> pd.DataFrame:
+    """
+    Repeat the chamber set points dataframe n times, excluding the initial set points (in the first row)
+
+    Parameters:
+    -----------
+    points_df: pd.DataFrame
+        chamber setpoints dataframe with timedelta index as returned by `chamber_setpoints`
+    n: int
+        number of times to repeat the dataframe values
+
+    Returns:
+    --------
+    res: pd.DataFrame
+        dataframe including intial chamber setpoints followed by n tiles of the remaining data
+    """
+    original_values = points_df.values
+
+    new_values = np.tile(original_values[1:], (n, 1))
+    new_index_list = [pd.Timedelta(minutes=1)]
+
+    for i in range(1, new_values.shape[0]):
+        new_index_list.append(pd.Timedelta(hours=i, minutes=1)) # can do this with pd.Timedelta_range instead
+
+    new_index = pd.TimedeltaIndex(new_index_list)
+
+    ext = pd.DataFrame(new_values, index=new_index, columns=points_df.columns)
+
+    first_row = points_df.iloc[[0]]
+    first_row.index = [pd.Timedelta(minutes=0)]
+
+    res = pd.concat([first_row, ext])
+    return res
 
 @njit
 def _calc_water_vap_pres(temp_numpy: np.ndarray, rh_numpy: np.ndarray) -> np.ndarray:
@@ -424,7 +467,7 @@ def _calc_sample_temperature(
     temp_set: np.ndarray[float]
         chamber temperature setpoint
     times: np.ndarray[float]
-        length of timestep (end time - start time) [min]
+        length of timestep [min]
     tau: float
         Characteristic thermal equilibration time [min]
     chamber_irrad_0: float
@@ -489,7 +532,6 @@ def chamber_properties(
     sample_temp_0: float,
     eva_solubility: float,
     solubility_prefactor: float,
-
     pet_permiability: float,
     pet_prefactor: float,
     thickness_eva: float,
@@ -534,7 +576,7 @@ def chamber_properties(
         >>> 'water_vapor_pressure', 'dew_point', 'sample_temperature'
     """
 
-    properties_df = pd.DataFrame(index=set_point_df.index)
+    # properties_df = pd.DataFrame(index=set_point_df.index)
 
     water_vapor_pressures = _calc_water_vap_pres(
         temp_numpy=set_point_df["temperature"].to_numpy(dtype=np.float64),
@@ -565,34 +607,43 @@ def chamber_properties(
         solubility_prefactor=solubility_prefactor,
     )
 
-    # where does this come from
-    # backsheet_eva_moisture_content = moisture_eva_back(
-    #     eva_moisture_0=eq_eva_water[0], # see excel comes from cell N9 as inital conditiono
-    #     sample_temp=sample_temperatures,
-    #     rh_at_sample_temp=rh_sample_temp,
-    #     equilibrium_eva_water=eq_eva_water,
-    #     pet_permiability=pet_permiability,
-    #     pet_prefactor=pet_prefactor,
-    #     thickness_eva=thickness_eva,
-    #     thickness_pet=thickness_pet,
-    #     n_steps=20 # remove this when we make it dynamic
-    # )
+    backsheet_eva_moisture_content, stable = moisture_eva_back(
+        eva_moisture_0=eq_eva_water[0],
+        sample_temp=sample_temperatures,
+        rh_at_sample_temp=rh_sample_temp,
+        equilibrium_eva_water=eq_eva_water,
+        pet_permiability=pet_permiability,
+        pet_prefactor=pet_prefactor,
+        thickness_eva=thickness_eva,
+        thickness_pet=thickness_pet,
+        n_steps=20 # usually stable
+    )
 
-    # rh_backside_cells = rh_internal_cell_backside(
-    #     back_eva_moisture=backsheet_eva_moisture_content,
-    #     equilibrium_eva_water=eq_eva_water,
-    #     rh_at_sample_temp=rh_sample_temp
-    # )
+    rh_backside_cells = rh_internal_cell_backside(
+        back_eva_moisture=backsheet_eva_moisture_content,
+        equilibrium_eva_water=eq_eva_water,
+        rh_at_sample_temp=rh_sample_temp
+    )
 
-    properties_df["water_vapor_pressure"] = water_vapor_pressures
-    properties_df["dew_point"] = dew_points
-    properties_df["sample_temperature"] = sample_temperatures
-    properties_df["rh_at_sample_temp"] = rh_sample_temp
-    properties_df["equilibrium_eva_water"] = eq_eva_water
 
-    # TEST this
-    # properties_df["back_eva_moisture_content"] = backsheet_eva_moisture_content
-    # properties_df['rh_backside_cells_internal'] = rh_backside_cells
+    properties_df = pd.DataFrame(
+        data={
+        "water_vapor_pressure" : water_vapor_pressures,
+        "dew_point": dew_points,
+        "sample_temperature": sample_temperatures,
+        "rh_at_sample_temp": rh_sample_temp,
+        "equilibrium_eva_water": eq_eva_water, # this may not be correct, check with kempe
+        "backsheet_moisture" : backsheet_eva_moisture_content,
+        "rh_internal_backside_cells" : rh_backside_cells,
+        },
+        index=set_point_df.index
+        )
+
+    # properties_df["water_vapor_pressure"] = water_vapor_pressures
+    # properties_df["dew_point"] = dew_points
+    # properties_df["sample_temperature"] = sample_temperatures
+    # properties_df["rh_at_sample_temp"] = rh_sample_temp
+    # properties_df["equilibrium_eva_water"] = eq_eva_water
 
 
     return properties_df

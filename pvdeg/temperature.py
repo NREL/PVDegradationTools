@@ -199,39 +199,9 @@ def cell(
 
     return temp_cell
 
-# @njit
-# def finite_diff_temperature(
-#     t_0: Union[int, float], 
-#     t_1: Union[int, float], 
-#     delta_t: Union[int, float], 
-#     tau: Union[int, float]
-#     )->Union[int, float]:
-#     """
-#     Finite Difference Method for 2 step temperature for next timestep.
-
-#     Parameters:
-#     -----------
-#     t_0:  Union[int, float]
-#         2nd previous step temperature
-#     t_1: Union[int, float]
-#         previous step temperature 
-#     delta_t: Union[int, float]
-#         change in time between steps
-#     tau: Union[int, float]
-#         Characteristic Thermal Equilibration Time `Ƭ` in minutes
-
-#     Returns:
-#     --------
-#     t_2: Union[int, float]
-#         current step temperature as a result of finite difference 
-#         of two previous steps
-#     """
-
-#     return t_0 + (t_1 - t_0) * np.exp( delta_t / tau)
-
-
-# these equations came from row K in the spreadsheet, is there somewhere else or something to cite
-# there should be some other irradiance factor/term in the equation
+# these equations came from row K in the spreadsheet, 
+# is there somewhere else or something to cite
+# there should be some other irradiance factor/term in the equation?
 @njit
 def chamber_sample_temperature(
     irradiance_340: float,
@@ -260,6 +230,8 @@ def chamber_sample_temperature(
     tau: float
         Characteristic thermal equilibration time [min]
     """
+
+    
 
     if irradiance_340 == 0:
         sample_temp = (

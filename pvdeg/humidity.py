@@ -798,7 +798,7 @@ def water_vapor_pressure(
     water_vapor_pressure = (
         np.exp(
             -0.580109
-            + temp * 0.078001
+            + 0.078001 * temp
             - 0.0003782525 * temp**2
             + 0.000001420179 * temp**3
             - 0.000000002447042 * temp**4
@@ -808,7 +808,6 @@ def water_vapor_pressure(
     )
 
     return water_vapor_pressure
-
 
 # @njit
 def equilibrium_eva_water(
@@ -842,6 +841,7 @@ def equilibrium_eva_water(
         / 100
     )
 
+
 @njit
 def _stable_min_steps(
     delta_t: float,
@@ -853,7 +853,7 @@ def _stable_min_steps(
     equilibrium_eva_water: float,
     thickness_eva: float,  # [mm]
     thickness_pet: float,  # [mm]
-):
+) -> float:
     """
     Calculate the number of substeps required for a single step in the quasi steady state moisture eva back calculation to keep it stable.
 
@@ -861,7 +861,6 @@ def _stable_min_steps(
     we are saving and overwriting the substep values and only end up saving the last iteration
     using middle equation for spreadsheet
     dC/dt
-
 
     .. math::
 
@@ -872,40 +871,60 @@ def _stable_min_steps(
     we want a value of < 0.25 to maintain stability within the solution
     """
     numerator = (
-        (backsheet_moisture + pet_prefactor * np.exp((-ea_pet / temperature)))
-        * 1/100
+        (backsheet_moisture + pet_prefactor * np.exp((-ea_pet / temperature))) # temperature needs to me in Kelvin
         * relative_humidity
+        / 100
     )
     denominator = equilibrium_eva_water * thickness_eva * thickness_pet
 
     return numerator * delta_t / denominator
 
+
 # qss calculation macro ported
-def moisture_eva_back( 
+# remove stable returns
+def moisture_eva_back(
     eva_moisture_0: float,
-    sample_temp: pd.Series,
-    rh_at_sample_temp: pd.Series,
-    equilibrium_eva_water: pd.Series,
+    sample_temp: Union[pd.Series, np.ndarray],
+    rh_at_sample_temp: Union[pd.Series, np.ndarray],
+    equilibrium_eva_water: Union[pd.Series, np.ndarray],
     pet_permiability: float,
     pet_prefactor: float,
     thickness_eva: float,
     thickness_pet: float,
-    n_steps: int, 
+    n_steps: int,
 ) -> np.ndarray:
 
-    sample_temp = sample_temp.to_numpy()
-    rh_at_sample_temp = rh_at_sample_temp.to_numpy()
-    equilibrium_eva_water = equilibrium_eva_water.to_numpy()
+    if isinstance(sample_temp, pd.Series):
+        sample_temp = sample_temp.to_numpy()
+    if isinstance(rh_at_sample_temp, pd.Series):
+        rh_at_sample_temp = rh_at_sample_temp.to_numpy()
+    if isinstance(equilibrium_eva_water, pd.Series):
+        equilibrium_eva_water = equilibrium_eva_water.to_numpy()
 
-    sample_temp = np.add(sample_temp, 273.15) # C -> K
-    ea_pet = pet_permiability / 0.0000861733241 # boltzmann in eV/K
+    sample_temp = np.add(sample_temp, 273.15)  # C -> K
+    ea_pet = pet_permiability / 0.0000861733241  # boltzmann in eV/K
 
     moisture = np.empty_like(sample_temp)
     moisture[0] = eva_moisture_0
 
+    stable = np.zeros_like(sample_temp)
+
     for i in range(1, sample_temp.shape[0]):
+        
+        # stable[i] = _stable_min_steps(
+        #     delta_t=1, # 1 min,
+        #     backsheet_moisture=moisture[i-1],
+        #     temperature=sample_temp[i],
+        #     relative_humidity=rh_at_sample_temp[i],
+        #     equilibrium_eva_water=equilibrium_eva_water[i],
+        #     ea_pet=ea_pet,
+        #     pet_prefactor=pet_prefactor,
+        #     thickness_eva=thickness_eva,
+        #     thickness_pet=thickness_pet,
+        # )
+
         moisture[i] = _calc_qss_substeps(
-            moisture=moisture[i-1],
+            moisture=moisture[i - 1],
             temperature=sample_temp[i],
             rh=rh_at_sample_temp[i],
             eq_eva_water=equilibrium_eva_water[i],
@@ -916,7 +935,8 @@ def moisture_eva_back(
             n_steps=n_steps,
         )
 
-    return moisture
+    return moisture, stable
+
 
 @njit
 def _calc_qss_substeps(
@@ -929,20 +949,48 @@ def _calc_qss_substeps(
     eq_eva_water,
     rh,
     n_steps,
-)->float:
+) -> float:
     for _ in range(20):
-        if 0 < moisture < 100: # normal case 
-            moisture = (moisture + pet_prefactor / thickness_pet * np.exp(-ea_pet / temperature) / eq_eva_water 
-                            * rh / 100 / thickness_eva * (eq_eva_water - moisture) / 24000 / n_steps)
+        if 0 < moisture < 100:  # normal case
+            moisture = (
+                moisture
+                + pet_prefactor
+                / thickness_pet
+                * np.exp(-ea_pet / temperature)
+                / eq_eva_water
+                * rh
+                / 100
+                / thickness_eva
+                * (eq_eva_water - moisture)
+                / 24000
+                / n_steps
+            )
 
-        elif rh == 0 and eq_eva_water == 0: # dry case
-            moisture = (moisture + pet_prefactor / thickness_pet * np.exp(-ea_pet / temperature) / 100 / thickness_eva 
-                            * (eq_eva_water - moisture) / 24000 / n_steps)
+        elif rh == 0 and eq_eva_water == 0:  # dry case
+            moisture = (
+                moisture
+                + pet_prefactor
+                / thickness_pet
+                * np.exp(-ea_pet / temperature)
+                / 100
+                / thickness_eva
+                * (eq_eva_water - moisture)
+                / 24000
+                / n_steps
+            )
 
-        else: # superwet case rh >= 100
-            moisture = (moisture + pet_prefactor / thickness_pet * np.exp(-ea_pet / temperature) 
-                            / eq_eva_water / thickness_eva * (eq_eva_water - moisture) / 24000 / n_steps
-                            )
+        else:  # superwet case rh >= 100
+            moisture = (
+                moisture
+                + pet_prefactor
+                / thickness_pet
+                * np.exp(-ea_pet / temperature)
+                / eq_eva_water
+                / thickness_eva
+                * (eq_eva_water - moisture)
+                / 24000
+                / n_steps
+            )
 
     return moisture
 
