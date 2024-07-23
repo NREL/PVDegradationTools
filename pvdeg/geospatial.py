@@ -5,6 +5,7 @@ Collection of classes and functions for geospatial analysis.
 from . import standards
 from . import humidity
 from . import letid
+from . import degradation
 
 import xarray as xr
 import dask.array as da
@@ -303,6 +304,17 @@ def template_parameters(func):
             "FF": ("gid", "time"),
             "Pmp": ("gid", "time"),
             "Pmp_norm": ("gid", "time"),
+        }
+
+        attrs = {}
+
+        global_attrs = {}
+
+        add_dims = {}
+
+    elif func == degradation.hydrolysis_driven_rate:
+        shapes = {
+            "k_h": ("gid",),
         }
 
         attrs = {}
