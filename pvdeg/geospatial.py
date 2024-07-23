@@ -229,7 +229,7 @@ def output_template(
         },
         coords={dim: ds_gids[dim] for dim in dims},
         attrs=global_attrs,
-    ).chunk({dim: ds_gids.chunks[dim] for dim in dims})
+    )#.chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
     return output_template
 
