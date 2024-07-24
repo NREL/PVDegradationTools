@@ -765,7 +765,6 @@ def vecArrhenius(
     poa_global_scaled = poa_global / 1000
 
     degredation = 0
-    # refactor to list comprehension approach
     for entry in range(len(poa_global_scaled)):
         degredation += (
             R0
