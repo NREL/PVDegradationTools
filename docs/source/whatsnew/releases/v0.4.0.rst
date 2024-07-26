@@ -1,0 +1,16 @@
+v0.4.0 (7-26-2024) 
+=======================
+
+Enhancements
+------------
+* symbolic equation solver for simple models.
+* notebook tutorial `Custom-Functions-Nopython.ipynb`
+
+Requirements
+------------
+* `sympy` package required for `pvdeg.symbolic` functions and notebook. Not added to dependency list.
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
+

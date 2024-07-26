@@ -18,6 +18,7 @@ from . import standards
 from . import temperature
 from . import utilities
 from . import weather
+from . import symbolic
 
 __version__ = version("pvdeg")
 

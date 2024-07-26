@@ -27,3 +27,4 @@ Modules, methods, classes and attributes are explained here.
     temperature
     utilities
     weather
+    symbolic
