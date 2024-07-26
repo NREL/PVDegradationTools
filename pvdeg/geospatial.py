@@ -312,7 +312,7 @@ def template_parameters(func):
         add_dims = {}
 
     else:
-        raise ValueError(f"No preset output template for function {func}.")
+        raise NotImplementedError(f"No preset output template for function {func}.")
 
     parameters = {
         "shapes": shapes,
