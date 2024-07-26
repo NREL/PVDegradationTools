@@ -101,7 +101,8 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     """
 
     df_weather = ds_gid.to_dataframe()
-    df_res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
+    res = func(weather_df=df_weather, meta=meta_gid, **kwargs) # this will sometimes be a dataframe already, if not -> make it a dataframe
+    df_res = res if isinstance(res, pd.DataFrame) else pd.DataFrame([res], columns=[func.__name__]) # convert numeric to dataframe
     ds_res = xr.Dataset.from_dataframe(df_res)
 
     if not df_res.index.name:
