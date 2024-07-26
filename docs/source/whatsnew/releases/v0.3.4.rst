@@ -1,0 +1,11 @@
+v0.3.4 (2024-07-26)
+=======================
+
+Bug Fixes
+---------
+* Fix incorrect keyword arguments in `pvdeg.standards.T98_estimate`
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
+

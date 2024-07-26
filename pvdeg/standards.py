@@ -504,7 +504,7 @@ def T98_estimate(
         meta=meta,
         poa=poa,
         temp_model=temp_model,
-        conf_inf=conf_inf,
+        conf=conf_inf,
         wind_factor=wind_factor,
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
@@ -517,7 +517,7 @@ def T98_estimate(
             meta=meta,
             poa=poa,
             temp_model=temp_model,
-            conf_0=conf_0,
+            conf=conf_0,
             wind_factor=wind_factor,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
