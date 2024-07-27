@@ -78,6 +78,16 @@ def start_dask(hpc=None):
 
     return client
 
+def _df_from_arbitrary(res, func):
+    if isinstance(res, pd.DataFrame):
+        return res
+    elif isinstance(res, pd.Series):
+        return pd.DataFrame(res, columns=[func.__name__])
+    elif isinstance(res, (int, float)):
+        return pd.DataFrame([res], columns=[func.__name__])
+
+    else:
+        raise NotImplementedError(f"function return type: {type(res)} not available for geospatial analysis yet.")
 
 def calc_gid(ds_gid, meta_gid, func, **kwargs):
     """
@@ -101,8 +111,8 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     """
 
     df_weather = ds_gid.to_dataframe()
-    res = func(weather_df=df_weather, meta=meta_gid, **kwargs) # this will sometimes be a dataframe already, if not -> make it a dataframe
-    df_res = res if isinstance(res, pd.DataFrame) else pd.DataFrame([res], columns=[func.__name__]) # convert numeric to dataframe
+    res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
+    df_res = _df_from_arbitrary(res, func) # convert all return types to dataframe
     ds_res = xr.Dataset.from_dataframe(df_res)
 
     if not df_res.index.name:
