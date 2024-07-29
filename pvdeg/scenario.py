@@ -21,6 +21,7 @@ from functools import partial
 import pprint
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 ### premade scenario with locations of interest. Ask Mike?
 # TODO: geospatial reset weather and addLocation from gids.
@@ -1098,8 +1099,6 @@ class GeospatialScenario(Scenario):
         self.geospatial = geospatial
         self.hpc = hpc
 
-        utilities.nrel_kestrel_check()  # remove this in the future?
-
     def __eq__(self, other):
         raise NotImplementedError("cannot directly compare geospatial scenario objects")
 
@@ -1467,9 +1466,26 @@ class GeospatialScenario(Scenario):
         self.meta_data = self.meta_data.iloc[gids]
         return
 
+    def gid_downsample(self, downsample_factor: int) -> None:
+        """
+        Downsample the NSRDB GID grid by a factor of n
+
+        Returns:
+        --------
+        None
+
+        See Also:
+        ---------
+        `pvdeg.utilities.gid_downsample`
+        """
+        self.meta_data, _ = utilities.gid_downsampling(
+            meta=self.meta_data, n=downsample_factor
+        )
+
     def gids_tonumpy(self) -> np.array:
         """
         Convert the scenario's gids to a numpy array
+
         Returns:
         --------
         gids : np.array
@@ -1480,6 +1496,7 @@ class GeospatialScenario(Scenario):
     def gids_tolist(self) -> np.array:
         """
         Convert the scenario's gids to a python list
+
         Returns:
         --------
         gids : np.array
@@ -1841,6 +1858,28 @@ class GeospatialScenario(Scenario):
 
         plt.title(f"Geographic Points with Proximity to {col_name} Highlighted")
         plt.legend()
+        plt.show()
+
+    def plot_world(
+        self,
+        data_variable: str,
+        cmap: str = "viridis",
+    ):
+
+        da = (self.results)[data_variable]
+
+        fig, ax = plt.subplots(figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+
+        da.plot(ax=ax, transform=ccrs.PlateCarree(), cmap=cmap)
+        ax.set_extent([-180, 180, -90, 90], crs=ccrs.PlateCarree())
+
+        ax.coastlines()
+        ax.add_feature(cfeature.BORDERS)
+        ax.gridlines(draw_labels=True)
+
+        ax.add_feature(cfeature.LAND)
+        ax.add_feature(cfeature.OCEAN)
+        ax.add_feature(cfeature.LAKES, edgecolor='black')
         plt.show()
 
     # test this

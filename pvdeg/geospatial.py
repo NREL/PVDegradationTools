@@ -179,8 +179,6 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
         Dataset with results for a block of gids.
     """
 
-    utilities.nrel_kestrel_check()
-
     if template is None:
         param = template_parameters(func)
         template = output_template(weather_ds, **param)
@@ -463,7 +461,7 @@ def meta_KDtree(meta_df, leaf_size=40, fp=None):
     coordinates = meta_df[['latitude', 'longitude']].values
     elevations = meta_df['altitude'].values
 
-    tree = KDTree(coordinates, leaf_size=40)
+    tree = KDTree(coordinates, leaf_size)
     
     if fp:
         dump(tree, fp)
