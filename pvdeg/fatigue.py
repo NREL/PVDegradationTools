@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 from scipy.constants import convert_temperature
-from . import temperature
+from pvdeg import temperature
+from pvdeg.decorators import geospatial_result_type
 
 
 def _avg_daily_temp_change(time_range, temp_cell):
@@ -97,18 +98,19 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     return num_changes_temp_hist
 
 
+@geospatial_result_type(0, ['damage'])
 def solder_fatigue(
-    weather_df,
-    meta,
-    time_range=None,
-    temp_cell=None,
-    reversal_temp=54.8,
-    n=1.9,
-    b=0.33,
-    C1=405.6,
-    Q=0.12,
-    wind_factor=None,
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    time_range: pd.Series = None,
+    temp_cell: pd.Series = None,
+    reversal_temp: float = 54.8,
+    n: float = 1.9,
+    b: float = 0.33,
+    C1: float = 405.6,
+    Q: float = 0.12,
+    wind_factor: float = 0.33,
+) -> float:
     """
     Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
     Damage will be returned as the rate of solder fatigue for one year. Based on:

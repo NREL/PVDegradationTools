@@ -2,9 +2,11 @@
 Collection of classes and functions for geospatial analysis.
 """
 
-from . import standards
-from . import humidity
-from . import letid
+from . import (
+    standards,
+    humidity,
+    letid,
+)
 
 import xarray as xr
 import dask.array as da
@@ -15,6 +17,8 @@ from dask.distributed import Client, LocalCluster
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
+
+from collections.abc import Callable
 
 
 def start_dask(hpc=None):
@@ -362,6 +366,23 @@ def zero_template(
 
     return res
 
+
+def auto_template(func: Callable, ds_gids: xr.Dataset)->xr.Dataset:
+
+    if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
+        raise ValueError(f"{func.__name__} cannot be autotemplated. create a template manually")
+
+    if func.numeric_or_timeseries == 0:
+        shapes = {datavar: ("gid",) for datavar in func.shape_names}
+    elif func.numeric_or_timeseries == 1:
+        shapes = {datavar: ("gid","time") for datavar in func.shape_names}
+
+    template = output_template( # zeros_template?
+        ds_gids=ds_gids,
+        shapes=shapes
+    )
+
+    return template
 
 def plot_USA(
     xr_res, cmap="viridis", vmin=None, vmax=None, title=None, cb_title=None, fp=None

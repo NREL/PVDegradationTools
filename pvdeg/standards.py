@@ -11,10 +11,12 @@ from rex import Outputs
 from pathlib import Path
 from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Union, Tuple
 
 # from gaps import ProjectPoints
 
 from pvdeg import temperature, spectral, utilities, weather
+from pvdeg.decorators import geospatial_result_type
 
 
 def eff_gap_parameters(
@@ -187,20 +189,21 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
     return x_eff
 
 
+@geospatial_result_type(0, ["x","T98_0", "T98_inf"]) # numeric result, with corresponding datavariable names
 def standoff(
-    weather_df=None,
-    meta=None,
-    weather_kwarg=None,
-    tilt=None,
-    azimuth=None,
-    sky_model="isotropic",
-    temp_model="sapm",
-    conf_0="insulated_back_glass_polymer",
-    conf_inf="open_rack_glass_polymer",
-    T98=70,  # [°C]
-    x_0=6.5,  # [cm]
-    wind_factor=0.33,
-):
+    weather_df: pd.DataFrame = None,
+    meta: dict = None,
+    weather_kwarg: dict = None,
+    tilt: Union[float, int] = None,
+    azimuth: Union[float, int] = None,
+    sky_model: str = "isotropic",
+    temp_model: str = "sapm",
+    conf_0: str = "insulated_back_glass_polymer",
+    conf_inf: str = "open_rack_glass_polymer",
+    T98: float = 70,  # [°C]
+    x_0: float = 6.5,  # [cm]
+    wind_factor: float = 0.33,
+) -> pd.DataFrame:
     """
     Calculate a minimum standoff distance for roof mounded PV systems.
     Will default to horizontal tilt. If the azimuth is not provided, it
@@ -414,6 +417,7 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
     return Output
 
 
+@geospatial_result_type(0, ["T98"])
 def T98_estimate(
     weather_df=None,
     meta=None,
