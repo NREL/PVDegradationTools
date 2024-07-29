@@ -21,12 +21,12 @@ If your variables are correlated form a list of correlations using pvdeg.monteca
 Defining Mean and Standard Deviation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Each variable passed to a Corr object in string form must have its own dictionary entry containing its mean and standard deviation in the following form.
-```
-my_dict = {
-<var_1> : {'mean' : <float>, 'stdev' : <float>}
-}
-```
-*why are there extra backticks this is upsetting*
+
+.. code-block:: Python
+
+    my_dict = {
+    <var_1> : {'mean' : <float>, 'stdev' : <float>}
+    }
 
 Generating Correlated Samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -39,13 +39,13 @@ Generating Uncorrelated Samples
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To create uncorrelated samples the ``corr`` parameter of ``pvdeg.montecarlo.generateCorrelatedSamples()`` provided with an empty list, while still providing the other arguments. like the following.  
 
-```
+.. code-block:: Python
+
     pvdeg.montecarlo.generateCorrelatedSamples(
         corr = [], 
         ...
         ...
     )
-```
 
 3rd Party Samples/Data
 ^^^^^^^^^^^^^^^^^^^^^^

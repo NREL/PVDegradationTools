@@ -3,9 +3,22 @@ Collection of classes and functions to obtain spectral parameters.
 """
 
 import pvlib
+import pandas as pd
+from pvdeg.decorators import geospatial_result_type
 
 
-def solar_position(weather_df, meta):
+@geospatial_result_type(
+    1,
+    [
+        "apparent_zenith",
+        "zenith",
+        "apparent_elevation",
+        "elevation",
+        "azimuth",
+        "equation_of_time",
+    ],
+)
+def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
     """
     Calculate solar position using pvlib based on weather data from the
     National Solar Radiation Database (NSRDB) for a given location (gid).
@@ -14,7 +27,7 @@ def solar_position(weather_df, meta):
     ----------
     weather_df : pandas.DataFrame
         Weather data for given location.
-    meta : pandas.Series
+    meta : dict
         Meta data of location.
 
     Returns
@@ -41,9 +54,24 @@ def solar_position(weather_df, meta):
     return solar_position
 
 
+@geospatial_result_type(
+    1,
+    [
+        "poa_global",
+        "poa_direct",
+        "poa_diffuse",
+        "poa_sky_diffuse",
+        "poa_ground_diffuse",
+    ],
+)
 def poa_irradiance(
-    weather_df, meta, sol_position=None, tilt=None, azimuth=None, sky_model="isotropic"
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    sol_position=None,
+    tilt=None,
+    azimuth=None,
+    sky_model="isotropic",
+) -> pd.DataFrame:
     """
     Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
     National Solar Radiation Database (NSRDB) for a given location (gid).

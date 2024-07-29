@@ -1,5 +1,4 @@
-"""Collection of functions for degradation calculations.
-"""
+"""Collection of functions for degradation calculations."""
 
 import numpy as np
 import pandas as pd
@@ -8,10 +7,13 @@ from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Union
 
 from . import temperature
 from . import spectral
 from . import weather
+
+from pvdeg.decorators import geospatial_result_type
 
 # TODO: Clean up all those functions and add gaps functionality
 
@@ -97,7 +99,7 @@ def _acceleration_factor(numerator, denominator):
 
 
 def vantHoff_deg(
-    weather_df, meta, I_chamber, temp_chamber, poa=None, temp=None, p=0.5, Tf=1.41
+    weather_df: pd.DataFrame, meta: dict, I_chamber, temp_chamber, poa=None, temp=None, p=0.5, Tf=1.41
 ):
     """
     Van't Hoff Irradiance Degradation
@@ -177,7 +179,16 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-def IwaVantHoff(weather_df, meta, poa=None, temp=None, Teq=None, p=0.5, Tf=1.41):
+@geospatial_result_type(0,["Iwa"])
+def IwaVantHoff(
+    weather_df: pd.DataFrame,
+    meta: dict,
+    poa: Union[pd.Series, pd.DataFrame] = None,
+    temp=None,
+    Teq=None,
+    p=0.5,
+    Tf=1.41,
+):
     """
     IWa : Environment Characterization [W/m²]
     For one year of degredation the controlled environmnet lamp settings will
@@ -299,8 +310,8 @@ def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
 
 
 def arrhenius_deg(
-    weather_df,
-    meta,
+    weather_df: pd.DataFrame,
+    meta: dict,
     rh_outdoor,
     I_chamber,
     rh_chamber,
@@ -463,17 +474,17 @@ def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
 # TODO:   CHECK
 # STANDARDIZE
 def IwaArrhenius(
-    weather_df,
-    meta,
-    rh_outdoor,
-    Ea,
-    poa=None,
-    temp=None,
-    RHwa=None,
-    Teq=None,
-    p=0.5,
-    n=1,
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    rh_outdoor: pd.Series,
+    Ea: float,
+    poa: pd.DataFrame = None,
+    temp: pd.Series = None,
+    RHwa: float = None,
+    Teq: float = None,
+    p: float = 0.5,
+    n: float = 1,
+) -> float:
     """
     Function to calculate IWa, the Environment Characterization [W/m²].
     For one year of degredation the controlled environmnet lamp settings will
@@ -643,8 +654,16 @@ def _gJtoMJ(gJ):
 
 
 def degradation(
-    spectra, rh_module, temp_module, wavelengths, Ea=40.0, n=1.0, p=0.5, C2=0.07, C=1.0
-):
+    spectra: pd.Series,
+    rh_module: pd.Series,
+    temp_module: pd.Series,
+    wavelengths: Union[int, np.ndarray[float]],
+    Ea: float = 40.0,
+    n: float = 1.0,
+    p: float = 0.5,
+    C2: float = 0.07,
+    C: float = 1.0,
+) -> float:
     """
     Compute degredation as double integral of Arrhenius (Activation
     Energy, RH, Temperature) and spectral (wavelength, irradiance)

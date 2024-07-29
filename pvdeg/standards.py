@@ -19,6 +19,7 @@ from pvdeg import temperature, spectral, utilities, weather
 from pvdeg.decorators import geospatial_result_type
 
 
+@geospatial_result_type(1, ["T_0", "T_inf", "poa"])
 def eff_gap_parameters(
     weather_df=None,
     meta=None,

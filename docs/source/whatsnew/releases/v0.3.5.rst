@@ -7,5 +7,5 @@ Enhancements
 
 Contributors
 ~~~~~~~~~~~~
-* Martin Springer (:ghuser:`tobin-ford`)
+* Tobin Ford (:ghuser:`tobin-ford`)
 
