@@ -56,13 +56,12 @@ def linear_ramp_time(
     return np.abs(time)
 
 
-# TODO: make this work with instant rate (use 0 for this)
 def fill_linear_region(
     step_time: Union[int, float],
-    step_time_resolution: Union[int, float],
-    set_0: Union[int, float],
-    set_f: Union[int, float],
-    rate: Union[int, float],
+    step_time_resolution: float,
+    set_0: float,
+    set_f: float,
+    rate: float,
 ) -> np.array:
     """
     Populate a setpoint timeseries of chamber setpoints with variable ramp rates.
@@ -125,7 +124,6 @@ def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-# instant change or linear change
 def _apply_fill_linear_region(
     row,
     column_name: str,
@@ -143,7 +141,7 @@ def _apply_fill_linear_region(
 
     values = fill_linear_region(
         step_time=row["step_length"],
-        step_time_resolution=row["time_resolution"],
+        step_time_resolution=(row["step_length"] / row["step_divisions"]), # find the time resolution for within the step
         set_0=row[f"previous_{column_name}"],
         set_f=row[column_name],
         rate=row[f"{column_name}_ramp"],
@@ -211,12 +209,12 @@ def chamber_set_points_timeseries(
     setpoints_series = pd.Series()
 
     for index, row in setpoints_np_series.items():
-        # if row.any(): # maybe failing because of zeros
         if row.size > 0:
             new_index = series_index(
                 start_time=df.loc[index, "start_time"],
                 step_length=df.loc[index, "step_length"],
-                resoultion=df.loc[index, "time_resolution"],
+                # resoultion=df.loc[index, "time_resolution"], # we dont just want the resoultion
+                resoultion=(df.loc[index, "step_length"] / df.loc[index, "step_divisions"]),
             )
             setpoints_series[index] = pd.Series(row, index=new_index)
 
