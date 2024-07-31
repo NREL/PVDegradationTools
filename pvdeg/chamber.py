@@ -1,6 +1,17 @@
 import pandas as pd
 import numpy as np
 from numba import njit
+from pvdeg.temperature import fdm_temperature
+from typing import Union
+import json
+import os
+import matplotlib.pyplot as plt
+
+from pvdeg import (
+    humidity,
+    utilities,
+    DATA_DIR,
+)
 
 
 def start_times(df: pd.DataFrame) -> pd.DataFrame:
@@ -260,3 +271,225 @@ def setpoints_timeseries_from_csv(
     timeseries_setpoints.index = timedeltas_index
 
     return timeseries_setpoints
+
+
+# @njit
+def _temp_calc(temps: np.ndarray, times: np.ndarray, tau: float, temp_0: float):
+    res = np.empty_like(temps)
+    res[0] = temp_0
+
+    for i in range(0, temps.shape[0] - 1):
+        delta_t = times[i + 1] - times[i]
+        delta_t = delta_t.astype("timedelta64[m]").astype(int)
+
+        res[i + 1] = fdm_temperature(
+            t_current=res[i],
+            t_set=temps[i + 1],
+            delta_time=delta_t,
+            tau=tau,
+        )
+
+    return res
+
+
+# calculate the air temperature in a chamber using finite difference method
+def air_temperature(
+    setpoints_df: pd.DataFrame, tau_c: float, air_temp_0: float
+) -> np.ndarray:
+    air_temp = _temp_calc(
+        temps=setpoints_df["temperature"].to_numpy(),
+        times=setpoints_df.index.to_numpy(),
+        tau=tau_c,
+        temp_0=air_temp_0,
+    )
+
+    return pd.Series(air_temp, index=setpoints_df.index)
+
+
+def sample_temperature(
+    setpoints_df: pd.DataFrame,
+    air_temperature: Union[pd.Series, np.ndarray],
+    tau_s: float,
+    sample_temp_0: float,
+) -> np.ndarray:
+    if isinstance(air_temperature, pd.Series):
+        air_temperature = air_temperature.to_numpy()
+
+    if not isinstance(air_temperature, np.ndarray):
+        raise ValueError("Air_temperature must be a numpy array or pandas series")
+
+    sample_temp = _temp_calc(
+        temps=air_temperature,
+        times=setpoints_df.index.to_numpy(),
+        tau=tau_s,
+        temp_0=sample_temp_0,
+    )
+
+    return pd.Series(sample_temp, index=setpoints_df.index)
+
+
+
+# @njit
+def _calc_water_vap_pres(temp_numpy: np.ndarray, rh_numpy: np.ndarray) -> np.ndarray:
+    water_vap_pres = np.empty_like(temp_numpy)
+
+    for i in range(water_vap_pres.shape[0]):
+        water_vap_pres[i] = humidity.water_vapor_pressure(temp=temp_numpy[i], rh=rh_numpy[i])
+
+    return water_vap_pres
+
+@njit
+def _calc_rh(
+    temp_set: np.ndarray[float],
+    rh_set: np.ndarray[float],
+    sample_temp: np.ndarray[float],
+) -> np.ndarray[float]:
+    rh = np.empty_like(sample_temp)
+
+    for i in range(sample_temp.shape[0]):
+        rh[i] = humidity.rh_at_sample_temperature(
+            temp_set=temp_set[i], rh_set=rh_set[i], sample_temp=sample_temp[i]
+        )
+    return rh
+
+
+
+class Sample:
+    def __init__(
+        self,
+        backsheet=None,
+        backsheet_thickness=None,
+        encapsulant=None,
+        encapsulant_thickness=None,
+    ):
+        f = open(os.path.join(DATA_DIR, "materials.json"))
+        self.materials = json.load(f)
+
+        if backsheet:
+            self.setBacksheet(backsheet, backsheet_thickness)
+
+        if encapsulant:
+            self.setEncapsulant(encapsulant_thickness)
+
+    def setEncapsulant(self, id: str, thickness):
+        """
+        Set encapsulant diffusivity activation energy, prefactor and solubility activation energy, prefactor.
+
+        Activation Energies will be in kJ/mol
+
+        Parameters:
+        -----------
+        id: str
+            name of material from `PVDegradationTools/data/materials.json`
+        thickness: float
+            thickness of encapsulant [mm]
+        """
+        self.diffusivity_encap_ea = (self.materials)[id]["Ead"]
+        self.diffusivity_encap_pre = (self.materials)[id]["Do"]
+        self.solubility_encap_ea = (self.materials)[id]["Eas"]
+        self.solubility_encap_pre = (self.materials)[id]["So"]
+        self.encap_thickness = thickness
+
+    def setBacksheet(self, id: str, thickness):
+        """
+        Set backsheet permiability activation energy and prefactor.
+        
+        Activation Energies will be in kJ/mol
+
+        Parameters:
+        -----------
+        id: str
+            name of material from `PVDegradationTools/data/materials.json`
+        thickness: float
+            thickness of backsheet [mm]
+        """
+        self.permiability_back_ea = (self.materials)[id]["Eap"]
+        self.permiability_back_pre = (self.materials)[id]["Po"]
+        self.back_thickness = thickness
+
+
+class Chamber(Sample):
+    def __init__(self, fp: str = None, setpoint_names: list[str] = None, **kwargs):
+        super().__init__()
+        self.setpoint_timeseries(fp, setpoint_names=setpoint_names, **kwargs)
+
+    def setpoint_timeseries(self, fp: str, setpoint_names: list[str] = None, **kwargs) -> None:
+        self.setpoints = setpoints_timeseries_from_csv(fp, setpoint_names, **kwargs)
+
+    def plot_setpoints(self) -> None:
+        self.setpoints.plot(title="Chamber Setpoints")
+        
+    def calc_temperatures(self, air_temp_0, sample_temp_0, tau_c, tau_s):
+        self.air_temperature = air_temperature(
+            self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
+        )
+        self.sample_temperature = sample_temperature(
+            self.setpoints,
+            tau_s=tau_s,
+            air_temperature=self.air_temperature,
+            sample_temp_0=sample_temp_0,
+        )
+    
+    def plot_temperatures(self):
+        self.air_temperature.plot(label="air temperature")
+        self.sample_temperature.plot(label="sample temperature")
+        plt.legend()
+
+    def calc_water_vapor_pressure(self): # vectorized
+        res = humidity.water_vapor_pressure(
+            self.air_temperature.to_numpy(dtype=np.float64),
+            self.setpoints['relative_humidity'].to_numpy(dtype=np.float64)
+        )
+        self.water_vapor_pressure = pd.Series(res, index=self.setpoints.index)
+
+    def calc_sample_relative_humidity(self): # vectorized
+        res = humidity.rh_at_sample_temperature(
+            self.air_temperature.to_numpy(dtype=np.float64), # C
+            self.setpoints['relative_humidity'].to_numpy(dtype=np.float64), # %
+            self.sample_temperature.to_numpy(dtype=np.float64), # C
+        )
+        self.sample_relative_humidity = pd.Series(res, index=self.setpoints.index)
+
+    def calc_equilibrium_ecapsulant_water(self):
+        res = humidity.equilibrium_eva_water(
+            self.sample_temperature.to_numpy(dtype=np.float64), # C
+            self.sample_relative_humidity.to_numpy(np.float64), # %
+            utilities.kj_mol_to_ev(self.solubility_encap_ea), # kJ/mol -> eV
+            self.solubility_encap_pre, # cm^2/s
+        )
+        self.equilibrium_encapsulant_water = pd.Series(res, index=self.setpoints.index)
+        
+    def calc_back_encapsulant_moisture(self, n_steps: int = 20):
+        res, _ = humidity.moisture_eva_back(
+            eva_moisture_0=self.equilibrium_encapsulant_water.iloc[0],
+            sample_temp=self.sample_temperature,
+            rh_at_sample_temp=self.sample_relative_humidity,
+            equilibrium_eva_water=self.equilibrium_encapsulant_water,
+            pet_permiability=utilities.kj_mol_to_ev(self.permiability_back_ea), # kJ/mol -> eV
+            pet_prefactor=self.permiability_back_pre, 
+            thickness_eva=self.encap_thickness, # mm
+            thickness_pet=self.back_thickness, # mm
+            n_steps=n_steps
+        )
+
+        self.back_encapsulant_moisture = pd.Series(res, index=self.setpoints.index)
+    
+    def calc_relative_humidity_internal_on_back_of_cells(self):
+        res = humidity.rh_internal_cell_backside(
+            back_eva_moisture=self.back_encapsulant_moisture.to_numpy(dtype=np.float64),
+            equilibrium_eva_water=self.equilibrium_encapsulant_water.to_numpy(dtype=np.float64),
+            rh_at_sample_temp=self.sample_relative_humidity.to_numpy(dtype=np.float64)
+        )
+        self.relative_humidity_internal_on_back_of_cells = pd.Series(res, self.setpoints.index)
+
+    def calc_dew_point(self):
+        res = humidity.chamber_dew_point_from_vapor_pressure(
+            self.water_vapor_pressure.to_numpy(dtype=np.float64)
+            )
+        self.dew_point = pd.Series(res, self.setpoints.index)
+        
+    def sample_conditions(self) -> pd.DataFrame:
+        ...
+        
+    def chamber_conditions(self) -> pd.DataFrame:
+        ...

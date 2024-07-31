@@ -447,14 +447,14 @@ def _calc_dew_point(water_vap_pres_numpy: np.ndarray) -> np.ndarray:
 
 # tau and times should both be in minutes
 # this cannot be vectorized but the others could
-def _calc_sample_temperature(
-    irradiance_340: np.ndarray[float],
-    temp_set: np.ndarray[float],
-    times: np.ndarray[np.timedelta64],
-    tau: float,
-    chamber_irrad_0: float,
-    sample_temp_0: float,
-) -> np.ndarray[float]:
+# def _calc_sample_temperature(
+#     irradiance_340: np.ndarray[float],
+#     temp_set: np.ndarray[float],
+#     times: np.ndarray[np.timedelta64],
+#     tau: float,
+#     chamber_irrad_0: float,
+#     sample_temp_0: float,
+# ) -> np.ndarray[float]:
     """
     Apply finite difference temperatures to chamber conditions.
 
@@ -462,45 +462,45 @@ def _calc_sample_temperature(
     -----------
     irradiance_340: np.ndarray[float]
         UV irradiance [W/m^2/nm at 340 nm]
-    temp_set: np.ndarray[float]
-        chamber temperature setpoint
-    times: np.ndarray[float]
-        length of timestep [min]
-    tau: float
-        Characteristic thermal equilibration time [min]
-    chamber_irrad_0: float
-        inital chamber UV irradiance [W/m^2/nm at 340 nm]
-    sample_temp_0: float
-        intial sample temperature [C]
+    # temp_set: np.ndarray[float]
+    #     chamber temperature setpoint
+    # times: np.ndarray[float]
+    #     length of timestep [min]
+    # tau: float
+    #     Characteristic thermal equilibration time [min]
+    # chamber_irrad_0: float
+    #     inital chamber UV irradiance [W/m^2/nm at 340 nm]
+    # sample_temp_0: float
+    #     intial sample temperature [C]
 
-    Returns:
-    --------
-    sample_temperatures: np.ndarray[float]
-        array of sample temperatures
+    # Returns:
+    # --------
+    # sample_temperatures: np.ndarray[float]
+    #     array of sample temperatures
 
-    """
+    # """
 
-    previous_times = _shift(times, 1)
-    differences = np.subtract(times, previous_times)
-    minute_times = differences.astype(
-        "timedelta64[m]"
-    ).astype(
-        int
-    )  # do we want to do this, they might be in minutes already so we can drop this part
+    # previous_times = _shift(times, 1)
+    # differences = np.subtract(times, previous_times)
+    # minute_times = differences.astype(
+    #     "timedelta64[m]"
+    # ).astype(
+    #     int
+    # )  # do we want to do this, they might be in minutes already so we can drop this part
 
-    sample_temperatures = np.empty_like(minute_times)
+    # sample_temperatures = np.empty_like(minute_times)
 
-    sample_temperatures[0] = sample_temp_0
-    irradiance_340[0] = chamber_irrad_0
+    # sample_temperatures[0] = sample_temp_0
+    # irradiance_340[0] = chamber_irrad_0
 
-    for i in range(1, minute_times.shape[0]):
-        sample_temperatures[i] = chamber_sample_temperature(
-            irradiance_340=irradiance_340[i],
-            previous_sample_temp=sample_temperatures[i - 1],
-            temp_set=temp_set[i],
-            delta_t=minute_times[i],
-            tau=tau,
-        )
+    # for i in range(1, minute_times.shape[0]):
+    #     sample_temperatures[i] = chamber_sample_temperature(
+    #         irradiance_340=irradiance_340[i],
+    #         previous_sample_temp=sample_temperatures[i - 1],
+    #         temp_set=temp_set[i],
+    #         delta_t=minute_times[i],
+    #         tau=tau,
+    #     )
 
     return sample_temperatures
 

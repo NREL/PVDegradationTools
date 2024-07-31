@@ -253,3 +253,28 @@ def chamber_sample_temperature(
             )
 
     return sample_temp
+
+# @njit
+def fdm_temperature(t_current: float, t_set: float, delta_time: float, tau: float):
+    """
+    Calculate next timestep of temperature using finite difference method. 
+
+    Parameters:
+    -----------
+    t_current: float
+        current temperature [C]
+    t_set: float
+        temperature we are approaching [C]
+    delta_time: float
+        length of timestep, units should match time unit of tau [time]
+    tau: float
+        thermal equilibration time, units should match time unit of delta_time [time]
+
+    Returns:
+    --------
+    t_next: float
+        temperature at next timestep [C]
+    """
+
+    t_next = t_current + (t_set - t_current) * (1 - np.exp( (-delta_time) / (tau) ))
+    return t_next

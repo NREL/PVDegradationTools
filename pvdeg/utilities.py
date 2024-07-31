@@ -8,6 +8,7 @@ from typing import Callable
 import math
 from numba import njit
 
+
 def gid_downsampling(meta, n):
     """
     Downsample the NSRDB GID grid by a factor of n
@@ -267,20 +268,24 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
             dtype=np.int64,
         )
 
-def _shift(arr, num, fill_value=np.timedelta64(0,'m')):
+
+def _shift(arr, num, fill_value=np.timedelta64(0, "m")):
     """
-    Fast numpy shift. 
+    Fast numpy shift.
     """
     result = np.empty_like(arr)
     if num > 0:
         result[:num] = fill_value
         result[num:] = arr[:-num]
     elif num < 0:
-        result[num:] = fill_value # mad bceause cant fill nan into a timdelta homogenous array, what is a workaround??? 0 values are not valid
+        result[num:] = (
+            fill_value  # mad bceause cant fill nan into a timdelta homogenous array, what is a workaround??? 0 values are not valid
+        )
         result[:num] = arr[-num:]
     else:
         result[:] = arr
     return result
+
 
 def _read_material(name, fname="materials.json"):
     """
@@ -435,13 +440,8 @@ def ts_gid_df(file, gid):
 
 
 def tilt_azimuth_scan(
-    weather_df=None, 
-    meta=None, 
-    tilt_step=5, 
-    azimuth_step=5, 
-    func=Callable, 
-    **kwarg
-    ):
+    weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
+):
     """
     Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
 
@@ -490,12 +490,34 @@ def tilt_azimuth_scan(
     print("\r", end="")
     return tilt_azimuth_series
 
-def plot_water_2d(water:np.ndarray[float]):
+
+def plot_water_2d(water: np.ndarray[float]):
     """
     Plot a heatmap of water module using a 2d numpy array.
     """
     import matplotlib.pyplot as plt
-    plt.matshow(water, cmap='viridis', vmin=-10, vmax=np.max(water)) # dont try to make triangular.
+
+    plt.matshow(
+        water, cmap="viridis", vmin=-10, vmax=np.max(water)
+    )  # dont try to make triangular.
     plt.title("Water in Module Nodes")
     plt.colorbar()
     plt.show()
+
+
+def kj_mol_to_ev(energy: float) -> float:
+    """
+    Convert Energy from kJ/mol to eV
+
+    Parameters:
+    -----------
+    energy: float
+        energy [kJ/mol]
+
+    Returns:
+    --------
+    energy: float
+        energy [eV]
+    """
+
+    return energy / 96.485

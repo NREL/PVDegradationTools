@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit
+from numba import jit, njit, vectorize, guvectorize, float64
 from typing import Union
 
 from . import temperature
@@ -771,9 +771,7 @@ def module(
     return results
 
 
-# check these constants and update docstring
-# come from Kats Profile in kempe spreadsheet
-@njit
+@vectorize(['float64(float64, float64)'], nopython=True)
 def water_vapor_pressure(
     temp: float,
     rh: float,
@@ -809,15 +807,17 @@ def water_vapor_pressure(
 
     return water_vapor_pressure
 
-# @njit
+
+# need to modify in place
+# this is badly behaving, returning zeros
 def equilibrium_eva_water(
-    sample_temp: Union[float, np.ndarray],
-    rh_at_sample_temp: Union[float, np.ndarray],
+    sample_temp: np.ndarray,
+    rh_at_sample_temp: np.ndarray,
     eva_solubility: float,
     solubility_prefactor: float,
-) -> Union[float, np.ndarray[float]]:
+):
     """
-    Calculate Equlibirum EVA H20 content [g/cm^3]
+    Calculate Equlibirum EVA H20 content [g/cm^3]. Modify `result` array in place.
 
     Parameters:
     -----------
@@ -871,7 +871,9 @@ def _stable_min_steps(
     we want a value of < 0.25 to maintain stability within the solution
     """
     numerator = (
-        (backsheet_moisture + pet_prefactor * np.exp((-ea_pet / temperature))) # temperature needs to me in Kelvin
+        (
+            backsheet_moisture + pet_prefactor * np.exp((-ea_pet / temperature))
+        )  # temperature needs to me in Kelvin
         * relative_humidity
         / 100
     )
@@ -893,7 +895,6 @@ def moisture_eva_back(
     thickness_pet: float,
     n_steps: int,
 ) -> np.ndarray:
-
     if isinstance(sample_temp, pd.Series):
         sample_temp = sample_temp.to_numpy()
     if isinstance(rh_at_sample_temp, pd.Series):
@@ -910,7 +911,6 @@ def moisture_eva_back(
     stable = np.zeros_like(sample_temp)
 
     for i in range(1, sample_temp.shape[0]):
-        
         # stable[i] = _stable_min_steps(
         #     delta_t=1, # 1 min,
         #     backsheet_moisture=moisture[i-1],
@@ -1082,7 +1082,8 @@ def chamber_dew_point_from_t_rh(
     return dew_point
 
 
-@njit
+# @njit
+@vectorize(['float64(float64, float64, float64)'], nopython=True)
 def rh_at_sample_temperature(
     temp_set: float,
     rh_set: float,
@@ -1135,65 +1136,120 @@ def rh_at_sample_temperature(
 
     return rh
 
-def _calc_diff_substeps(water_new, water_old, n_steps, t, delta_t, dis, delta_dis, Fo)->None: # inplace
+
+def _calc_diff_substeps(
+    water_new, water_old, n_steps, t, delta_t, dis, delta_dis, Fo
+) -> None:  # inplace
     water_copy = water_old.copy()
 
-    for _ in range(n_steps): 
+    for _ in range(n_steps):
         for y in range(1, water_new.shape[0] - 1):
             # update the edge
-            water_copy[0,:] = dis
-            water_new[0,:] = dis + delta_dis # one further, do we want this?
-            
-            water_new[-1,-1] = Fo * (water_copy[-2,-1] * 4) + (1 - 4 * Fo) * water_copy[-1,-1] # inner node
-            
-            water_new[y,-1] = Fo * (water_copy[y+1,-1] + water_copy[y-1,-1] + 2 * water_copy[y,-2]) + (1 - 4 * Fo) * water_copy[y,-1] # internal edge
+            water_copy[0, :] = dis
+            water_new[0, :] = dis + delta_dis  # one further, do we want this?
 
-            for x in range(y+1, water_copy.shape[1] - 1): 
-                neighbor_sum = (
-                    water_copy[y-1, x] +
-                    water_copy[y+1, x] +
-                    water_copy[y, x-1] +
-                    water_copy[y, x+1]
+            water_new[-1, -1] = (
+                Fo * (water_copy[-2, -1] * 4) + (1 - 4 * Fo) * water_copy[-1, -1]
+            )  # inner node
+
+            water_new[y, -1] = (
+                Fo
+                * (
+                    water_copy[y + 1, -1]
+                    + water_copy[y - 1, -1]
+                    + 2 * water_copy[y, -2]
                 )
-                water_new[y,x] = Fo * neighbor_sum + (1 - 4 * Fo) * water_copy[y, x] # central nodes
+                + (1 - 4 * Fo) * water_copy[y, -1]
+            )  # internal edge
 
-            water_new[y,y] = Fo * (2 * water_copy[y-1, y] + 2 * water_copy[y, y+1]) + (1 - 4 * Fo) * water_copy[y,y] # diagonal
+            for x in range(y + 1, water_copy.shape[1] - 1):
+                neighbor_sum = (
+                    water_copy[y - 1, x]
+                    + water_copy[y + 1, x]
+                    + water_copy[y, x - 1]
+                    + water_copy[y, x + 1]
+                )
+                water_new[y, x] = (
+                    Fo * neighbor_sum + (1 - 4 * Fo) * water_copy[y, x]
+                )  # central nodes
+
+            water_new[y, y] = (
+                Fo * (2 * water_copy[y - 1, y] + 2 * water_copy[y, y + 1])
+                + (1 - 4 * Fo) * water_copy[y, y]
+            )  # diagonal
 
             dis += delta_dis
-            t += delta_t # do we need this one, temperature is not used anywhere?
+            t += delta_t  # do we need this one, temperature is not used anywhere?
 
-            water_copy = water_new.copy() # update copy so we can continue updating it
+            water_copy = water_new.copy()  # update copy so we can continue updating it
+
 
 def module_front(
     chamber_properties: pd.DataFrame,
-    p = 0.1, # [cm] perimiter area
-    CW = 15.6, # [cm] cell dimensions
-    nodes = 20, # number of nodes on each axis, square cell only
-    eva_diffusivity_ea = 0.395292897, # eV
-    Dif = 2.31097881676966, # cm^2/s diffusivity prefactor
-    n_steps = 20, # number of substeps
-    )-> np.ndarray:
+    p=0.1,  # [cm] perimiter area
+    CW=15.6,  # [cm] cell dimensions
+    nodes=20,  # number of nodes on each axis, square cell only
+    eva_diffusivity_ea=0.395292897,  # eV
+    Dif=2.31097881676966,  # cm^2/s diffusivity prefactor
+    n_steps=20,  # number of substeps
+) -> np.ndarray:
+    """
+    Calculate water intrusion into the front of the module using 2 dimensional finite difference method.
 
-    EaD = eva_diffusivity_ea / 0.0000861733241 # k in [eV/K]
-    W = ((CW + 2 * p) / 2) / nodes # 
+    Parameters:
+    -----------
+    chamber_properties: pd.DataFrame
+        dataframe containing a timedelta index with the column names as follows
+        >>> ["backsheet_moisture", "sample_temperature", "backsheet_moisture"]
+
+    p: float
+        cell perimiter area [cm]
+    CW: float
+        cell edge dimension, only supports square modules [cm]
+    nodes: int
+        number of nodes to split each axis into for finite difference method analysis. higher is more accurate but slower. [unitless]
+    eva_diffusivity_ea: float
+        encapsulant diffusion activation energy [eV]
+    Dif: float
+        prefactor encapsulant diffusion [cm^2/s]
+    n_steps: int
+        number of stubsteps to calculate for numerical stability. 4-5 works for most cases but quick changes error can accumulate quickly so 20 is a good value for numerical safety.
+    """
+
+    EaD = eva_diffusivity_ea / 0.0000861733241  # k in [eV/K]
+    W = ((CW + 2 * p) / 2) / nodes  #
 
     # two options, we can have a 3d array that stores all timesteps
     results = np.zeros((chamber_properties.shape[0] + 1, nodes, nodes))
-    results[0, 0, :] = chamber_properties['backsheet_moisture'].iloc[0]
+    results[0, 0, :] = chamber_properties["backsheet_moisture"].iloc[0]
 
-    for i in range(chamber_properties.shape[0] - 1): # loop over each entry the the results 
+    for i in range(
+        chamber_properties.shape[0] - 1
+    ):  # loop over each entry the the results
+        Temperature = chamber_properties["sample_temperature"].iloc[i]
+        DTemperature = (
+            chamber_properties["sample_temperature"].iloc[i + 1]
+            - chamber_properties["sample_temperature"].iloc[i]
+        )
+        Disolved = chamber_properties["backsheet_moisture"].iloc[i]
+        DDisolved = (
+            chamber_properties["backsheet_moisture"].iloc[i + 1]
+            - chamber_properties["backsheet_moisture"].iloc[i]
+        )
 
-        Temperature = chamber_properties['sample_temperature'].iloc[i]
-        DTemperature = chamber_properties['sample_temperature'].iloc[i+1] - chamber_properties['sample_temperature'].iloc[i] 
-        Disolved = chamber_properties['backsheet_moisture'].iloc[i]
-        DDisolved = chamber_properties['backsheet_moisture'].iloc[i+1] - chamber_properties['backsheet_moisture'].iloc[i]
-
-        time_step = (chamber_properties.index.values[i+1] - chamber_properties.index.values[i]).astype('timedelta64[s]').astype(int) # timestep in units of seconds
+        time_step = (
+            (
+                chamber_properties.index.values[i + 1]
+                - chamber_properties.index.values[i]
+            )
+            .astype("timedelta64[s]")
+            .astype(int)
+        )  # timestep in units of seconds
         Fo = Dif * np.exp(-EaD / (273.15 + Temperature)) * time_step / (W * W)
 
         _calc_diff_substeps(
-            water_new=results[i+1,:,:],
-            water_old=results[i,:,:],
+            water_new=results[i + 1, :, :],
+            water_old=results[i, :, :],
             n_steps=n_steps,
             t=Temperature,
             delta_t=DTemperature,
