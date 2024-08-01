@@ -13,7 +13,7 @@ with open(os.path.join(TEST_DATA_DIR, "summit-weather.pkl"), "rb") as f:
     GEO_WEATHER = pickle.load(f)
 
 HUMIDITY_TEMPLATE = xr.open_dataset(
-    os.path.join(TEST_DATA_DIR, "humidity_template.nc")
+    os.path.join(TEST_DATA_DIR, "humidity_template.nc"), engine='h5netcdf'
 ).compute()
 
 
