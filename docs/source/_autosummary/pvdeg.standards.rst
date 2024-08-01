@@ -19,9 +19,12 @@ pvdeg.standards
       :nosignatures:
 
       
-      pvdeg.standards.calc_standoff
+      pvdeg.standards.T98_estimate
       pvdeg.standards.eff_gap
-      pvdeg.standards.run_calc_standoff
+      pvdeg.standards.eff_gap_parameters
+      pvdeg.standards.interpret_standoff
+      pvdeg.standards.standoff
+      pvdeg.standards.standoff_x
 
    
    
@@ -37,11 +40,11 @@ pvdeg.standards
 
    
 
-   .. autofunction:: calc_standoff
+   .. autofunction:: T98_estimate
 
-   .. _sphx_glr_backref_pvdeg.standards.calc_standoff:
+   .. _sphx_glr_backref_pvdeg.standards.T98_estimate:
 
-   .. minigallery:: pvdeg.standards.calc_standoff
+   .. minigallery:: pvdeg.standards.T98_estimate
        :add-heading:
 
    .. autofunction:: eff_gap
@@ -51,11 +54,32 @@ pvdeg.standards
    .. minigallery:: pvdeg.standards.eff_gap
        :add-heading:
 
-   .. autofunction:: run_calc_standoff
+   .. autofunction:: eff_gap_parameters
 
-   .. _sphx_glr_backref_pvdeg.standards.run_calc_standoff:
+   .. _sphx_glr_backref_pvdeg.standards.eff_gap_parameters:
 
-   .. minigallery:: pvdeg.standards.run_calc_standoff
+   .. minigallery:: pvdeg.standards.eff_gap_parameters
+       :add-heading:
+
+   .. autofunction:: interpret_standoff
+
+   .. _sphx_glr_backref_pvdeg.standards.interpret_standoff:
+
+   .. minigallery:: pvdeg.standards.interpret_standoff
+       :add-heading:
+
+   .. autofunction:: standoff
+
+   .. _sphx_glr_backref_pvdeg.standards.standoff:
+
+   .. minigallery:: pvdeg.standards.standoff
+       :add-heading:
+
+   .. autofunction:: standoff_x
+
+   .. _sphx_glr_backref_pvdeg.standards.standoff_x:
+
+   .. minigallery:: pvdeg.standards.standoff_x
        :add-heading:
    
    
