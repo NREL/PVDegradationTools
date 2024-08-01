@@ -7,6 +7,7 @@ from pvdeg import DATA_DIR
 from typing import Callable
 import inspect
 import math
+import xarray as xr
 
 
 def gid_downsampling(meta, n):
@@ -471,3 +472,32 @@ def tilt_azimuth_scan(
     print("\r                     ", end="")
     print("\r", end="")
     return tilt_azimuth_series
+
+def compare_templates(ds1: xr.Dataset, ds2: xr.Dataset, atol=1e-10, consider_nan_equal=True) -> bool:
+    """Compare loaded datasets with "empty-like" values"""
+
+    if ds1.dims != ds2.dims:
+        return False
+
+    if set(ds1.coords.keys()) != set(ds2.coords.keys()):
+        return False
+
+    for coord in ds1.coords:
+        if ds1.coords[coord].dtype.kind in {'i', 'f'}:
+            if not np.allclose(ds1.coords[coord], ds2.coords[coord], atol=atol): # Use np.allclose for numeric coordinates
+                return False
+        elif ds1.coords[coord].dtype.kind == 'M': # datetime64
+            if not np.array_equal(ds1.coords[coord], ds2.coords[coord]): # Use array equality for datetime coordinates
+                return False
+        else:
+            if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
+                return False
+
+    if set(ds1.data_vars.keys()) != set(ds2.data_vars.keys()):
+        return False
+
+    for dim in ds1.dims:
+        if not ds1.indexes[dim].equals(ds2.indexes[dim]):
+            return False
+
+    return True
