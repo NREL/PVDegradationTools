@@ -1185,7 +1185,9 @@ def _calc_diff_substeps(
 
 
 def module_front(
-    chamber_properties: pd.DataFrame,
+    time_index: pd.Index, # pandas index containing np.timedelta64
+    backsheet_moisture: pd.Series, # g/m^3
+    sample_temperature: pd.Series, # K
     p=0.1,  # [cm] perimiter area
     CW=15.6,  # [cm] cell dimensions
     nodes=20,  # number of nodes on each axis, square cell only
@@ -1198,10 +1200,12 @@ def module_front(
 
     Parameters:
     -----------
-    chamber_properties: pd.DataFrame
-        dataframe containing a timedelta index with the column names as follows
-        >>> ["backsheet_moisture", "sample_temperature", "backsheet_moisture"]
-
+    time_index: pd.Index
+        pandas instance with dtype, np.timedeltad64
+    backsheet_moisture: pd.Series
+        water content in the backsheet of a module [g/m^3]
+    sample_temperature: pd.Series
+        temperature of the module [K]
     p: float
         cell perimiter area [cm]
     CW: float
@@ -1214,33 +1218,38 @@ def module_front(
         prefactor encapsulant diffusion [cm^2/s]
     n_steps: int
         number of stubsteps to calculate for numerical stability. 4-5 works for most cases but quick changes error can accumulate quickly so 20 is a good value for numerical safety.
+
+    Returns:
+    --------
+    results: np.ndarray
+        3d dimensional numpy array containing a 2 dimensional numpy matrix at each timestep corresponding to water intrusion. Shape (time_index.shape[0], nodes, nodes) [g/cm^3]
     """
 
     EaD = eva_diffusivity_ea / 0.0000861733241  # k in [eV/K]
     W = ((CW + 2 * p) / 2) / nodes  #
 
     # two options, we can have a 3d array that stores all timesteps
-    results = np.zeros((chamber_properties.shape[0] + 1, nodes, nodes))
-    results[0, 0, :] = chamber_properties["backsheet_moisture"].iloc[0]
+    results = np.zeros((len(time_index) + 1, nodes, nodes))
+    results[0, 0, :] = backsheet_moisture.iloc[0]
 
     for i in range(
-        chamber_properties.shape[0] - 1
+        len(time_index) - 1
     ):  # loop over each entry the the results
-        Temperature = chamber_properties["sample_temperature"].iloc[i]
+        Temperature = sample_temperature.iloc[i]
         DTemperature = (
-            chamber_properties["sample_temperature"].iloc[i + 1]
-            - chamber_properties["sample_temperature"].iloc[i]
+            sample_temperature.iloc[i + 1]
+            - sample_temperature.iloc[i]
         )
-        Disolved = chamber_properties["backsheet_moisture"].iloc[i]
+        Disolved = backsheet_moisture.iloc[i]
         DDisolved = (
-            chamber_properties["backsheet_moisture"].iloc[i + 1]
-            - chamber_properties["backsheet_moisture"].iloc[i]
+            backsheet_moisture.iloc[i + 1]
+            - backsheet_moisture.iloc[i]
         )
 
         time_step = (
             (
-                chamber_properties.index.values[i + 1]
-                - chamber_properties.index.values[i]
+                time_index.values[i + 1]
+                - time_index.values[i]
             )
             .astype("timedelta64[s]")
             .astype(int)
@@ -1259,6 +1268,7 @@ def module_front(
         )
 
     return results
+
 
 
 # def run_module(

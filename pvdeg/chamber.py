@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from pvdeg import (
     humidity,
     utilities,
+    spectral,
     DATA_DIR,
 )
 
@@ -270,6 +271,10 @@ def setpoints_timeseries_from_csv(
     timedeltas_index = minutes.astype("timedelta64[m]")
     timeseries_setpoints.index = timedeltas_index
 
+    timeseries_setpoints.columns = [
+        f"setpoint_{name}" for name in timeseries_setpoints.columns.tolist()
+    ]
+
     return timeseries_setpoints
 
 
@@ -297,13 +302,13 @@ def air_temperature(
     setpoints_df: pd.DataFrame, tau_c: float, air_temp_0: float
 ) -> np.ndarray:
     air_temp = _temp_calc(
-        temps=setpoints_df["temperature"].to_numpy(),
+        temps=setpoints_df["setpoint_temperature"].to_numpy(),
         times=setpoints_df.index.to_numpy(),
         tau=tau_c,
         temp_0=air_temp_0,
     )
 
-    return pd.Series(air_temp, index=setpoints_df.index)
+    return pd.Series(air_temp, index=setpoints_df.index, name="Air Temperature")
 
 
 def sample_temperature(
@@ -325,8 +330,7 @@ def sample_temperature(
         temp_0=sample_temp_0,
     )
 
-    return pd.Series(sample_temp, index=setpoints_df.index)
-
+    return pd.Series(sample_temp, index=setpoints_df.index, name="Sample Temperature")
 
 
 # @njit
@@ -334,9 +338,12 @@ def _calc_water_vap_pres(temp_numpy: np.ndarray, rh_numpy: np.ndarray) -> np.nda
     water_vap_pres = np.empty_like(temp_numpy)
 
     for i in range(water_vap_pres.shape[0]):
-        water_vap_pres[i] = humidity.water_vapor_pressure(temp=temp_numpy[i], rh=rh_numpy[i])
+        water_vap_pres[i] = humidity.water_vapor_pressure(
+            temp=temp_numpy[i], rh=rh_numpy[i]
+        )
 
     return water_vap_pres
+
 
 @njit
 def _calc_rh(
@@ -351,7 +358,6 @@ def _calc_rh(
             temp_set=temp_set[i], rh_set=rh_set[i], sample_temp=sample_temp[i]
         )
     return rh
-
 
 
 class Sample:
@@ -393,7 +399,7 @@ class Sample:
     def setBacksheet(self, id: str, thickness):
         """
         Set backsheet permiability activation energy and prefactor.
-        
+
         Activation Energies will be in kJ/mol
 
         Parameters:
@@ -413,13 +419,18 @@ class Chamber(Sample):
         super().__init__()
         self.setpoint_timeseries(fp, setpoint_names=setpoint_names, **kwargs)
 
-    def setpoint_timeseries(self, fp: str, setpoint_names: list[str] = None, **kwargs) -> None:
+    def setpoint_timeseries(
+        self, fp: str, setpoint_names: list[str] = None, **kwargs
+    ) -> None:
+        """Read a setpoints CSV and create a timeseries of setpoint values"""
         self.setpoints = setpoints_timeseries_from_csv(fp, setpoint_names, **kwargs)
 
     def plot_setpoints(self) -> None:
+        """Plot setpoint timeseries values"""
         self.setpoints.plot(title="Chamber Setpoints")
-        
+
     def calc_temperatures(self, air_temp_0, sample_temp_0, tau_c, tau_s):
+        """Calculate sample and air temperatures."""
         self.air_temperature = air_temperature(
             self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
         )
@@ -429,67 +440,166 @@ class Chamber(Sample):
             air_temperature=self.air_temperature,
             sample_temp_0=sample_temp_0,
         )
-    
+
     def plot_temperatures(self):
+        """Plot sample and air temperature over the course of the chamber test"""
         self.air_temperature.plot(label="air temperature")
         self.sample_temperature.plot(label="sample temperature")
         plt.legend()
 
-    def calc_water_vapor_pressure(self): # vectorized
+    def calc_water_vapor_pressure(self):
+        """Calculate chamber water vapor pressure"""
         res = humidity.water_vapor_pressure(
             self.air_temperature.to_numpy(dtype=np.float64),
-            self.setpoints['relative_humidity'].to_numpy(dtype=np.float64)
+            self.setpoints["setpoint_relative_humidity"].to_numpy(dtype=np.float64),
         )
-        self.water_vapor_pressure = pd.Series(res, index=self.setpoints.index)
+        self.water_vapor_pressure = pd.Series(
+            res, index=self.setpoints.index, name="Water Vapor Pressure"
+        )
 
-    def calc_sample_relative_humidity(self): # vectorized
+    def calc_sample_relative_humidity(self):
+        """Calculate sample percent relative humidity"""
         res = humidity.rh_at_sample_temperature(
-            self.air_temperature.to_numpy(dtype=np.float64), # C
-            self.setpoints['relative_humidity'].to_numpy(dtype=np.float64), # %
-            self.sample_temperature.to_numpy(dtype=np.float64), # C
+            self.air_temperature.to_numpy(dtype=np.float64),  # C
+            self.setpoints["setpoint_relative_humidity"].to_numpy(
+                dtype=np.float64
+            ),  # %
+            self.sample_temperature.to_numpy(dtype=np.float64),  # C
         )
-        self.sample_relative_humidity = pd.Series(res, index=self.setpoints.index)
+        self.sample_relative_humidity = pd.Series(
+            res, index=self.setpoints.index, name="Sample Relative Humidity"
+        )
 
     def calc_equilibrium_ecapsulant_water(self):
+        """Calculate the equilibrium state of the water in the encapsulant"""
         res = humidity.equilibrium_eva_water(
-            self.sample_temperature.to_numpy(dtype=np.float64), # C
-            self.sample_relative_humidity.to_numpy(np.float64), # %
-            utilities.kj_mol_to_ev(self.solubility_encap_ea), # kJ/mol -> eV
-            self.solubility_encap_pre, # cm^2/s
+            self.sample_temperature.to_numpy(dtype=np.float64),  # C
+            self.sample_relative_humidity.to_numpy(np.float64),  # %
+            utilities.kj_mol_to_ev(self.solubility_encap_ea),  # kJ/mol -> eV
+            self.solubility_encap_pre,  # cm^2/s
         )
-        self.equilibrium_encapsulant_water = pd.Series(res, index=self.setpoints.index)
-        
+        self.equilibrium_encapsulant_water = pd.Series(
+            res, index=self.setpoints.index, name="Equilibrium Encapsulant Water"
+        )
+
     def calc_back_encapsulant_moisture(self, n_steps: int = 20):
+        """Calculate the moisture on the backside of the encapsulant"""
         res, _ = humidity.moisture_eva_back(
             eva_moisture_0=self.equilibrium_encapsulant_water.iloc[0],
             sample_temp=self.sample_temperature,
             rh_at_sample_temp=self.sample_relative_humidity,
             equilibrium_eva_water=self.equilibrium_encapsulant_water,
-            pet_permiability=utilities.kj_mol_to_ev(self.permiability_back_ea), # kJ/mol -> eV
-            pet_prefactor=self.permiability_back_pre, 
-            thickness_eva=self.encap_thickness, # mm
-            thickness_pet=self.back_thickness, # mm
-            n_steps=n_steps
+            pet_permiability=utilities.kj_mol_to_ev(
+                self.permiability_back_ea
+            ),  # kJ/mol -> eV
+            pet_prefactor=self.permiability_back_pre,
+            thickness_eva=self.encap_thickness,  # mm
+            thickness_pet=self.back_thickness,  # mm
+            n_steps=n_steps,
         )
 
-        self.back_encapsulant_moisture = pd.Series(res, index=self.setpoints.index)
-    
+        self.back_encapsulant_moisture = pd.Series(
+            res, index=self.setpoints.index, name="Back Encapsulant Moisture"
+        )
+
     def calc_relative_humidity_internal_on_back_of_cells(self):
+        """Calculate the relative humidity inside the module on the backside of the cells"""
         res = humidity.rh_internal_cell_backside(
             back_eva_moisture=self.back_encapsulant_moisture.to_numpy(dtype=np.float64),
-            equilibrium_eva_water=self.equilibrium_encapsulant_water.to_numpy(dtype=np.float64),
-            rh_at_sample_temp=self.sample_relative_humidity.to_numpy(dtype=np.float64)
+            equilibrium_eva_water=self.equilibrium_encapsulant_water.to_numpy(
+                dtype=np.float64
+            ),
+            rh_at_sample_temp=self.sample_relative_humidity.to_numpy(dtype=np.float64),
         )
-        self.relative_humidity_internal_on_back_of_cells = pd.Series(res, self.setpoints.index)
+        self.relative_humidity_internal_on_back_of_cells = pd.Series(
+            res, self.setpoints.index, name="Relative Humidity Internal Cells Backside"
+        )
 
     def calc_dew_point(self):
+        """Calculate the chamber dew point"""
         res = humidity.chamber_dew_point_from_vapor_pressure(
             self.water_vapor_pressure.to_numpy(dtype=np.float64)
-            )
-        self.dew_point = pd.Series(res, self.setpoints.index)
-        
-    def sample_conditions(self) -> pd.DataFrame:
-        ...
-        
-    def chamber_conditions(self) -> pd.DataFrame:
-        ...
+        )
+        self.dew_point = pd.Series(res, self.setpoints.index, name="Dew Point")
+
+    def chamber_conditions(self, tau_c: float, air_temp_0: float) -> pd.DataFrame:
+        """
+        Calculate the chamber conditions
+
+        Parameters:
+        -----------
+        tau_c: float
+            $\tau_C$ thermal equilibration time of the chamber [min]
+        air_temp_0: float
+            initial air temperature in chamber [$\degree C$]
+
+        Returns:
+        --------
+        chamber_and_set_df: pd.DataFrame
+            pandas dataframe containing all chamber setpoints, chamber air temperature,
+            water vapor pressure and dew point conditions for each timestep.
+        """
+
+        self.air_temperature = air_temperature(
+            self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
+        )
+        self.calc_water_vapor_pressure()
+        self.calc_dew_point()
+
+        chamber_df = pd.DataFrame(
+            [self.air_temperature, self.water_vapor_pressure, self.dew_point]
+        ).T
+        chamber_and_set_df = pd.concat([self.setpoints, chamber_df], axis=1)
+        return chamber_and_set_df
+
+    def sample_conditions(
+        self, tau_s: float, sample_temp_0: float, n_steps: int = 20
+    ) -> pd.DataFrame:
+        """
+        Calculate the sample conditions
+
+        Parameters:
+        -----------
+        tau_s: float
+            $\tau_S$ thermal equilibration time of the test sample [min]
+        sample_temp_0: float
+            initial air temperature in chamber [$\degree C$]
+        n_steps: int
+            number of stubsteps to calculate for numerical stability.
+            4-5 works for most cases but quick changes error can accumulate
+            quickly so 20 is a good value for numerical safety.
+            *Used to calculate backside encapsulant moisture*
+
+        Returns:
+        --------
+        sample_df: pd.DataFrame
+            pandas dataframe containing
+            [sample temperature, sample relative humidity, equilibrium encapsulant water, back encapsulant moisture, relative humidity internal on back of cells]
+        """
+        self.sample_temperature = sample_temperature(
+            self.setpoints,
+            air_temperature=self.air_temperature,
+            tau_s=tau_s,
+            sample_temp_0=sample_temp_0,
+        )
+        self.calc_sample_relative_humidity()
+        self.calc_equilibrium_ecapsulant_water()
+        self.calc_back_encapsulant_moisture(n_steps=n_steps)
+        self.calc_relative_humidity_internal_on_back_of_cells()
+
+        sample_df = pd.DataFrame(
+            [
+                self.sample_temperature,
+                self.sample_relative_humidity,
+                self.equilibrium_encapsulant_water,
+                self.back_encapsulant_moisture,
+                self.relative_humidity_internal_on_back_of_cells,
+            ]
+        ).T
+        return sample_df
+
+    def gti(self) -> pd.Series:
+        gti = spectral.get_GTI_from_irradiance_340(
+            self.setpoints["setpoint_irradiance_340"]
+        )
+        return gti

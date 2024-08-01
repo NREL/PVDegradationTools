@@ -254,7 +254,7 @@ def chamber_sample_temperature(
 
     return sample_temp
 
-# @njit
+# add the irradiance term
 def fdm_temperature(t_current: float, t_set: float, delta_time: float, tau: float):
     """
     Calculate next timestep of temperature using finite difference method. 

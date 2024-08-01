@@ -3,6 +3,9 @@ Collection of classes and functions to obtain spectral parameters.
 """
 
 import pvlib
+from numba import njit, prange, cuda
+import numpy as np
+import pandas as pd
 
 
 def solar_position(weather_df, meta):
@@ -107,3 +110,52 @@ def poa_irradiance(
     )
 
     return poa
+
+
+# Deprication Warning: pvlib.spectrum.get_am15g was depricated in pvlib v0.11.0
+# will be removed in v0.12.0, currently pvdeg should be using v0.10.3
+def get_GTI_from_irradiance_340(irradiance_340: pd.Series) -> pd.Series:
+    """
+    Calculate the Global Tilt Irradiance of a module with 37 degrees of tile from irradiance at 340 nm.
+
+    Parameters:
+    -----------
+    irradiance_340: pd.Series
+        array of UV irradiance at 340 nm [W/m^2/nm @ 340nm]
+
+    Returns:
+    --------
+    GTI: pd.Series
+        Full spectrum Global Tilt Irradiance for a module at 37 degrees in [W/m^2]
+    """
+
+    am15 = pvlib.spectrum.get_am15g()
+    wavelengths = am15.index.to_numpy(dtype=np.float64)
+    spectrum = am15.to_numpy(dtype=np.float64)
+
+    gti = _GTI_from_irradiance_340(
+        irradiance_340=irradiance_340.to_numpy(dtype=np.float64),
+        wavelengths=wavelengths,
+        spectrum=spectrum,
+    )
+
+    return pd.Series(gti, index=irradiance_340.index, name="GTI")
+
+
+# this is very inneficient
+# we probably dont need to integrate here
+# according to the spectrum, we know that the ratio of 340 to full spectrum is the same compared to the refenece so this is just a proportion calculation
+@njit(parallel=True, cache=True)
+def _GTI_from_irradiance_340(
+    irradiance_340: np.ndarray, wavelengths: np.ndarray, spectrum: np.ndarray
+) -> np.ndarray:
+    gti = np.empty_like(irradiance_340)
+    spectrum_340 = spectrum[120]  # 340nm at 120th index
+
+    for i in prange(irradiance_340.shape[0]):
+        scaling_factor = irradiance_340[i] / spectrum_340
+        scaled_irradiance = scaling_factor * spectrum
+        total_irradiance = np.trapz(scaled_irradiance, wavelengths)
+        gti[i] = total_irradiance
+
+    return gti
