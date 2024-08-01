@@ -11,7 +11,7 @@ import pvlib
 
 
 from pvdeg import collection, utilities, standards, DATA_DIR
-from pvdeg.decorators import geospatial_result_type
+from pvdeg.decorators import geospatial_quick_shape
 
 
 def tau_now(tau_0, tau_deg, n_b):
@@ -871,7 +871,7 @@ def calc_injection_outdoors(results):
     return injection
 
 
-@geospatial_result_type(1, ["Temperature", "Injection", "NA", "NB", "NC", "tau", "Jsc", "Voc", "Isc", "FF", "Pmp", "Pmp_norm"])
+@geospatial_quick_shape(1, ["Temperature", "Injection", "NA", "NB", "NC", "tau", "Jsc", "Voc", "Isc", "FF", "Pmp", "Pmp_norm"])
 def calc_letid_outdoors(
     tau_0,
     tau_deg,

@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from scipy.constants import convert_temperature
 from pvdeg import temperature
-from pvdeg.decorators import geospatial_result_type
+from pvdeg.decorators import geospatial_quick_shape
 
 
 def _avg_daily_temp_change(time_range, temp_cell):
@@ -98,7 +98,7 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     return num_changes_temp_hist
 
 
-@geospatial_result_type(0, ['damage'])
+@geospatial_quick_shape(0, ['damage'])
 def solder_fatigue(
     weather_df: pd.DataFrame,
     meta: dict,

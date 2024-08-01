@@ -4,10 +4,10 @@ Collection of classes and functions to obtain spectral parameters.
 
 import pvlib
 import pandas as pd
-from pvdeg.decorators import geospatial_result_type
+from pvdeg.decorators import geospatial_quick_shape
 
 
-@geospatial_result_type(
+@geospatial_quick_shape(
     1,
     [
         "apparent_zenith",
@@ -54,7 +54,7 @@ def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
     return solar_position
 
 
-@geospatial_result_type(
+@geospatial_quick_shape(
     1,
     [
         "poa_global",

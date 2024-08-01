@@ -4,12 +4,12 @@ Collection of classes and functions to calculate different temperatures.
 
 import pvlib
 import pvdeg
-from pvdeg.decorators import geospatial_result_type
+from pvdeg.decorators import geospatial_quick_shape
 import pandas as pd
 from typing import Union
 
 
-@geospatial_result_type(1, ['module_temperature'])
+@geospatial_quick_shape(1, ['module_temperature'])
 def module(
     weather_df,
     meta,
@@ -100,7 +100,7 @@ def module(
     return module_temperature
 
 
-@geospatial_result_type(1, ["cell_temperature"])
+@geospatial_quick_shape(1, ["cell_temperature"])
 def cell(
     weather_df: pd.DataFrame,
     meta: dict,

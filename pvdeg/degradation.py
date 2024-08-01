@@ -13,7 +13,7 @@ from . import temperature
 from . import spectral
 from . import weather
 
-from pvdeg.decorators import geospatial_result_type
+from pvdeg.decorators import geospatial_quick_shape
 
 # TODO: Clean up all those functions and add gaps functionality
 
@@ -179,7 +179,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-@geospatial_result_type(0,["Iwa"])
+@geospatial_quick_shape(0,["Iwa"])
 def IwaVantHoff(
     weather_df: pd.DataFrame,
     meta: dict,

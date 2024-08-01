@@ -16,7 +16,7 @@ from . import (
     weather
 )
 
-from pvdeg.decorators import geospatial_result_type
+from pvdeg.decorators import geospatial_quick_shape
 
 
 def _ambient(weather_df):
@@ -654,7 +654,7 @@ def backsheet(
     return backsheet
 
 
-@geospatial_result_type(1, ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
+@geospatial_quick_shape(1, ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
 def module(
     weather_df,
     meta,

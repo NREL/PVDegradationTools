@@ -383,12 +383,16 @@ def zero_template(
 def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
     Automatically create a template for a target function: `func`.
-    Only works on functions that have a strict return type. 
+    Only works on functions that have the `numeric_or_timeseries` and `shape_names` attributes.
+    These attributes are assigned at function definition with the `@geospatial_quick_shape` decorator.
+    
     Otherwise you will have to create your own template. 
     Don't worry, this is easy. See the Geospatial Templates Notebook 
     for more information. 
 
     examples:
+    ---------
+
     the function returns a numeric value
     >>> pvdeg.design.edge_seal_width
 
@@ -396,9 +400,10 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     >>> pvdeg.module.humidity
 
     counter example:
-    the function could either return a single numeric or a series based on changed in the input
-
-    Note: Only works on functions that use the `geospatial_result_type` decorator in the source code.
+    ----------------
+    the function could either return a single numeric or a series based on changed in 
+    the input. Because it does not have a known result shape we cannot determine the 
+    attributes required for autotemplating ahead of time. 
     """
 
     if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
@@ -416,7 +421,6 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     )
 
     return template
-
 
 def plot_USA(
     xr_res, cmap="viridis", vmin=None, vmax=None, title=None, cb_title=None, fp=None

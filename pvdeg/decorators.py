@@ -4,7 +4,7 @@ Private API, should only be used in PVDeg implemenation files.
 """
 
 
-def geospatial_result_type(value: bool, shape_names: list[str]) -> None:
+def geospatial_quick_shape(numeric_or_timeseries: bool, shape_names: list[str]) -> None:
     """
     Add an attribute to the functions that can be run with geospatial analysis.
     Strict typing is not enough for this purpose so we can view this attribute
@@ -33,10 +33,26 @@ def geospatial_result_type(value: bool, shape_names: list[str]) -> None:
 
     * Note: we cannot autotemplate functions with ambiguous return types that depend on runtime input,
     the function will need strictly return a timeseries or numeric but not one or the other.
+
+    Parameters:
+    -----------
+    numeric_or_timeseries: bool
+        indicate whether the function returns a single numeric/tuple of numerics
+        or a timeseries/tuple of timeseries. False when numeric, True when timeseries
+
+    shape_names: list[str]
+        list of return value names. These will become the xarray datavariable names in the output.
+
+    Modifies:
+    ---------
+    func.numeric_or_timeseries
+        sets to numeric_or_timeseries argument
+    func.shape_names
+        sets to shape_names argument
     """
 
     def decorator(func):
-        setattr(func, "numeric_or_timeseries", value)
+        setattr(func, "numeric_or_timeseries", numeric_or_timeseries)
         setattr(func, "shape_names", shape_names)
         return func
 
