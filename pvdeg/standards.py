@@ -11,12 +11,15 @@ from rex import Outputs
 from pathlib import Path
 from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Union, Tuple
 
 # from gaps import ProjectPoints
 
 from pvdeg import temperature, spectral, utilities, weather
+from pvdeg.decorators import geospatial_quick_shape
 
 
+@geospatial_quick_shape(1, ["T_0", "T_inf", "poa"])
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
@@ -187,20 +190,21 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
     return x_eff
 
 
+@geospatial_quick_shape(0, ["x","T98_0", "T98_inf"]) # numeric result, with corresponding datavariable names
 def standoff(
-    weather_df=None,
-    meta=None,
-    weather_kwarg=None,
-    tilt=None,
-    azimuth=None,
-    sky_model="isotropic",
-    temp_model="sapm",
-    conf_0="insulated_back_glass_polymer",
-    conf_inf="open_rack_glass_polymer",
-    T98=70,  # [°C]
-    x_0=6.5,  # [cm]
-    wind_factor=0.33,
-):
+    weather_df: pd.DataFrame = None,
+    meta: dict = None,
+    weather_kwarg: dict = None,
+    tilt: Union[float, int] = None,
+    azimuth: Union[float, int] = None,
+    sky_model: str = "isotropic",
+    temp_model: str = "sapm",
+    conf_0: str = "insulated_back_glass_polymer",
+    conf_inf: str = "open_rack_glass_polymer",
+    T98: float = 70,  # [°C]
+    x_0: float = 6.5,  # [cm]
+    wind_factor: float = 0.33,
+) -> pd.DataFrame:
     """
     Calculate a minimum standoff distance for roof mounded PV systems.
     Will default to horizontal tilt. If the azimuth is not provided, it
@@ -414,6 +418,7 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
     return Output
 
 
+@geospatial_quick_shape(0, ["T98"])
 def T98_estimate(
     weather_df=None,
     meta=None,
@@ -504,7 +509,7 @@ def T98_estimate(
         meta=meta,
         poa=poa,
         temp_model=temp_model,
-        conf_inf=conf_inf,
+        conf=conf_inf,
         wind_factor=wind_factor,
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
@@ -517,7 +522,7 @@ def T98_estimate(
             meta=meta,
             poa=poa,
             temp_model=temp_model,
-            conf_0=conf_0,
+            conf=conf_0,
             wind_factor=wind_factor,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")

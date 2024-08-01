@@ -1,9 +1,9 @@
-v0.3.5 (2024-07-23)
+v0.3.4 (2024-07-26)
 =======================
 
-Enhancements
+Bug Fixes
 ---------
-* Implemented testing for geospatial analysis
+* Fix incorrect keyword arguments in `pvdeg.standards.T98_estimate`
 
 Contributors
 ~~~~~~~~~~~~

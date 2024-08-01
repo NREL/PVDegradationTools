@@ -4,8 +4,12 @@ Collection of classes and functions to calculate different temperatures.
 
 import pvlib
 import pvdeg
+from pvdeg.decorators import geospatial_quick_shape
+import pandas as pd
+from typing import Union
 
 
+@geospatial_quick_shape(1, ['module_temperature'])
 def module(
     weather_df,
     meta,
@@ -96,14 +100,15 @@ def module(
     return module_temperature
 
 
+@geospatial_quick_shape(1, ["cell_temperature"])
 def cell(
-    weather_df,
-    meta,
-    poa=None,
-    temp_model="sapm",
-    conf="open_rack_glass_polymer",
-    wind_factor=0.33,
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    poa: Union[pd.DataFrame, pd.Series] = None,
+    temp_model: str = "sapm",
+    conf: str = "open_rack_glass_polymer",
+    wind_factor: float = 0.33,
+) -> pd.DataFrame:
     """
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.

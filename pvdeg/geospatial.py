@@ -2,9 +2,11 @@
 Collection of classes and functions for geospatial analysis.
 """
 
-from . import standards
-from . import humidity
-from . import letid
+from . import (
+    standards,
+    humidity,
+    letid,
+)
 
 import xarray as xr
 import dask.array as da
@@ -15,6 +17,8 @@ from dask.distributed import Client, LocalCluster
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.io.shapereader as shpreader
+
+from collections.abc import Callable
 
 
 def start_dask(hpc=None):
@@ -79,6 +83,28 @@ def start_dask(hpc=None):
     return client
 
 
+def _df_from_arbitrary(res, func):
+    numerics = (int, float, np.number)
+    arrays = (np.ndarray, pd.Series)
+
+    if isinstance(res, pd.DataFrame):
+        return res
+    elif isinstance(res, pd.Series):
+        return pd.DataFrame(res, columns=[func.__name__])
+    elif isinstance(res, (int, float)):
+        return pd.DataFrame([res], columns=[func.__name__])
+    elif isinstance(res, tuple) and all(isinstance(item, numerics) for item in res):
+        return pd.DataFrame([res])
+    elif isinstance(res, tuple) and all(isinstance(item, arrays) for item in res):
+        return pd.concat(
+            res, axis=1
+        )  # they must all be the same length here or this will error out
+    else:
+        raise NotImplementedError(
+            f"function return type: {type(res)} not available for geospatial analysis yet."
+        )
+
+
 def calc_gid(ds_gid, meta_gid, func, **kwargs):
     """
     Calculates a single gid for a given function.
@@ -101,7 +127,8 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     """
 
     df_weather = ds_gid.to_dataframe()
-    df_res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
+    res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
+    df_res = _df_from_arbitrary(res, func)  # convert all return types to dataframe
     ds_res = xr.Dataset.from_dataframe(df_res)
 
     if not df_res.index.name:
@@ -229,11 +256,12 @@ def output_template(
         },
         coords={dim: ds_gids[dim] for dim in dims},
         attrs=global_attrs,
-    )#.chunk({dim: ds_gids.chunks[dim] for dim in dims})
+    )  # .chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
     return output_template
 
 
+# we should be able to get rid of this with the new autotemplating function and decorator
 def template_parameters(func):
     """
     Output parameters for xarray template.
@@ -312,7 +340,7 @@ def template_parameters(func):
         add_dims = {}
 
     else:
-        raise ValueError(f"No preset output template for function {func}.")
+        raise NotImplementedError(f"No preset output template for function {func}.")
 
     parameters = {
         "shapes": shapes,
@@ -351,6 +379,48 @@ def zero_template(
 
     return res
 
+
+def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
+    """
+    Automatically create a template for a target function: `func`.
+    Only works on functions that have the `numeric_or_timeseries` and `shape_names` attributes.
+    These attributes are assigned at function definition with the `@geospatial_quick_shape` decorator.
+    
+    Otherwise you will have to create your own template. 
+    Don't worry, this is easy. See the Geospatial Templates Notebook 
+    for more information. 
+
+    examples:
+    ---------
+
+    the function returns a numeric value
+    >>> pvdeg.design.edge_seal_width
+
+    the function returns a timeseries result
+    >>> pvdeg.module.humidity
+
+    counter example:
+    ----------------
+    the function could either return a single numeric or a series based on changed in 
+    the input. Because it does not have a known result shape we cannot determine the 
+    attributes required for autotemplating ahead of time. 
+    """
+
+    if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
+        raise ValueError(
+            f"{func.__name__} cannot be autotemplated. create a template manually"
+        )
+
+    if func.numeric_or_timeseries == 0:
+        shapes = {datavar: ("gid",) for datavar in func.shape_names}
+    elif func.numeric_or_timeseries == 1:
+        shapes = {datavar: ("gid", "time") for datavar in func.shape_names}
+
+    template = output_template(  # zeros_template?
+        ds_gids=ds_gids, shapes=shapes
+    )
+
+    return template
 
 def plot_USA(
     xr_res, cmap="viridis", vmin=None, vmax=None, title=None, cb_title=None, fp=None
