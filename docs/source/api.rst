@@ -24,7 +24,7 @@ Modules, methods, classes and attributes are explained here.
     montecarlo
     spectral
     standards
+    symbolic
     temperature
     utilities
     weather
-    symbolic

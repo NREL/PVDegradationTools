@@ -14,11 +14,11 @@ from . import letid
 from . import montecarlo
 from .scenario import Scenario
 from . import spectral
+from . import symbolic
 from . import standards
 from . import temperature
 from . import utilities
 from . import weather
-from . import symbolic
 
 __version__ = version("pvdeg")
 
