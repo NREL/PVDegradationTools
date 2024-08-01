@@ -5,10 +5,11 @@ import pandas as pd
 import numpy as np
 import os
 
-with open(r"C:\Users\tford\Downloads\summit-weather.pkl", 'rb') as f:
-    GEO_WEATHER = pickle.load(f)
 
-GEO_META = pd.read_csv(r"C:\Users\tford\Downloads\summit-meta.csv", index_col=0)
+GEO_META = pd.read_csv(os.path.join(TEST_DATA_DIR, "summit-meta.csv"), index_col=0)
+
+with open(os.path.join(TEST_DATA_DIR, "summit-weather.pkl"), 'rb') as f:
+    GEO_WEATHER = pickle.load(f)
 
 # refactor
 def test_analysis_standoff():
