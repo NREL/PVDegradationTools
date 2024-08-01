@@ -1,6 +1,7 @@
 import pytest
 import os
 import json
+import numpy as np
 import pandas as pd
 import sympy as sp # not a dependency, may cause issues
 import pvdeg
@@ -14,7 +15,6 @@ WEATHER = pd.read_csv(
 
 with open(os.path.join(TEST_DATA_DIR, "meta.json"), "r") as file:
     META = json.load(file)
-
 
 # D = k_d  * E * Ileak
 # degradation rate, D
@@ -92,3 +92,25 @@ def test_symbolic_timeseries():
     ).sum()
 
     assert res == pytest.approx(6.5617e-09)
+
+def test_calc_df_symbolic_bad():
+    expr = sp.symbols('not_in_columns')
+    df = pd.DataFrame([[1,2,3,5]],columns=['a','b','c','d'])
+
+    with pytest.raises(ValueError):
+        pvdeg.symbolic.calc_df_symbolic(expr=expr, df=df)
+
+def test_calc_kwarg_timeseries_bad_type():
+    # try passing an invalid argument type
+    with pytest.raises(ValueError, match="only simple numerics or timeseries allowed"):
+        pvdeg.symbolic.calc_kwarg_timeseries(expr=None, kwarg={'bad':pd.DataFrame()})
+
+def test_calc_kwarg_timeseries_bad_mismatch_lengths():
+    # arrays of different lengths
+    with pytest.raises(NotImplementedError, match="arrays/series are different lengths. fix mismatched length. otherwise arbitrary symbolic solution is too complex for solver. nested loops or loops dependent on previous results not supported."):
+        pvdeg.symbolic.calc_kwarg_timeseries(expr=None, kwarg={'len1':np.zeros((5,)), 'len2':np.zeros(10,)})
+
+def test_calc_kwarg_timeseries_no_index():
+
+    v1, v2 = sp.symbols('v1 v2')
+    expr = v1 * v2

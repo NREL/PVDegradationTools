@@ -64,6 +64,9 @@ def _have_same_indices(series_list):
     if not series_list:
         return True
 
+    if not isinstance(series_list, pd.Series):
+        return False
+
     first_index = series_list[0].index
 
     same_indicies = all(s.index.equals(first_index) for s in series_list[1:])
