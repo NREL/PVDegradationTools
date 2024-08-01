@@ -342,6 +342,34 @@ def template_parameters(func):
     return parameters
 
 
+def zero_template(
+    lat_grid, lon_grid, shapes, attrs=dict(), global_attrs=dict(), add_dims=dict()
+):
+    gids = len(lat_grid)
+
+    dims_size = {"gid": gids} | add_dims
+
+    stacked = xr.Dataset(
+        data_vars={
+            var: (dim, da.zeros([dims_size[d] for d in dim]), attrs.get(var))
+            for var, dim in shapes.items()
+        },
+        coords={"gid": np.linspace(0, gids - 1, gids, dtype=int)},
+        attrs=global_attrs,
+    )  # .chunk({dim: ds_gids.chunks[dim] for dim in dims})
+
+    stacked = stacked.drop(["gid"])
+    mindex_obj = pd.MultiIndex.from_arrays(
+        [lat_grid, lon_grid], names=["latitude", "longitude"]
+    )
+    mindex_coords = xr.Coordinates.from_pandas_multiindex(mindex_obj, "gid")
+    stacked = stacked.assign_coords(mindex_coords)
+    stacked = stacked.drop_duplicates("gid")
+    res = stacked.unstack("gid")
+
+    return res
+
+
 def plot_USA(
     xr_res, cmap="viridis", vmin=None, vmax=None, title=None, cb_title=None, fp=None
 ):
