@@ -22,7 +22,11 @@ pvdeg.utilities
       pvdeg.utilities.convert_tmy
       pvdeg.utilities.get_kinetics
       pvdeg.utilities.gid_downsampling
+      pvdeg.utilities.kj_mol_to_ev
+      pvdeg.utilities.meta_as_dict
+      pvdeg.utilities.plot_water_2d
       pvdeg.utilities.quantile_df
+      pvdeg.utilities.tilt_azimuth_scan
       pvdeg.utilities.ts_gid_df
       pvdeg.utilities.write_gids
 
@@ -61,11 +65,39 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.gid_downsampling
        :add-heading:
 
+   .. autofunction:: kj_mol_to_ev
+
+   .. _sphx_glr_backref_pvdeg.utilities.kj_mol_to_ev:
+
+   .. minigallery:: pvdeg.utilities.kj_mol_to_ev
+       :add-heading:
+
+   .. autofunction:: meta_as_dict
+
+   .. _sphx_glr_backref_pvdeg.utilities.meta_as_dict:
+
+   .. minigallery:: pvdeg.utilities.meta_as_dict
+       :add-heading:
+
+   .. autofunction:: plot_water_2d
+
+   .. _sphx_glr_backref_pvdeg.utilities.plot_water_2d:
+
+   .. minigallery:: pvdeg.utilities.plot_water_2d
+       :add-heading:
+
    .. autofunction:: quantile_df
 
    .. _sphx_glr_backref_pvdeg.utilities.quantile_df:
 
    .. minigallery:: pvdeg.utilities.quantile_df
+       :add-heading:
+
+   .. autofunction:: tilt_azimuth_scan
+
+   .. _sphx_glr_backref_pvdeg.utilities.tilt_azimuth_scan:
+
+   .. minigallery:: pvdeg.utilities.tilt_azimuth_scan
        :add-heading:
 
    .. autofunction:: ts_gid_df

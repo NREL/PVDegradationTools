@@ -199,9 +199,7 @@ def cell(
 
     return temp_cell
 
-# these equations came from row K in the spreadsheet, 
-# is there somewhere else or something to cite
-# there should be some other irradiance factor/term in the equation?
+# not being actively used
 @njit
 def chamber_sample_temperature(
     irradiance_340: float,

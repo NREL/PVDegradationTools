@@ -15,9 +15,11 @@ Modules, methods, classes and attributes are explained here.
     :toctree: _autosummary/
     :template: module.rst
 
+    chamber
     collection
     degradation
     design
+    diffusion
     fatigue
     humidity
     letid

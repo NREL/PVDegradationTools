@@ -23,11 +23,15 @@ pvdeg.humidity
       pvdeg.humidity.back_encap
       pvdeg.humidity.backsheet
       pvdeg.humidity.backsheet_from_encap
+      pvdeg.humidity.chamber_dew_point_from_t_rh
+      pvdeg.humidity.chamber_dew_point_from_vapor_pressure
       pvdeg.humidity.dew_yield
+      pvdeg.humidity.equilibrium_eva_water
       pvdeg.humidity.front_encap
       pvdeg.humidity.module
+      pvdeg.humidity.moisture_eva_back
       pvdeg.humidity.psat
-      pvdeg.humidity.run_module
+      pvdeg.humidity.rh_internal_cell_backside
       pvdeg.humidity.surface_outside
 
    
@@ -72,11 +76,32 @@ pvdeg.humidity
    .. minigallery:: pvdeg.humidity.backsheet_from_encap
        :add-heading:
 
+   .. autofunction:: chamber_dew_point_from_t_rh
+
+   .. _sphx_glr_backref_pvdeg.humidity.chamber_dew_point_from_t_rh:
+
+   .. minigallery:: pvdeg.humidity.chamber_dew_point_from_t_rh
+       :add-heading:
+
+   .. autofunction:: chamber_dew_point_from_vapor_pressure
+
+   .. _sphx_glr_backref_pvdeg.humidity.chamber_dew_point_from_vapor_pressure:
+
+   .. minigallery:: pvdeg.humidity.chamber_dew_point_from_vapor_pressure
+       :add-heading:
+
    .. autofunction:: dew_yield
 
    .. _sphx_glr_backref_pvdeg.humidity.dew_yield:
 
    .. minigallery:: pvdeg.humidity.dew_yield
+       :add-heading:
+
+   .. autofunction:: equilibrium_eva_water
+
+   .. _sphx_glr_backref_pvdeg.humidity.equilibrium_eva_water:
+
+   .. minigallery:: pvdeg.humidity.equilibrium_eva_water
        :add-heading:
 
    .. autofunction:: front_encap
@@ -93,6 +118,13 @@ pvdeg.humidity
    .. minigallery:: pvdeg.humidity.module
        :add-heading:
 
+   .. autofunction:: moisture_eva_back
+
+   .. _sphx_glr_backref_pvdeg.humidity.moisture_eva_back:
+
+   .. minigallery:: pvdeg.humidity.moisture_eva_back
+       :add-heading:
+
    .. autofunction:: psat
 
    .. _sphx_glr_backref_pvdeg.humidity.psat:
@@ -100,11 +132,11 @@ pvdeg.humidity
    .. minigallery:: pvdeg.humidity.psat
        :add-heading:
 
-   .. autofunction:: run_module
+   .. autofunction:: rh_internal_cell_backside
 
-   .. _sphx_glr_backref_pvdeg.humidity.run_module:
+   .. _sphx_glr_backref_pvdeg.humidity.rh_internal_cell_backside:
 
-   .. minigallery:: pvdeg.humidity.run_module
+   .. minigallery:: pvdeg.humidity.rh_internal_cell_backside
        :add-heading:
 
    .. autofunction:: surface_outside

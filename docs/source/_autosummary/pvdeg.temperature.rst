@@ -20,6 +20,8 @@ pvdeg.temperature
 
       
       pvdeg.temperature.cell
+      pvdeg.temperature.chamber_sample_temperature
+      pvdeg.temperature.fdm_temperature
       pvdeg.temperature.module
 
    
@@ -41,6 +43,20 @@ pvdeg.temperature
    .. _sphx_glr_backref_pvdeg.temperature.cell:
 
    .. minigallery:: pvdeg.temperature.cell
+       :add-heading:
+
+   .. autofunction:: chamber_sample_temperature
+
+   .. _sphx_glr_backref_pvdeg.temperature.chamber_sample_temperature:
+
+   .. minigallery:: pvdeg.temperature.chamber_sample_temperature
+       :add-heading:
+
+   .. autofunction:: fdm_temperature
+
+   .. _sphx_glr_backref_pvdeg.temperature.fdm_temperature:
+
+   .. minigallery:: pvdeg.temperature.fdm_temperature
        :add-heading:
 
    .. autofunction:: module

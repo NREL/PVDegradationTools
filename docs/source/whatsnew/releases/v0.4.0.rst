@@ -1,0 +1,17 @@
+v0.4.0 (2024-08-02)
+=======================
+
+Enhancements
+------------
+* created new modules: ``chamber``, ``diffusion``
+* ``chamber`` provides a class ``Chamber`` to provide for streamlined stress test chamber conditions and test sample conditions.
+* ``diffusion`` provides a function ``diffusion.module_front`` to calculate solute diffusion into a host material.
+* Tutorial notebook: ``"Chamber Stressor.ipynb"``
+
+Documentation
+-------------
+* Created page :ref:`chamber-setpoints`
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford(:ghuser:`tobin-ford`)

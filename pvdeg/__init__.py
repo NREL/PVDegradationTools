@@ -4,10 +4,12 @@ import logging
 from .config import *
 
 # from . import cli
-from . import chamber
+# from . import chamber
+from .chamber import Chamber
 from . import collection
 from . import degradation
 from . import design
+from . import diffusion
 from . import fatigue
 from . import geospatial
 from . import humidity

@@ -11,6 +11,7 @@ User Guide
    NSRDB_API_Key
    montecarlo
    pv-variables-terms
+   chamber_setpoints
    contributing
    
    

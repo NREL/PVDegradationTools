@@ -1,3 +1,7 @@
+"""
+Collection of classes, methods and functions to calculate chamber stress test and chamber sample conditions.
+"""
+
 import pandas as pd
 import numpy as np
 from numba import njit
@@ -415,22 +419,65 @@ class Sample:
 
 
 class Chamber(Sample):
-    def __init__(self, fp: str = None, setpoint_names: list[str] = None, **kwargs):
+    def __init__(
+            self, 
+            fp: str = None, 
+            setpoint_names: list[str] = None, 
+            **kwargs
+        ):
+        """
+        Create a chamber stress test object. 
+        
+        This will contain information about the chamber and the sample before running calculations for chamber and sample conditions. 
+
+        Parameters:
+        -----------
+        fp: str
+            filepath to CSV of setpoints following the schema defined in the [docs]()
+        """
+
         super().__init__()
         self.setpoint_timeseries(fp, setpoint_names=setpoint_names, **kwargs)
 
     def setpoint_timeseries(
-        self, fp: str, setpoint_names: list[str] = None, **kwargs
+        self, 
+        fp: str, 
+        setpoint_names: list[str] = None, 
+        **kwargs
     ) -> None:
-        """Read a setpoints CSV and create a timeseries of setpoint values"""
+        """
+        Read a setpoints CSV and create a timeseries of setpoint values
+        """
         self.setpoints = setpoints_timeseries_from_csv(fp, setpoint_names, **kwargs)
 
     def plot_setpoints(self) -> None:
-        """Plot setpoint timeseries values"""
+        """
+        Plot setpoint timeseries values
+        """
         self.setpoints.plot(title="Chamber Setpoints")
 
-    def calc_temperatures(self, air_temp_0, sample_temp_0, tau_c, tau_s):
-        """Calculate sample and air temperatures."""
+    def calc_temperatures(self, air_temp_0: float, sample_temp_0: float, tau_c: float, tau_s: float) -> None:
+        """
+        Calculate sample and air temperatures.
+        
+        Parameters:
+        -----------
+        air_temp_0: float
+            initial air temperature in chamber [$\degree C$]
+        sample_temp_0: float
+            initial air temperature in chamber [$\degree C$]
+        tau_c: float
+            $\tau_C$ thermal equilibration time of the chamber [min]
+        tau_s: float
+            $\tau_S$ thermal equilibration time of the test sample [min]
+
+        Modifies:
+        ---------
+        self.air_temperature: pd.Series
+            pandas series of air temperatures inside of test chamber [C]
+        self.sample_temperature: pd.Series
+            pandas series of sample temperatures inside of test chamber [C]
+        """
         self.air_temperature = air_temperature(
             self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
         )
