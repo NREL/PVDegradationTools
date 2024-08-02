@@ -19,7 +19,7 @@ def module(
 
     Parameters
     ----------
-    weather_df : (pd.dataframe)
+    weather_df : pd.dataframe
         Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
     poa : pandas.DataFrame
          Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
@@ -37,7 +37,7 @@ def module(
 
     Returns
     -------
-    module_temperature : pandas.DataFrame
+    module_temperature : pandas.Series
         The module temperature in degrees Celsius at each time step.
     """
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
@@ -138,7 +138,7 @@ def cell(
 
     Return:
     -------
-    temp_cell : pandas.DataFrame
+    temp_cell : pandas.Series
         This is the temperature of the cell in a module at every time step.[°C]
     """
 

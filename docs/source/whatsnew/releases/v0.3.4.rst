@@ -1,0 +1,10 @@
+v0.3.4 (2024-08-02)
+=======================
+
+Bug Fixes
+---------
+* Fixed ``pvdeg.temperature.module`` and ``pvdeg.temperature.cell`` docstring return type. Correct return type ``pd.Series``
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`Tobin-Ford`)
