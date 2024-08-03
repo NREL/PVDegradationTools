@@ -1,0 +1,127 @@
+{
+    "OX000": {
+	 "Comments": "This data is for oxygen permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm^2/s]. So is in [g/cm^3/atm]. Po is in[g*mm/cm^3/atm]."
+    },	
+    "OX001": {
+	    "Name": "Tedlar",
+        "alias": "PVF",
+        "Fickian": true,
+        "Ead": 30.48,
+        "Do": 0.0001421,
+        "Eas": -0.0272266,
+        "So": 0.0003594,
+        "Eap": 30.2107,
+        "Po": 441.260
+    },
+    "OX002": {
+	    "Name": "ST504",
+        "alias": "PET1",
+        "Fickian": true,
+        "Ead": 47.603,
+        "Do": 0.554153,
+        "Eas": -11.5918,
+        "So": 9.554366e-07,
+        "Eap": 34.2011,
+        "Po": 2128.8937
+    },
+    "OX003": {
+	    "Name": "EVA",
+        "alias": "EVA",
+        "Fickian": true,
+        "Ead": 29.43112031,
+        "Do": 0.129061678,
+        "Eas": 32.3137806,
+        "So": 87.81142774,
+        "Eap": 61.7449009,
+        "Po": 97917899126
+    },
+    "OX004": {
+	    "Name": "AAA",
+        "alias": "AAA",
+        "Fickian": true,
+        "Ead": 37.41778528,
+        "Do": 24.10839436,
+        "Eas": -0.947566422,
+        "So": 7.81445e-06,
+        "Eap": 36.47021886,
+        "Po": 1627722.989
+    },
+    "OX005": {
+	    "Name": "Helioseal_101_dry",
+        "alias": "PIB-A",
+        "Fickian": true,
+        "Ead": 45.01267147,
+        "Do": 3.370970011,
+        "Eas": -3.528965263,
+        "So": 0.0000525558996546881,
+        "Eap": 41.48370621,
+        "Po": 1530700.085
+    },
+    "OX006": {
+	    "Name": "Helioseal_101_wet",
+        "alias": "PIB-A Wet",
+        "Fickian": true,
+        "Ead": 50.75602972,
+        "Do": 37.24247609,
+        "Eas": -5.398392306,
+        "So": 1.58555e-05,
+        "Eap": 45.35763741,
+        "Po": 5101898.064
+    },
+    "OX007": {
+	    "Name": "LPO3_dry",
+        "alias": "PIB-B",
+        "Fickian": true,
+        "Ead": 40.99859372,
+        "Do": 0.690368586,
+        "Eas": 3.507719187,
+        "So": 0.000543049,
+        "Eap": 44.5738773,
+        "Po": 3287750.401
+    },
+    "OX008": {
+	    "Name": "LPO3_wet",
+        "alias": "PIB-B",
+        "Fickian": true,
+        "Ead": 48.73189239,
+        "Do": 10.50219391,
+        "Eas": -2.129673846,
+        "So": 9.19588e-05,
+        "Eap": 46.60221855,
+        "Po": 8344245.628
+    },
+    "OX009": {
+	    "Name": "Nagase_dry",
+        "alias": "PIB-B",
+        "Fickian": true,
+        "Ead": 47.53715467,
+        "Do": 11.22649621,
+        "Eas": 2.574465974,
+        "So": 0.000433787,
+        "Eap": 50.11162064,
+        "Po": 42076035.42
+    },
+    "OX010": {
+	    "Name": "Nagase_wet",
+        "alias": "PIB-B",
+        "Fickian": true,
+        "Ead": 42.09928821,
+        "Do": 0.973239619,
+        "Eas": 3.706124657,
+        "So": 0.001037698,
+        "Eap": 45.80541287,
+        "Po": 8725784.224
+    },
+    "OX011": {
+	    "Name": "Oppanol_B_200",
+	    "Source": "G. J. Van Amerongen, The Permeability of Different Rubbers to Gases and Its Relation to Diffusivity and Solubility, Journal of Applied Physics 17, 972 (1946); https://doi.org/10.1063/1.1707667",
+        "alias": "PIB-lit",
+        "Fickian": true,
+        "Ead": 45.18908901,
+        "Do": 7.3,
+        "Eas": -0.418217328,
+        "So": 0.000129043,
+        "Eap": 44.77087169,
+        "Po": 8138979.958
+    }
+}
