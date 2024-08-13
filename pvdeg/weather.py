@@ -2,6 +2,9 @@
 Collection of classes and functions to obtain spectral parameters.
 """
 
+from pvdeg import humidity
+from pvdeg.utilities import nrel_kestrel_check
+
 from pvlib import iotools
 import os
 import glob
@@ -10,7 +13,6 @@ from rex import NSRDBX, Outputs
 from pvdeg import humidity
 import datetime
 import numpy as np
-
 import h5py
 import dask.dataframe as dd
 import xarray as xr
@@ -27,7 +29,7 @@ def get(database, id=None, geospatial=False, **kwargs):
     database : (str)
         'NSRDB' or 'PVGIS'
     id : (int or tuple)
-        If NSRDB, id is the gid for the desired location
+        If NSRDB, id is the gid for the desired location. 
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
     geospatial : (bool)
         If True, initialize weather data via xarray dataset and meta data via
@@ -108,6 +110,8 @@ def get(database, id=None, geospatial=False, **kwargs):
 
     elif geospatial:
         if database == "NSRDB":
+            nrel_kestrel_check()
+
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
             meta_df["wind_height"] = 2
         elif database == "local":

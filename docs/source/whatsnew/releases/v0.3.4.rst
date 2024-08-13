@@ -1,0 +1,18 @@
+v0.3.4 (2024-06-13)
+=======================
+
+Enhancements
+------------
+* Unified Cell and Module Temperature function. See: `temperature.temperature``
+* Added support for pvlib temperature models. `see pvlib docs <https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html>`
+* Overhauled scenario class for pv system analysis. Scenario object for single point analysis and GeospatialScenario object for geospatial analysis. See: `scenario.Scenario` and `scenario.GeospatialScenario`
+* Created Scenario tutorials to showcase new scenario functionality.
+* Added a number of geospatial downselection functions. Find coordinates near mountains, rivers, coastlines and lakes from NSRDB data. See: `geospatial.identify_mountains_weights`, `geospatial.identify_mountains_radii`, `geospatial.feature_downselect`
+* Added geospatial bounding box support. Clip unwanted data with rectangular bounding boxes. See: `geospatial.apply_bounding_box`
+* Added stochastic non-uniform density downselection function to preferentially select for mountains (higher point density with changes in elevation, lower density when flatter.) See:  `geospatial.elevation_stochastic_downselection`
+* Updated non-uniform downselection with thresholding and non-linear normalization (support for logarithmic and exponential normalization) See: `geospatial.identify_mountains_weights`
+* Added Scenario and GeospatialScenario methods for quick plotting and downselection. See: `GeospatialScenario.plot_coords`, `GeospatialScenario.plot_meta_classification` `GeospatialScenario.plot_USA`, `Scenario.extract`, `Scenario.plot`, `GeospatialScenario.classify_mountain_weights`, `GeospatialScenario.classify_mountain_radii`, `GeospatialScenario.downselect_elevation_stochastic`
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
