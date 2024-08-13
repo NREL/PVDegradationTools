@@ -96,7 +96,7 @@ def poa_irradiance(
     -------
     poa : pandas.DataFrame
          Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
-         'poa_sky_diffuse', 'poa_ground_diffuse'.
+         'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
     """
 
     # TODO: change for handling HSAT tracking passed or requested
