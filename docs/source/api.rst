@@ -26,6 +26,7 @@ Modules, methods, classes and attributes are explained here.
     geospatial
     spectral
     standards
+    symbolic
     temperature
     utilities
     weather

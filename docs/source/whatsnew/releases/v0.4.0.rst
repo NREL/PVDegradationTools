@@ -5,8 +5,10 @@ Enhancements
 ---------
 * Autotemplating system for geospatial analysis using `pvdeg.geospatial.autotemplate`
 * New module `pvdeg.decorators` that contains `pvdeg` specific decorator functions.
-* Implemented `geospatial_result_type` decorator to update functions and preform runtime introspection to determine if a function is autotemplate-able. 
+* Implemented `geospatial_result_type` decorator to update functions and preform runtime introspection to determine if a function is autotemplate-able.
 * `Geospatial Templates.ipynb` notebook to showcase new and old templating functionality for users.
+* symbolic equation solver for simple models.
+* notebook tutorial `Custom-Functions-Nopython.ipynb`
 
 Bug Fixes
 ---------
@@ -14,8 +16,10 @@ Bug Fixes
 * Replaced deprecated numba `jit(nopython=True)` calls with `njit`
 * Fixed whatsnew `v0.3.5` author
 
+Requirements
+------------
+* `sympy` package required for `pvdeg.symbolic` functions and notebook. Not added to dependency list.
+
 Contributors
 ~~~~~~~~~~~~
 * Tobin Ford (:ghuser:`tobin-ford`)
-
-
