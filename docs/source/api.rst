@@ -22,6 +22,8 @@ Modules, methods, classes and attributes are explained here.
     humidity
     letid
     montecarlo
+    scenario
+    geospatial
     spectral
     standards
     temperature
