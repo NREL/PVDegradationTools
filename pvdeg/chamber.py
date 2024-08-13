@@ -185,7 +185,7 @@ def flat_restore_index(series):
 
 def setpoint_series(df: pd.DataFrame, setpoint_name: str) -> pd.Series:
     if df[setpoint_name].isnull().sum():
-        return ValueError(
+        raise ValueError(
             f"column: {setpoint_name} contains NaN values. Remove from setpoint list or remove NaN's in input."
         )
 
