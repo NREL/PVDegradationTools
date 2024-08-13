@@ -1,7 +1,8 @@
-"""Collection of functions for PV module design considertations.
-"""
+"""Collection of functions for PV module design considertations."""
 
 from . import humidity
+from pvdeg.decorators import geospatial_quick_shape
+import pandas as pd
 
 
 def edge_seal_ingress_rate(avg_psat):
@@ -41,7 +42,14 @@ def edge_seal_ingress_rate(avg_psat):
     return k
 
 
-def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
+@geospatial_quick_shape(0, ["width"])
+def edge_seal_width(
+    weather_df: pd.DataFrame,
+    meta: dict,
+    k: float = None,
+    years: int = 25,
+    from_dew_point: bool = False,
+):
     """
     Determine the width of edge seal required for given number of years water ingress.
 

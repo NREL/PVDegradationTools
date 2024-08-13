@@ -10,6 +10,7 @@ User Guide
    package_overview
    NSRDB_API_Key
    montecarlo
+   geospatial-templates
    pv-variables-terms
    contributing
    

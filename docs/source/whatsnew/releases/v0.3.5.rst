@@ -1,0 +1,11 @@
+v0.3.5 (2024-07-23)
+=======================
+
+Enhancements
+---------
+* Implemented testing for geospatial analysis
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
+

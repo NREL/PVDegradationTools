@@ -6,10 +6,10 @@ pvdeg.utilities
 
 .. automodule:: pvdeg.utilities
 
-   .. this is crazy  
+   .. this is crazy
 
-   
-   
+
+
 
    Function Overview
    -----------------
@@ -18,7 +18,7 @@ pvdeg.utilities
       :toctree:
       :nosignatures:
 
-      
+
       pvdeg.utilities.convert_tmy
       pvdeg.utilities.fix_metadata
       pvdeg.utilities.geospatial_from_csv
@@ -35,19 +35,19 @@ pvdeg.utilities
       pvdeg.utilities.ts_gid_df
       pvdeg.utilities.write_gids
 
-   
-   
-   
-   .. this is crazy  
 
-   
-   
 
-.. 
+
+   .. this is crazy
+
+
+
+
+..
    Functions
    ---------
 
-   
+
 
    .. autofunction:: convert_tmy
 
@@ -153,13 +153,3 @@ pvdeg.utilities
 
    .. minigallery:: pvdeg.utilities.write_gids
        :add-heading:
-   
-   
-
-   
-   
-   
-
-   
-   
-   
