@@ -18,6 +18,8 @@ from typing import Union, Tuple
 from pvdeg import temperature, spectral, utilities, weather
 from pvdeg.decorators import geospatial_quick_shape
 
+# passing all tests after updating temperature models but this should be checked throughly before final release
+
 
 @geospatial_quick_shape(1, ["T_0", "T_inf", "poa"])
 def eff_gap_parameters(
@@ -31,6 +33,7 @@ def eff_gap_parameters(
     tilt=None,
     azimuth=None,
     wind_factor=0.33,
+    model_kwarg={},
 ):
     """
     Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system
@@ -108,21 +111,27 @@ def eff_gap_parameters(
         azimuth=azimuth,
         sky_model=sky_model,
     )
-    T_0 = temperature.cell(
+
+    T_0 = temperature.temperature(
+        cell_or_mod="cell",
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg,
     )
-    T_inf = temperature.cell(
+
+    T_inf = temperature.temperature(
+        cell_or_mod="cell",
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg,
     )
 
     return T_0, T_inf, poa
@@ -152,7 +161,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
         Thermal decay constant [cm], [Kempe, PVSC Proceedings 2023].
         According to edition 2 of IEC TS 63126 a value of 6.5 cm is recommended.
     poa_min : float, optional
-        Minimum iradiance 
+        Minimum iradiance
     t_ambient_min : floa, optional
         Minimum am
 
@@ -180,6 +189,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
                 )
     try:
         x_eff = -x_0 * np.log(1 - summ / n)
+        # x_eff = np.multiply(np.negative(x_0), np.log(np.subtract(1, np.divide(summ, n))))
     except RuntimeWarning as e:
         x_eff = (
             np.nan
@@ -190,7 +200,10 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
     return x_eff
 
 
-@geospatial_quick_shape(0, ["x","T98_0", "T98_inf"]) # numeric result, with corresponding datavariable names
+# test conf for other temperature models
+@geospatial_quick_shape(
+    0, ["x", "T98_0", "T98_inf"]
+)  # numeric result, with corresponding datavariable names
 def standoff(
     weather_df: pd.DataFrame = None,
     meta: dict = None,
@@ -201,9 +214,13 @@ def standoff(
     temp_model: str = "sapm",
     conf_0: str = "insulated_back_glass_polymer",
     conf_inf: str = "open_rack_glass_polymer",
+    conf_0_kwarg={},
+    conf_inf_kwarg={},
     T98: float = 70,  # [°C]
     x_0: float = 6.5,  # [cm]
     wind_factor: float = 0.33,
+    irradiance_kwarg={},
+    model_kwarg={},
 ) -> pd.DataFrame:
     """
     Calculate a minimum standoff distance for roof mounded PV systems.
@@ -228,14 +245,28 @@ def standoff(
     sky_model : str, optional
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
     temp_model : str, optional
-        Options: 'sapm'.  'pvsyst' and 'faiman' will be added later.
         Performs the calculations for the cell temperature.
+        Options:
+        `'sapm_cell'`,`'sapm_module'`,`'pvsyst_cell'`,`'faiman'`,`'faiman_rad'`,
+        `'ross'`,`'noct_sam'`, `'fuentes'`, `'generic_linear'`.
+        Note: we cannot simply drop in `pvsyst` using `conf_0=insulated` and
+        `conf_inf=freestanding`. This will yield erroneous results as these
+        configurtions represent different cases. Must provide equivalent
+        `conf_0_kwarg` and `conf_inf_kwarg` between temperature models.
     conf_0 : str, optional
         Model for the high temperature module on the exponential decay curve.
         Default: 'insulated_back_glass_polymer'
     conf_inf : str, optional
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
+    conf_0_kwarg : dict, optional
+        keyword arguments for the high tempeature module on the exponential
+        decay curve. Use for temperature models other than ``sapm`` model
+        arguments representing an 'insulated_back_glass_polymer' module.
+    conf_inf_kwarg : dict, optional
+        keyword arguments for the lowest tempeature module on the exponential
+        decay curve. Use for temperature models other than ``sapm`` model
+        arguments representing an 'open_rack_glass_polymer' module.
     x_0 : float, optional
         Thermal decay constant (cm), [Kempe, PVSC Proceedings 2023]
     wind_factor : float, optional
@@ -245,6 +276,13 @@ def standoff(
         It is recommended that a power-law relationship between height and wind speed of 0.33
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        Used in place of dedicated arguments in the case of a top down scenario
+        method call.
+    model_kwarg : dict, optional
+        dictionary to provide to the temperature model, see temperature.temperature for more information
 
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
@@ -277,30 +315,40 @@ def standoff(
         weather_df, meta = weather.get(**weather_kwarg)
 
     solar_position = spectral.solar_position(weather_df, meta)
+
+    irradiance_dict = {
+        "sol_position": solar_position,
+        "tilt": tilt,
+        "azimuth": azimuth,
+        "sky_model": sky_model,
+    }
+
     poa = spectral.poa_irradiance(
-        weather_df=weather_df,
-        meta=meta,
-        sol_position=solar_position,
-        tilt=tilt,
-        azimuth=azimuth,
-        sky_model=sky_model,
+        weather_df=weather_df, meta=meta, **irradiance_dict | irradiance_kwarg
     )
-    T_0 = temperature.cell(
+
+    T_0 = temperature.temperature(
+        cell_or_mod="cell",
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_0,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg | conf_0_kwarg,  # may lead to undesired behavior, test
     )
     T98_0 = T_0.quantile(q=0.98, interpolation="linear")
-    T_inf = temperature.cell(
+
+    T_inf = temperature.temperature(
+        cell_or_mod="cell",
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg
+        | conf_inf_kwarg,  # may lead to undesired behavior, test
     )
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
@@ -432,6 +480,7 @@ def T98_estimate(
     azimuth=None,
     x_eff=None,
     x_0=6.5,
+    model_kwarg={},
 ):
     """
     Estimate the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
@@ -472,6 +521,9 @@ def T98_estimate(
         It is recommended that a power-law relationship between height and wind speed of 0.33
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
+    model_kwarg : dict, optional
+        keyword argument dictionary to provide other arguments to the temperature model.
+        See temperature.temperature for more information.
 
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
@@ -503,30 +555,35 @@ def T98_estimate(
         azimuth=azimuth,
         sky_model=sky_model,
     )
-
-    T_inf = temperature.cell(
+    T_inf = temperature.temperature(
+        cell_or_mod="cell",
         weather_df=weather_df,
         meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf_inf,
         wind_factor=wind_factor,
+        model_kwarg=model_kwarg,
     )
+
     T98_inf = T_inf.quantile(q=0.98, interpolation="linear")
 
     if x_eff == None:
         return T98_inf
     else:
-        T_0 = temperature.cell(
+        T_0 = temperature.temperature(
+            cell_or_mod="cell",
             weather_df=weather_df,
             meta=meta,
             poa=poa,
             temp_model=temp_model,
             conf=conf_0,
             wind_factor=wind_factor,
+            model_kwarg=model_kwarg,
         )
         T98_0 = T_0.quantile(q=0.98, interpolation="linear")
         T98 = T98_0 - (T98_0 - T98_inf) * (1 - np.exp(-x_eff / x_0))
+
         return T98
 
 
@@ -542,6 +599,7 @@ def standoff_x(
     T98=None,
     x_0=None,
     wind_factor=None,
+    model_kwarg={},
 ):
     """
     Calculate a minimum standoff distance for roof mounded PV systems.
@@ -566,6 +624,7 @@ def standoff_x(
         azimuth=azimuth,
         sky_model=sky_model,
         temp_model=temp_model,
+        model_kwarg=model_kwarg,
         conf_0=conf_0,
         conf_inf=conf_inf,
         T98=T98,
