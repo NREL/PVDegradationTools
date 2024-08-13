@@ -285,6 +285,8 @@ def output_template(
 
 
 # we should be able to get rid of this with the new autotemplating function and decorator
+# this is helpful for users so we should move it to a section in the documenation,
+# discuss with group
 def template_parameters(func):
     """
     Output parameters for xarray template.
