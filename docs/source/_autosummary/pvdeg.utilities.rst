@@ -153,3 +153,4 @@ pvdeg.utilities
 
    .. minigallery:: pvdeg.utilities.write_gids
        :add-heading:
+       :add-heading:

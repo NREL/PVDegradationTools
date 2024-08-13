@@ -16,6 +16,15 @@ Enhancements
 Bug Fixes
 ---------
 * Fix incorrect keyword arguments in `pvdeg.standards.T98_estimate`
+* Fixed ``pvdeg.temperature.module`` and ``pvdeg.temperature.cell`` docstring return type. Correct return type ``pd.Series``
+
+Dependencies
+------------
+* Restrict the following dependencies to fix unit testing
+- numpy==1.26.4
+- pvlib==0.10.3
+- scipy<1.14.0
+
 
 Contributors
 ~~~~~~~~~~~~

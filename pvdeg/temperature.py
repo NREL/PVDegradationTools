@@ -106,8 +106,14 @@ def module(
 
     Parameters
     ----------
-    weather_df : (pd.dataframe)
-        Data Frame with minimum requirements of 'temp_air' and 'wind_speed' poa : pandas.DataFrame Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse', 'poa_sky_diffuse', 'poa_ground_diffuse'.  temp_model : str, optional The temperature model to use, Sandia Array Performance Model 'sapm' from pvlib by default.
+    weather_df : pd.dataframe
+        Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
+    poa : pandas.DataFrame
+         Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
+         'poa_sky_diffuse', 'poa_ground_diffuse'.
+    temp_model : str, optional
+        The temperature model to use, Sandia Array Performance Model 'sapm'
+        from pvlib by default.
     conf : str, optional
         The configuration of the PV module architecture and mounting
         configuration.
@@ -118,7 +124,7 @@ def module(
 
     Returns
     -------
-    module_temperature : pandas.DataFrame
+    module_temperature : pandas.Series
         The module temperature in degrees Celsius at each time step.
     """
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
@@ -220,7 +226,7 @@ def cell(
 
     Return:
     -------
-    temp_cell : pandas.DataFrame
+    temp_cell : pandas.Series
         This is the temperature of the cell in a module at every time step.[°C]
     """
 
