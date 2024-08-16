@@ -13,7 +13,8 @@ Scenarios
 * Added geospatial bounding box support. Clip unwanted data with rectangular bounding boxes. See: ``geospatial.apply_bounding_box``
 * Added stochastic non-uniform density downselection function to preferentially select for mountains (higher point density with changes in elevation, lower density when flatter.) See:  ``geospatial.elevation_stochastic_downselection``
 * Updated non-uniform downselection with thresholding and non-linear normalization (support for logarithmic and exponential normalization) See: ``geospatial.identify_mountains_weights``
-* Added Scenario and GeospatialScenario methods for quick plotting and downselection. See: ``GeospatialScenario.plot_coords``, ``GeospatialScenario.plot_meta_classification``, ``GeospatialScenario.plot_USA``, ``Scenario.extract``, ``Scenario.plot``, ``GeospatialScenario.classify_mountain_weights``, ``GeospatialScenario.classify_mountain_radii``, ``GeospatialScenario.downselect_elevation_stochastic``
+* Added Scenario and GeospatialScenario methods for quick plotting and downselection. See: ``GeospatialScenario.plot_coords``, ``GeospatialScenario.plot_meta_classification``, ``GeospatialScenario.plot_USA``, ``Scenario.extract``, ``Scenario.plot``, ``GeospatialScenario.classify_mountain_weights``, ``GeospatialScenario.classify_mountain_radii``, ``GeospatialScenario.downselect_elevation_stochastic``.  
+* Added a convenience method ``GepspatialScenario.geospatial_data`` to quickly pull the geospatial weather and metadata from a scenario. Matches the API for ``pvdeg.weather.get``.  
 
 Geospatial Improvements  
 
@@ -40,6 +41,7 @@ Bug Fixes
 * Replaced deprecated numba `jit(nopython=True)` calls with `njit`
 * Fix incorrect keyword arguments in `pvdeg.standards.T98_estimate`
 * Fixed ``pvdeg.temperature.module`` and ``pvdeg.temperature.cell`` docstring return type. Correct return type ``pd.Series``
+* Fixed broken Geospatial Analysis, when using chunked (dask) xarrays for weather data
 
 Dependencies
 ------------
