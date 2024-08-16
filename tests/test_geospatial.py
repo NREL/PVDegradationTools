@@ -17,7 +17,7 @@ HUMIDITY_TEMPLATE = xr.open_dataset(
 ).compute()
 
 
-def test_analysis_standoff():
+def test_analysis_standoff_unchunked():
     res_ds = pvdeg.geospatial.analysis(
         weather_ds=GEO_WEATHER,
         meta_df=GEO_META,
