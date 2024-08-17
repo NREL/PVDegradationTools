@@ -256,12 +256,14 @@ def test_wind_speed_factor_noct_sam():
     assert 2 == height_above_3m
     assert 1 == height_below_3m
 
+
 def test_wind_speed_factor_prillman():
     wind_speed_factor = pvdeg.temperature._wind_speed_factor(
         temp_model="prillman", meta=META, wind_factor=None
     )
 
     assert 1 == wind_speed_factor
+
 
 def test_wind_speed_factor_generic_linear():
     wind_speed_factor = pvdeg.temperature._wind_speed_factor(
@@ -270,7 +272,10 @@ def test_wind_speed_factor_generic_linear():
 
     pytest.approx(1.2730501155464236, wind_speed_factor)
 
-# this test will fail when the else condition becomes deprecated in the future. 
+
+# this test will fail when the else condition becomes deprecated in the future.
 # It is fine to remove this when it stops working, added for coverage purposes
 def test_wind_speed_factor_null():
-    assert 1 == pvdeg.temperature._wind_speed_factor(temp_model='', meta=META, wind_factor=None)
+    assert 1 == pvdeg.temperature._wind_speed_factor(
+        temp_model="", meta=META, wind_factor=None
+    )
