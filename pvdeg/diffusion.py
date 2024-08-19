@@ -4,11 +4,12 @@ Collection of classes and functions to calculate diffusion of permeants into a P
 
 import os
 import json
-import pvdeg
 import pandas as pd
 from pvdeg import DATA_DIR
+from numba import jit
+import numpy as np
 
-def esdiffusion (
+def esdiffusion(
         temperature, 
         es=None, 
         enc=None, 
@@ -17,6 +18,7 @@ def esdiffusion (
         sn=20, 
         en=50,
         press = 0.209,
+        repeat = 1,
         ** kwarg
         ):
     
@@ -44,6 +46,10 @@ def esdiffusion (
         This is the number of nodes used for the calculation in the edge seal.
     en : integer, required
         This is the number of nodes used for the calculation in the encapsulant.
+    press : float, optional
+        This is the partial pressure of oxygen.
+    repeat : integer, optional
+        This is the number of times to do the calculation for the whole dataset. E.g. repeat the 1-y data for 10 years.
     kwargs : dict, optional
         If es or enc are left at 'None' then the parameters, Dos, Eads, Sos, Eass, Doe, Eade, Soe, Ease in units of 
         [cm²/s], [g/cm³], or [kJ/mol] for diffusivity, solubility, or activation energy respectively.
@@ -57,30 +63,88 @@ def esdiffusion (
 
     with open(os.path.join(DATA_DIR, 'O2permeation.json')) as user_file:
         O2= json.load(user_file)
-    user_file.close()
+        user_file.close()
     #O2
+    if es == None:
+        esp = O2.get('OX005')    #This is the number for the edge seal in the json file
+    else:
+        esp = O2.get(es)
 
-    es = O2.get('OX005')    #This is the number for the edge seal in the json file
-    enc = O2.get('OX003')   #This is the number for the encapsulant in the json file
+    if enc == None:
+        encp = O2.get('OX003')   #This is the number for the encapsulant in the json file
+    else:
+        encp =O2.get(enc)
 
     #These are the edge seal oxygen permeation parameters
-    Dos=es.get('Do')
-    Eads=es.get('Ead')/0.0083144626
-    Sos=es.get('So')
-    Eass=es.get('Eas')/0.0083144626
+    Dos=esp.get('Do')
+    Eads=esp.get('Ead')/0.0083144626
+    Sos=esp.get('So')*press #puts in the adjustment for the atmospheric pressure or oxygen.
+    Eass=esp.get('Eas')/0.0083144626
     #These are the encapsulant oxygen permeaiton parameters
-    Doe=enc.get('Do')
-    Eade=enc.get('Ead')/0.0083144626
-    Soe=enc.get('So')
-    Ease=enc.get('Eas')/0.0083144626
+    Doe=encp.get('Do')
+    Eade=encp.get('Ead')/0.0083144626
+    Soe=encp.get('So')*press #puts in the adjustment for the atmospheric pressure or oxygen.
+    Ease=encp.get('Eas')/0.0083144626
 
-    Esw = 1.5   #This is the edge seal width in [cm]
-    Encw = 10   #This is the encapsulant width in [cm]
-    sn = 20     #This is the number of edge seal nodes to use
-    en = 50     #This is the number of encapsulant nodes to use
-    Esw = Esw/sn
-    Encw = Encw/en
+    so=Sos/Soe
+    eas=Eass-Ease
+    dod=Dos/Doe
+    ead=Eads-Eade
 
-    ingress_data = temperature
+    esw = esw/(sn-0.5) #The 0.5 is put in there because the model exterior is defined as the center of the edge node.
+    encw = encw/(en-0.5) #The 0.5 is put in because the model interior encapsulant node is a point of symmetry and defines the condition at the center line.
 
-    return ingress_data
+    perm_mid = np.array(np.zeros((sn + en + 3))) #This is the profile at a transition point between output points.
+    perm = np.array(np.zeros((len(temperature)*repeat-repeat+1, sn + en + 3))) #It adds in two nodes for the interface concentration for both materials and one for the hour column.
+    temperature = pd.DataFrame(temperature, columns = ['module_temperature','time','time_step']) #This adds the number of time steps to be used as a subdivision between data points. [s]
+    met_data = temperature[['module_temperature','time']].to_numpy()
+    met_data[:,0]=met_data[:,0]+273.15
+    time_step = np.array(np.ones(len(temperature)), dtype=np.int8)
+
+    for row in range(0,  len(met_data)-1): #This section sets up the number of sub calculations for each output point to ensure model calculation stability.
+        dt=met_data[row+1][1]-met_data[row][1]
+        fos = Dos * np.exp(-Eads/met_data[row][0]) * dt / esw / esw
+        foe = Doe * np.exp(-Eads/met_data[row][0])* dt / encw / encw #This is the dimensionless Fourrier number for the encapsulant. Diffusivity [=] cm2/s, T [=] s, w [=] cm  
+        if fos>0.25 or foe>0.25:
+            if fos>foe:
+                time_step[row] = np.trunc(fos*4) + 1
+            else:
+                time_step[row] = np.trunc(foe*4) + 1
+
+    perm[0][1]=Sos*np.exp(-Eass/met_data[0][0])
+    perm_mid = perm[0]
+    for rp_num in range(repeat):
+        rp_time = rp_num*met_data[met_data.shape[0]-1][1]
+        rp_row = rp_num*(met_data.shape[0]-1) #-1 is used because it doesn't know how much time to have from the end of the data to a repeat of the data, it just ignores the loop step.
+        for row in range(0,  len(temperature)-1):
+            dt=((met_data[row+1][1]-met_data[row][1])/time_step[row+1])*3600 #Time step in [s]
+            dtemp=(met_data[row+1][0]-met_data[row][0])/time_step[row+1] #Temperature step in [C]
+            for mid_point in range(1, time_step[row+1]+1):
+                fos = Dos * np.exp(-Eads/( met_data[row][0]+dtemp*mid_point)) * dt / esw / esw
+                foe = Doe * np.exp(-Eade/( met_data[row][0]+dtemp*mid_point))* dt / encw / encw
+                r1=so*np.exp(-eas/(met_data[row][0]+dtemp*mid_point))
+                r2=dod*np.exp(-ead/(met_data[row][0]+dtemp*mid_point))*r1*esw/encw
+                for node in range(2, sn): #Calculates the edge seal nodes. Adjusted to not calculate ends and to have the first node be temperature.
+                    perm[row+1 + rp_row][node]=perm_mid[node]+fos*(perm_mid[node-1]+perm_mid[node+1]-2*perm_mid[node])
+                for node in range(sn+3, en + sn+2): # calculates the encapsulant nodes. Adjust to not calculated ends and for a prior temperature and two interface nodes.
+                    perm[row+1 + rp_row][node]=perm_mid[node]+foe*(perm_mid[node-1]+perm_mid[node+1]-2*perm_mid[node])
+                perm[row+1 + rp_row][en+sn+2]=perm_mid[en+sn+2]+2*foe*(perm_mid[en+sn+1]-perm_mid[en+sn+2])  #Calculates the center encapsulant node. Accounts for temperature and two interfade nodes. 
+                perm[row+1 + rp_row][sn]=perm_mid[sn]+fos*(perm_mid[sn-1]+perm_mid[sn+3]*r1-2*perm_mid[sn])*2/(1+r2) #Calculated edge seal node adjacent to the first encapsulant node. Node numbers shifted.
+                perm[row+1 + rp_row][sn+3]=perm_mid[sn+3]+fos*(perm_mid[sn]/r1+perm_mid[sn+4]-2*perm_mid[sn+3])*2/(1+1/r2) #Calculated encapsulant node adjacent to the last edge seal node. Node numbers shifted.
+                perm[row+1 + rp_row][1]=Sos*np.exp(-Eass/(met_data[row+1][0]+dtemp*mid_point))
+                perm_mid = perm[row+1 + rp_row]
+            perm[row+1 + rp_row][sn+1]= (perm_mid[sn+3]*r2-perm_mid[sn]*r1)/(r1+1) #calculate edge seal at interface.
+            perm[row+1 + rp_row][sn+2]=perm[row-1 + rp_row][sn+1]/r1 #calculate encapsulant at interface
+            perm[row+1 + rp_row][0] = rp_time + met_data[row+1][1]
+        met_data[0][0]=met_data[met_data.shape[0]-1][0] #Because it is cycling around, it needs to start with the last temperature.
+
+    positions = np.array(np.zeros((sn + en + 3)))
+    for node in range(sn): #Creates the header values of the distance.
+        positions[node+1]=node*esw
+    positions[sn+1]=sn*esw-esw/2
+    positions[sn+2]=positions[sn+1]
+    for node in range(en):
+        positions[sn+3+node]=positions[sn+1]+encw/2+encw*node
+    perm=np.vstack([positions, perm])
+
+    return pd.DataFrame(perm[1:,1:],index=perm[1:,0],columns=perm[0,1:])
