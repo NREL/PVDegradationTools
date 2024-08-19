@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 from scipy.constants import convert_temperature
-from . import temperature
+from pvdeg import temperature
+from pvdeg.decorators import geospatial_quick_shape
 
 
 def _avg_daily_temp_change(time_range, temp_cell):
@@ -97,18 +98,23 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     return num_changes_temp_hist
 
 
+@geospatial_quick_shape(0, ["damage"])
 def solder_fatigue(
-    weather_df,
-    meta,
-    time_range=None,
-    temp_cell=None,
-    reversal_temp=54.8,
-    n=1.9,
-    b=0.33,
-    C1=405.6,
-    Q=0.12,
-    wind_factor=None,
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    time_range: pd.Series = None,
+    temp_cell: pd.Series = None,
+    reversal_temp: float = 54.8,
+    n: float = 1.9,
+    b: float = 0.33,
+    C1: float = 405.6,
+    Q: float = 0.12,
+    wind_factor: float = 0.33,
+    temp_model="sapm",
+    conf="open_rack_glass_polymer",
+    model_kwarg={},
+    irradiance_kwarg={},
+) -> float:
     """
     Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
     Damage will be returned as the rate of solder fatigue for one year. Based on:
@@ -152,6 +158,32 @@ def solder_fatigue(
         scaling constant, see the paper for details on appropriate values
     Q : float
         activation energy [eV]
+    temp_model : (str, optional)
+        Specify which temperature model from pvlib to use. Current options:
+    conf : (str)
+        The configuration of the PV module architecture and mounting
+        configuration. Currently only used for 'sapm' and 'pvsys'.
+        With different options for each.
+
+        'sapm' options: ``open_rack_glass_polymer`` (default),
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``,
+        ``insulated_back_glass_polymer``
+
+        'pvsys' options: ``freestanding``, ``insulated``
+
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    irradiance_kwarg : (dict, optional)
+        keyword argument dictionary used for the poa irradiance caluation.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+    model_kwarg : (dict, optional)
+        keyword argument dictionary used for the pvlib temperature model calculation.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
     Returns
     --------
@@ -177,8 +209,18 @@ def solder_fatigue(
         time_range = weather_df.index
 
     if temp_cell is None:
-        temp_cell = temperature.cell(
-            weather_df=weather_df, meta=meta, wind_factor=wind_factor
+        # temp_cell = temperature.cell(
+        #     weather_df=weather_df, meta=meta, wind_factor=wind_factor
+        # )
+        temp_cell = temperature.temperature(  # we just calculate poa inside
+            cell_or_mod="cell",
+            weather_df=weather_df,
+            meta=meta,
+            temp_model=temp_model,
+            conf=conf,
+            wind_factor=wind_factor,
+            irradiance_kwarg=irradiance_kwarg,
+            model_kwarg=model_kwarg,
         )
 
     temp_amplitude, temp_max_avg = _avg_daily_temp_change(time_range, temp_cell)

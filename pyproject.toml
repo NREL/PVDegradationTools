@@ -29,6 +29,9 @@ keywords = [
 ]
 dependencies = [
     "aiohttp==3.9.5",
+    "numpy==1.26.4",
+    "pvlib==0.10.3",
+    "scipy<1.14.0",
     "NREL-rex",
     "cartopy",
     "dask[dataframe]",
@@ -41,19 +44,17 @@ dependencies = [
     "netCDF4",
     "notebook",
     "numba",
-    "numpy",
     "openpyxl",
     "pandas",
     "photovoltaic",
-    "pvlib",
     "python-dateutil",
     "pytz",
-    "scipy",
     "seaborn",
     "tables",
     "tqdm",
     "xarray",
     "pre-commit",
+    "sympy",
 ]
 dynamic = ["version"]
 
@@ -70,6 +71,7 @@ docs = [
 test = [
     "pytest",
     "pytest-cov",
+    "sympy",
 ]
 books = [
     "jupyter-book",
