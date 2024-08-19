@@ -27,7 +27,6 @@ import cartopy.feature as cfeature
 from typing import Tuple
 from shapely import LineString, MultiLineString
 
-
 def start_dask(hpc=None):
     """
     Starts a dask cluster for parallel processing.
@@ -271,12 +270,12 @@ def output_template(
 
     output_template = xr.Dataset(
         data_vars={
-            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
+            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var)) # this will produce a dask array with 1 chunk of the same size as the input
             for var, dim in shapes.items()
         },
         coords={dim: ds_gids[dim] for dim in dims},
         attrs=global_attrs,
-    ) # moved chunks down from here
+    ) 
     
     if ds_gids.chunks: # chunk to match input
         output_template = output_template.chunk({dim: ds_gids.chunks[dim] for dim in dims})

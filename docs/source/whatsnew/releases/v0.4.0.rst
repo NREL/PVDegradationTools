@@ -18,11 +18,12 @@ Scenarios
 
 Geospatial Improvements  
 
-* Autotemplating system for geospatial analysis using `pvdeg.geospatial.autotemplate`
+* Autotemplating system for geospatial analysis using `pvdeg.geospatial.autotemplate`.  
 * New module `pvdeg.decorators` that contains `pvdeg` specific decorator functions.
 * Implemented `geospatial_result_type` decorator to update functions and preform runtime introspection to determine if a function is autotemplate-able.
 * `Geospatial Templates.ipynb` notebook to showcase new and old templating functionality for users.
-* Implemented testing for geospatial analysis
+* Implemented testing for geospatial analysis.  
+* Added chunked and unchunked testing.  
 
 Symbolic Evaluation  
 

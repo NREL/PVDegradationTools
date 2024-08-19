@@ -32,15 +32,15 @@ DSETS = [
 META_KEYS = [""]
 
 
-
 def test_colum_name():
-    df, meta_data=pvdeg.weather.read(
-    os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),"csv"
-)
+    df, meta_data = pvdeg.weather.read(
+        os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"), "csv"
+    )
     assert "City" in meta_data.keys()
     assert "tz" in meta_data.keys()
     assert "Year" in df
     assert "dew_point" in df
+
 
 def test_get():
     """
