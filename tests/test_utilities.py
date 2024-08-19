@@ -131,6 +131,7 @@ def test_add_material():
         json.dump(data, f, indent=4)
 
 
+# this only works because we are not running on kestrel
 def test_nrel_kestrel_check_bad():
     with pytest.raises(ConnectionError):
         pvdeg.utilities.nrel_kestrel_check()

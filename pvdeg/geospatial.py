@@ -269,9 +269,6 @@ def output_template(
     dims = set([d for dim in shapes.values() for d in dim])
     dims_size = dict(ds_gids.sizes) | add_dims
 
-    # if len(ds_gids.chunks) == 0:
-    #     raise ValueError(f"argument ds_gids must contain chunks")
-
     output_template = xr.Dataset(
         data_vars={
             var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
@@ -279,7 +276,10 @@ def output_template(
         },
         coords={dim: ds_gids[dim] for dim in dims},
         attrs=global_attrs,
-    )  # .chunk({dim: ds_gids.chunks[dim] for dim in dims})
+    ) # moved chunks down from here
+    
+    if ds_gids.chunks: # chunk to match input
+        output_template = output_template.chunk({dim: ds_gids.chunks[dim] for dim in dims})
 
     return output_template
 
