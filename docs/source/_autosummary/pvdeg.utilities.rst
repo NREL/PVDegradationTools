@@ -19,10 +19,12 @@ pvdeg.utilities
       :nosignatures:
 
       
+      pvdeg.utilities.compare_templates
       pvdeg.utilities.convert_tmy
       pvdeg.utilities.fix_metadata
       pvdeg.utilities.geospatial_from_csv
       pvdeg.utilities.get_kinetics
+      pvdeg.utilities.get_state_bbox
       pvdeg.utilities.gid_downsampling
       pvdeg.utilities.meta_as_dict
       pvdeg.utilities.new_id
@@ -48,6 +50,13 @@ pvdeg.utilities
    ---------
 
    
+
+   .. autofunction:: compare_templates
+
+   .. _sphx_glr_backref_pvdeg.utilities.compare_templates:
+
+   .. minigallery:: pvdeg.utilities.compare_templates
+       :add-heading:
 
    .. autofunction:: convert_tmy
 
@@ -75,6 +84,13 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.get_kinetics:
 
    .. minigallery:: pvdeg.utilities.get_kinetics
+       :add-heading:
+
+   .. autofunction:: get_state_bbox
+
+   .. _sphx_glr_backref_pvdeg.utilities.get_state_bbox:
+
+   .. minigallery:: pvdeg.utilities.get_state_bbox
        :add-heading:
 
    .. autofunction:: gid_downsampling

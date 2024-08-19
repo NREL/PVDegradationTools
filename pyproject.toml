@@ -71,6 +71,7 @@ docs = [
 test = [
     "pytest",
     "pytest-cov",
+    "sympy",
 ]
 books = [
     "jupyter-book",

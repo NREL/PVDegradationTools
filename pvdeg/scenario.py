@@ -1206,7 +1206,9 @@ class GeospatialScenario(Scenario):
 
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
 
-        geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(
+        # we don't downsample weather data until this runs 
+        # because on NSRDB we are storing weather OUT of MEMORY with dask
+        geo_meta, geo_gids = pvdeg.utilities.gid_downsampling( 
             geo_meta, downsample_factor
         )
 
@@ -1524,6 +1526,29 @@ class GeospatialScenario(Scenario):
         )
 
         return coords
+
+    def geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
+        """
+        Extract the geospatial weather dataset and metadata dataframe from the scenario object
+        
+        Example Use:
+        >>> geo_weather, geo_meta = GeospatialScenario.geospatial_data()
+
+        This gets us the result we would use in the traditional pvdeg geospatial approach.
+
+        Parameters:
+        -----------
+        None
+
+        Returns:
+        --------
+        (weather_data, meta_data): (xr.Dataset, pd.DataFrame)        
+            A tuple of weather data as an `xarray.Dataset` and the corresponding meta data as a dataframe.
+        """
+        # downsample here, not done already happens at pipeline runtime
+        geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index) 
+        return geo_weather_sub, self.meta_data
+        
 
     def addJob(
         self,

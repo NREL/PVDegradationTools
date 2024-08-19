@@ -4,10 +4,14 @@ Collection of classes and functions to calculate different temperatures.
 
 import pvlib
 import pvdeg
+from pvdeg.decorators import geospatial_quick_shape
+import pandas as pd
+from typing import Union
 from functools import partial
 import inspect
 
-def map_model(temp_model:str, cell_or_mod:str)->callable:
+
+def map_model(temp_model: str, cell_or_mod: str) -> callable:
     """
     Utility function to map string to pvlib function.
 
@@ -16,40 +20,41 @@ def map_model(temp_model:str, cell_or_mod:str)->callable:
     https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
     """
     # sapm_cell_from_module?
-    # prillman diverges from others, used for smoothing/interp      
+    # prillman diverges from others, used for smoothing/interp
 
     # double check that models are in correct maps
-    module = { # only module
-        'sapm' : pvlib.temperature.sapm_module,
-        'sapm_mod' : pvlib.temperature.sapm_module,
+    module = {  # only module
+        "sapm": pvlib.temperature.sapm_module,
+        "sapm_mod": pvlib.temperature.sapm_module,
     }
 
-    cell = { # only cell 
-        'sapm' : pvlib.temperature.sapm_cell,
-        'sapm_cell' : pvlib.temperature.sapm_cell,
-        'pvsyst' : pvlib.temperature.pvsyst_cell,
-        'ross' : pvlib.temperature.ross,
-        'noct_sam' : pvlib.temperature.noct_sam,  
-        'generic_linear' : pvlib.temperature.generic_linear,
+    cell = {  # only cell
+        "sapm": pvlib.temperature.sapm_cell,
+        "sapm_cell": pvlib.temperature.sapm_cell,
+        "pvsyst": pvlib.temperature.pvsyst_cell,
+        "ross": pvlib.temperature.ross,
+        "noct_sam": pvlib.temperature.noct_sam,
+        "generic_linear": pvlib.temperature.generic_linear,
     }
 
-    agnostic = { # module or cell
-        'faiman' : pvlib.temperature.faiman,
-        'faiman_rad' : pvlib.temperature.faiman_rad,
-        'fuentes' : pvlib.temperature.fuentes,
+    agnostic = {  # module or cell
+        "faiman": pvlib.temperature.faiman,
+        "faiman_rad": pvlib.temperature.faiman_rad,
+        "fuentes": pvlib.temperature.fuentes,
     }
 
-    super_map = {'module' : module, 'cell' : cell}
-    
+    super_map = {"module": module, "cell": cell}
+
     if cell_or_mod:
-        agnostic.update(super_map[cell_or_mod]) # bad naming
+        agnostic.update(super_map[cell_or_mod])  # bad naming
     else:
-        agnostic.update(module) # if none then we use all
+        agnostic.update(module)  # if none then we use all
         agnostic.update(cell)
 
     return agnostic[temp_model]
 
-def _wind_speed_factor(temp_model:str, meta:dict, wind_factor:float):
+
+def _wind_speed_factor(temp_model: str, meta: dict, wind_factor: float):
     if temp_model == "sapm":
         wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
     elif temp_model == "pvsyst":
@@ -86,6 +91,8 @@ def _wind_speed_factor(temp_model:str, meta:dict, wind_factor:float):
 
     return wind_speed_factor
 
+
+@geospatial_quick_shape(1, ["module_temperature"])
 def module(
     weather_df,
     meta,
@@ -93,14 +100,20 @@ def module(
     temp_model="sapm",
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
-    ):
+):
     """
     Calculate module surface temperature using pvlib.
 
     Parameters
     ----------
-    weather_df : (pd.dataframe)
-        Data Frame with minimum requirements of 'temp_air' and 'wind_speed' poa : pandas.DataFrame Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse', 'poa_sky_diffuse', 'poa_ground_diffuse'.  temp_model : str, optional The temperature model to use, Sandia Array Performance Model 'sapm' from pvlib by default.
+    weather_df : pd.dataframe
+        Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
+    poa : pandas.DataFrame
+         Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
+         'poa_sky_diffuse', 'poa_ground_diffuse'.
+    temp_model : str, optional
+        The temperature model to use, Sandia Array Performance Model 'sapm'
+        from pvlib by default.
     conf : str, optional
         The configuration of the PV module architecture and mounting
         configuration.
@@ -111,7 +124,7 @@ def module(
 
     Returns
     -------
-    module_temperature : pandas.DataFrame
+    module_temperature : pandas.Series
         The module temperature in degrees Celsius at each time step.
     """
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
@@ -170,14 +183,15 @@ def module(
     return module_temperature
 
 
+@geospatial_quick_shape(1, ["cell_temperature"])
 def cell(
-    weather_df,
-    meta,
-    poa=None,
-    temp_model="sapm",
-    conf="open_rack_glass_polymer",
-    wind_factor=0.33,
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    poa: Union[pd.DataFrame, pd.Series] = None,
+    temp_model: str = "sapm",
+    conf: str = "open_rack_glass_polymer",
+    wind_factor: float = 0.33,
+) -> pd.DataFrame:
     """
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.
@@ -212,7 +226,7 @@ def cell(
 
     Return:
     -------
-    temp_cell : pandas.DataFrame
+    temp_cell : pandas.Series
         This is the temperature of the cell in a module at every time step.[°C]
     """
 
@@ -270,6 +284,7 @@ def cell(
 
     return temp_cell
 
+
 # test not providing poa
 # what if we dont need the cell or mod param, only matters for sapm
 # to add more temperature model options just add them to the model_map function with the value as a reference to your function
@@ -278,13 +293,13 @@ def temperature(
     weather_df,
     meta,
     poa=None,
-    temp_model="sapm", 
-    cell_or_mod=None, 
+    temp_model="sapm",
+    cell_or_mod=None,
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
-    irradiance_kwarg={}, 
-    model_kwarg={}, 
-    ):
+    irradiance_kwarg={},
+    model_kwarg={},
+):
     """
     Calculate the PV cell or module temperature using PVLIB
     Current supports the following temperature models:
@@ -295,8 +310,8 @@ def temperature(
     Parameters:
     -----------
     cell_or_mod : (str)
-        choose to calculate the cell or module temperature. Use 
-        ``cell_or_mod == 'mod' or 'module'`` for module temp calculation. 
+        choose to calculate the cell or module temperature. Use
+        ``cell_or_mod == 'mod' or 'module'`` for module temp calculation.
         ``cell_or_mod == 'cell'`` for cell temp calculation.
     weather_df : (pd.dataframe)
         Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
@@ -309,14 +324,14 @@ def temperature(
     conf : (str)
         The configuration of the PV module architecture and mounting
         configuration. Currently only used for 'sapm' and 'pvsys'.
-        With different options for each. 
-        
-        'sapm' options: ``open_rack_glass_polymer`` (default), 
-        ``open_rack_glass_glass``, ``close_mount_glass_glass``, 
+        With different options for each.
+
+        'sapm' options: ``open_rack_glass_polymer`` (default),
+        ``open_rack_glass_glass``, ``close_mount_glass_glass``,
         ``insulated_back_glass_polymer``
 
         'pvsys' options: ``freestanding``, ``insulated``
-        
+
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement heights
         between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
@@ -343,59 +358,54 @@ def temperature(
         sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
     """
-    cell_or_mod = 'module' if cell_or_mod == 'mod' else cell_or_mod  #mod->module
+    cell_or_mod = "module" if cell_or_mod == "mod" else cell_or_mod  # mod->module
 
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
         wind_speed_factor = _wind_speed_factor(temp_model, meta, wind_factor)
 
-    if temp_model in ['sapm', 'pvsyst']:
-        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf] 
+    if temp_model in ["sapm", "pvsyst"]:
+        parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
-        if cell_or_mod!='cell' and temp_model=='sapm':
+        if cell_or_mod != "cell" and temp_model == "sapm":
             # strip the 'deltaT' for calculations that will not need it
-            parameters = {k: v for k, v in parameters.items() if k != 'deltaT'}
+            parameters = {k: v for k, v in parameters.items() if k != "deltaT"}
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(
-            weather_df, 
-            meta, 
-            **irradiance_kwarg 
-            ) 
+        poa = pvdeg.spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     # irrelevant key,value pair will be ignored (NO ERROR)
     weather_args = {
-    'poa_global' : poa["poa_global"],
-    'temp_air' : weather_df["temp_air"],
-    'wind_speed' : weather_df["wind_speed"] * wind_speed_factor, 
-    } # but this will ovewrite the model default always, so will have to provide default wind speed in the kwargs 
+        "poa_global": poa["poa_global"],
+        "temp_air": weather_df["temp_air"],
+        "wind_speed": weather_df["wind_speed"] * wind_speed_factor,
+    }  # but this will ovewrite the model default always, so will have to provide default wind speed in the kwargs
 
-    # only apply nessecary values to the model, 
+    # only apply nessecary values to the model,
     func = map_model(temp_model, cell_or_mod)
     sig = inspect.signature(func)
 
     # unpack signature into list for merging all dictionaries
     model_args = {
         k: (v.default if v.default is not inspect.Parameter.empty else None)
-        for k,v in sig.parameters.items()
+        for k, v in sig.parameters.items()
     }
 
     # if key is present update the value in the function signature
     for key in model_args:
         # we only want to update the values with matching keys
-        if key in weather_args: 
+        if key in weather_args:
             model_args[key] = weather_args[key]
-   
+
     try:
         model_args.update(parameters)
     except NameError:
-        pass # hits when not sapm or pvsyst
-    
-    # add optional kwargs, overwrites copies 
+        pass  # hits when not sapm or pvsyst
+
+    # add optional kwargs, overwrites copies
     model_args.update(**model_kwarg)
-    
+
     temperature = func(**model_args)
 
     return temperature
-
