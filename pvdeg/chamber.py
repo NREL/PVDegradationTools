@@ -38,6 +38,7 @@ def start_times(df: pd.DataFrame) -> pd.DataFrame:
         )
     return df
 
+
 # this tries to shift all of these even if they dont exist
 def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -176,7 +177,9 @@ def _apply_fill_linear_region(
         step_time_resolution=(
             row["step_length"] / row["step_divisions"]
         ),  # find the time resolution for within the step
-        set_0=row[f"previous_{column_name}"], # this will be wrong when we shift the first row for the nan
+        set_0=row[
+            f"previous_{column_name}"
+        ],  # this will be wrong when we shift the first row for the nan
         set_f=row[column_name],
         rate=row[f"{column_name}_ramp"],
     )
@@ -383,7 +386,7 @@ def sample_temperature(
     if "irradiance_full" in setpoints_df.columns:
         sample_temp = _temp_calc_irradiance(
             temps=air_temperature,
-            irradiances=setpoints_df["irradiance_full"],
+            irradiances=setpoints_df["irradiance_full"].to_numpy(),
             times=setpoints_df.index.to_numpy(),
             tau=tau_s,
             temp_0=sample_temp_0,
@@ -449,9 +452,9 @@ class Sample:
         f = open(os.path.join(DATA_DIR, "materials.json"))
         self.materials = json.load(f)
 
-        self.absorptance = (absorptance,)
-        self.length = (length,)
-        self.width = (width,)
+        self.absorptance = absorptance
+        self.length = length
+        self.width = width
 
         if backsheet:
             self.setBacksheet(backsheet, backsheet_thickness)
@@ -459,7 +462,7 @@ class Sample:
         if encapsulant:
             self.setEncapsulant(encapsulant_thickness)
 
-    def setEncapsulant(self, id: str, thickness):
+    def setEncapsulant(self, id: str, thickness: float) -> None:
         """
         Set encapsulant diffusivity activation energy, prefactor and solubility activation energy, prefactor.
 
@@ -478,7 +481,7 @@ class Sample:
         self.solubility_encap_pre = (self.materials)[id]["So"]
         self.encap_thickness = thickness
 
-    def setBacksheet(self, id: str, thickness):
+    def setBacksheet(self, id: str, thickness: float) -> None:
         """
         Set backsheet permiability activation energy and prefactor.
 
@@ -495,9 +498,9 @@ class Sample:
         self.permiability_back_pre = (self.materials)[id]["Po"]
         self.back_thickness = thickness
 
-    def setDimensions(self, length: float, width: float):
+    def setDimensions(self, length: float = None, width: float = None) -> None:
         """
-        Set dimensions of a rectangular test sample with
+        Set dimensions of a rectangular test sample.
 
         Parameters:
         -----------
@@ -591,7 +594,10 @@ class Chamber(Sample):
             self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
         )
 
-        if "irradiance_340" in self.setpoints.columns:
+        if (
+            "irradiance_340" in self.setpoints.columns
+            and "irradiance_full" not in self.setpoints.columns
+        ):
             # gti calculation is very slow because of integration
             print("Calculating GTI...")
             self.setpoints["irradiance_full"] = spectral.get_GTI_from_irradiance_340(
@@ -776,10 +782,11 @@ class Chamber(Sample):
         gti: pd.Series
             full spectrum irradiance using ASTM G173-03 AM1.5 spectrum.
         """
-        gti = spectral.get_GTI_from_irradiance_340(
+        self.setpoints["irradiance_full"] = spectral.get_GTI_from_irradiance_340(
             self.setpoints["setpoint_irradiance_340"]
         )
-        return gti
+
+        return self.setpoints["irradiance_full"]
 
     def _ipython_display_(self):
         """
