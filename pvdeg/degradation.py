@@ -1038,7 +1038,7 @@ def hydrolysis_driven_rate(
     C=4.91e7,
     n=1.9,
     Ea=0.74,
-    const_Boltzmann=8.62e-5,
+    const_Boltzmann=8.6171e-5,  # eV/K
     tilt=None,
     azimuth=None,
     temp_model="sapm",
@@ -1067,7 +1067,7 @@ def hydrolysis_driven_rate(
     Returns
     -------
     hydrolysis_rate : float
-        Hydrolysis driven rate of degradation [1/s]
+        Hydrolysis driven rate of degradation [%/s]
 
     References
     ----------
@@ -1113,6 +1113,113 @@ def hydrolysis_driven_rate(
     )
 
     res = {"k_h": hydrolysis_rate}
+    df_res = pd.DataFrame.from_dict(res, orient="index").T
+
+    return df_res
+
+
+def light_driven_rate(
+    weather_df=None,
+    meta=None,
+    weather_kwarg=None,
+    A_P=71.83,
+    n=1.9,
+    X=0.63,
+    E_P=0.45,
+    const_Boltzmann=8.6171e-5,  # eV/K
+    tilt=None,
+    azimuth=None,
+    temp_model="sapm",
+    sky_model="isotropic",
+    conf_0="insulated_back_glass_polymer",
+    wind_factor=0.33,
+):
+    """
+    Calculates the hydrolysis driven rate of degradation.
+
+    Parameters
+    ----------
+    C : float
+        Pre-exponential factor
+    RH_eff : float
+        Effective relative humidity [%]
+    n : float
+        RH sensitivity factor
+    X : float
+        UV sensitivity factor
+    E_P : float
+        Activation energy
+    const_Boltzmann : float
+        Boltzmann constant 8.62E-5 [eV/K]
+    module_temperature : float
+        Module temperature [K]
+
+    Returns
+    -------
+    hydrolysis_rate : float
+        Light driven rate of degradation [%/s]
+
+    References
+    ----------
+    doi: 10.1109/JPHOTOV.2019.2916197
+
+    """
+
+    parameters = [
+        "temp_air",
+        "wind_speed",
+        "dhi",
+        "ghi",
+        "dni",
+        "relative_humidity",
+        "clearsky_ghi",
+    ]
+
+    if isinstance(weather_df, dd.DataFrame):
+        weather_df = weather_df[parameters].compute()
+        weather_df.set_index("time", inplace=True)
+    elif isinstance(weather_df, pd.DataFrame):
+        weather_df = weather_df[parameters]
+    elif weather_df is None:
+        weather_df, meta = weather.get(**weather_kwarg)
+
+    solar_position = spectral.solar_position(weather_df, meta)
+    poa = spectral.poa_irradiance(
+        weather_df=weather_df,
+        meta=meta,
+        sol_position=solar_position,
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+    )
+    module_temperature = temperature.module(
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_0,
+        wind_factor=wind_factor,
+    )
+
+    rh_eff = effective_rel_humidity(weather_df["relative_humidity"])
+
+    kt = weather_df["ghi"] / weather_df["clearsky_ghi"]
+    kt_star = np.maximum(0.1, np.minimum(kt, 0.7))
+
+    uv_b = (1.897 - 0.860 * kt_star) * 1e-3 * weather_df["ghi"]
+    uv_a = (7.210 - 2.365 * kt_star) * 1e-2 * weather_df["ghi"]
+
+    uv_dose = uv_a + uv_b
+
+    # Calculate the hydrolysis driven rate of degradation
+    photo_rate = (
+        A_P
+        * uv_dose.mean() ** X
+        * rh_eff.mean() ** n
+        * np.exp(-E_P / (const_Boltzmann * (module_temperature.mean() + 273.15)))
+    )
+
+    res = {"k_p": photo_rate}
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
