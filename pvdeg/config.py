@@ -11,6 +11,7 @@ REPO_NAME = __name__
 DATA_DIR = PVDEG_DIR / "data"
 TEST_DIR = PVDEG_DIR.parent / "tests"
 TEST_DATA_DIR = PVDEG_DIR.parent / "tests" / "data"
+CHAMBER_DIR = PVDEG_DIR.parent / "testing-setpoints"
 
 # DATA_LIBRARY = PVDEG_DIR.parent / "DataLibrary"
 # if not os.path.isdir(DATA_LIBRARY):

@@ -2,6 +2,8 @@
 Collection of classes, methods and functions to calculate chamber stress test and chamber sample conditions.
 """
 
+# TODO: cleanup all chamber methods, they are heinous to look at
+
 import pandas as pd
 import numpy as np
 from numba import njit
@@ -40,31 +42,50 @@ def start_times(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # this tries to shift all of these even if they dont exist
+# def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
+#     """
+#     Update the setpoint dataframe to contain previous setpoint information in current row
+#     """
+#     mapping = [
+#         "temperature",
+#         "relative_humidity",
+#         "voltage",
+#         "irradiance_340",
+#         "irradiance_300-400",
+#         "irradiance_full",
+#     ]
+#     col_names = [
+#         "previous_temperature",
+#         "previous_relative_humidity",
+#         "previous_voltage",
+#         "previous_irradiance_340",
+#         "previous_irradiance_300-400",
+#         "previous_irradiance_full",
+#     ]
+#     for setpoint, shifted_setpoint in zip(mapping, col_names):
+#         if setpoint in df.columns:
+#             df[shifted_setpoint] = df[setpoint].shift(1)
+
+#     return df
+
 def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Update the setpoint dataframe to contain previous setpoint information in current row
+    Create setpoints columns with values shifted by 1. 
+    At row k, the shifted value will come from row k - 1.
     """
-    mapping = [
-        "temperature",
-        "relative_humidity",
-        "voltage",
-        "irradiance_340",
-        "irradiance_300-400",
-        "irradiance_full",
-    ]
-    col_names = [
-        "previous_temperature",
-        "previous_relative_humidity",
-        "previous_voltage",
-        "previous_irradiance_340",
-        "previous_irradiance_300-400",
-        "previous_irradiance_full",
-    ]
-    for setpoint, shifted_setpoint in zip(mapping, col_names):
-        if setpoint in df.columns:
-            df[shifted_setpoint] = df[setpoint].shift(1)
 
-    # df[col_names] = df[mapping].shift(1)
+    ignore_columns = {
+        "step_length",
+        "step_divisions",
+    }
+
+    # only care about setpoints, not ramp rates
+    setpoints = set(df.columns).difference(ignore_columns)
+    setpoint_names = {name.rstrip("_ramp") for name in setpoints} 
+
+    for name in setpoint_names:
+        df[f"previous_{name}"] = df[name].shift(1)
+
     return df
 
 
@@ -129,9 +150,14 @@ def fill_linear_region(
     if rate != 0:
         ramp_time = linear_ramp_time(y_0=set_0, y_f=set_f, rate=rate)
 
-        if ramp_time > step_time:
+        if ramp_time > step_time: # adding a tolerance
+        # not np.isclose(ramp_time, step_time, rtol=0.01):
+        # if ramp_time > step_time:
             raise ValueError(
-                "Ramp speed is too slow, will not finish ramping up before next set point"
+                f"""
+                Ramp speed is too slow, will not finish ramping up before next set point.
+                ramp will take {ramp_time} minutes but step is only {step_time} minutes.
+                """
             )
 
         ramp_steps = num_steps(step_time=ramp_time, resolution=step_time_resolution)
