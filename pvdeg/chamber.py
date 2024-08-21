@@ -5,17 +5,22 @@ Collection of classes, methods and functions to calculate chamber stress test an
 import pandas as pd
 import numpy as np
 from numba import njit
-from pvdeg.temperature import fdm_temperature
 from typing import Union
 import json
 import os
 import matplotlib.pyplot as plt
+from IPython.display import display
 
 from pvdeg import (
     humidity,
     utilities,
     spectral,
     DATA_DIR,
+)
+
+from pvdeg.temperature import (
+    fdm_temperature,
+    fdm_temperature_irradiance,
 )
 
 
@@ -33,7 +38,7 @@ def start_times(df: pd.DataFrame) -> pd.DataFrame:
         )
     return df
 
-
+# this tries to shift all of these even if they dont exist
 def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
     """
     Update the setpoint dataframe to contain previous setpoint information in current row
@@ -54,7 +59,11 @@ def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
         "previous_irradiance_300-400",
         "previous_irradiance_full",
     ]
-    df[col_names] = df[mapping].shift(1)
+    for setpoint, shifted_setpoint in zip(mapping, col_names):
+        if setpoint in df.columns:
+            df[shifted_setpoint] = df[setpoint].shift(1)
+
+    # df[col_names] = df[mapping].shift(1)
     return df
 
 
@@ -159,12 +168,15 @@ def _apply_fill_linear_region(
         name of the column to target in the dataframe
     """
 
+    if pd.isna(row[f"previous_{column_name}"]):
+        row[f"previous_{column_name}"] = row[column_name]
+
     values = fill_linear_region(
         step_time=row["step_length"],
         step_time_resolution=(
             row["step_length"] / row["step_divisions"]
         ),  # find the time resolution for within the step
-        set_0=row[f"previous_{column_name}"],
+        set_0=row[f"previous_{column_name}"], # this will be wrong when we shift the first row for the nan
         set_f=row[column_name],
         rate=row[f"{column_name}_ramp"],
     )
@@ -283,7 +295,9 @@ def setpoints_timeseries_from_csv(
 
 
 # @njit
-def _temp_calc(temps: np.ndarray, times: np.ndarray, tau: float, temp_0: float):
+def _temp_calc_no_irradiance(
+    temps: np.ndarray, times: np.ndarray, tau: float, temp_0: float
+) -> np.ndarray:
     res = np.empty_like(temps)
     res[0] = temp_0
 
@@ -301,11 +315,48 @@ def _temp_calc(temps: np.ndarray, times: np.ndarray, tau: float, temp_0: float):
     return res
 
 
+# we can move a calculation outside of the loop
+# the temperature increase from irradiance at a timestep has a constant factor of
+# K = surface area * absorptance so we can bring this out of the loop if we refactor the temperature irradiance
+
+
+# @njit
+def _temp_calc_irradiance(
+    temps: np.ndarray,
+    times: np.ndarray,
+    irradiances: np.ndarray,
+    tau: float,
+    temp_0: float,
+    surface_area: float,
+    absorptance: float,
+) -> np.ndarray:
+    res = np.empty_like(temps)
+    res[0] = (
+        temp_0  # initial irradiance has no effect on intial temperature because it is at an instant so the accumulated irradiance (integral of G = 0)
+    )
+
+    for i in range(0, temps.shape[0] - 1):
+        delta_t = times[i + 1] - times[i]
+        delta_t = delta_t.astype("timedelta64[m]").astype(int)
+
+        res[i + 1] = fdm_temperature_irradiance(
+            t_current=res[i],
+            t_set=temps[i + 1],
+            irradiance=irradiances[i],
+            delta_time=delta_t,
+            tau=tau,
+            surface_area=surface_area,
+            absorptance=absorptance,
+        )
+
+    return res
+
+
 # calculate the air temperature in a chamber using finite difference method
 def air_temperature(
     setpoints_df: pd.DataFrame, tau_c: float, air_temp_0: float
 ) -> np.ndarray:
-    air_temp = _temp_calc(
+    air_temp = _temp_calc_no_irradiance(
         temps=setpoints_df["setpoint_temperature"].to_numpy(),
         times=setpoints_df.index.to_numpy(),
         tau=tau_c,
@@ -320,6 +371,8 @@ def sample_temperature(
     air_temperature: Union[pd.Series, np.ndarray],
     tau_s: float,
     sample_temp_0: float,
+    surface_area: float = None,
+    absorptance: float = None,
 ) -> np.ndarray:
     if isinstance(air_temperature, pd.Series):
         air_temperature = air_temperature.to_numpy()
@@ -327,12 +380,30 @@ def sample_temperature(
     if not isinstance(air_temperature, np.ndarray):
         raise ValueError("Air_temperature must be a numpy array or pandas series")
 
-    sample_temp = _temp_calc(
-        temps=air_temperature,
-        times=setpoints_df.index.to_numpy(),
-        tau=tau_s,
-        temp_0=sample_temp_0,
-    )
+    if "irradiance_full" in setpoints_df.columns:
+        sample_temp = _temp_calc_irradiance(
+            temps=air_temperature,
+            irradiances=setpoints_df["irradiance_full"],
+            times=setpoints_df.index.to_numpy(),
+            tau=tau_s,
+            temp_0=sample_temp_0,
+            surface_area=surface_area,
+            absorptance=absorptance,
+        )
+
+    else:
+        print(f"""
+              "irradiance_full" not in setpoints_df.columns 
+              Current column names {setpoints_df.columns}.
+              calculating sample temperature without irradiance"
+              """)
+
+        sample_temp = _temp_calc_no_irradiance(
+            temps=air_temperature,
+            times=setpoints_df.index.to_numpy(),
+            tau=tau_s,
+            temp_0=sample_temp_0,
+        )
 
     return pd.Series(sample_temp, index=setpoints_df.index, name="Sample Temperature")
 
@@ -371,9 +442,16 @@ class Sample:
         backsheet_thickness=None,
         encapsulant=None,
         encapsulant_thickness=None,
+        absorptance=None,
+        length=None,
+        width=None,
     ):
         f = open(os.path.join(DATA_DIR, "materials.json"))
         self.materials = json.load(f)
+
+        self.absorptance = (absorptance,)
+        self.length = (length,)
+        self.width = (width,)
 
         if backsheet:
             self.setBacksheet(backsheet, backsheet_thickness)
@@ -417,18 +495,50 @@ class Sample:
         self.permiability_back_pre = (self.materials)[id]["Po"]
         self.back_thickness = thickness
 
+    def setDimensions(self, length: float, width: float):
+        """
+        Set dimensions of a rectangular test sample with
+
+        Parameters:
+        -----------
+        length: float
+            dimension of side A [m]
+        width: float
+            dimension of side B [m]
+
+        Modifies:
+        ----------
+        self.length
+            sets to length
+        self.width
+            sets to width
+        """
+        self.length = length
+        self.width = width
+
+    def setAbsorptance(self, absorptance: float):
+        """
+        Set the absorptance of a test sample.
+
+        Parameters:
+        -----------
+        absorptance: float
+            Fraction of light absorbed by the sample. [unitless]
+
+        Modifies:
+        ----------
+        self.absorptance: float
+            sets to absorptance arg
+        """
+        self.absorptance = absorptance
+
 
 class Chamber(Sample):
-    def __init__(
-            self, 
-            fp: str = None, 
-            setpoint_names: list[str] = None, 
-            **kwargs
-        ):
+    def __init__(self, fp: str = None, setpoint_names: list[str] = None, **kwargs):
         """
-        Create a chamber stress test object. 
-        
-        This will contain information about the chamber and the sample before running calculations for chamber and sample conditions. 
+        Create a chamber stress test object.
+
+        This will contain information about the chamber and the sample before running calculations for chamber and sample conditions.
 
         Parameters:
         -----------
@@ -440,10 +550,7 @@ class Chamber(Sample):
         self.setpoint_timeseries(fp, setpoint_names=setpoint_names, **kwargs)
 
     def setpoint_timeseries(
-        self, 
-        fp: str, 
-        setpoint_names: list[str] = None, 
-        **kwargs
+        self, fp: str, setpoint_names: list[str] = None, **kwargs
     ) -> None:
         """
         Read a setpoints CSV and create a timeseries of setpoint values
@@ -456,10 +563,12 @@ class Chamber(Sample):
         """
         self.setpoints.plot(title="Chamber Setpoints")
 
-    def calc_temperatures(self, air_temp_0: float, sample_temp_0: float, tau_c: float, tau_s: float) -> None:
+    def calc_temperatures(
+        self, air_temp_0: float, sample_temp_0: float, tau_c: float, tau_s: float
+    ) -> None:
         """
         Calculate sample and air temperatures.
-        
+
         Parameters:
         -----------
         air_temp_0: float
@@ -481,11 +590,22 @@ class Chamber(Sample):
         self.air_temperature = air_temperature(
             self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
         )
+
+        if "irradiance_340" in self.setpoints.columns:
+            # gti calculation is very slow because of integration
+            print("Calculating GTI...")
+            self.setpoints["irradiance_full"] = spectral.get_GTI_from_irradiance_340(
+                self.setpoints["irradiance_340"]
+            )  # this may be misleading
+            print('Saved in self.setpoints as "irradiance_full')
+
         self.sample_temperature = sample_temperature(
             self.setpoints,
             tau_s=tau_s,
             air_temperature=self.air_temperature,
             sample_temp_0=sample_temp_0,
+            surface_area=(self.length * self.width),
+            absorptance=self.absorptance,
         )
 
     def plot_temperatures(self):
@@ -628,6 +748,8 @@ class Chamber(Sample):
             air_temperature=self.air_temperature,
             tau_s=tau_s,
             sample_temp_0=sample_temp_0,
+            surface_area=(self.length * self.width),
+            absorptance=self.absorptance,
         )
         self.calc_sample_relative_humidity()
         self.calc_equilibrium_ecapsulant_water()
@@ -645,8 +767,22 @@ class Chamber(Sample):
         ).T
         return sample_df
 
-    def gti(self) -> pd.Series:
+    def gti_from_irradiance_340(self) -> pd.Series:
+        """
+        Calculate full spectrum GTI from irradiance at 340 nm
+
+        Returns:
+        --------
+        gti: pd.Series
+            full spectrum irradiance using ASTM G173-03 AM1.5 spectrum.
+        """
         gti = spectral.get_GTI_from_irradiance_340(
             self.setpoints["setpoint_irradiance_340"]
         )
         return gti
+
+    def _ipython_display_(self):
+        """
+        Display the setpoints of the chamber instance.
+        """
+        display(self.setpoints)

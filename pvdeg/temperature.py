@@ -199,8 +199,7 @@ def cell(
 
     return temp_cell
 
-# not being actively used
-@njit
+# @njit
 def chamber_sample_temperature(
     irradiance_340: float,
     temp_set: float,
@@ -229,8 +228,6 @@ def chamber_sample_temperature(
         Characteristic thermal equilibration time [min]
     """
 
-    
-
     if irradiance_340 == 0:
         sample_temp = (
             temp_set + (previous_sample_temp-temp_set) 
@@ -252,10 +249,10 @@ def chamber_sample_temperature(
 
     return sample_temp
 
-# add the irradiance term
+@njit
 def fdm_temperature(t_current: float, t_set: float, delta_time: float, tau: float):
     """
-    Calculate next timestep of temperature using finite difference method. 
+    Calculate next timestep of temperature using finite difference method without utilizing irradiance.
 
     Parameters:
     -----------
@@ -276,3 +273,49 @@ def fdm_temperature(t_current: float, t_set: float, delta_time: float, tau: floa
 
     t_next = t_current + (t_set - t_current) * (1 - np.exp( (-delta_time) / (tau) ))
     return t_next
+
+# @njit
+def fdm_temperature_irradiance(
+    t_current: float, 
+    t_set: float, 
+    irradiance: float,
+    delta_time: float, 
+    tau: float, 
+    surface_area: float,
+    absorptance: float,
+) -> float:
+
+    """
+    Calculate next timestep of temperature using finite difference method utilizing irradiance.
+
+    Parameters:
+    -----------
+    t_current: float
+        current temperature [C]
+    t_set: float
+        temperature we are approaching [C]
+    irradiance: float
+        full spectrum irradiance at current time [w / m^2]
+    delta_time: float
+        length of timestep, units should match time unit of tau [time]
+    tau: float
+        thermal equilibration time, units should match time unit of delta_time [time]
+    surface_area: float
+        surface area of sample [m^2]
+    absorptance: float
+        Fraction of light absorbed by the sample. [unitless]
+    Returns:
+    --------
+    t_next: float
+        temperature at next timestep [C]
+    """
+    
+    # new term
+    # we wan to add the increased irradiance caused by the temperature
+    temp_increase = (delta_time / tau) * irradiance * surface_area * absorptance
+
+    t_next = t_current + (t_set - t_current) * (1 - np.exp( (-delta_time) / (tau) )) + temp_increase
+    return t_next
+
+
+
