@@ -3,6 +3,8 @@ Collection of classes and functions for geospatial analysis.
 """
 
 from . import (
+    degradation,
+    fatigue,
     standards,
     humidity,
     letid,
@@ -373,6 +375,28 @@ def template_parameters(func):
     elif func == degradation.hydrolysis_driven_rate:
         shapes = {
             "k_h": ("gid",),
+        }
+
+        attrs = {}
+
+        global_attrs = {}
+
+        add_dims = {}
+
+    elif func == fatigue.thermomechanical_driven_rate:
+        shapes = {
+            "k_tm": ("gid",),
+        }
+
+        attrs = {}
+
+        global_attrs = {}
+
+        add_dims = {}
+
+    elif func == degradation.light_driven_rate:
+        shapes = {
+            "k_p": ("gid",),
         }
 
         attrs = {}
