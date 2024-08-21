@@ -1,11 +1,15 @@
 import numpy as np
 import pandas as pd
 from scipy.constants import convert_temperature
-from pvdeg import temperature
 from pvdeg.decorators import geospatial_quick_shape
+import dask.dataframe as dd
+
+from . import temperature
+from . import spectral
+from . import weather
 
 
-def _avg_daily_temp_change(time_range, temp_cell):
+def _avg_daily_temp_change(time_range, temperature):
     """
     Helper function. Get the average of a year for the daily maximum temperature change.
 
@@ -18,14 +22,14 @@ def _avg_daily_temp_change(time_range, temp_cell):
     time_range : timestamp series
         Local time of specific site by the hour
         year-month-day hr:min:sec . (Example) 2002-01-01 01:00:00
-    temp_cell : float series
-        Photovoltaic module cell temperature(Celsius) for every hour of a year
+    temperature : float series
+        Photovoltaic module temperature(Celsius) for every hour of a year
 
     Returns
     -------
     avg_daily_temp_change : float
         Average Daily Temerature Change for 1-year (Celsius)
-    avg_max_temp_cell : float
+    avg_max_temperature : float
         Average of Daily Maximum Temperature for 1-year (Celsius)
 
     """
@@ -34,41 +38,39 @@ def _avg_daily_temp_change(time_range, temp_cell):
         time_range = pd.to_datetime(time_range)
 
     # Setup frame for vector processing
-    timeAndTemp_df = pd.DataFrame(columns=["Cell Temperature"])
-    timeAndTemp_df["Cell Temperature"] = temp_cell
+    timeAndTemp_df = pd.DataFrame(columns=["temperature"])
+    timeAndTemp_df["temperature"] = temperature
     timeAndTemp_df.index = time_range
     timeAndTemp_df["month"] = timeAndTemp_df.index.month
     timeAndTemp_df["day"] = timeAndTemp_df.index.day
 
-    # Group by month and day to determine the max and min cell Temperature [°C] for each day
-    dailyMaxCellTemp_series = timeAndTemp_df.groupby(["month", "day"])[
-        "Cell Temperature"
-    ].max()
-    dailyMinCellTemp_series = timeAndTemp_df.groupby(["month", "day"])[
-        "Cell Temperature"
-    ].min()
-    temp_cell_change = pd.DataFrame(
-        {"Max": dailyMaxCellTemp_series, "Min": dailyMinCellTemp_series}
+    # Group by month and day to determine the max and min temperature [°C] for each day
+    dailyMaxTemp_series = timeAndTemp_df.groupby(["month", "day"])["temperature"].max()
+    dailyMinTemp_series = timeAndTemp_df.groupby(["month", "day"])["temperature"].min()
+    temperature_change = pd.DataFrame(
+        {"Max": dailyMaxTemp_series, "Min": dailyMinTemp_series}
     )
-    temp_cell_change["TempChange"] = temp_cell_change["Max"] - temp_cell_change["Min"]
+    temperature_change["TempChange"] = (
+        temperature_change["Max"] - temperature_change["Min"]
+    )
 
     # Find the average temperature change for every day of one year [°C]
-    avg_daily_temp_change = temp_cell_change["TempChange"].mean()
-    # Find daily maximum cell temperature average
-    avg_max_temp_cell = dailyMaxCellTemp_series.mean()
+    avg_daily_temp_change = temperature_change["TempChange"].mean()
+    # Find daily maximum temperature average
+    avg_max_temperature = dailyMaxTemp_series.mean()
 
-    return avg_daily_temp_change, avg_max_temp_cell
+    return avg_daily_temp_change, avg_max_temperature
 
 
-def _times_over_reversal_number(temp_cell, reversal_temp):
+def _times_over_reversal_number(temperature, reversal_temp):
     """
     Helper function. Get the number of times a temperature increases or decreases over a
     specific temperature gradient.
 
     Parameters
     ------------
-    temp_cell : float series
-        Photovoltaic module cell temperature [C]
+    temperature : float series
+        Photovoltaic module temperature [C]
     reversal_temp : float
         Temperature threshold to cross above and below [C]
 
@@ -81,8 +83,8 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     # Find the number of times the temperature crosses over 54.8(°C)
 
     temp_df = pd.DataFrame()
-    temp_df["CellTemp"] = temp_cell
-    temp_df["COMPARE"] = temp_cell
+    temp_df["CellTemp"] = temperature
+    temp_df["COMPARE"] = temperature
     temp_df["COMPARE"] = temp_df.COMPARE.shift(-1)
 
     # reversal_temp = 54.8
@@ -146,7 +148,7 @@ def solder_fatigue(
         (Example) 2002-01-01 01:00:00
         If a time range is not give, function will use dt index from weather_df
     temp_cell : float series, optional
-        Photovoltaic module cell temperature [C] for every hour of a year
+        Photovoltaic module temperature [C] for every hour of a year
     reversal_temp : float, optional
         Temperature threshold to cross above and below [C]
         See the paper for other use cases
@@ -243,3 +245,111 @@ def solder_fatigue(
 
 
 # TODO: add gaps functionality
+
+
+def thermomechanical_driven_rate(
+    weather_df=None,
+    meta=None,
+    weather_kwarg=None,
+    A_Tm=2.04,  # <- Outdoors | Inddors -> 9.10e-5,
+    E_Tm=0.43,  # <- Outdoors | Inddors -> 0.4,
+    theta=2.24,
+    const_Boltzmann=8.6171e-5,  # eV/K
+    reversal_temp=None,
+    tilt=None,
+    azimuth=None,
+    temp_model="sapm",
+    sky_model="isotropic",
+    conf_0="insulated_back_glass_polymer",
+    wind_factor=0.33,
+):
+    """
+    Calculates the hydrolysis driven rate of degradation.
+
+    Parameters
+    ----------
+    A_Tm : float
+        Pre-exponential factor
+    E_Tm : float
+        Activation energy
+    const_Boltzmann : float
+        Boltzmann constant 8.62E-5 [eV/K]
+    tilt : float
+        Tilt angle of the module [degrees]
+    azimuth : float
+        Azimuth angle of the module [degrees]
+    temp_model : str
+        Temperature model to use
+    sky_model : str
+        Sky model to use
+    conf_0 : str
+        Configuration of the PV module architecture and mounting
+    wind_factor : float
+        Wind speed correction exponent to account for different wind speed measurement heights
+
+    Returns
+    -------
+    thermomechanical_rate : float
+        Thermo-mechanical driven rate of degradation [%/s]
+
+    References
+    ----------
+    doi: 10.1109/JPHOTOV.2019.2916197
+
+    """
+
+    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni", "relative_humidity"]
+
+    if isinstance(weather_df, dd.DataFrame):
+        weather_df = weather_df[parameters].compute()
+        weather_df.set_index("time", inplace=True)
+    elif isinstance(weather_df, pd.DataFrame):
+        weather_df = weather_df[parameters]
+    elif weather_df is None:
+        weather_df, meta = weather.get(**weather_kwarg)
+
+    solar_position = spectral.solar_position(weather_df, meta)
+    poa = spectral.poa_irradiance(
+        weather_df=weather_df,
+        meta=meta,
+        sol_position=solar_position,
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+    )
+    module_temperature = temperature.module(
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_0,
+        wind_factor=wind_factor,
+    )
+
+    temp_range, temp_max_avg = _avg_daily_temp_change(
+        weather_df.index, module_temperature
+    )
+    temp_max_avg = convert_temperature(temp_max_avg, "Celsius", "Kelvin")
+
+    if reversal_temp is None:
+        reversal_temp = temp_range
+    num_changes_temp_hist = _times_over_reversal_number(
+        module_temperature, reversal_temp
+    )
+
+    # cycling_rate = num_changes_temp_hist  # cycles per year
+    cycling_rate = 0.5  # TODO: Figure out what this should be
+
+    # Calculate the thermo-mechanical driven rate of degradation
+    thermomechanical_rate = (
+        A_Tm
+        * (temp_range**theta)
+        * cycling_rate
+        * np.exp(-E_Tm / (const_Boltzmann * temp_max_avg))
+        * 100  # Convert to %
+    )
+
+    res = {"k_tm": thermomechanical_rate}
+    df_res = pd.DataFrame.from_dict(res, orient="index").T
+
+    return df_res
