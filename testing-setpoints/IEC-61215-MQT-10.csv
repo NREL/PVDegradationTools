@@ -1,0 +1,3 @@
+step_length,step_divisions,temperature,temperature_ramp,irradiance_280-400,irradiance_280-400_ramp
+[m],[unitless],[C],[C/min],[w/m^2],[w/m^2/min]
+3600,3600,60,0,250,0

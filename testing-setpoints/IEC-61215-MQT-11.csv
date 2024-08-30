@@ -1,0 +1,10 @@
+step_length,step_divisions,temperature,temperature_ramp,voltage,voltage_ramp
+[m],[unitless],[C],[C/min],[V],[V/min]
+1,1,25,0,0,0
+60,60,-40,-1.09,0,0
+60,60,-40,0,0,0
+120,120,85,2,100,0
+40,40,85,0,0,0
+120,120,-40,-2,0,0
+60,60,-40,0,0,0
+
