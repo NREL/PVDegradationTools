@@ -298,7 +298,7 @@ def temperature(
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
     irradiance_kwarg={},
-    model_kwarg={},
+    model_kwarg={}
 ):
     """
     Calculate the PV cell or module temperature using PVLIB
