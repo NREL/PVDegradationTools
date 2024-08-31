@@ -22,7 +22,7 @@ def get(database, id=None, geospatial=False, **kwargs):
     Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function
 
-    Parameters:
+    Parameters
     -----------
     database : (str)
         'NSRDB' or 'PVGIS'
@@ -38,7 +38,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         Additional keyword arguments to pass to the get_weather function
         (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
 
-    Returns:
+    Returns
     --------
     weather_df : (pd.DataFrame)
         DataFrame of weather data

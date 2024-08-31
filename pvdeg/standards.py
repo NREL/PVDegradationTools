@@ -11,11 +11,16 @@ from rex import Outputs
 from pathlib import Path
 from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
+import PySAM.Pvwattsv8 as pv
 
 # from gaps import ProjectPoints
 
-from pvdeg import temperature, spectral, utilities, weather
-
+from pvdeg import (
+    temperature, 
+    spectral, 
+    utilities, 
+    weather,
+)
 
 def eff_gap_parameters(
     weather_df=None,
@@ -600,7 +605,6 @@ def vertical_POA(
         Annual AC energy
     lcoa_nom : float [cents/kWh]
         LCOE Levelized cost of energy nominal
-
     """
 
     import PySAM
@@ -707,3 +711,75 @@ def vertical_POA(
     df_res = pd.DataFrame.from_dict(res, orient="index").T
 
     return df_res
+
+def pysam( # no autotemplating
+    weather_df: pd.DataFrame,
+    meta: dict,
+    model: str,
+    model_default: str,
+    results: list[str] = None,
+) -> dict:
+    """
+    Run pySam simulation.
+
+    Parameters
+    -----------
+    weather_df: pd.DataFrame
+        DataFrame of weather data. As returned by ``pvdeg.weather.get``
+    meta: dict
+        Dictionary of metadata for the weather data. As returned by ``pvdeg.weather.get``
+    model: str
+        choose pySam module.
+
+            options: ``pvwatts8``, ``pysamv1``
+
+    results: list[str]
+        list of strings corresponding to pysam outputs.
+
+    Returns
+    -------
+    pysam_res: dict
+        dictionary of outputs
+
+    """
+    import PySAM.Pvwattsv8 as pv8
+    import PySAM.Pvsamv1 as pv1
+    import PySAM.Utilityrate5 as ur
+
+    weather_df = utilities.add_time_columns_tmy(weather_df=weather_df)
+
+    solar_resource = {
+        'lat': meta['latitude'],
+        'lon': meta['longitude'],
+        'tz': meta['tz'] if 'tz' in meta.keys() else 0,
+        'elev': meta['altitude'],
+        'year': list(weather_df['Year']),
+        'month': list(weather_df['Month']),
+        'day': list(weather_df['Day']),
+        'hour': list(weather_df['Hour']),
+        'minute': list(weather_df['Minute']),
+        'dn': list(weather_df['dni']),
+        'df': list(weather_df['dhi']),
+        'wspd': list(weather_df['wind_speed']),
+        'tdry': list(weather_df['temp_air']),
+        'alb' : weather_df['albedo'] if 'albedo' in weather_df.columns.values else [0.2]*len(weather_df)
+    }
+
+    # https://nrel-pysam.readthedocs.io/en/main/modules/Pvwattsv8.html
+    # https://nrel-pysam.readthedocs.io/en/main/modules/Pvsamv1.html
+    if model == "pvwatts8": 
+        pysam_model = pv8.default(model_default) # PVWattsCommerical
+    elif model == "pysamv1":
+        pysam_model = pv1.default(model_default) # FlatPlatePVCommercial
+
+    pysam_model.SolarResource.solar_resource_data = solar_resource
+    pysam_model.execute()
+    outputs = pysam_model.Outputs.export()
+
+    if not results:
+        return outputs
+
+    pysam_res = {}
+    for key in results:
+        pysam_res[key] = outputs[key]
+    return pysam_res

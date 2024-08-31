@@ -471,3 +471,41 @@ def tilt_azimuth_scan(
     print("\r                     ", end="")
     print("\r", end="")
     return tilt_azimuth_series
+
+def add_time_columns_tmy(weather_df, coerce_year=1979):
+    """
+    Add time columns to a tmy weather dataframe.
+
+    Parameters:
+    -----------
+    weather_df: pd.DataFrame
+        tmy weather dataframe containing 8760 rows.
+    coerce_year: int
+        year to set the dataframe to.
+
+    Returns:
+    --------
+    weather_df: pd.DataFrame
+        dataframe with columns added new columns will be 
+
+        ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
+    """
+
+    weather_df = weather_df.reset_index(drop=True)    
+
+    date_range = pd.date_range(
+        start=f'{coerce_year}-01-01 00:00:00', 
+        end=f'{coerce_year}-12-31 23:00:00', 
+        freq='h'
+    )
+
+    df = pd.DataFrame({
+        'Year': date_range.year,
+        'Month': date_range.month,
+        'Day': date_range.day,
+        'Hour': date_range.hour,
+        'Minute': date_range.minute
+    })
+
+    weather_df = pd.concat([weather_df, df], axis=1)
+    return weather_df
