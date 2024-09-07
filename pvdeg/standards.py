@@ -853,7 +853,8 @@ def pysam(
 
 def pysam_hourly_trivial(weather_df, meta):
 
-    import PySAM.Pvwattsv8 as pv8
+    # import PySAM.Pvwattsv8 as pv8
+    import PySAM.Pvsamv1 as pv1
 
     weather_df = weather_df.reset_index(drop=True)
     weather_df = utilities.add_time_columns_tmy(weather_df) # only supports hourly data
@@ -875,7 +876,8 @@ def pysam_hourly_trivial(weather_df, meta):
         'alb' : weather_df['albedo'] if 'albedo' in weather_df.columns.values else [0.2]*len(weather_df)
     }
     
-    model = pv8.default("PVWattsCommercial")
+    # model = pv8.default("PVWattsCommercial")
+    model = pv1.default("FlatPlatePVCommercial")
     model.SolarResource.solar_resource_data = sr
     model.execute()
     outputs = model.Outputs.export()
