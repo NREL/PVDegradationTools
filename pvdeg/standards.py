@@ -11,7 +11,6 @@ from rex import Outputs
 from pathlib import Path
 from random import random
 from concurrent.futures import ProcessPoolExecutor, as_completed
-import PySAM.Pvwattsv8 as pv
 
 # from gaps import ProjectPoints
 
@@ -712,7 +711,8 @@ def vertical_POA(
 
     return df_res
 
-def pysam( # no autotemplating
+# this may only work with PVGIS
+def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
     model: str,
@@ -744,7 +744,7 @@ def pysam( # no autotemplating
     """
     import PySAM.Pvwattsv8 as pv8
     import PySAM.Pvsamv1 as pv1
-    import PySAM.Utilityrate5 as ur
+    import json
 
     weather_df = utilities.add_time_columns_tmy(weather_df=weather_df)
 
