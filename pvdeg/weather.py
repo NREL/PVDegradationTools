@@ -2,6 +2,9 @@
 Collection of classes and functions to obtain spectral parameters.
 """
 
+from pvdeg import humidity
+from pvdeg.utilities import nrel_kestrel_check
+
 from pvlib import iotools
 import os
 import glob
@@ -10,7 +13,6 @@ from rex import NSRDBX, Outputs
 from pvdeg import humidity
 import datetime
 import numpy as np
-
 import h5py
 import dask.dataframe as dd
 import xarray as xr
@@ -19,7 +21,6 @@ import xarray as xr
 def get(database, id=None, geospatial=False, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
-    Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function
 
     Parameters
@@ -27,7 +28,7 @@ def get(database, id=None, geospatial=False, **kwargs):
     database : (str)
         'NSRDB' or 'PVGIS'
     id : (int or tuple)
-        If NSRDB, id is the gid for the desired location
+        If NSRDB, id is the gid for the desired location. 
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
     geospatial : (bool)
         If True, initialize weather data via xarray dataset and meta data via
@@ -63,15 +64,12 @@ def get(database, id=None, geospatial=False, **kwargs):
             )
 
     if not geospatial:
-        # TODO: decide wether to follow NSRDB or pvlib conventions...
-        # e.g. temp_air vs. air_temperature
-        # "map variables" will guarantee PVLIB conventions (automatic in coming update) which is "temp_air"
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
             URL = "https://re.jrc.ec.europa.eu/api/v5_2/"
             weather_df, _, meta, _ = iotools.get_pvgis_tmy(
-                latitude=lat, longitude=lon, map_variables=True, url=URL, **kwargs
+                latitude=lat, longitude=lon, url=URL, **kwargs
             )
             meta = meta["location"]
         elif database == "PSM3":
@@ -101,13 +99,17 @@ def get(database, id=None, geospatial=False, **kwargs):
         map_meta(meta)
 
         if "relative_humidity" not in weather_df.columns:
-            print('Column "relative_humidity" not found in DataFrame. Calculating...')
+            print('\r','Column "relative_humidity" not found in DataFrame. Calculating...', end='')
             weather_df = humidity._ambient(weather_df)
+            print('\r', '                                                                    ',end='')
+            print('\r', end='')
 
         return weather_df, meta
 
     elif geospatial:
         if database == "NSRDB":
+            nrel_kestrel_check()
+
             weather_ds, meta_df = get_NSRDB(geospatial=geospatial, **kwargs)
             meta_df["wind_height"] = 2
         elif database == "local":
@@ -581,7 +583,6 @@ def get_NSRDB(
         satellite == None
     ):  # TODO: This function is not fully written as of January 3, 2024
         satellite, gid = get_satellite(location)
-        print("the satellite is ", satellite)
     if not geospatial:
         nsrdb_fnames, hsds = get_NSRDB_fnames(
             satellite=satellite, names=names, NREL_HPC=NREL_HPC
@@ -874,3 +875,59 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
     file1 = open(savefile, "w")
     file1.writelines(savedata)
     file1.close()
+
+def get_anywhere(database = "PSM3", id=None, **kwargs):
+    """
+    Load weather data directly from  NSRDB or through any other PVLIB i/o
+    tools function. Only works for a single location look-up, not for geospatial analysis.
+
+    Parameters:
+    -----------
+    database : (str)
+        'PSM3' or 'PVGIS'
+        Indicates the first database to try. PSM3 is for the NSRDB
+    id : (int or tuple)
+        The gid or tuple with latitude and longitude for the desired location. 
+        Using a gid is not recommended because it is specific to one database.
+    API_KEY : (str)
+        This is used to access the NSRDB without limitation if a custom key is supplied.
+    **kwargs :
+        Additional keyword arguments to pass to the get_weather function
+        (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
+
+    Returns:
+    --------
+    weather_df : (pd.DataFrame)
+        DataFrame of weather data
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
+
+    weather_arg = {'api_key': 'DEMO_KEY',  #Pass in a custom key to avoid access limitations.
+            'email': 'user@mail.com',
+            'names': 'tmy',
+            'attributes': [],
+            'map_variables': True,
+            'geospatial': False}
+    weather_arg.update(kwargs) #Will default to the kwargs passed to the function.
+
+    if database == "PSM3":
+        try:
+            weather_db, meta = get(database='PSM3', id=id, **weather_arg)
+        except:
+            try:
+                weather_db, meta = get(database='PVGIS', id=id, **{'map_variables': True} )
+            except:
+                meta = {'result': 'This location was not found in either the NSRDB or PVGIS'}
+                weather_db = {'result': 'NA'}
+    else:
+        try:
+            weather_db, meta = get(database='PVGIS', id=id, **{'map_variables': True})
+        except:
+            try:
+                weather_db, meta = get(database='PSM3', id=id, **weather_arg)
+            except:
+                meta = {'result': 'This location was not found in either the NSRDB or PVGIS'}
+                weather_db = {'result': 'NA'}
+
+    return weather_db, meta 

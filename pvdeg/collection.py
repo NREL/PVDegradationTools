@@ -191,7 +191,7 @@ def calculate_jsc_from_tau_cp(
     collection_array_interp = f(depth)
 
     # 5. integrate
-    jsc = simpson(collection_array_interp * generation, depth) * q
+    jsc = simpson(collection_array_interp * generation, x=depth) * q
 
     return jsc * 1000
 
@@ -314,7 +314,7 @@ def calculate_jsc_from_tau_iqe(
     )
 
     # 3. integrate iqe with spectrum
-    jsc = simpson(qet * spectrum, wavelengths) / 10
+    jsc = simpson(qet * spectrum, x=wavelengths) / 10
     return jsc
 
 
@@ -337,5 +337,5 @@ def generation_current(generation, depth):
     """
     q = elementary_charge
 
-    j_gen = simpson(generation, depth) * q / 10
+    j_gen = simpson(generation, x=depth) * q / 10
     return j_gen

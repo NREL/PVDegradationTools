@@ -12,8 +12,9 @@ from . import geospatial
 from . import humidity
 from . import letid
 from . import montecarlo
-from .scenario import Scenario
+from . import scenario
 from . import spectral
+from . import symbolic
 from . import standards
 from . import temperature
 from . import utilities
