@@ -671,6 +671,7 @@ def vertical_POA(
     lcoa_nom : float [cents/kWh]
         LCOE Levelized cost of energy nominal
     """
+    return
 
     import PySAM
     import PySAM.Pvsamv1 as PV
@@ -834,7 +835,7 @@ def pysam(
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvwattsv8.html
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvsamv1.html
     if model == "pvwatts8": 
-        pysam_model = pv8.default(model_default) # PVWattsCommerical
+        pysam_model = pv8.default(model_default) # PVWattsCommercial
     elif model == "pysamv1":
         pysam_model = pv1.default(model_default) # FlatPlatePVCommercial
 
@@ -849,3 +850,34 @@ def pysam(
     for key in results:
         pysam_res[key] = outputs[key]
     return pysam_res
+
+def pysam_hourly_trivial(weather_df, meta):
+
+    import PySAM.Pvwattsv8 as pv8
+
+    weather_df = weather_df.reset_index(drop=True)
+    weather_df = utilities.add_time_columns_tmy(weather_df) # only supports hourly data
+    
+    sr = {
+        'lat': meta['latitude'],
+        'lon': meta['longitude'],
+        'tz': meta['tz'] if 'tz' in meta.keys() else 0,
+        'elev': meta['altitude'],
+        'year': list(weather_df['Year']),
+        'month': list(weather_df['Month']),
+        'day': list(weather_df['Day']),
+        'hour': list(weather_df['Hour']),
+        'minute': list(weather_df['Minute']),
+        'dn': list(weather_df['dni']),
+        'df': list(weather_df['dhi']),
+        'wspd': list(weather_df['wind_speed']),
+        'tdry': list(weather_df['temp_air']),
+        'alb' : weather_df['albedo'] if 'albedo' in weather_df.columns.values else [0.2]*len(weather_df)
+    }
+    
+    model = pv8.default("PVWattsCommercial")
+    model.SolarResource.solar_resource_data = sr
+    model.execute()
+    outputs = model.Outputs.export()
+
+    return outputs
