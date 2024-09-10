@@ -64,7 +64,7 @@
 	"Po": 1172612706438.09
     },
     "W006": {
-	"name": "Surlyn "Jura Sol"",
+	"name": "Surlyn Jura Sol",
 	"alias": "Ionomer-2",
 	"contributor": "Michael Kempe",
 	"source": "unpublished measurements",
@@ -365,7 +365,7 @@
 	"contributor": "Michael Kempe",
 	"source": "unpublished measurements",
 	"comment": "This material is not Fickian. The values here are only approximate",
-	"Fickian": flase,
+	"Fickian": false,
 	"Ead": 56.2460834706032,
 	"Do": 159.982701698288,
 	"Eas": 20.8063496388738,
@@ -473,9 +473,8 @@
 	"alias": "PIB",
 	"contributor": "Michael Kempe",
 	"source": "B. L. Lee, T. W. Yang, and E. Wilusz, Moisture Effects on Isobutylene-Isoprene Copolymer-Based Composite Barrier. I: Moisture Diffusion and Detection, POLYMER ENGINEERING AND SCIENCE, MID-MAY 1996, Vol. 36, NO. 9",
-	"source": "unpublished measurements",
 	"Fickian": true,
-	"Ead": 66.7749676968273,
+	"Ead": 66.7749676968273
     },
     "W038": {
 	"name": "PIB Helioseal matrix only",
