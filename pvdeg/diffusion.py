@@ -86,8 +86,8 @@ def esdiffusion(
         encp = O2.get(encapsulant)
 
     try:
-        print("The edge seal is", esp.get("Name"), ".")
-        print("The encapsulant is", encp.get("Name"), ".")
+        print("The edge seal is", esp.get("name"), ".")
+        print("The encapsulant is", encp.get("name"), ".")
     except:
         print("")
 
