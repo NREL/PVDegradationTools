@@ -227,6 +227,7 @@ def get_state_bbox(
     Retrieve the top left and bottom right coordinate pairs for state bounding boxes.
     """
 
+    # can move to its own file in pvdeg.DATA_DIR
     bbox_dict = {
         "Alabama": [
             [-84.8882446289062, 35.0080299377441],
@@ -491,7 +492,9 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-def _read_material(name, fname="materials.json"):
+# previously: fname="materials.json"
+# add control over what parameters (O2, H2, AA)?
+def _read_material(name, fname="O2permeation.json"):
     """
     read a material from materials.json and return the parameter dictionary
 
@@ -521,6 +524,8 @@ def _read_material(name, fname="materials.json"):
     return mat_dict
 
 
+# previously: fname="materials.json"
+# add control over what parameters (O2, H2, AA)?
 def _add_material(
     name,
     alias,
@@ -531,7 +536,7 @@ def _add_material(
     Eap=None,
     Po=None,
     fickian=True,
-    fname="materials.json",
+    fname="O2permeation.json",
 ):
     """
     Add a new material to the materials.json database. Check the parameters for specific units.

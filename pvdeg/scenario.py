@@ -234,7 +234,7 @@ class Scenario:
         self,
         module_name: str = None,
         racking: str = "open_rack_glass_polymer",
-        material: str = "EVA",
+        material: str = "OX003",
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
@@ -254,7 +254,8 @@ class Scenario:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
         material : (str)
-            Name of the material desired. For a complete list, see data/materials.json.
+            Key of the material desired. For a complete list, see pvdeg/data/O2permeation.json
+            or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         temp_model : (str)
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
@@ -864,7 +865,10 @@ class Scenario:
         plt.show()
 
     def _ipython_display_(self):
-        file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
+        file_url = "no file provided" 
+        if self.path:
+            file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
+
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
             <h2>{self.name}: Scenario Analysis</h2>
