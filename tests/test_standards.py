@@ -94,13 +94,9 @@ def test_eff_gap():
     # assert expected_result_l2 == pytest.approx(result_l2, abs=1e-5)
 
 
-def test_T98():
-    weather_db = 'PVGIS' #This pulls data for most of the world.
-    weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia
-    #weather_id = (35.6754, 139.65) #Tokyo, Japan
-    weather_arg = {'map_variables': True}
-    WEATHER_df, META = pvdeg.weather.get(weather_db, weather_id)
-    df, meta_data=pvdeg.weather.read(
+def test_T98_Xmin():
+    
+    WEATHER_df, META =pvdeg.weather.read(
         os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),"csv"
     )
     standoff = pvdeg.standards.standoff(weather_df=WEATHER_df, meta=META)
@@ -108,7 +104,22 @@ def test_T98():
                                       T98=70, tilt=META['latitude'], azimuth=None,
                                       sky_model='isotropic', temp_model='sapm', conf_0='insulated_back_glass_polymer', conf_inf='open_rack_glass_polymer',
                                       x_0=6.5, wind_factor=0.33)
-    assert standoff.x[0]== pytest.approx(9.261615)
-    assert standoff.T98_0[0]== pytest.approx(89.5806502251565)
-    assert standoff.T98_inf[0]== pytest.approx(63.79827740597881)
+    assert standoff.x[0]== pytest.approx(2.008636)
+    assert standoff.T98_0[0]== pytest.approx(77.038644)
+    assert standoff.T98_inf[0]== pytest.approx(50.561112)
+    kwarg_x = dict( sky_model="isotropic",
+        temp_model="sapm",
+        conf_0="insulated_back_glass_polymer",
+        conf_inf="open_rack_glass_polymer",
+        T98=70,
+        x_0=6.5,
+        wind_factor=0.33)
+    x_azimuth_step=45
+    x_tilt_step=45
+    standoff_series = pvdeg.utilities.tilt_azimuth_scan(weather_df=WEATHER_df, meta=META,
+        tilt_step=x_tilt_step, azimuth_step=x_azimuth_step, func = pvdeg.standards.standoff_x, **kwarg_x)
+    print(standoff_series)
+    print(WEATHER_df)
+    print(META)
+    assert standoff_series[13,2]==pytest.approx(1.92868166)
 
