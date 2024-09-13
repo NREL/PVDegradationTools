@@ -206,11 +206,13 @@ class Scenario:
         elif weather_db == "PVGIS":
             pass
         else:
-            raise ValueError(f"""
-                email : {self.email} \n api-key : {self.api_key}  
-                Must provide an email and api key during class initialization 
+            raise ValueError(
+                f"""
+                email : {self.email} \n api-key : {self.api_key}
+                Must provide an email and api key during class initialization
                 when using NDSRDB : {weather_db} == 'PSM3'
-                """)
+                """
+            )
 
         point_weather, point_meta = pvdeg.weather.get(
             weather_db, id=weather_id, **weather_arg
@@ -925,7 +927,7 @@ class Scenario:
             module_content = f"""
             <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span> 
+                    <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span>
                     {module['module_name']}
                 </h4>
             </div>
@@ -957,7 +959,7 @@ class Scenario:
             module_content = f"""
             <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span> 
+                    <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span>
                     {module_name}
                 </h4>
             </div>
@@ -969,7 +971,7 @@ class Scenario:
                 module_content += f"""
                 <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                     <h5 style="font-family: monospace; margin: 0;">
-                        <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span> 
+                        <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span>
                         {function_name}
                     </h5>
                 </div>
@@ -1029,7 +1031,7 @@ class Scenario:
             weather_data_html = f"""
             <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span> 
+                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>
                     Weather Data
                 </h4>
             </div>
@@ -1053,7 +1055,7 @@ class Scenario:
             step_content = f"""
             <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> 
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
                     {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
                 </h4>
             </div>
@@ -1124,7 +1126,7 @@ class GeospatialScenario(Scenario):
         see_added: bool = False,
     ) -> None:
         """
-        Add a location to the scenario. This can be done in three ways: Pass (region, region_col) for gid list. 
+        Add a location to the scenario. This can be done in three ways: Pass (region, region_col) for gid list.
 
         Parameters:
         -----------
@@ -1135,9 +1137,9 @@ class GeospatialScenario(Scenario):
             - ``country='United States'``
             - ``country=['United States']``
             - ``country=['Mexico', 'Canada']``
-            
+
         state : str
-            combination of states or provinces to include from NSRDB.  
+            combination of states or provinces to include from NSRDB.
             Supports two-letter codes for American states. Can mix two-letter
             codes with full length strings. Can take single string, or list of strings (len >= 1)
             Examples:
@@ -1147,8 +1149,8 @@ class GeospatialScenario(Scenario):
 
         county : str
             county to include from NSRDB. If duplicate county exists in two
-            states present in the ``state`` argument, both will be included. 
-            If no state is provided 
+            states present in the ``state`` argument, both will be included.
+            If no state is provided
         downsample_factor : int
             downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         year : int
@@ -1206,9 +1208,9 @@ class GeospatialScenario(Scenario):
 
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
 
-        # we don't downsample weather data until this runs 
+        # we don't downsample weather data until this runs
         # because on NSRDB we are storing weather OUT of MEMORY with dask
-        geo_meta, geo_gids = pvdeg.utilities.gid_downsampling( 
+        geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(
             geo_meta, downsample_factor
         )
 
@@ -1530,7 +1532,7 @@ class GeospatialScenario(Scenario):
     def geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
         """
         Extract the geospatial weather dataset and metadata dataframe from the scenario object
-        
+
         Example Use:
         >>> geo_weather, geo_meta = GeospatialScenario.geospatial_data()
 
@@ -1542,13 +1544,14 @@ class GeospatialScenario(Scenario):
 
         Returns:
         --------
-        (weather_data, meta_data): (xr.Dataset, pd.DataFrame)        
+        (weather_data, meta_data): (xr.Dataset, pd.DataFrame)
             A tuple of weather data as an `xarray.Dataset` and the corresponding meta data as a dataframe.
         """
         # downsample here, not done already happens at pipeline runtime
-        geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index) 
+        geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index).chunk(
+            chunks={"time": -1, "gid": 50}
+        )
         return geo_weather_sub, self.meta_data
-        
 
     def addJob(
         self,
@@ -1890,10 +1893,11 @@ class GeospatialScenario(Scenario):
         data_variable: str,
         cmap: str = "viridis",
     ):
-
         da = (self.results)[data_variable]
 
-        fig, ax = plt.subplots(figsize=(10, 6), subplot_kw={'projection': ccrs.PlateCarree()})
+        fig, ax = plt.subplots(
+            figsize=(10, 6), subplot_kw={"projection": ccrs.PlateCarree()}
+        )
 
         da.plot(ax=ax, transform=ccrs.PlateCarree(), cmap=cmap)
         ax.set_extent([-180, 180, -90, 90], crs=ccrs.PlateCarree())
@@ -1904,7 +1908,7 @@ class GeospatialScenario(Scenario):
 
         ax.add_feature(cfeature.LAND)
         ax.add_feature(cfeature.OCEAN)
-        ax.add_feature(cfeature.LAKES, edgecolor='black')
+        ax.add_feature(cfeature.LAKES, edgecolor="black")
         plt.show()
 
     # test this
@@ -1959,7 +1963,7 @@ class GeospatialScenario(Scenario):
             step_content = f"""
             <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> 
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
                     {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
                 </h4>
             </div>
@@ -2029,7 +2033,7 @@ class GeospatialScenario(Scenario):
             result_content = f"""
             <div id="{result_id}" onclick="toggleVisibility('content_{result_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span> 
+                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span>
                     Geospatial Result
                 </h4>
             </div>
@@ -2074,7 +2078,7 @@ class GeospatialScenario(Scenario):
             meta_data_html = f"""
             <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_meta_data" style="color: #b676c2;">►</span> 
+                    <span id="arrow_content_meta_data" style="color: #b676c2;">►</span>
                     Meta Data
                 </h4>
             </div>
