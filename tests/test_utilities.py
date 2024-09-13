@@ -82,7 +82,7 @@ def test_get_kinetics_bad():
 
 def test_read_material_bad():
     # no name case
-    fpath = os.path.join(DATA_DIR, "materials.json")
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
@@ -110,7 +110,7 @@ def test_add_material():
     pvdeg.utilities._add_material(name="tmat", **new_mat)
 
     # read updated file
-    fpath = os.path.join(DATA_DIR, "materials.json")
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
@@ -122,7 +122,7 @@ def test_add_material():
     assert data["tmat"] == new_mat
 
     # restore file to original state
-    fpath = os.path.join(DATA_DIR, "materials.json")
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
     data.pop("tmat")  # reset to default state
@@ -133,5 +133,6 @@ def test_add_material():
 
 # this only works because we are not running on kestrel
 def test_nrel_kestrel_check_bad():
+
     with pytest.raises(ConnectionError):
         pvdeg.utilities.nrel_kestrel_check()

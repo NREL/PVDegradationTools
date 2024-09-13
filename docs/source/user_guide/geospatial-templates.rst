@@ -1,6 +1,6 @@
 .. _geospatial-templates:
 
-Geospatial Analysis
+Geospatial Templates
 ===================
 Using 3 dimensional labeled arrays (`Xarray`) we are able to run calculations using meteorological data across many points at once. This process has been parallelized using `dask` and `xarray`. Both of these packages can be run locally or on cloud HPC environments. 
 

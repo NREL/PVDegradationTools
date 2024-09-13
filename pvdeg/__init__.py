@@ -19,6 +19,7 @@ from . import standards
 from . import temperature
 from . import utilities
 from . import weather
+from . import diffusion
 
 __version__ = version("pvdeg")
 

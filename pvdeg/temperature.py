@@ -191,7 +191,7 @@ def cell(
     temp_model: str = "sapm",
     conf: str = "open_rack_glass_polymer",
     wind_factor: float = 0.33,
-) -> pd.DataFrame:
+    ) -> pd.DataFrame:
     """
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.
@@ -298,14 +298,11 @@ def temperature(
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
     irradiance_kwarg={},
-    model_kwarg={},
+    model_kwarg={}
 ):
     """
     Calculate the PV cell or module temperature using PVLIB
     Current supports the following temperature models:
-
-    ``sapm_cell``,``sapm_module``,``pvsyst_cell``,``faiman``,``faiman_rad``,
-    ``ross``,``noct_sam``, ``fuentes``, ``generic_linear``
 
     Parameters:
     -----------
@@ -321,6 +318,10 @@ def temperature(
         Dataframe or series with minimum requirement of 'poa_global'. Will be calculated from weather_df, meta if not provided
     temp_model : (str, optional)
         Specify which temperature model from pvlib to use. Current options:
+
+        ``sapm_cell``,``sapm_module``,``pvsyst_cell``,``faiman``,``faiman_rad``,
+        ``ross``,``noct_sam``, ``fuentes``, ``generic_linear``
+
     conf : (str)
         The configuration of the PV module architecture and mounting
         configuration. Currently only used for 'sapm' and 'pvsys'.
