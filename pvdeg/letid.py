@@ -11,6 +11,7 @@ import pvlib
 
 
 from pvdeg import collection, utilities, standards, DATA_DIR
+from pvdeg.decorators import geospatial_quick_shape
 
 
 def tau_now(tau_0, tau_deg, n_b):
@@ -658,7 +659,7 @@ def calc_energy_loss(timesteps):
 
         Column names must include:
             - ``'Pmp_norm'``, a column of normalized (0-1) maximum power such as returned by
-            Degradation.calc_device_params
+            letid.calc_device_params
 
     Returns
     -------
@@ -672,9 +673,10 @@ def calc_energy_loss(timesteps):
         start = timesteps["Datetime"].iloc[0]
         timedelta = [(d - start).total_seconds() / 3600 for d in timesteps["Datetime"]]
 
+    print(timesteps.columns)
     pmp_norm = timesteps["Pmp_norm"]
     energy_loss = 1 - (
-        simpson(pmp_norm, timedelta) / simpson(np.ones(len(pmp_norm)), timedelta)
+        simpson(pmp_norm, x=timedelta) / simpson(np.ones(len(pmp_norm)), x=timedelta)
     )
 
     return energy_loss
@@ -870,6 +872,23 @@ def calc_injection_outdoors(results):
     return injection
 
 
+@geospatial_quick_shape(
+    1,
+    [
+        "Temperature",
+        "Injection",
+        "NA",
+        "NB",
+        "NC",
+        "tau",
+        "Jsc",
+        "Voc",
+        "Isc",
+        "FF",
+        "Pmp",
+        "Pmp_norm",
+    ],
+)
 def calc_letid_outdoors(
     tau_0,
     tau_deg,
