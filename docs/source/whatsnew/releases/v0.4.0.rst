@@ -1,0 +1,58 @@
+v0.4.0 (2024-07-29)
+=======================
+
+Enhancements
+---------
+Scenarios  
+
+* Unified Cell and Module Temperature function. See: ``temperature.temperature``
+* Added support for pvlib temperature models. ``see pvlib docs <https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html>``
+* Overhauled scenario class for pv system analysis. Scenario object for single point analysis and GeospatialScenario object for geospatial analysis. See: ``scenario.Scenario`` and ``scenario.GeospatialScenario``
+* Created Scenario tutorials to showcase new scenario functionality.  
+* Added a number of geospatial downselection functions. Find coordinates near mountains, rivers, coastlines and lakes from NSRDB data. See: ``geospatial.identify_mountains_weights``, ``geospatial.identify_mountains_radii``, ``geospatial.feature_downselect``
+* Added geospatial bounding box support. Clip unwanted data with rectangular bounding boxes. See: ``geospatial.apply_bounding_box``
+* Added stochastic non-uniform density downselection function to preferentially select for mountains (higher point density with changes in elevation, lower density when flatter.) See:  ``geospatial.elevation_stochastic_downselection``
+* Updated non-uniform downselection with thresholding and non-linear normalization (support for logarithmic and exponential normalization) See: ``geospatial.identify_mountains_weights``
+* Added Scenario and GeospatialScenario methods for quick plotting and downselection. See: ``GeospatialScenario.plot_coords``, ``GeospatialScenario.plot_meta_classification``, ``GeospatialScenario.plot_USA``, ``Scenario.extract``, ``Scenario.plot``, ``GeospatialScenario.classify_mountain_weights``, ``GeospatialScenario.classify_mountain_radii``, ``GeospatialScenario.downselect_elevation_stochastic``.  
+* Added a convenience method ``GepspatialScenario.geospatial_data`` to quickly pull the geospatial weather and metadata from a scenario. Matches the API for ``pvdeg.weather.get``.  
+
+Geospatial Improvements  
+
+* Autotemplating system for geospatial analysis using `pvdeg.geospatial.autotemplate`.  
+* New module `pvdeg.decorators` that contains `pvdeg` specific decorator functions.
+* Implemented `geospatial_result_type` decorator to update functions and preform runtime introspection to determine if a function is autotemplate-able.
+* `Geospatial Templates.ipynb` notebook to showcase new and old templating functionality for users.
+* Implemented testing for geospatial analysis.  
+* Added chunked and unchunked testing.  
+
+Symbolic Evaluation  
+
+* symbolic equation solver for simple models.
+* notebook tutorial `Custom-Functions-Nopython.ipynb`
+
+IEC-63126 Tool
+
+* Added `GeospatialScenario` to standoff tool for regional analyses.
+* Increased plotting functionality within tool.
+
+Bug Fixes
+---------
+* Added type hinting to many `pvdeg` functions
+* Fixed broken keywords in many `pvdeg.standards` function calls
+* Replaced deprecated numba `jit(nopython=True)` calls with `njit`
+* Fix incorrect keyword arguments in `pvdeg.standards.T98_estimate`
+* Fixed ``pvdeg.temperature.module`` and ``pvdeg.temperature.cell`` docstring return type. Correct return type ``pd.Series``
+* Fixed broken Geospatial Analysis, when using chunked (dask) xarrays for weather data
+
+Dependencies
+------------
+* `sympy` package required for `pvdeg.symbolic` functions and notebook. Not added to dependency list.
+* Restrict the following dependencies to fix unit testing
+* ``numpy==1.26.4``
+* ``pvlib==0.10.3``
+* ``scipy<1.14.0``
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
+* Mike Kempe (:ghuser:`MDKempe`)

@@ -1,0 +1,16 @@
+
+v0.4.1 (2024-08-30)
+=======================
+
+Enhancements
+------------
+Diffusion
+
+- Created a 1D diffsion tool. ``Tools - Edge Seal Oxygen Ingress.ipynb``
+- Created a diffusion module. Only has a 1D diffusion calculation function (``pvdeg.diffusion.esdiffusion``)
+but 2D calculation combing soon.
+
+Contributors
+~~~~~~~~~~~~
+* Mike Kempe (:ghuser:`MDKempe`)
+* Tobin Ford (:ghuser:`tobin-ford`)
