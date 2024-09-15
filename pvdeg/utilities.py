@@ -1262,3 +1262,49 @@ def compare_templates(
             return False
 
     return True
+
+def merge_sparse(files: list[str])->xr.Dataset:
+    """
+    Merge an arbitrary number of geospatial analysis results. 
+    Creates monotonically increasing indicies.
+
+    Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.
+
+    Parameters
+    -----------
+    files: list[str]
+        A list of strings representing filepaths to netcdf (.nc) files.
+        Each file must have the same coordinates, `['latitude','longitude']` and identical datavariables.
+
+    Returns
+    -------
+    merged_ds: xr.Dataset
+        Dataset (in memory) with `coordinates = ['latitude','longitude']` and datavariables matching files in 
+        filepaths list.
+    """
+
+    datasets = [xr.open_dataset(fp, engine='h5netcdf').compute() for fp in files]
+
+    latitudes = np.concatenate([ds.latitude.values for ds in datasets])
+    longitudes = np.concatenate([ds.longitude.values for ds in datasets])
+    unique_latitudes = np.sort(np.unique(latitudes))
+    unique_longitudes = np.sort(np.unique(longitudes))
+
+    data_vars = datasets[0].data_vars
+
+    merged_ds = xr.Dataset(
+        {var: (['latitude', 'longitude'], np.full((len(unique_latitudes), len(unique_longitudes)), np.nan)) for var in data_vars},
+        coords={
+            'latitude': unique_latitudes,
+            'longitude': unique_longitudes
+        }
+    )
+
+    for ds in datasets:
+        lat_inds = np.searchsorted(unique_latitudes, ds.latitude.values)
+        lon_inds = np.searchsorted(unique_longitudes, ds.longitude.values)
+
+        for var in ds.data_vars:
+            merged_ds[var].values[np.ix_(lat_inds, lon_inds)] = ds[var].values
+
+    return merged_ds

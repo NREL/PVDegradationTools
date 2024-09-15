@@ -927,7 +927,7 @@ def elevation_stochastic_downselect(
 
 
 def interpolate_analysis(
-    result: xr.Dataset, data_var: str, method="nearest"
+    result: xr.Dataset, data_var: str, method="nearest", resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Interpolate sparse spatial result data against DataArray coordinates.
@@ -935,6 +935,9 @@ def interpolate_analysis(
 
     Parameters:
     -----------
+    resolution: complex
+        Change the amount the input is interpolated.
+        For more interpolation set higher (200j is more than 100j)
 
     Result:
     -------
@@ -951,8 +954,8 @@ def interpolate_analysis(
     )  # probably a nicer way to do this
 
     grid_lat, grid_lon = np.mgrid[
-        df["latitude"].min() : df["latitude"].max() : 100j,
-        df["longitude"].min() : df["longitude"].max() : 100j,
+        df["latitude"].min() : df["latitude"].max() : resolution,
+        df["longitude"].min() : df["longitude"].max() : resolution,
     ]
 
     grid_z = griddata(data[:, 0:2], data[:, 2], xi=(grid_lat, grid_lon), method=method)
@@ -960,12 +963,42 @@ def interpolate_analysis(
     return grid_z, grid_lat, grid_lon
 
 
-def plot_sparse_analysis(result: xr.Dataset, data_var: str, method="nearest") -> None:
+# api could be updated to match that of plot_USA
+def plot_sparse_analysis(
+    result: xr.Dataset, 
+    data_var: str, 
+    method="nearest", 
+    resolution:complex=100j,
+    figsize:tuple=(10,8),
+) -> None:
+    """
+    Plot the output of a sparse geospatial analysis using interpolation.
+
+    Parameters
+    -----------
+    result: xr.Dataset
+        xarray dataset in memory containing coordinates['longitude', 'latitude'] and at least one datavariable.
+    data_var: str
+        name of datavariable to plot from result
+    method: str
+        interpolation method. 
+        Options: `'nearest', 'linear', 'cubic'`
+        See [`scipy.interpolate.griddata`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html)
+    resolution: complex
+        Change the amount the input is interpolated.
+        For more interpolation set higher (200j is more than 100j)
+
+    Returns
+    -------
+    fig, ax: tuple
+        matplotlib figure and axes of plot
+    """
+
     grid_values, lat, lon = interpolate_analysis(
-        result=result, data_var=data_var, method=method
+        result=result, data_var=data_var, method=method, resolution=resolution
     )
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=figsize)
     ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
     ax.patch.set_visible(False)
 
@@ -977,7 +1010,7 @@ def plot_sparse_analysis(result: xr.Dataset, data_var: str, method="nearest") ->
         origin="lower",
         cmap="viridis",
         transform=ccrs.PlateCarree(),
-    )  # should this be trnsposed
+    )
 
     shapename = "admin_1_states_provinces_lakes"
     states_shp = shpreader.natural_earth(
@@ -994,7 +1027,9 @@ def plot_sparse_analysis(result: xr.Dataset, data_var: str, method="nearest") ->
     cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
     cbar.set_label("Value")
 
-    plt.title("Interpolated Heatmap")
+    plt.title(f"Interpolated Sparse Analysis, {data_var}")
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
     plt.show()
+
+    return fig, ax
