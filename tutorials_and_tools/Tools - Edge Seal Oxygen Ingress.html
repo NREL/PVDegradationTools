@@ -1,0 +1,1022 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Tools - Edge Seal Oxygen Ingress Calculator tool &#8212; PVDEG Tutorials</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=ac02cc09edc035673794" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=384b581d" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=87e54e7c" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=ac02cc09edc035673794"></script>
+
+    <script src="../_static/documentation_options.js?v=c73c0f3e"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=efea14e4"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials_and_tools/Tools - Edge Seal Oxygen Ingress';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="B-O LID - Accelerated Test" href="B-O%20LID%20-%20Accelerated%20Test.html" />
+    <link rel="prev" title="Tools - Module Standoff for IEC TS 63126" href="Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">PVDEG Tutorials</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    Welcome to the PVDEG Tutorials and Tools
+                </a>
+            </li>
+        </ul>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="1%20-%20Basics%2C%20Humidity%2C%20Design.html">1 - Basics, Humidity, Design</a></li>
+<li class="toctree-l1"><a class="reference internal" href="2%20-%20Degradation.html">2 - Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="3%20-%20Spectral%20Degradation.html">3 - Spectral Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="4%20-%20Weather%20Database%20Access.html">4 - Weather Database Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html">Tools - Module Standoff for IEC TS 63126</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Tools - Edge Seal Oxygen Ingress Calculator tool</a></li>
+<li class="toctree-l1"><a class="reference internal" href="B-O%20LID%20-%20Accelerated%20Test.html">B-O LID - Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Accelerated%20Test.html">LETID - Accelerated Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20LETID.html">LETID - Outdoor Environments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Outdoor%20Scenario%20Based%20on%20Accelerated%20Test%20Result.html">LETID - Outdoor Scenario Based on Accelerated Test</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LETID%20-%20Passivated%20Wafer.html">LETID - Passivated Wafer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ASTM%20Live%20Demo.html">ASTM Demonstration</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/NREL/PVDegradationTools/blob/main/tutorials_and_tools/tutorials_and_tools/Tools - Edge Seal Oxygen Ingress.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch onColab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img src="../_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="initThebeSBT()"
+  class="btn btn-sm btn-launch-thebe dropdown-item"
+  title="Launch Thebe"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-play"></i>
+  </span>
+<span class="btn__text-container">Live Code</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NREL/PVDegradationTools" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NREL/PVDegradationTools/issues/new?title=Issue%20on%20page%20%2Ftutorials_and_tools/Tools - Edge Seal Oxygen Ingress.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/tutorials_and_tools/Tools - Edge Seal Oxygen Ingress.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<label class="sidebar-toggle secondary-toggle btn btn-sm" for="__secondary"title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</label>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Tools - Edge Seal Oxygen Ingress Calculator tool</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-weather-data">1. Import Weather Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-the-calculations">2. Set up the Calculations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-calculations">3. Run the Calculations</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="tools-edge-seal-oxygen-ingress-calculator-tool">
+<h1>Tools - Edge Seal Oxygen Ingress Calculator tool<a class="headerlink" href="#tools-edge-seal-oxygen-ingress-calculator-tool" title="Link to this heading">#</a></h1>
+<p>Calculation of oxygen ingress profile through an edge seal and into the encapsulant.</p>
+<p><strong>Requirements:</strong></p>
+<ul class="simple">
+<li><p>Local weather data file or site longitude and latittude.</p></li>
+<li><p>Properties and dimensions of the edge seal.</p></li>
+</ul>
+<p><strong>Objectives:</strong></p>
+<ol class="arabic simple">
+<li><p>Import weather data.</p></li>
+<li><p>Set up the calculations.</p></li>
+<li><p>Calculate oxygen ingress into an edge seal.</p></li>
+<li><p>Incorporate an oxygen consumption model.</p></li>
+<li><p>Plot the data.</p></li>
+</ol>
+<p><strong>Background:</strong></p>
+<p>This performs a 1-D finite difference model for oxygen ingress through an edge seal and into an encapsulant. This is effectively an infinitely long module with a prescribed width.The output is then displayed graphically.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+<span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">pvdeg</span><span class="o">==</span><span class="m">0</span>.3.3
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Defaulting to user installation because normal site-packages is not writeable
+Collecting pvdeg==0.3.3
+  Downloading pvdeg-0.3.3-py3-none-any.whl.metadata (6.7 kB)
+Requirement already satisfied: NREL-rex in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (0.2.86)
+Requirement already satisfied: cartopy in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (0.23.0)
+Requirement already satisfied: dask in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (2023.11.0)
+Requirement already satisfied: dask-jobqueue in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (0.8.5)
+Requirement already satisfied: h5netcdf in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (1.3.0)
+Requirement already satisfied: h5py in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (3.9.0)
+Requirement already satisfied: jupyterlab in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (4.2.2)
+Requirement already satisfied: matplotlib in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (3.7.2)
+Requirement already satisfied: netCDF4 in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (1.7.1.post1)
+Requirement already satisfied: notebook in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (7.2.1)
+Requirement already satisfied: numba in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (0.59.0)
+Requirement already satisfied: numpy in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (1.24.4)
+Requirement already satisfied: openpyxl in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (3.0.10)
+Requirement already satisfied: pandas in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (2.1.0)
+Requirement already satisfied: photovoltaic in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (0.1.9)
+Requirement already satisfied: pvlib in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (0.11.0)
+Requirement already satisfied: python-dateutil in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (2.8.2)
+Requirement already satisfied: pytz in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (2023.3)
+Requirement already satisfied: scipy in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.3.3) (1.11.1)
+Requirement already satisfied: seaborn in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (0.12.2)
+Requirement already satisfied: tables in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (3.9.2)
+Requirement already satisfied: tqdm in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (4.65.0)
+Requirement already satisfied: xarray in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (2023.6.0)
+Requirement already satisfied: pre-commit in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.3.3) (3.7.1)
+Requirement already satisfied: shapely&gt;=1.7 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from cartopy-&gt;pvdeg==0.3.3) (1.8.5.post1)
+Requirement already satisfied: packaging&gt;=20 in c:\programdata\anaconda3\lib\site-packages (from cartopy-&gt;pvdeg==0.3.3) (23.1)
+Requirement already satisfied: pyshp&gt;=2.3 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from cartopy-&gt;pvdeg==0.3.3) (2.3.1)
+Requirement already satisfied: pyproj&gt;=3.3.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from cartopy-&gt;pvdeg==0.3.3) (3.6.0)
+Requirement already satisfied: contourpy&gt;=1.0.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.3.3) (1.1.0)
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.3.3) (0.11.0)
+Requirement already satisfied: fonttools&gt;=4.22.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.3.3) (4.42.0)
+Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.3.3) (1.4.4)
+Requirement already satisfied: pillow&gt;=6.2.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.3.3) (10.0.0)
+Requirement already satisfied: pyparsing&lt;3.1,&gt;=2.3.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.3.3) (3.0.9)
+Requirement already satisfied: six&gt;=1.5 in c:\programdata\anaconda3\lib\site-packages (from python-dateutil-&gt;pvdeg==0.3.3) (1.16.0)
+Requirement already satisfied: click&gt;=8.1 in c:\programdata\anaconda3\lib\site-packages (from dask-&gt;pvdeg==0.3.3) (8.1.7)
+Requirement already satisfied: cloudpickle&gt;=1.5.0 in c:\programdata\anaconda3\lib\site-packages (from dask-&gt;pvdeg==0.3.3) (2.2.1)
+Requirement already satisfied: fsspec&gt;=2021.09.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from dask-&gt;pvdeg==0.3.3) (2023.3.0)
+Requirement already satisfied: partd&gt;=1.2.0 in c:\programdata\anaconda3\lib\site-packages (from dask-&gt;pvdeg==0.3.3) (1.4.1)
+Requirement already satisfied: pyyaml&gt;=5.3.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from dask-&gt;pvdeg==0.3.3) (6.0.1)
+Requirement already satisfied: toolz&gt;=0.10.0 in c:\programdata\anaconda3\lib\site-packages (from dask-&gt;pvdeg==0.3.3) (0.12.0)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in c:\programdata\anaconda3\lib\site-packages (from dask-&gt;pvdeg==0.3.3) (7.0.1)
+Requirement already satisfied: distributed&gt;=2022.02.0 in c:\programdata\anaconda3\lib\site-packages (from dask-jobqueue-&gt;pvdeg==0.3.3) (2023.11.0)
+Requirement already satisfied: async-lru&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (2.0.4)
+Requirement already satisfied: httpx&gt;=0.25.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (0.27.0)
+Requirement already satisfied: ipykernel&gt;=6.5.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (6.28.0)
+Requirement already satisfied: jinja2&gt;=3.0.3 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (3.1.3)
+Requirement already satisfied: jupyter-core in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (5.5.0)
+Requirement already satisfied: jupyter-lsp&gt;=2.0.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (2.2.0)
+Requirement already satisfied: jupyter-server&lt;3,&gt;=2.4.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (2.10.0)
+Requirement already satisfied: jupyterlab-server&lt;3,&gt;=2.27.1 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (2.27.2)
+Requirement already satisfied: notebook-shim&gt;=0.2 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (0.2.3)
+Requirement already satisfied: setuptools&gt;=40.1.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (70.1.1)
+Requirement already satisfied: tornado&gt;=6.2.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (6.3.3)
+Requirement already satisfied: traitlets in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.3.3) (5.14.3)
+Requirement already satisfied: cftime in c:\programdata\anaconda3\lib\site-packages (from netCDF4-&gt;pvdeg==0.3.3) (1.6.4)
+Requirement already satisfied: certifi in c:\programdata\anaconda3\lib\site-packages (from netCDF4-&gt;pvdeg==0.3.3) (2024.6.2)
+Requirement already satisfied: h5pyd&gt;=0.18.0 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.3.3) (0.18.0)
+Requirement already satisfied: hsds&gt;=0.8.4 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.3.3) (0.8.4)
+Requirement already satisfied: psutil&gt;=5.6 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.3.3) (5.9.0)
+Requirement already satisfied: toml&gt;=0.10.0 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.3.3) (0.10.2)
+Requirement already satisfied: tzdata&gt;=2022.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pandas-&gt;pvdeg==0.3.3) (2023.3)
+Requirement already satisfied: llvmlite&lt;0.43,&gt;=0.42.0dev0 in c:\programdata\anaconda3\lib\site-packages (from numba-&gt;pvdeg==0.3.3) (0.42.0)
+Requirement already satisfied: et_xmlfile in c:\programdata\anaconda3\lib\site-packages (from openpyxl-&gt;pvdeg==0.3.3) (1.1.0)
+Requirement already satisfied: cfgv&gt;=2.0.0 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.3.3) (3.4.0)
+Requirement already satisfied: identify&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.3.3) (2.5.36)
+Requirement already satisfied: nodeenv&gt;=0.11.1 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.3.3) (1.9.1)
+Requirement already satisfied: virtualenv&gt;=20.10.0 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.3.3) (20.26.3)
+Requirement already satisfied: requests in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvlib-&gt;pvdeg==0.3.3) (2.31.0)
+Requirement already satisfied: numexpr&gt;=2.6.2 in c:\programdata\anaconda3\lib\site-packages (from tables-&gt;pvdeg==0.3.3) (2.8.7)
+Requirement already satisfied: py-cpuinfo in c:\programdata\anaconda3\lib\site-packages (from tables-&gt;pvdeg==0.3.3) (9.0.0)
+Requirement already satisfied: colorama in c:\programdata\anaconda3\lib\site-packages (from tqdm-&gt;pvdeg==0.3.3) (0.4.6)
+Requirement already satisfied: locket&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.3.3) (1.0.0)
+Requirement already satisfied: msgpack&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.3.3) (1.0.3)
+Requirement already satisfied: sortedcontainers&gt;=2.0.5 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.3.3) (2.4.0)
+Requirement already satisfied: tblib&gt;=1.6.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.3.3) (1.7.0)
+Requirement already satisfied: urllib3&gt;=1.24.3 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.3.3) (1.26.18)
+Requirement already satisfied: zict&gt;=3.0.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.3.3) (3.0.0)
+Requirement already satisfied: requests-unixsocket in c:\programdata\anaconda3\lib\site-packages (from h5pyd&gt;=0.18.0-&gt;NREL-rex-&gt;pvdeg==0.3.3) (0.3.0)
+Requirement already satisfied: pyjwt in c:\programdata\anaconda3\lib\site-packages (from h5pyd&gt;=0.18.0-&gt;NREL-rex-&gt;pvdeg==0.3.3) (2.4.0)
+Requirement already satisfied: aiohttp==3.8.5 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (3.8.5)
+Requirement already satisfied: aiobotocore==2.5.0 in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (2.5.0)
+Requirement already satisfied: aiohttp-cors in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (0.7.0)
+Requirement already satisfied: aiofiles in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (24.1.0)
+Requirement already satisfied: azure-storage-blob in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (12.20.0)
+Requirement already satisfied: botocore in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.29.76)
+Requirement already satisfied: cryptography in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (42.0.2)
+Requirement already satisfied: numcodecs in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (0.12.1)
+Requirement already satisfied: simplejson in c:\programdata\anaconda3\lib\site-packages (from hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (3.19.2)
+Requirement already satisfied: wrapt&gt;=1.10.10 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiobotocore==2.5.0-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.15.0)
+Requirement already satisfied: aioitertools&gt;=0.5.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiobotocore==2.5.0-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (0.11.0)
+Requirement already satisfied: attrs&gt;=17.3.0 in c:\programdata\anaconda3\lib\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (23.1.0)
+Requirement already satisfied: charset-normalizer&lt;4.0,&gt;=2.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (3.2.0)
+Requirement already satisfied: multidict&lt;7.0,&gt;=4.5 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (6.0.4)
+Requirement already satisfied: async-timeout&lt;5.0,&gt;=4.0.0a3 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (4.0.2)
+Requirement already satisfied: yarl&lt;2.0,&gt;=1.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.9.2)
+Requirement already satisfied: frozenlist&gt;=1.1.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.4.0)
+Requirement already satisfied: aiosignal&gt;=1.1.2 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.8.5-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.3.1)
+Requirement already satisfied: anyio in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (4.2.0)
+Requirement already satisfied: httpcore==1.* in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.0.5)
+Requirement already satisfied: idna in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (3.4)
+Requirement already satisfied: sniffio in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.3.0)
+Requirement already satisfied: h11&lt;0.15,&gt;=0.13 in c:\programdata\anaconda3\lib\site-packages (from httpcore==1.*-&gt;httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.14.0)
+Requirement already satisfied: zipp&gt;=0.5 in c:\programdata\anaconda3\lib\site-packages (from importlib-metadata&gt;=4.13.0-&gt;dask-&gt;pvdeg==0.3.3) (3.17.0)
+Requirement already satisfied: comm&gt;=0.1.1 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.1.2)
+Requirement already satisfied: debugpy&gt;=1.6.5 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.6.7)
+Requirement already satisfied: ipython&gt;=7.23.1 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (8.25.0)
+Requirement already satisfied: jupyter-client&gt;=6.1.12 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (8.6.0)
+Requirement already satisfied: matplotlib-inline&gt;=0.1 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.1.6)
+Requirement already satisfied: nest-asyncio in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.6.0)
+Requirement already satisfied: pyzmq&gt;=24 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (25.1.2)
+Requirement already satisfied: MarkupSafe&gt;=2.0 in c:\programdata\anaconda3\lib\site-packages (from jinja2&gt;=3.0.3-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.1.3)
+Requirement already satisfied: platformdirs&gt;=2.5 in c:\programdata\anaconda3\lib\site-packages (from jupyter-core-&gt;jupyterlab-&gt;pvdeg==0.3.3) (3.10.0)
+Requirement already satisfied: pywin32&gt;=300 in c:\programdata\anaconda3\lib\site-packages (from jupyter-core-&gt;jupyterlab-&gt;pvdeg==0.3.3) (305.1)
+Requirement already satisfied: argon2-cffi in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (21.3.0)
+Requirement already satisfied: jupyter-events&gt;=0.6.0 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.8.0)
+Requirement already satisfied: jupyter-server-terminals in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.4.4)
+Requirement already satisfied: nbconvert&gt;=6.4.4 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (7.10.0)
+Requirement already satisfied: nbformat&gt;=5.3.0 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (5.9.2)
+Requirement already satisfied: overrides in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (7.4.0)
+Requirement already satisfied: prometheus-client in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.14.1)
+Requirement already satisfied: pywinpty in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.0.10)
+Requirement already satisfied: send2trash&gt;=1.8.2 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.8.2)
+Requirement already satisfied: terminado&gt;=0.8.3 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.17.1)
+Requirement already satisfied: websocket-client in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.58.0)
+Requirement already satisfied: babel&gt;=2.10 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.11.0)
+Requirement already satisfied: json5&gt;=0.9.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.9.6)
+Requirement already satisfied: jsonschema&gt;=4.18.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.3.3) (4.19.2)
+Requirement already satisfied: distlib&lt;1,&gt;=0.3.7 in c:\programdata\anaconda3\lib\site-packages (from virtualenv&gt;=20.10.0-&gt;pre-commit-&gt;pvdeg==0.3.3) (0.3.8)
+Requirement already satisfied: filelock&lt;4,&gt;=3.12.2 in c:\programdata\anaconda3\lib\site-packages (from virtualenv&gt;=20.10.0-&gt;pre-commit-&gt;pvdeg==0.3.3) (3.13.1)
+Requirement already satisfied: jmespath&lt;2.0.0,&gt;=0.7.1 in c:\programdata\anaconda3\lib\site-packages (from botocore-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.0.1)
+Requirement already satisfied: decorator in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (5.1.1)
+Requirement already satisfied: jedi&gt;=0.16 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.18.1)
+Requirement already satisfied: prompt-toolkit&lt;3.1.0,&gt;=3.0.41 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (3.0.43)
+Requirement already satisfied: pygments&gt;=2.4.0 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.15.1)
+Requirement already satisfied: stack-data in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.2.0)
+Requirement already satisfied: typing-extensions&gt;=4.6 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (4.9.0)
+Requirement already satisfied: jsonschema-specifications&gt;=2023.03.6 in c:\programdata\anaconda3\lib\site-packages (from jsonschema&gt;=4.18.0-&gt;jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2023.7.1)
+Requirement already satisfied: referencing&gt;=0.28.4 in c:\programdata\anaconda3\lib\site-packages (from jsonschema&gt;=4.18.0-&gt;jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.30.2)
+Requirement already satisfied: rpds-py&gt;=0.7.1 in c:\programdata\anaconda3\lib\site-packages (from jsonschema&gt;=4.18.0-&gt;jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.10.6)
+Requirement already satisfied: python-json-logger&gt;=2.0.4 in c:\programdata\anaconda3\lib\site-packages (from jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.0.7)
+Requirement already satisfied: rfc3339-validator in c:\programdata\anaconda3\lib\site-packages (from jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.1.4)
+Requirement already satisfied: rfc3986-validator&gt;=0.1.1 in c:\programdata\anaconda3\lib\site-packages (from jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.1.1)
+Requirement already satisfied: beautifulsoup4 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (4.12.2)
+Requirement already satisfied: bleach!=5.0.0 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (4.1.0)
+Requirement already satisfied: defusedxml in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.7.1)
+Requirement already satisfied: jupyterlab-pygments in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.1.2)
+Requirement already satisfied: mistune&lt;4,&gt;=2.0.3 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.0.4)
+Requirement already satisfied: nbclient&gt;=0.5.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.7.4)
+Requirement already satisfied: pandocfilters&gt;=1.4.1 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.5.0)
+Requirement already satisfied: tinycss2 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.2.1)
+Requirement already satisfied: fastjsonschema in c:\programdata\anaconda3\lib\site-packages (from nbformat&gt;=5.3.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.16.2)
+Requirement already satisfied: argon2-cffi-bindings in c:\programdata\anaconda3\lib\site-packages (from argon2-cffi-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (21.2.0)
+Requirement already satisfied: azure-core&gt;=1.28.0 in c:\programdata\anaconda3\lib\site-packages (from azure-storage-blob-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.30.2)
+Requirement already satisfied: isodate&gt;=0.6.1 in c:\programdata\anaconda3\lib\site-packages (from azure-storage-blob-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (0.6.1)
+Requirement already satisfied: cffi&gt;=1.12 in c:\programdata\anaconda3\lib\site-packages (from cryptography-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (1.16.0)
+Requirement already satisfied: webencodings in c:\programdata\anaconda3\lib\site-packages (from bleach!=5.0.0-&gt;nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.5.1)
+Requirement already satisfied: pycparser in c:\programdata\anaconda3\lib\site-packages (from cffi&gt;=1.12-&gt;cryptography-&gt;hsds&gt;=0.8.4-&gt;NREL-rex-&gt;pvdeg==0.3.3) (2.21)
+Requirement already satisfied: parso&lt;0.9.0,&gt;=0.8.0 in c:\programdata\anaconda3\lib\site-packages (from jedi&gt;=0.16-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.8.3)
+Requirement already satisfied: fqdn in c:\programdata\anaconda3\lib\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.5.1)
+Requirement already satisfied: isoduration in c:\programdata\anaconda3\lib\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (20.11.0)
+Requirement already satisfied: jsonpointer&gt;1.13 in c:\programdata\anaconda3\lib\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.1)
+Requirement already satisfied: uri-template in c:\users\sayala\appdata\roaming\python\python311\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.3.0)
+Requirement already satisfied: webcolors&gt;=1.11 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.13)
+Requirement already satisfied: wcwidth in c:\programdata\anaconda3\lib\site-packages (from prompt-toolkit&lt;3.1.0,&gt;=3.0.41-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.2.5)
+Requirement already satisfied: soupsieve&gt;1.2 in c:\programdata\anaconda3\lib\site-packages (from beautifulsoup4-&gt;nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.5)
+Requirement already satisfied: executing in c:\programdata\anaconda3\lib\site-packages (from stack-data-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.8.3)
+Requirement already satisfied: asttokens in c:\programdata\anaconda3\lib\site-packages (from stack-data-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (2.0.5)
+Requirement already satisfied: pure-eval in c:\programdata\anaconda3\lib\site-packages (from stack-data-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (0.2.2)
+Requirement already satisfied: arrow&gt;=0.15.0 in c:\programdata\anaconda3\lib\site-packages (from isoduration-&gt;jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.3.3) (1.2.3)
+Downloading pvdeg-0.3.3-py3-none-any.whl (2.7 MB)
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   ---------------------------------------- 0.0/2.7 MB ? eta -:--:--
+   --- ------------------------------------ 0.3/2.7 MB ? eta -:--:--
+   --- ------------------------------------ 0.3/2.7 MB ? eta -:--:--
+   ------- -------------------------------- 0.5/2.7 MB 524.3 kB/s eta 0:00:05
+   ----------- ---------------------------- 0.8/2.7 MB 745.8 kB/s eta 0:00:03
+   ------------------- -------------------- 1.3/2.7 MB 1.1 MB/s eta 0:00:02
+   ------------------------------- -------- 2.1/2.7 MB 1.6 MB/s eta 0:00:01
+   ---------------------------------------- 2.7/2.7 MB 1.8 MB/s eta 0:00:00
+Installing collected packages: pvdeg
+Successfully installed pvdeg-0.3.3
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">pvdeg</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">json</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">platform</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Working on a &quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Python version &quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Pandas version &quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;pvdeg version &quot;</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Windows 10
+Python version  3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]
+Pandas version  2.1.0
+pvdeg version  0.3.3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="import-weather-data">
+<h2>1. Import Weather Data<a class="headerlink" href="#import-weather-data" title="Link to this heading">#</a></h2>
+<p>The function has these minimum requirements when using a weather data file:</p>
+<ul class="simple">
+<li><p>Weather data containing (at least) DNI, DHI, GHI, Temperature, RH, and Wind-Speed data at module level.</p></li>
+<li><p>Site meta-data containing (at least) latitude, longitude, and time zone</p></li>
+</ul>
+<p>Alternatively one may can get meterological data from the NSRDB or PVGIS with just the longitude and latitude. This function for the NSRDB (via NSRDB ‘PSM3’) works primarily for most of North America and South America. PVGIS works for most of the rest of the world (via SARAH ‘PVGIS’). See the tutorial “Weather Database Access.ipynb” tutorial on PVdeg or Jensen et al. <a class="reference external" href="https://doi.org/10.1016/j.solener.2023.112092">https://doi.org/10.1016/j.solener.2023.112092</a> for satellite coverage information.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get data from a supplied data file (Do not use the next box of code if using your own file)</span>
+<span class="n">weather_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;psm3_demo.csv&#39;</span><span class="p">)</span>
+<span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">weather_file</span><span class="p">,</span><span class="s1">&#39;csv&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;Source&#39;: &#39;NSRDB&#39;, &#39;Location ID&#39;: 145809.0, &#39;City&#39;: &#39;-&#39;, &#39;State&#39;: &#39;-&#39;, &#39;Country&#39;: &#39;-&#39;, &#39;Clearsky DHI Units&#39;: &#39;w/m2&#39;, &#39;Clearsky DNI Units&#39;: &#39;w/m2&#39;, &#39;Clearsky GHI Units&#39;: &#39;w/m2&#39;, &#39;Dew Point Units&#39;: &#39;c&#39;, &#39;DHI Units&#39;: &#39;w/m2&#39;, &#39;DNI Units&#39;: &#39;w/m2&#39;, &#39;GHI Units&#39;: &#39;w/m2&#39;, &#39;Solar Zenith Angle Units&#39;: &#39;Degree&#39;, &#39;Temperature Units&#39;: &#39;c&#39;, &#39;Pressure Units&#39;: &#39;mbar&#39;, &#39;Relative Humidity Units&#39;: &#39;%&#39;, &#39;Precipitable Water Units&#39;: &#39;cm&#39;, &#39;Wind Direction Units&#39;: &#39;Degrees&#39;, &#39;Wind Speed Units&#39;: &#39;m/s&#39;, &#39;Cloud Type -15&#39;: &#39;N/A&#39;, &#39;Cloud Type 0&#39;: &#39;Clear&#39;, &#39;Cloud Type 1&#39;: &#39;Probably Clear&#39;, &#39;Cloud Type 2&#39;: &#39;Fog&#39;, &#39;Cloud Type 3&#39;: &#39;Water&#39;, &#39;Cloud Type 4&#39;: &#39;Super-Cooled Water&#39;, &#39;Cloud Type 5&#39;: &#39;Mixed&#39;, &#39;Cloud Type 6&#39;: &#39;Opaque Ice&#39;, &#39;Cloud Type 7&#39;: &#39;Cirrus&#39;, &#39;Cloud Type 8&#39;: &#39;Overlapping&#39;, &#39;Cloud Type 9&#39;: &#39;Overshooting&#39;, &#39;Cloud Type 10&#39;: &#39;Unknown&#39;, &#39;Cloud Type 11&#39;: &#39;Dust&#39;, &#39;Cloud Type 12&#39;: &#39;Smoke&#39;, &#39;Fill Flag 0&#39;: &#39;N/A&#39;, &#39;Fill Flag 1&#39;: &#39;Missing Image&#39;, &#39;Fill Flag 2&#39;: &#39;Low Irradiance&#39;, &#39;Fill Flag 3&#39;: &#39;Exceeds Clearsky&#39;, &#39;Fill Flag 4&#39;: &#39;Missing CLoud Properties&#39;, &#39;Fill Flag 5&#39;: &#39;Rayleigh Violation&#39;, &#39;Surface Albedo Units&#39;: &#39;N/A&#39;, &#39;Version&#39;: &#39;3.0.6&#39;, &#39;latitude&#39;: 39.73, &#39;longitude&#39;: -105.18, &#39;tz&#39;: -7.0, &#39;altitude&#39;: 1820.0}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This routine will get a meteorological dataset from anywhere in the world where it is available </span>
+<span class="c1">#weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia</span>
+<span class="c1">#weather_id = (35.6754, 139.65) #Tokyo, Japan</span>
+<span class="c1">#weather_id = (-43.52646, 172.62165) #Christchurch, New Zealand</span>
+<span class="c1">#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska</span>
+<span class="c1">#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland</span>
+<span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">33.4152</span><span class="p">,</span> <span class="o">-</span><span class="mf">111.8315</span><span class="p">)</span> <span class="c1">#Mesa, Arizona</span>
+<span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get_anywhere</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">weather_id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">8</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="c1"># This routine will get a meteorological dataset from anywhere in the world where it is available </span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="c1">#weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span> <span class="c1">#weather_id = (35.6754, 139.65) #Tokyo, Japan</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="c1">#weather_id = (-43.52646, 172.62165) #Christchurch, New Zealand</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="c1">#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1">#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="mf">33.4152</span><span class="p">,</span> <span class="o">-</span><span class="mf">111.8315</span><span class="p">)</span> <span class="c1">#Mesa, Arizona</span>
+<span class="ne">----&gt; </span><span class="mi">8</span> <span class="n">weather_df</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get_anywhere</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">weather_id</span><span class="p">)</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="nb">print</span><span class="p">(</span><span class="n">meta</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span>: module &#39;pvdeg.weather&#39; has no attribute &#39;get_anywhere&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#This computes a module temperature. Here the default is an open rack system, but other options include: </span>
+<span class="c1">#       &#39;open_rack_glass_glass&#39;, </span>
+<span class="c1">#       &#39;close_mount_glass_glass&#39;,</span>
+<span class="c1">#       &#39;insulated_back_glass_polymer&#39;</span>
+
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">temperature</span><span class="o">.</span><span class="n">temperature</span><span class="p">(</span>
+    <span class="n">weather_df</span><span class="o">=</span><span class="n">weather_df</span><span class="p">,</span>
+    <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+    <span class="n">cell_or_mod</span><span class="o">=</span><span class="s2">&quot;module&quot;</span><span class="p">,</span> 
+    <span class="n">temp_model</span><span class="o">=</span><span class="s2">&quot;sapm&quot;</span><span class="p">,</span>
+    <span class="n">conf</span><span class="o">=</span><span class="s2">&quot;open_rack_glass_polymer&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">temperature</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;module_temperature&#39;</span><span class="p">])</span>
+<span class="n">temperature</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8760</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The array tilt angle was not provided, therefore the latitude tilt of 33.4 was used.
+The array azimuth was not provided, therefore an azimuth of 180.0 was used.
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="set-up-the-calculations">
+<h2>2. Set up the Calculations<a class="headerlink" href="#set-up-the-calculations" title="Link to this heading">#</a></h2>
+<p>There is a library of some materials and the relevant oxygen ingress parameters that can be used.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">es</span> <span class="o">=</span> <span class="s1">&#39;OX005&#39;</span>    <span class="c1">#This is the number for the edge seal in the json file</span>
+<span class="n">enc</span> <span class="o">=</span> <span class="s1">&#39;OX003&#39;</span>   <span class="c1">#This is the number for the encapsulant in the json file</span>
+<span class="n">esw</span> <span class="o">=</span> <span class="mf">1.5</span>   <span class="c1">#This is the edge seal width in [cm]</span>
+<span class="n">encw</span> <span class="o">=</span> <span class="mi">10</span>   <span class="c1">#This is the encapsulant width in [cm]</span>
+<span class="n">sn</span> <span class="o">=</span> <span class="mi">20</span>     <span class="c1">#This is the number of edge seal nodes to use</span>
+<span class="n">en</span> <span class="o">=</span> <span class="mi">50</span>     <span class="c1">#This is the number of encapsulant nodes to use</span>
+<span class="n">pressure</span> <span class="o">=</span> <span class="mf">0.2109</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mf">0.0065</span> <span class="o">*</span> <span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;altitude&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="mf">288.15</span><span class="p">)</span> <span class="o">**</span> <span class="mf">5.25588</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="run-the-calculations">
+<h2>3. Run the Calculations<a class="headerlink" href="#run-the-calculations" title="Link to this heading">#</a></h2>
+<p>This runs the calculations for diffusion using a simple 1-D finite difference calculation. The first set of calculations is just for diffusion, then the next two include some consumption of oxygen. In typical PV applications, it is common for oxygen ingress distance to be limited by its consumption rate in the encapsulant.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">oxygen_profile</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">diffusion</span><span class="o">.</span><span class="n">esdiffusion</span><span class="p">(</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span> 
+    <span class="n">edge_seal</span><span class="o">=</span><span class="n">es</span><span class="p">,</span> 
+    <span class="n">encapsulant</span><span class="o">=</span><span class="n">enc</span><span class="p">,</span> 
+    <span class="n">edge_seal_width</span><span class="o">=</span><span class="n">esw</span><span class="p">,</span> 
+    <span class="n">encapsulant_width</span><span class="o">=</span><span class="n">encw</span><span class="p">,</span> 
+    <span class="n">seal_nodes</span><span class="o">=</span><span class="n">sn</span><span class="p">,</span> 
+    <span class="n">encapsulant_nodes</span><span class="o">=</span><span class="n">en</span><span class="p">,</span> 
+    <span class="n">press</span><span class="o">=</span><span class="n">pressure</span><span class="p">,</span> 
+    <span class="n">repeat</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The edge seal is None .
+The encapsulant is None .
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_lines</span><span class="o">=</span><span class="mi">10</span>
+<span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_lines</span><span class="p">):</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">oxygen_profile</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">index</span><span class="o">*</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">oxygen_profile</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">n_lines</span><span class="p">))],</span> <span class="n">label</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">index</span><span class="o">*</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">oxygen_profile</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">n_lines</span><span class="p">)</span><span class="o">/</span><span class="mi">8760</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Time [year]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Oxygen Concentration [g/cm³]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Distance From Edge [cm]&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ticklabel_format</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;plain&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/1bffd9cb33ac860bb8400b79788ff0fe2212fbe8866ac016ce508a6bee88a0ae.png" src="../_images/1bffd9cb33ac860bb8400b79788ff0fe2212fbe8866ac016ce508a6bee88a0ae.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">oxygen_profile</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>         0.000000      0.076923      0.153846      0.230769      0.307692   \
+0.0       0.000048  0.000000e+00  0.000000e+00  0.000000e+00  0.000000e+00   
+1.0       0.000048  4.025938e-07  0.000000e+00  0.000000e+00  0.000000e+00   
+2.0       0.000048  7.914468e-07  3.295784e-09  0.000000e+00  0.000000e+00   
+3.0       0.000048  1.165328e-06  9.571569e-09  2.635343e-11  0.000000e+00   
+4.0       0.000049  1.525385e-06  1.852325e-08  1.006938e-10  2.058149e-13   
+...            ...           ...           ...           ...           ...   
+17514.0   0.000042  4.267309e-05  4.035455e-05  3.816304e-05  3.614315e-05   
+17515.0   0.000043  4.255340e-05  4.035980e-05  3.817013e-05  3.614761e-05   
+17516.0   0.000043  4.247354e-05  4.035994e-05  3.817617e-05  3.615158e-05   
+17517.0   0.000045  4.244049e-05  4.035799e-05  3.818062e-05  3.615468e-05   
+17518.0   0.000047  4.244476e-05  4.035617e-05  3.818351e-05  3.615683e-05   
+
+         0.384615   0.461538   0.538462   0.615385   0.692308   ...  \
+0.0       0.000000   0.000000   0.000000   0.000000   0.000000  ...   
+1.0       0.000000   0.000000   0.000000   0.000000   0.000000  ...   
+2.0       0.000000   0.000000   0.000000   0.000000   0.000000  ...   
+3.0       0.000000   0.000000   0.000000   0.000000   0.000000  ...   
+4.0       0.000000   0.000000   0.000000   0.000000   0.000000  ...   
+...            ...        ...        ...        ...        ...  ...   
+17514.0   0.000034   0.000032   0.000031   0.000029   0.000027  ...   
+17515.0   0.000034   0.000032   0.000031   0.000029   0.000027  ...   
+17516.0   0.000034   0.000032   0.000031   0.000029   0.000027  ...   
+17517.0   0.000034   0.000032   0.000031   0.000029   0.000027  ...   
+17518.0   0.000034   0.000032   0.000031   0.000029   0.000027  ...   
+
+         9.681818   9.883838   10.085859  10.287879  10.489899  10.691919  \
+0.0       0.000000   0.000000   0.000000   0.000000   0.000000   0.000000   
+1.0       0.000000   0.000000   0.000000   0.000000   0.000000   0.000000   
+2.0       0.000000   0.000000   0.000000   0.000000   0.000000   0.000000   
+3.0       0.000000   0.000000   0.000000   0.000000   0.000000   0.000000   
+4.0       0.000000   0.000000   0.000000   0.000000   0.000000   0.000000   
+...            ...        ...        ...        ...        ...        ...   
+17514.0   0.000009   0.000009   0.000009   0.000009   0.000009   0.000009   
+17515.0   0.000009   0.000009   0.000009   0.000009   0.000009   0.000009   
+17516.0   0.000009   0.000009   0.000009   0.000009   0.000009   0.000009   
+17517.0   0.000009   0.000009   0.000009   0.000009   0.000009   0.000009   
+17518.0   0.000009   0.000009   0.000009   0.000009   0.000009   0.000009   
+
+         10.893939  11.095960  11.297980  11.500000  
+0.0       0.000000   0.000000   0.000000   0.000000  
+1.0       0.000000   0.000000   0.000000   0.000000  
+2.0       0.000000   0.000000   0.000000   0.000000  
+3.0       0.000000   0.000000   0.000000   0.000000  
+4.0       0.000000   0.000000   0.000000   0.000000  
+...            ...        ...        ...        ...  
+17514.0   0.000009   0.000009   0.000009   0.000009  
+17515.0   0.000009   0.000009   0.000009   0.000009  
+17516.0   0.000009   0.000009   0.000009   0.000009  
+17517.0   0.000009   0.000009   0.000009   0.000009  
+17518.0   0.000009   0.000009   0.000009   0.000009  
+
+[17519 rows x 72 columns]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "NREL/PVDegradationTools",
+            ref: "main",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./tutorials_and_tools"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tools - Module Standoff for IEC TS 63126</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="B-O%20LID%20-%20Accelerated%20Test.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">B-O LID - Accelerated Test</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#import-weather-data">1. Import Weather Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-the-calculations">2. Set up the Calculations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-calculations">3. Run the Calculations</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Michael Kempe
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=ac02cc09edc035673794"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=ac02cc09edc035673794"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

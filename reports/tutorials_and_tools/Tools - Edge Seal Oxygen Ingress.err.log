@@ -1,0 +1,47 @@
+Traceback (most recent call last):
+  File "C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\jupyter_cache\executors\utils.py", line 58, in single_nb_execution
+    executenb(
+  File "C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\nbclient\client.py", line 1305, in execute
+    return NotebookClient(nb=nb, resources=resources, km=km, **kwargs).execute()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\Anaconda3\Lib\site-packages\jupyter_core\utils\__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ProgramData\Anaconda3\Lib\asyncio\base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\nbclient\client.py", line 705, in async_execute
+    await self.async_execute_cell(
+  File "C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\nbclient\client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\nbclient\client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# This routine will get a meteorological dataset from anywhere in the world where it is available 
+#weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia
+#weather_id = (35.6754, 139.65) #Tokyo, Japan
+#weather_id = (-43.52646, 172.62165) #Christchurch, New Zealand
+#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska
+#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland
+weather_id = (33.4152, -111.8315) #Mesa, Arizona
+weather_df, meta = pvdeg.weather.get_anywhere(id=weather_id)
+print(meta)
+------------------
+
+
+[1;31m---------------------------------------------------------------------------[0m
+[1;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [1;32mIn[5], line 8[0m
+[0;32m      1[0m [38;5;66;03m# This routine will get a meteorological dataset from anywhere in the world where it is available [39;00m
+[0;32m      2[0m [38;5;66;03m#weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia[39;00m
+[0;32m      3[0m [38;5;66;03m#weather_id = (35.6754, 139.65) #Tokyo, Japan[39;00m
+[0;32m      4[0m [38;5;66;03m#weather_id = (-43.52646, 172.62165) #Christchurch, New Zealand[39;00m
+[0;32m      5[0m [38;5;66;03m#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska[39;00m
+[0;32m      6[0m [38;5;66;03m#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland[39;00m
+[0;32m      7[0m weather_id [38;5;241m=[39m ([38;5;241m33.4152[39m, [38;5;241m-[39m[38;5;241m111.8315[39m) [38;5;66;03m#Mesa, Arizona[39;00m
+[1;32m----> 8[0m weather_df, meta [38;5;241m=[39m pvdeg[38;5;241m.[39mweather[38;5;241m.[39mget_anywhere([38;5;28mid[39m[38;5;241m=[39mweather_id)
+[0;32m      9[0m [38;5;28mprint[39m(meta)
+
+[1;31mAttributeError[0m: module 'pvdeg.weather' has no attribute 'get_anywhere'
+
