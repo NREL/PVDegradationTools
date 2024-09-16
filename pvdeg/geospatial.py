@@ -970,6 +970,7 @@ def plot_sparse_analysis(
     method="nearest", 
     resolution:complex=100j,
     figsize:tuple=(10,8),
+    show_plot:bool=False,
 ) -> None:
     """
     Plot the output of a sparse geospatial analysis using interpolation.
@@ -999,7 +1000,7 @@ def plot_sparse_analysis(
     )
 
     fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False) # these should be the same ccrs
     ax.patch.set_visible(False)
 
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
@@ -1009,7 +1010,7 @@ def plot_sparse_analysis(
         extent=extent,
         origin="lower",
         cmap="viridis",
-        transform=ccrs.PlateCarree(),
+        transform=ccrs.PlateCarree(), # why are ccrs different
     )
 
     shapename = "admin_1_states_provinces_lakes"
@@ -1030,6 +1031,70 @@ def plot_sparse_analysis(
     plt.title(f"Interpolated Sparse Analysis, {data_var}")
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
-    plt.show()
+    
+    if show_plot:
+        plt.show()
+
+    return fig, ax
+
+def plot_sparse_analysis_land(
+    result: xr.Dataset, 
+    data_var: str, 
+    method="nearest", 
+    resolution:complex=100j,
+    figsize:tuple=(10,8),
+    show_plot:bool=False,
+    proj=ccrs.PlateCarree(),
+):
+
+    import matplotlib.path as mpath
+    from cartopy.mpl.patch import geos_to_path
+
+    grid_values, lat, lon = interpolate_analysis(
+        result=result, data_var=data_var, method=method, resolution=resolution
+    )
+
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_axes([0, 0, 1, 1], projection=proj, frameon=False)
+    ax.patch.set_visible(False)
+
+    extent = [lon.min(), lon.max(), lat.min(), lat.max()]
+    ax.set_extent(extent, crs=proj)
+
+    mesh = ax.pcolormesh(lon, lat, grid_values, transform=proj, cmap='viridis')
+
+    land_path = geos_to_path(list(cfeature.LAND.geometries()))
+    land_path = mpath.Path.make_compound_path(*land_path)
+    plate_carre_data_transform = proj._as_mpl_transform(ax)
+    mesh.set_clip_path(land_path, plate_carre_data_transform)
+
+    shapename = "admin_1_states_provinces_lakes"
+    states_shp = shpreader.natural_earth(
+        resolution="110m", category="cultural", name=shapename
+    )
+
+    ax.add_geometries(
+        shpreader.Reader(states_shp).geometries(),
+        proj,
+        facecolor="none",
+        edgecolor="black",
+        linestyle=':'
+    )
+
+    cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
+    cbar.set_label("Value")
+
+    utilities._add_cartopy_features(
+        ax=ax, 
+        features = [
+            cfeature.BORDERS,
+            cfeature.COASTLINE,
+            cfeature.LAND,
+            cfeature.OCEAN,
+        ],
+    )
+
+    if show_plot:
+        plt.show()
 
     return fig, ax

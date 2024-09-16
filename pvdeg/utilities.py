@@ -11,7 +11,7 @@ from string import ascii_uppercase
 from collections import OrderedDict
 import xarray as xr
 from subprocess import run
-
+import cartopy.feature as cfeature
 
 def gid_downsampling(meta, n):
     """
@@ -1012,7 +1012,7 @@ def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
         min and max latitude and longitudes. Minimum latitude at lats[0].
         Maximum latitude at lats[1]. Same pattern for longs.
     """
-    if coord_1 and coord_2:
+    if coord_1 is not None and coord_2 is not None:
         lats = [coord_1[0], coord_2[0]]
         longs = [coord_1[1], coord_2[1]]
     elif coords.any():
@@ -1043,20 +1043,21 @@ def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
     return
 
 
-def _add_cartopy_features(ax):
+def _add_cartopy_features(
+        ax, 
+        features = [
+            cfeature.BORDERS,
+            cfeature.COASTLINE,
+            cfeature.LAND,
+            cfeature.OCEAN,
+            cfeature.LAKES,
+            cfeature.RIVERS,
+        ],
+    ):
     """
     Add cartopy features to an existing matplotlib.pyplot axis.
     """
-    import cartopy.feature as cfeature
-
-    features = [
-        cfeature.BORDERS,
-        cfeature.COASTLINE,
-        cfeature.LAND,
-        cfeature.OCEAN,
-        cfeature.LAKES,
-        cfeature.RIVERS,
-    ]
+   
 
     for i in features:
         if i == cfeature.BORDERS:

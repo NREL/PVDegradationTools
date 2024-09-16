@@ -1767,7 +1767,7 @@ class GeospatialScenario(Scenario):
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
-    ) -> None:
+    ):
         """
         Plot lat-long coordinate pairs on blank map. Quickly view
         geospatial datapoints before your analysis.
@@ -1789,6 +1789,11 @@ class GeospatialScenario(Scenario):
         size : float
             matplotlib scatter point size. Without any downsampling NSRDB
             points will siginficantly overlap.
+
+        Returns:
+        --------
+        fig, ax
+            matplotlib figure and axis
         """
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
@@ -1810,6 +1815,9 @@ class GeospatialScenario(Scenario):
 
         plt.title(f"Coordinate Pairs from '{self.name}' Meta Data")
         plt.show()
+
+        return fig, ax
+
 
     def plot_meta_classification(
         self,
@@ -1844,6 +1852,11 @@ class GeospatialScenario(Scenario):
         size : float
             matplotlib scatter point size. Without any downsampling NSRDB
             points will siginficantly overlap.
+
+        Returns:
+        --------
+        fig, ax
+            matplotlib figure and axis
         """
         if not col_name:
             raise ValueError("col_name cannot be none")
@@ -1891,6 +1904,8 @@ class GeospatialScenario(Scenario):
         plt.title(f"Geographic Points with Proximity to {col_name} Highlighted")
         plt.legend()
         plt.show()
+
+        return fig, ax
 
     def plot_world(
         self,
