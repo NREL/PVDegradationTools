@@ -470,8 +470,213 @@ document.write(`
 <p><img alt="alt text" src="../_images/T98_70C_standoff_Map.png" /></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
-<span class="c1"># !pip install pvdeg==0.3.3</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies </span>
+<span class="c1"># and prevent &quot;ModuleNotFoundError&quot; in later cells:</span>
+<span class="o">!</span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">pvdeg</span><span class="o">==</span><span class="m">0</span>.4.2
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Defaulting to user installation because normal site-packages is not writeable
+Collecting pvdeg==0.4.2
+  Using cached pvdeg-0.4.2-py3-none-any.whl.metadata (6.8 kB)
+Collecting aiohttp==3.9.5 (from pvdeg==0.4.2)
+  Using cached aiohttp-3.9.5-cp311-cp311-win_amd64.whl.metadata (7.7 kB)
+Requirement already satisfied: numpy==1.26.4 in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (1.26.4)
+Collecting pvlib==0.10.3 (from pvdeg==0.4.2)
+  Using cached pvlib-0.10.3-py3-none-any.whl.metadata (3.8 kB)
+Requirement already satisfied: scipy&lt;1.14.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.4.2) (1.11.1)
+Requirement already satisfied: NREL-rex in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (0.2.86)
+Requirement already satisfied: cartopy in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (0.23.0)
+Requirement already satisfied: dask[dataframe] in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (2023.11.0)
+Requirement already satisfied: dask-jobqueue in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (0.8.5)
+Requirement already satisfied: bokeh in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (3.3.4)
+Requirement already satisfied: h5netcdf in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (1.3.0)
+Requirement already satisfied: h5py in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.4.2) (3.9.0)
+Requirement already satisfied: jupyterlab in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (4.2.2)
+Requirement already satisfied: matplotlib in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.4.2) (3.7.2)
+Requirement already satisfied: netCDF4 in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (1.7.1.post1)
+Requirement already satisfied: notebook in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (7.2.1)
+Requirement already satisfied: numba in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (0.59.0)
+Requirement already satisfied: openpyxl in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (3.0.10)
+Requirement already satisfied: pandas in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.4.2) (2.1.0)
+Requirement already satisfied: photovoltaic in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (0.1.9)
+Requirement already satisfied: python-dateutil in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (2.8.2)
+Requirement already satisfied: pytz in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvdeg==0.4.2) (2023.3)
+Requirement already satisfied: seaborn in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (0.12.2)
+Requirement already satisfied: tables in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (3.9.2)
+Requirement already satisfied: tqdm in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (4.65.0)
+Requirement already satisfied: xarray in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (2023.6.0)
+Requirement already satisfied: pre-commit in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (3.7.1)
+Requirement already satisfied: sympy in c:\programdata\anaconda3\lib\site-packages (from pvdeg==0.4.2) (1.12)
+Requirement already satisfied: aiosignal&gt;=1.1.2 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.9.5-&gt;pvdeg==0.4.2) (1.3.1)
+Requirement already satisfied: attrs&gt;=17.3.0 in c:\programdata\anaconda3\lib\site-packages (from aiohttp==3.9.5-&gt;pvdeg==0.4.2) (23.1.0)
+Requirement already satisfied: frozenlist&gt;=1.1.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.9.5-&gt;pvdeg==0.4.2) (1.4.0)
+Requirement already satisfied: multidict&lt;7.0,&gt;=4.5 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.9.5-&gt;pvdeg==0.4.2) (6.0.4)
+Requirement already satisfied: yarl&lt;2.0,&gt;=1.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from aiohttp==3.9.5-&gt;pvdeg==0.4.2) (1.9.2)
+Requirement already satisfied: requests in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pvlib==0.10.3-&gt;pvdeg==0.4.2) (2.31.0)
+Requirement already satisfied: tzdata&gt;=2022.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from pandas-&gt;pvdeg==0.4.2) (2023.3)
+Requirement already satisfied: six&gt;=1.5 in c:\programdata\anaconda3\lib\site-packages (from python-dateutil-&gt;pvdeg==0.4.2) (1.16.0)
+Requirement already satisfied: Jinja2&gt;=2.9 in c:\programdata\anaconda3\lib\site-packages (from bokeh-&gt;pvdeg==0.4.2) (3.1.3)
+Requirement already satisfied: contourpy&gt;=1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from bokeh-&gt;pvdeg==0.4.2) (1.1.0)
+Requirement already satisfied: packaging&gt;=16.8 in c:\programdata\anaconda3\lib\site-packages (from bokeh-&gt;pvdeg==0.4.2) (23.1)
+Requirement already satisfied: pillow&gt;=7.1.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from bokeh-&gt;pvdeg==0.4.2) (10.0.0)
+Requirement already satisfied: PyYAML&gt;=3.10 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from bokeh-&gt;pvdeg==0.4.2) (6.0.1)
+Requirement already satisfied: tornado&gt;=5.1 in c:\programdata\anaconda3\lib\site-packages (from bokeh-&gt;pvdeg==0.4.2) (6.3.3)
+Requirement already satisfied: xyzservices&gt;=2021.09.1 in c:\programdata\anaconda3\lib\site-packages (from bokeh-&gt;pvdeg==0.4.2) (2022.9.0)
+Requirement already satisfied: shapely&gt;=1.7 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from cartopy-&gt;pvdeg==0.4.2) (1.8.5.post1)
+Requirement already satisfied: pyshp&gt;=2.3 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from cartopy-&gt;pvdeg==0.4.2) (2.3.1)
+Requirement already satisfied: pyproj&gt;=3.3.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from cartopy-&gt;pvdeg==0.4.2) (3.6.0)
+Requirement already satisfied: cycler&gt;=0.10 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.4.2) (0.11.0)
+Requirement already satisfied: fonttools&gt;=4.22.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.4.2) (4.42.0)
+Requirement already satisfied: kiwisolver&gt;=1.0.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.4.2) (1.4.4)
+Requirement already satisfied: pyparsing&lt;3.1,&gt;=2.3.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from matplotlib-&gt;pvdeg==0.4.2) (3.0.9)
+Requirement already satisfied: distributed&gt;=2022.02.0 in c:\programdata\anaconda3\lib\site-packages (from dask-jobqueue-&gt;pvdeg==0.4.2) (2023.11.0)
+Requirement already satisfied: click&gt;=8.1 in c:\programdata\anaconda3\lib\site-packages (from dask[dataframe]-&gt;pvdeg==0.4.2) (8.1.7)
+Requirement already satisfied: cloudpickle&gt;=1.5.0 in c:\programdata\anaconda3\lib\site-packages (from dask[dataframe]-&gt;pvdeg==0.4.2) (2.2.1)
+Requirement already satisfied: fsspec&gt;=2021.09.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from dask[dataframe]-&gt;pvdeg==0.4.2) (2023.3.0)
+Requirement already satisfied: partd&gt;=1.2.0 in c:\programdata\anaconda3\lib\site-packages (from dask[dataframe]-&gt;pvdeg==0.4.2) (1.4.1)
+Requirement already satisfied: toolz&gt;=0.10.0 in c:\programdata\anaconda3\lib\site-packages (from dask[dataframe]-&gt;pvdeg==0.4.2) (0.12.0)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in c:\programdata\anaconda3\lib\site-packages (from dask[dataframe]-&gt;pvdeg==0.4.2) (7.0.1)
+Requirement already satisfied: async-lru&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (2.0.4)
+Requirement already satisfied: httpx&gt;=0.25.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (0.27.0)
+Requirement already satisfied: ipykernel&gt;=6.5.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (6.28.0)
+Requirement already satisfied: jupyter-core in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (5.5.0)
+Requirement already satisfied: jupyter-lsp&gt;=2.0.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (2.2.0)
+Requirement already satisfied: jupyter-server&lt;3,&gt;=2.4.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (2.10.0)
+Requirement already satisfied: jupyterlab-server&lt;3,&gt;=2.27.1 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (2.27.2)
+Requirement already satisfied: notebook-shim&gt;=0.2 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (0.2.3)
+Requirement already satisfied: setuptools&gt;=40.1.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (70.1.1)
+Requirement already satisfied: traitlets in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-&gt;pvdeg==0.4.2) (5.14.3)
+Requirement already satisfied: cftime in c:\programdata\anaconda3\lib\site-packages (from netCDF4-&gt;pvdeg==0.4.2) (1.6.4)
+Requirement already satisfied: certifi in c:\programdata\anaconda3\lib\site-packages (from netCDF4-&gt;pvdeg==0.4.2) (2024.6.2)
+Requirement already satisfied: h5pyd&gt;=0.18.0 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.4.2) (0.18.0)
+Requirement already satisfied: hsds&gt;=0.8.4 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.4.2) (0.8.4)
+Requirement already satisfied: psutil&gt;=5.6 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.4.2) (5.9.0)
+Requirement already satisfied: toml&gt;=0.10.0 in c:\programdata\anaconda3\lib\site-packages (from NREL-rex-&gt;pvdeg==0.4.2) (0.10.2)
+Requirement already satisfied: llvmlite&lt;0.43,&gt;=0.42.0dev0 in c:\programdata\anaconda3\lib\site-packages (from numba-&gt;pvdeg==0.4.2) (0.42.0)
+Requirement already satisfied: et_xmlfile in c:\programdata\anaconda3\lib\site-packages (from openpyxl-&gt;pvdeg==0.4.2) (1.1.0)
+Requirement already satisfied: cfgv&gt;=2.0.0 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.4.2) (3.4.0)
+Requirement already satisfied: identify&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.4.2) (2.5.36)
+Requirement already satisfied: nodeenv&gt;=0.11.1 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.4.2) (1.9.1)
+Requirement already satisfied: virtualenv&gt;=20.10.0 in c:\programdata\anaconda3\lib\site-packages (from pre-commit-&gt;pvdeg==0.4.2) (20.26.3)
+Requirement already satisfied: mpmath&gt;=0.19 in c:\programdata\anaconda3\lib\site-packages (from sympy-&gt;pvdeg==0.4.2) (1.3.0)
+Requirement already satisfied: numexpr&gt;=2.6.2 in c:\programdata\anaconda3\lib\site-packages (from tables-&gt;pvdeg==0.4.2) (2.8.7)
+Requirement already satisfied: py-cpuinfo in c:\programdata\anaconda3\lib\site-packages (from tables-&gt;pvdeg==0.4.2) (9.0.0)
+Requirement already satisfied: colorama in c:\programdata\anaconda3\lib\site-packages (from tqdm-&gt;pvdeg==0.4.2) (0.4.6)
+Requirement already satisfied: locket&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.4.2) (1.0.0)
+Requirement already satisfied: msgpack&gt;=1.0.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.4.2) (1.0.3)
+Requirement already satisfied: sortedcontainers&gt;=2.0.5 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.4.2) (2.4.0)
+Requirement already satisfied: tblib&gt;=1.6.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.4.2) (1.7.0)
+Requirement already satisfied: urllib3&gt;=1.24.3 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.4.2) (1.26.18)
+Requirement already satisfied: zict&gt;=3.0.0 in c:\programdata\anaconda3\lib\site-packages (from distributed&gt;=2022.02.0-&gt;dask-jobqueue-&gt;pvdeg==0.4.2) (3.0.0)
+Requirement already satisfied: requests-unixsocket in c:\programdata\anaconda3\lib\site-packages (from h5pyd&gt;=0.18.0-&gt;NREL-rex-&gt;pvdeg==0.4.2) (0.3.0)
+Requirement already satisfied: pyjwt in c:\programdata\anaconda3\lib\site-packages (from h5pyd&gt;=0.18.0-&gt;NREL-rex-&gt;pvdeg==0.4.2) (2.4.0)
+INFO: pip is looking at multiple versions of hsds to determine which version is compatible with other requirements. This could take a while.
+Collecting NREL-rex (from pvdeg==0.4.2)
+  Using cached NREL_rex-0.2.90-py3-none-any.whl.metadata (5.8 kB)
+Requirement already satisfied: scikit-learn&gt;=1.3 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from NREL-rex-&gt;pvdeg==0.4.2) (1.3.0)
+Requirement already satisfied: anyio in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (4.2.0)
+Requirement already satisfied: httpcore==1.* in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.0.5)
+Requirement already satisfied: idna in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (3.4)
+Requirement already satisfied: sniffio in c:\programdata\anaconda3\lib\site-packages (from httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.3.0)
+Requirement already satisfied: h11&lt;0.15,&gt;=0.13 in c:\programdata\anaconda3\lib\site-packages (from httpcore==1.*-&gt;httpx&gt;=0.25.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.14.0)
+Requirement already satisfied: zipp&gt;=0.5 in c:\programdata\anaconda3\lib\site-packages (from importlib-metadata&gt;=4.13.0-&gt;dask[dataframe]-&gt;pvdeg==0.4.2) (3.17.0)
+Requirement already satisfied: comm&gt;=0.1.1 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.1.2)
+Requirement already satisfied: debugpy&gt;=1.6.5 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.6.7)
+Requirement already satisfied: ipython&gt;=7.23.1 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (8.25.0)
+Requirement already satisfied: jupyter-client&gt;=6.1.12 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (8.6.0)
+Requirement already satisfied: matplotlib-inline&gt;=0.1 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.1.6)
+Requirement already satisfied: nest-asyncio in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.6.0)
+Requirement already satisfied: pyzmq&gt;=24 in c:\programdata\anaconda3\lib\site-packages (from ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (25.1.2)
+Requirement already satisfied: MarkupSafe&gt;=2.0 in c:\programdata\anaconda3\lib\site-packages (from Jinja2&gt;=2.9-&gt;bokeh-&gt;pvdeg==0.4.2) (2.1.3)
+Requirement already satisfied: platformdirs&gt;=2.5 in c:\programdata\anaconda3\lib\site-packages (from jupyter-core-&gt;jupyterlab-&gt;pvdeg==0.4.2) (3.10.0)
+Requirement already satisfied: pywin32&gt;=300 in c:\programdata\anaconda3\lib\site-packages (from jupyter-core-&gt;jupyterlab-&gt;pvdeg==0.4.2) (305.1)
+Requirement already satisfied: argon2-cffi in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (21.3.0)
+Requirement already satisfied: jupyter-events&gt;=0.6.0 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.8.0)
+Requirement already satisfied: jupyter-server-terminals in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.4.4)
+Requirement already satisfied: nbconvert&gt;=6.4.4 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (7.10.0)
+Requirement already satisfied: nbformat&gt;=5.3.0 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (5.9.2)
+Requirement already satisfied: overrides in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (7.4.0)
+Requirement already satisfied: prometheus-client in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.14.1)
+Requirement already satisfied: pywinpty in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.0.10)
+Requirement already satisfied: send2trash&gt;=1.8.2 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.8.2)
+Requirement already satisfied: terminado&gt;=0.8.3 in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.17.1)
+Requirement already satisfied: websocket-client in c:\programdata\anaconda3\lib\site-packages (from jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.58.0)
+Requirement already satisfied: babel&gt;=2.10 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.11.0)
+Requirement already satisfied: json5&gt;=0.9.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.9.6)
+Requirement already satisfied: jsonschema&gt;=4.18.0 in c:\programdata\anaconda3\lib\site-packages (from jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.4.2) (4.19.2)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from requests-&gt;pvlib==0.10.3-&gt;pvdeg==0.4.2) (3.2.0)
+Requirement already satisfied: joblib&gt;=1.1.1 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from scikit-learn&gt;=1.3-&gt;NREL-rex-&gt;pvdeg==0.4.2) (1.3.2)
+Requirement already satisfied: threadpoolctl&gt;=2.0.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from scikit-learn&gt;=1.3-&gt;NREL-rex-&gt;pvdeg==0.4.2) (3.2.0)
+Requirement already satisfied: distlib&lt;1,&gt;=0.3.7 in c:\programdata\anaconda3\lib\site-packages (from virtualenv&gt;=20.10.0-&gt;pre-commit-&gt;pvdeg==0.4.2) (0.3.8)
+Requirement already satisfied: filelock&lt;4,&gt;=3.12.2 in c:\programdata\anaconda3\lib\site-packages (from virtualenv&gt;=20.10.0-&gt;pre-commit-&gt;pvdeg==0.4.2) (3.13.1)
+Requirement already satisfied: decorator in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (5.1.1)
+Requirement already satisfied: jedi&gt;=0.16 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.18.1)
+Requirement already satisfied: prompt-toolkit&lt;3.1.0,&gt;=3.0.41 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (3.0.43)
+Requirement already satisfied: pygments&gt;=2.4.0 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.15.1)
+Requirement already satisfied: stack-data in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.2.0)
+Requirement already satisfied: typing-extensions&gt;=4.6 in c:\programdata\anaconda3\lib\site-packages (from ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (4.9.0)
+Requirement already satisfied: jsonschema-specifications&gt;=2023.03.6 in c:\programdata\anaconda3\lib\site-packages (from jsonschema&gt;=4.18.0-&gt;jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2023.7.1)
+Requirement already satisfied: referencing&gt;=0.28.4 in c:\programdata\anaconda3\lib\site-packages (from jsonschema&gt;=4.18.0-&gt;jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.30.2)
+Requirement already satisfied: rpds-py&gt;=0.7.1 in c:\programdata\anaconda3\lib\site-packages (from jsonschema&gt;=4.18.0-&gt;jupyterlab-server&lt;3,&gt;=2.27.1-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.10.6)
+Requirement already satisfied: python-json-logger&gt;=2.0.4 in c:\programdata\anaconda3\lib\site-packages (from jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.0.7)
+Requirement already satisfied: rfc3339-validator in c:\programdata\anaconda3\lib\site-packages (from jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.1.4)
+Requirement already satisfied: rfc3986-validator&gt;=0.1.1 in c:\programdata\anaconda3\lib\site-packages (from jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.1.1)
+Requirement already satisfied: beautifulsoup4 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (4.12.2)
+Requirement already satisfied: bleach!=5.0.0 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (4.1.0)
+Requirement already satisfied: defusedxml in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.7.1)
+Requirement already satisfied: jupyterlab-pygments in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.1.2)
+Requirement already satisfied: mistune&lt;4,&gt;=2.0.3 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.0.4)
+Requirement already satisfied: nbclient&gt;=0.5.0 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.7.4)
+Requirement already satisfied: pandocfilters&gt;=1.4.1 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.5.0)
+Requirement already satisfied: tinycss2 in c:\programdata\anaconda3\lib\site-packages (from nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.2.1)
+Requirement already satisfied: fastjsonschema in c:\programdata\anaconda3\lib\site-packages (from nbformat&gt;=5.3.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.16.2)
+Requirement already satisfied: argon2-cffi-bindings in c:\programdata\anaconda3\lib\site-packages (from argon2-cffi-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (21.2.0)
+Requirement already satisfied: webencodings in c:\programdata\anaconda3\lib\site-packages (from bleach!=5.0.0-&gt;nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.5.1)
+Requirement already satisfied: parso&lt;0.9.0,&gt;=0.8.0 in c:\programdata\anaconda3\lib\site-packages (from jedi&gt;=0.16-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.8.3)
+Requirement already satisfied: fqdn in c:\programdata\anaconda3\lib\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.5.1)
+Requirement already satisfied: isoduration in c:\programdata\anaconda3\lib\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (20.11.0)
+Requirement already satisfied: jsonpointer&gt;1.13 in c:\programdata\anaconda3\lib\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.1)
+Requirement already satisfied: uri-template in c:\users\sayala\appdata\roaming\python\python311\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.3.0)
+Requirement already satisfied: webcolors&gt;=1.11 in c:\users\sayala\appdata\roaming\python\python311\site-packages (from jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.13)
+Requirement already satisfied: wcwidth in c:\programdata\anaconda3\lib\site-packages (from prompt-toolkit&lt;3.1.0,&gt;=3.0.41-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.2.5)
+Requirement already satisfied: cffi&gt;=1.0.1 in c:\programdata\anaconda3\lib\site-packages (from argon2-cffi-bindings-&gt;argon2-cffi-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.16.0)
+Requirement already satisfied: soupsieve&gt;1.2 in c:\programdata\anaconda3\lib\site-packages (from beautifulsoup4-&gt;nbconvert&gt;=6.4.4-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.5)
+Requirement already satisfied: executing in c:\programdata\anaconda3\lib\site-packages (from stack-data-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.8.3)
+Requirement already satisfied: asttokens in c:\programdata\anaconda3\lib\site-packages (from stack-data-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.0.5)
+Requirement already satisfied: pure-eval in c:\programdata\anaconda3\lib\site-packages (from stack-data-&gt;ipython&gt;=7.23.1-&gt;ipykernel&gt;=6.5.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (0.2.2)
+Requirement already satisfied: pycparser in c:\programdata\anaconda3\lib\site-packages (from cffi&gt;=1.0.1-&gt;argon2-cffi-bindings-&gt;argon2-cffi-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (2.21)
+Requirement already satisfied: arrow&gt;=0.15.0 in c:\programdata\anaconda3\lib\site-packages (from isoduration-&gt;jsonschema[format-nongpl]&gt;=4.18.0-&gt;jupyter-events&gt;=0.6.0-&gt;jupyter-server&lt;3,&gt;=2.4.0-&gt;jupyterlab-&gt;pvdeg==0.4.2) (1.2.3)
+Using cached pvdeg-0.4.2-py3-none-any.whl (2.7 MB)
+Using cached aiohttp-3.9.5-cp311-cp311-win_amd64.whl (370 kB)
+Using cached pvlib-0.10.3-py3-none-any.whl (29.5 MB)
+Using cached NREL_rex-0.2.90-py3-none-any.whl (160 kB)
+Installing collected packages: aiohttp, pvlib, NREL-rex, pvdeg
+  Attempting uninstall: aiohttp
+    Found existing installation: aiohttp 3.8.5
+    Uninstalling aiohttp-3.8.5:
+      Successfully uninstalled aiohttp-3.8.5
+  Attempting uninstall: pvlib
+    Found existing installation: pvlib 0.11.0
+    Uninstalling pvlib-0.11.0:
+      Successfully uninstalled pvlib-0.11.0
+  Attempting uninstall: pvdeg
+    Found existing installation: pvdeg 0.3.3
+    Uninstalling pvdeg-0.3.3:
+      Successfully uninstalled pvdeg-0.3.3
+Successfully installed NREL-rex-0.2.90 aiohttp-3.9.5 pvdeg-0.4.2 pvlib-0.10.3
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>WARNING: Ignoring invalid distribution ~umpy (C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages)
+WARNING: Ignoring invalid distribution ~umpy (C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages)
+WARNING: Ignoring invalid distribution ~umpy (C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages)
+WARNING: Ignoring invalid distribution ~umpy (C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages)
+ERROR: pip&#39;s dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+pvfactors 1.5.2 requires pvlib&lt;0.10.0,&gt;=0.9.0, but you have pvlib 0.10.3 which is incompatible.
+rdtools 2.1.5 requires pvlib&lt;0.10.0,&gt;=0.7.0, but you have pvlib 0.10.3 which is incompatible.
+s3fs 2023.3.0 requires aiobotocore~=2.4.2, but you have aiobotocore 2.5.0 which is incompatible.
+hsds 0.8.4 requires aiohttp==3.8.5, but you have aiohttp 3.9.5 which is incompatible.
 </pre></div>
 </div>
 </div>
@@ -491,6 +696,56 @@ document.write(`
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">ModuleNotFoundError</span><span class="g g-Whitespace">                       </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">line</span> <span class="mi">3</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span> <span class="kn">import</span> <span class="nn">os</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span> <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="ne">----&gt; </span><span class="mi">3</span> <span class="kn">import</span> <span class="nn">pvdeg</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">pvdeg</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+
+<span class="n">File</span> <span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Roaming</span>\<span class="n">Python</span>\<span class="n">Python311</span>\<span class="n">site</span><span class="o">-</span><span class="n">packages</span>\<span class="n">pvdeg</span>\<span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">7</span>
+<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1"># from . import cli</span>
+<span class="ne">----&gt; </span><span class="mi">7</span> <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">collection</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">degradation</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">design</span>
+
+<span class="n">File</span> <span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Roaming</span>\<span class="n">Python</span>\<span class="n">Python311</span>\<span class="n">site</span><span class="o">-</span><span class="n">packages</span>\<span class="n">pvdeg</span>\<span class="n">collection</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">4</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;Collection of functions related to calculating current collection in solar cells</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="ne">----&gt; </span><span class="mi">4</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">simpson</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+
+<span class="n">File</span> <span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Roaming</span>\<span class="n">Python</span>\<span class="n">Python311</span>\<span class="n">site</span><span class="o">-</span><span class="n">packages</span>\<span class="n">numpy</span>\<span class="fm">__init__</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">119</span>
+<span class="g g-Whitespace">    </span><span class="mi">116</span> <span class="kn">import</span> <span class="nn">sys</span>
+<span class="g g-Whitespace">    </span><span class="mi">117</span> <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="ne">--&gt; </span><span class="mi">119</span> <span class="kn">from</span> <span class="nn">._globals</span> <span class="kn">import</span> <span class="n">_NoValue</span><span class="p">,</span> <span class="n">_CopyMode</span>
+<span class="nn">    120 # These exceptions were moved</span> in <span class="ni">1.25 and are hidden from __dir__</span><span class="nt">()</span>
+<span class="g g-Whitespace">    </span><span class="mi">121</span> <span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">122</span>     <span class="n">ComplexWarning</span><span class="p">,</span> <span class="n">ModuleDeprecationWarning</span><span class="p">,</span> <span class="n">VisibleDeprecationWarning</span><span class="p">,</span>
+<span class="g g-Whitespace">    </span><span class="mi">123</span>     <span class="n">TooHardError</span><span class="p">,</span> <span class="n">AxisError</span><span class="p">)</span>
+
+<span class="n">File</span> <span class="o">~</span>\<span class="n">AppData</span>\<span class="n">Roaming</span>\<span class="n">Python</span>\<span class="n">Python311</span>\<span class="n">site</span><span class="o">-</span><span class="n">packages</span>\<span class="n">numpy</span>\<span class="n">_globals</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">20</span>
+<span class="g g-Whitespace">      </span><span class="mi">1</span><span class="w"> </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="g g-Whitespace">      </span><span class="mi">2</span><span class="sd"> Module defining global singleton classes.</span>
+<span class="g g-Whitespace">      </span><span class="mi">3</span><span class="sd"> </span>
+<span class="sd">   (...)</span>
+<span class="g g-Whitespace">     </span><span class="mi">16</span><span class="sd"> </span>
+<span class="g g-Whitespace">     </span><span class="mi">17</span><span class="sd"> &quot;&quot;&quot;</span>
+<span class="g g-Whitespace">     </span><span class="mi">18</span> <span class="kn">import</span> <span class="nn">enum</span>
+<span class="ne">---&gt; </span><span class="mi">20</span> <span class="kn">from</span> <span class="nn">._utils</span> <span class="kn">import</span> <span class="n">set_module</span> <span class="k">as</span> <span class="n">_set_module</span>
+<span class="g g-Whitespace">     </span><span class="mi">22</span> <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_NoValue&#39;</span><span class="p">,</span> <span class="s1">&#39;_CopyMode&#39;</span><span class="p">]</span>
+<span class="g g-Whitespace">     </span><span class="mi">25</span> <span class="c1"># Disallow reloading this module so as to preserve the identities of the</span>
+<span class="g g-Whitespace">     </span><span class="mi">26</span> <span class="c1"># classes defined here.</span>
+
+<span class="ne">ModuleNotFoundError</span>: No module named &#39;numpy._utils&#39;
+</pre></div>
+</div>
+</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -507,11 +762,11 @@ document.write(`
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Windows 10
-Python version  3.11.7 | packaged by Anaconda, Inc. | (main, Dec 15 2023, 18:05:47) [MSC v.1916 64 bit (AMD64)]
-Pandas version  2.1.0
-pvdeg version  0.3.3
+Python version  3.9.18 (main, Sep 11 2023, 14:09:26) [MSC v.1916 64 bit (AMD64)]
+Pandas version  2.1.4
+pvdeg version  0.2.0+11.g7f12df3.dirty
 dask version 2023.11.0
-C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\pvdeg\data
+c:\users\mkempe\documents\github\pvdegradationtools\pvdeg\data
 </pre></div>
 </div>
 </div>
@@ -555,17 +810,7 @@ C:\Users\sayala\AppData\Roaming\Python\Python311\site-packages\pvdeg\data
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
-<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">line</span> <span class="mi">8</span>
-<span class="g g-Whitespace">      </span><span class="mi">4</span> <span class="n">weather_id</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mf">43.52646</span><span class="p">,</span> <span class="mf">172.62165</span><span class="p">)</span> <span class="c1">#Christchurch, New Zealand</span>
-<span class="g g-Whitespace">      </span><span class="mi">5</span> <span class="c1">#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska</span>
-<span class="g g-Whitespace">      </span><span class="mi">6</span> <span class="c1">#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland</span>
-<span class="g g-Whitespace">      </span><span class="mi">7</span> <span class="c1">#weather_id = (33.4152, -111.8315) #Mesa, Arizona</span>
-<span class="ne">----&gt; </span><span class="mi">8</span> <span class="n">WEATHER_df</span><span class="p">,</span> <span class="n">META</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">get_anywhere</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">weather_id</span><span class="p">)</span>
-<span class="g g-Whitespace">      </span><span class="mi">9</span> <span class="nb">print</span><span class="p">(</span><span class="n">META</span><span class="p">)</span>
-
-<span class="ne">AttributeError</span>: module &#39;pvdeg.weather&#39; has no attribute &#39;get_anywhere&#39;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;latitude&#39;: -43.52646, &#39;longitude&#39;: 172.62165, &#39;altitude&#39;: 4.0, &#39;wind_height&#39;: 10, &#39;Source&#39;: &#39;PVGIS&#39;}
 </pre></div>
 </div>
 </div>

@@ -18,27 +18,63 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-# This routine will get a meteorological dataset from anywhere in the world where it is available 
-#weather_id = (24.7136, 46.6753) #Riyadh, Saudi Arabia
-#weather_id = (35.6754, 139.65) #Tokyo, Japan
-weather_id = (-43.52646, 172.62165) #Christchurch, New Zealand
-#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska
-#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland
-#weather_id = (33.4152, -111.8315) #Mesa, Arizona
-WEATHER_df, META = pvdeg.weather.get_anywhere(id=weather_id)
-print(META)
+import os
+from pathlib import Path
+import pvdeg
+import pandas as pd
+from pvdeg import DATA_DIR
+import dask
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+import math
 ------------------
 
 
 [1;31m---------------------------------------------------------------------------[0m
-[1;31mAttributeError[0m                            Traceback (most recent call last)
-Cell [1;32mIn[5], line 8[0m
-[0;32m      4[0m weather_id [38;5;241m=[39m ([38;5;241m-[39m[38;5;241m43.52646[39m, [38;5;241m172.62165[39m) [38;5;66;03m#Christchurch, New Zealand[39;00m
-[0;32m      5[0m [38;5;66;03m#weather_id = (64.84031, -147.73836) #Fairbanks, Alaska[39;00m
-[0;32m      6[0m [38;5;66;03m#weather_id = (65.14037, -21.91633) #Reykjavik, Iceland[39;00m
-[0;32m      7[0m [38;5;66;03m#weather_id = (33.4152, -111.8315) #Mesa, Arizona[39;00m
-[1;32m----> 8[0m WEATHER_df, META [38;5;241m=[39m pvdeg[38;5;241m.[39mweather[38;5;241m.[39mget_anywhere([38;5;28mid[39m[38;5;241m=[39mweather_id)
-[0;32m      9[0m [38;5;28mprint[39m(META)
+[1;31mModuleNotFoundError[0m                       Traceback (most recent call last)
+Cell [1;32mIn[2], line 3[0m
+[0;32m      1[0m [38;5;28;01mimport[39;00m [38;5;21;01mos[39;00m
+[0;32m      2[0m [38;5;28;01mfrom[39;00m [38;5;21;01mpathlib[39;00m [38;5;28;01mimport[39;00m Path
+[1;32m----> 3[0m [38;5;28;01mimport[39;00m [38;5;21;01mpvdeg[39;00m
+[0;32m      4[0m [38;5;28;01mimport[39;00m [38;5;21;01mpandas[39;00m [38;5;28;01mas[39;00m [38;5;21;01mpd[39;00m
+[0;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mpvdeg[39;00m [38;5;28;01mimport[39;00m DATA_DIR
 
-[1;31mAttributeError[0m: module 'pvdeg.weather' has no attribute 'get_anywhere'
+File [1;32m~\AppData\Roaming\Python\Python311\site-packages\pvdeg\__init__.py:7[0m
+[0;32m      4[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mconfig[39;00m [38;5;28;01mimport[39;00m [38;5;241m*[39m
+[0;32m      6[0m [38;5;66;03m# from . import cli[39;00m
+[1;32m----> 7[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m [38;5;28;01mimport[39;00m collection
+[0;32m      8[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m [38;5;28;01mimport[39;00m degradation
+[0;32m      9[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m [38;5;28;01mimport[39;00m design
+
+File [1;32m~\AppData\Roaming\Python\Python311\site-packages\pvdeg\collection.py:4[0m
+[0;32m      1[0m [38;5;124;03m"""Collection of functions related to calculating current collection in solar cells[39;00m
+[0;32m      2[0m [38;5;124;03m"""[39;00m
+[1;32m----> 4[0m [38;5;28;01mimport[39;00m [38;5;21;01mnumpy[39;00m [38;5;28;01mas[39;00m [38;5;21;01mnp[39;00m
+[0;32m      5[0m [38;5;28;01mfrom[39;00m [38;5;21;01mscipy[39;00m[38;5;21;01m.[39;00m[38;5;21;01mintegrate[39;00m [38;5;28;01mimport[39;00m simpson
+[0;32m      6[0m [38;5;28;01mfrom[39;00m [38;5;21;01mscipy[39;00m[38;5;21;01m.[39;00m[38;5;21;01minterpolate[39;00m [38;5;28;01mimport[39;00m interp1d
+
+File [1;32m~\AppData\Roaming\Python\Python311\site-packages\numpy\__init__.py:119[0m
+[0;32m    116[0m [38;5;28;01mimport[39;00m [38;5;21;01msys[39;00m
+[0;32m    117[0m [38;5;28;01mimport[39;00m [38;5;21;01mwarnings[39;00m
+[1;32m--> 119[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m_globals[39;00m [38;5;28;01mimport[39;00m _NoValue, _CopyMode
+[0;32m    120[0m [38;5;66;03m# These exceptions were moved in 1.25 and are hidden from __dir__()[39;00m
+[0;32m    121[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01mexceptions[39;00m [38;5;28;01mimport[39;00m (
+[0;32m    122[0m     ComplexWarning, ModuleDeprecationWarning, VisibleDeprecationWarning,
+[0;32m    123[0m     TooHardError, AxisError)
+
+File [1;32m~\AppData\Roaming\Python\Python311\site-packages\numpy\_globals.py:20[0m
+[0;32m      1[0m [38;5;124;03m"""[39;00m
+[0;32m      2[0m [38;5;124;03mModule defining global singleton classes.[39;00m
+[0;32m      3[0m 
+[1;32m   (...)[0m
+[0;32m     16[0m 
+[0;32m     17[0m [38;5;124;03m"""[39;00m
+[0;32m     18[0m [38;5;28;01mimport[39;00m [38;5;21;01menum[39;00m
+[1;32m---> 20[0m [38;5;28;01mfrom[39;00m [38;5;21;01m.[39;00m[38;5;21;01m_utils[39;00m [38;5;28;01mimport[39;00m set_module [38;5;28;01mas[39;00m _set_module
+[0;32m     22[0m __all__ [38;5;241m=[39m [[38;5;124m'[39m[38;5;124m_NoValue[39m[38;5;124m'[39m, [38;5;124m'[39m[38;5;124m_CopyMode[39m[38;5;124m'[39m]
+[0;32m     25[0m [38;5;66;03m# Disallow reloading this module so as to preserve the identities of the[39;00m
+[0;32m     26[0m [38;5;66;03m# classes defined here.[39;00m
+
+[1;31mModuleNotFoundError[0m: No module named 'numpy._utils'
 
