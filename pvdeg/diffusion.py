@@ -187,10 +187,9 @@ def esdiffusion(
                 )
                 # Cs edge seal/Ce encapsulant
                 r1 = so * np.exp(-eas / (met_data[row][0] + dtemp * mid_point))
-                r2 = (
-                    dod * np.exp(-ead / (met_data[row][0] + dtemp * mid_point))
-                    * r1 * encapsulant_width / edge_seal_width
-                )  # Ds/De*Cs/Ce*We/Ws
+                r2 = dod * np.exp(-ead / (met_data[row][0] + dtemp * mid_point)
+                                  )* r1 * encapsulant_width / edge_seal_width
+                  # Ds/De*Cs/Ce*We/Ws
                 # Calculates the edge seal nodes. Adjusted to not calculate ends and to have the first node be temperature.
                 for node in range(2, seal_nodes):
                     perm[row + 1 + rp_row][node] = perm_mid[node] + fos * (
@@ -201,34 +200,41 @@ def esdiffusion(
                     perm[row + 1 + rp_row][node] = perm_mid[node] + foe * (
                         perm_mid[node - 1] + perm_mid[node + 1] - 2 * perm_mid[node]
                     )
-                # Calculates the center encapsulant node. Accounts for temperature and two interfade nodes.
+                # Calculates the center encapsulant node. Accounts for temperature and two interface nodes.
                 perm[row + 1 + rp_row][encapsulant_nodes + seal_nodes + 2] = perm_mid[
-                    encapsulant_nodes + seal_nodes + 2
-                ] + 2 * foe * (perm_mid[encapsulant_nodes + seal_nodes + 1] - perm_mid[encapsulant_nodes + seal_nodes + 2])
+                    encapsulant_nodes + seal_nodes + 2] + 2 * foe * (
+                        perm_mid[encapsulant_nodes + seal_nodes + 1] - 
+                        perm_mid[encapsulant_nodes + seal_nodes + 2])
+                
                 # Calculated edge seal node adjacent to the first encapsulant node. Node numbers shifted.
                 perm[row + 1 + rp_row][seal_nodes] = perm_mid[seal_nodes] + fos * (
                     perm_mid[seal_nodes - 1]
                     + perm_mid[seal_nodes + 3] * r1 * 2 / (1 + r2)
-                    - perm_mid[seal_nodes] * (1 + 2 / (1 + r2))
-                )
+                    - perm_mid[seal_nodes] * (1 + 2 / (1 + r2)))
+  
                 # Calculated encapsulant node adjacent to the last edge seal node. Node numbers shifted.
                 perm[row + 1 + rp_row][seal_nodes + 3] = perm_mid[seal_nodes + 3] + foe * (
                     perm_mid[seal_nodes] / r1 * 2 / (1 + 1 / r2)
                     + perm_mid[seal_nodes + 4]
-                    - perm_mid[seal_nodes + 3] * (1 + 2 / (1 + 1 / r2))
-                )
+                    - perm_mid[seal_nodes + 3] * (1 + 2 / (1 + 1 / r2)))
+                
                 # sets the concentration at the edge seal to air interface.
                 perm[row + 1 + rp_row][1] = Sos * np.exp(
                     -Eass / (met_data[row + 1][0] + dtemp * mid_point)
                 )
                 perm_mid = perm[row + 1 + rp_row]
 
-            # calculate edge seal at interface to encapsulant.
-            perm[row + 1 + rp_row][seal_nodes + 1] = (
-                perm_mid[seal_nodes + 3] / r2 * r1 + perm_mid[seal_nodes]
-            ) / (1 / r2 + 1)
-            # calculate encapsulant at interface to the edge seal.
-            perm[row + 1 + rp_row][seal_nodes + 2] = perm[row + 1 + rp_row][seal_nodes + 1] / r1
+            # Calculate edge seal at interface to encapsulant.
+            # Blocked out code did weird things and was based on equal flxes. Actually using a simple averaging. This looks better and is not used in the diffusion calculations.
+            #perm[row + 1 + rp_row][seal_nodes + 1] = (perm_mid[seal_nodes + 3]*r1  
+            #                                          + perm_mid[seal_nodes]*r2) / (1+r2)
+            perm[row + 1 + rp_row][seal_nodes + 1] = perm_mid[seal_nodes ]+(perm_mid[seal_nodes]-perm_mid[seal_nodes-1])/2
+
+            # Calculate encapsulant at interface to the edge seal.
+            #perm[row + 1 + rp_row][seal_nodes + 2] = perm[row + 1 + rp_row][seal_nodes + 1] / r1
+            perm[row + 1 + rp_row][seal_nodes + 2] = perm_mid[seal_nodes + 3]-(perm_mid[seal_nodes + 4]-perm_mid[seal_nodes+3])/2
+
+            # Puts in the time for the first column.
             perm[row + 1 + rp_row][0] = rp_time + met_data[row + 1][1]
 
         # Because it is cycling around, it needs to start with the last temperature.
