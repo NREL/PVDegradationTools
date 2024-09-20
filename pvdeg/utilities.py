@@ -518,13 +518,16 @@ def _read_material(name, fname="O2permeation.json"):
     f.close()
     print('work')
     if name is None:
-        material_list = ''
-        print('working')
-        for key in data:
-            if 'name' in data[key].keys():
-                material_list = material_list + key + "=" + data[key]['name'] + '\n'
-        material_list = material_list[0:len(material_list)-1]
-        return [*material_list]
+        return list(data.keys())
+
+        # what was the point of this
+        # material_list = ''
+        # print('working')
+        # for key in data:
+        #     if 'name' in data[key].keys():
+        #         material_list = material_list + key + "=" + data[key]['name'] + '\n'
+        # material_list = material_list[0:len(material_list)-1]
+        # return [*material_list]
 
     mat_dict = data[name]
     return mat_dict
