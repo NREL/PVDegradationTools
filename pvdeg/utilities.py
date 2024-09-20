@@ -515,9 +515,15 @@ def _read_material(name, fname="O2permeation.json"):
     fpath = os.path.join(DATA_DIR, fname)
     with open(fpath) as f:
         data = json.load(f)
-
+    f.close()
+    print('work')
     if name is None:
-        material_list = data.keys()
+        material_list = ''
+        print('working')
+        for key in data:
+            if 'name' in data[key].keys():
+                material_list = material_list + key + "=" + data[key]['name'] + '\n'
+        material_list = material_list[0:len(material_list)-1]
         return [*material_list]
 
     mat_dict = data[name]
