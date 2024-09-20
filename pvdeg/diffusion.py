@@ -88,24 +88,24 @@ def esdiffusion(
         H2O = json.load(user_file)
         user_file.close()
 
-    if edge_seal[0,2]=="OX":
+    if edge_seal[0:2]=="OX":
         esp = O2.get(edge_seal)
         if printout:
             print("Oxygen ingress parameters loaded for the edge seal.")
     else:
-        if edge_seal[0,1]=="W":
+        if edge_seal[0:1]=="W":
             esp = H2O.get(edge_seal)
             if printout:
                 print("Water ingress parameters loaded for the edge seal.")
         else:
             print("Edge seal material not found")
 
-    if encapsulant[0,2]=="OX":
+    if encapsulant[0:2]=="OX":
         encp = O2.get(encapsulant)
         if printout:
             print("Oxygen ingress parameters loaded for the encapsulant.")
     else:
-        if encapsulant[0,1]=="W":
+        if encapsulant[0:1]=="W":
             encp = H2O.get(encapsulant)
             if printout:
                 print("Water ingress parameters loaded for the eencapsulant.")
