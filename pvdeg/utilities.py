@@ -516,11 +516,13 @@ def _read_material(name, fname="O2permeation.json"):
     with open(fpath) as f:
         data = json.load(f)
     f.close()
-    print('work')
+
     if name is None:
         return list(data.keys())
 
-        # what was the point of this
+        # Mike Added
+        # broke test
+        # =========== 
         # material_list = ''
         # print('working')
         # for key in data:
