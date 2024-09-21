@@ -16,15 +16,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from copy import deepcopy
-from typing import List, Union, Optional, Tuple, Callable
+from typing import List, Union, Optional, Tuple, Callable, overload
 from functools import partial
 import pprint
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-
-### premade scenario with locations of interest. Ask Mike?
-# TODO: geospatial reset weather and addLocation from gids.
 
 
 class Scenario:
@@ -1193,27 +1190,40 @@ class GeospatialScenario(Scenario):
             bbox_gids = pvdeg.geospatial.apply_bounding_box(geo_meta, **bbox_kwarg)
             geo_meta = geo_meta.loc[bbox_gids]
 
+
+        #                Downselect by Region
+        # ======================================================
+
         # string to list whole word list or keep list
         toList = lambda s: s if isinstance(s, list) else [s]
 
         if country:
             countries = toList(country)
+            self._check_set(countries, set(geo_meta["country"]))
             geo_meta = geo_meta[geo_meta["country"].isin(countries)]
+
+
         if state:
             states = toList(state)
             states = [
                 pvdeg.utilities._get_state(entry) if len(entry) == 2 else entry
                 for entry in states
             ]
+
+            self._check_set(states, set(geo_meta["state"]))
             geo_meta = geo_meta[geo_meta["state"].isin(states)]
+
+
         if county:
             if isinstance(county, str):
                 county = toList(county)
 
+            self._check_set(county, set(geo_meta["county"]))
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
 
-        # we don't downsample weather data until this runs
-        # because on NSRDB we are storing weather OUT of MEMORY with dask
+        # ======================================================
+
+
         geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(
             geo_meta, downsample_factor
         )
@@ -1533,7 +1543,7 @@ class GeospatialScenario(Scenario):
 
         return coords
 
-    def geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
+    def get_geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
         """
         Extract the geospatial weather dataset and metadata dataframe from the scenario object
 
@@ -1548,7 +1558,7 @@ class GeospatialScenario(Scenario):
 
         Returns:
         --------
-        (weather_data, meta_data): (xr.Dataset, pd.DataFrame)
+        (weather_data, meta_data): tuple[xr.Dataset, pd.DataFrame]
             A tuple of weather data as an `xarray.Dataset` and the corresponding meta data as a dataframe.
         """
         # downsample here, not done already happens at pipeline runtime
@@ -1556,6 +1566,26 @@ class GeospatialScenario(Scenario):
             chunks={"time": -1, "gid": 50}
         )
         return geo_weather_sub, self.meta_data
+
+    # @dispatch(xr.Dataset, pd.DataFrame)
+    def set_geospatial_data(self, weather_ds: xr.Dataset, meta_df: pd.DataFrame ) -> None:
+        """
+        Parameters:
+        -----------
+        weather_ds : xarray.Dataset
+            Dataset containing weather data for a block of gids.
+        meta_df : pandas.DataFrame
+            DataFrame containing meta data for a block of gids.
+
+        Modifies:
+        ----------
+        self.weather_data
+            sets to weather_ds
+        self.meta_data
+            sets to meta_df
+        """
+        self.weather_data, self.meta_data = weather_ds, meta_df
+
 
     def addJob(
         self,
@@ -1580,7 +1610,6 @@ class GeospatialScenario(Scenario):
             set flag to get a userWarning notifying the user of the job added
            to the pipeline in method call. ``default = False``
         """
-        # check if we can do geospatial analyis on desired function
         try:
             pvdeg.geospatial.template_parameters(func)
         except ValueError:
@@ -1589,10 +1618,6 @@ class GeospatialScenario(Scenario):
             )
 
         geo_job_dict = {"geospatial_job": {"job": func, "params": func_params}}
-
-        # # UNTESTED
-        # if func_params:
-        #     geo_job_dict.update(func_params)
 
         self.pipeline = geo_job_dict
 
@@ -1740,7 +1765,8 @@ class GeospatialScenario(Scenario):
                 f"self.geospatial should be True. Current value = {self.geospatial}"
             )
 
-        discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
+        # discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
+        discard_weather, meta_df = self._get_geospatial_data(year=2022)
 
         if country:
             meta_df = meta_df[meta_df["country"] == country]
@@ -1971,6 +1997,17 @@ class GeospatialScenario(Scenario):
 
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
+
+
+    def _check_set(self, iterable, to_check: set):
+        """Check if iterable is a subset of to_check"""
+        if not isinstance(iterable, set):
+            iterable = set(iterable)
+
+        if not iterable.issubset(to_check):
+            raise ValueError(f"All of iterable: {iterable} does not exist in {to_check}")
+
+    
 
     def format_pipeline(self):
         pipeline_html = "<div>"
