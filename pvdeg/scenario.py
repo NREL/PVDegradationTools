@@ -1,5 +1,7 @@
 """Class to define an analysis scenario."""
 
+import matplotlib.axes
+import matplotlib.figure
 import pvdeg
 from pvdeg import utilities
 
@@ -1787,13 +1789,15 @@ class GeospatialScenario(Scenario):
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
         )
 
+    import matplotlib
+
     def plot_coords(
         self,
         coord_1: Optional[tuple[float]] = None,
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         """
         Plot lat-long coordinate pairs on blank map. Quickly view
         geospatial datapoints before your analysis.
@@ -1852,7 +1856,7 @@ class GeospatialScenario(Scenario):
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         """
         Plot classified lat-long coordinate pairs on map. Quicly view
         geospatial datapoints with binary classification in a meta_data
@@ -1937,7 +1941,7 @@ class GeospatialScenario(Scenario):
         self,
         data_variable: str,
         cmap: str = "viridis",
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         da = (self.results)[data_variable]
 
         fig, ax = plt.subplots(
@@ -1956,6 +1960,8 @@ class GeospatialScenario(Scenario):
         ax.add_feature(cfeature.LAKES, edgecolor="black")
         plt.show()
 
+        return fig, ax
+
     # test this
     def plot_USA(
         self,
@@ -1964,7 +1970,7 @@ class GeospatialScenario(Scenario):
         cmap: str = "viridis",
         vmin: Union[int, float] = 0,
         vmax: Optional[Union[int, float]] = None,
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         """
         Plot a vizualization of the geospatial scenario result.
         Only works on geospatial scenarios.
@@ -1997,6 +2003,8 @@ class GeospatialScenario(Scenario):
 
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
+
+        return fig, ax
 
 
     def _check_set(self, iterable, to_check: set):
