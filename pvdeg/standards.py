@@ -778,12 +778,12 @@ def vertical_POA(
 
     return df_res
 
-# this may only work with PVGIS
 def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
-    model: str,
-    model_default: str,
+    pv_model: str,
+    pv_model_default: str,
+    files: dict[str: str] = None,
     results: list[str] = None,
 ) -> dict:
     """
@@ -795,19 +795,85 @@ def pysam(
         DataFrame of weather data. As returned by ``pvdeg.weather.get``
     meta: dict
         Dictionary of metadata for the weather data. As returned by ``pvdeg.weather.get``
-    model: str
-        choose pySam module.
+    pv_model: str
+        choose pySam photovoltaic system model. 
+        Some models are less thorough and run faster. 
+        pvwatts8 is ~50x faster than pysamv1 but only calculates 46 parameters while pysamv1 calculates 195.
 
-            options: ``pvwatts8``, ``pysamv1``
+            options: ``pvwatts8``, ``pysamv1``, etc.
+
+    pv_model_default: str
+        choose pysam config for pv model. [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
+
+        On the docs some modules have availabile defaults listed. 
+
+        For example:  
+        [Pvwattsv8](https://nrel-pysam.readthedocs.io/en/main/modules/Pvwattsv8.html)
+        - "FuelCellCommercial"
+        - "FuelCellSingleOwner"
+        - "GenericPVWattsWindFuelCellBatteryHybridHostDeveloper"
+        - "GenericPVWattsWindFuelCellBatteryHybridSingleOwner"
+        - "PVWattsBatteryCommercial"
+        - "PVWattsBatteryHostDeveloper"
+        - "PVWattsBatteryResidential"
+        - "PVWattsBatteryThirdParty"
+        - "PVWattsWindBatteryHybridHostDeveloper"
+        - "PVWattsWindBatteryHybridSingleOwner"
+        - "PVWattsWindFuelCellBatteryHybridHostDeveloper"
+        - "PVWattsWindFuelCellBatteryHybridSingleOwner"
+        - "PVWattsAllEquityPartnershipFlip"
+        - "PVWattsCommercial"
+        - "PVWattsCommunitySolar"
+        - "PVWattsHostDeveloper"
+        - "PVWattsLCOECalculator"
+        - "PVWattsLeveragedPartnershipFlip"
+        - "PVWattsMerchantPlant"
+        - "PVWattsNone"
+        - "PVWattsResidential"
+        - "PVWattsSaleLeaseback"
+        - "PVWattsSingleOwner"
+        - "PVWattsThirdParty"
+
+        [Pvsamv1](https://nrel-pysam.readthedocs.io/en/main/modules/Pvsamv1.html)
+        - "FlatPlatePVAllEquityPartnershipFlip"
+        - "FlatPlatePVCommercial"
+        - "FlatPlatePVHostDeveloper"
+        - "FlatPlatePVLCOECalculator"
+        - "FlatPlatePVLeveragedPartnershipFlip"
+        - "FlatPlatePVMerchantPlant"
+        - "FlatPlatePVNone"
+        - "FlatPlatePVResidential"
+        - "FlatPlatePVSaleLeaseback"
+        - "FlatPlatePVSingleOwner"
+        - "FlatPlatePVThirdParty"
+        - "PVBatteryAllEquityPartnershipFlip"
+        - "PVBatteryCommercial"
+        - "PVBatteryHostDeveloper"
+        - "PVBatteryLeveragedPartnershipFlip"
+        - "PVBatteryMerchantPlant"
+        - "PVBatteryResidential"
+        - "PVBatterySaleLeaseback"
+        - "PVBatterySingleOwner"
+        - "PVBatteryThirdParty"
+        - "PhotovoltaicWindBatteryHybridHostDeveloper"
+        - "PhotovoltaicWindBatteryHybridSingleOwner"
 
     results: list[str]
-        list of strings corresponding to pysam outputs.
+        list of strings corresponding to pysam outputs to return.
+        Pysam models such as `Pvwatts8` and `Pvsamv1` return hundreds of results.
+        So we can chose to take only the specified results while throwing away the others.
+
+        To grab only 'annual_energy' and 'ac' from the model results. 
+
+        >>> results = ['annual_energy', 'ac']
+
+        This may cause some undesired behavior with geospatial calculations if the lengths of the results within the list are different. 
 
     Returns
     -------
     pysam_res: dict
-        dictionary of outputs
-
+        dictionary of outputs. Keys are result name and value is the corresponding result. 
+        If `results` is not specified, the dictionary will contain every calculation from the model.
     """
     import PySAM.Pvwattsv8 as pv8
     import PySAM.Pvsamv1 as pv1
@@ -834,12 +900,16 @@ def pysam(
 
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvwattsv8.html
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvsamv1.html
-    if model == "pvwatts8": 
-        pysam_model = pv8.default(model_default) # PVWattsCommercial
-    elif model == "pysamv1":
-        pysam_model = pv1.default(model_default) # FlatPlatePVCommercial
+    if pv_model == "pvwatts8": 
+        pysam_model = pv8.default(pv_model_default) # PVWattsCommercial
+    elif pv_model == "pysamv1":
+        pysam_model = pv1.default(pv_model_default) # FlatPlatePVCommercial
 
-    pysam_model.SolarResource.solar_resource_data = solar_resource
+    pysam_model.unassign('solar_resource_file') # unassign file
+
+    # Duplicate Columns in the dataframe seem to cause this issue
+    # Error (-4) converting nested tuple 0 into row in matrix.
+    pysam_model.SolarResource.solar_resource_data = solar_resource 
     pysam_model.execute()
     outputs = pysam_model.Outputs.export()
 
