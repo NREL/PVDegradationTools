@@ -791,7 +791,7 @@ class Scenario:
         start_time: Optional[dt] = None,
         end_time: Optional[dt] = None,
         title: str = "",
-    ) -> None:
+    ) -> tuple:
         """
         Plot scenario results along an axis using `Scenario.extract`
 
@@ -843,7 +843,8 @@ class Scenario:
 
         Returns:
         -------
-        None
+        fig, ax: tuple
+            matplotlib figure and axis objects
 
         See Also:
         ---------
@@ -864,6 +865,8 @@ class Scenario:
         df.plot(ax=ax)
         ax.set_title(f"{self.name} : {title}")
         plt.show()
+
+        return fig, ax
 
     def _ipython_display_(self):
         file_url = "no file provided" 
@@ -1105,7 +1108,12 @@ class GeospatialScenario(Scenario):
         self.hpc = hpc
 
     def __eq__(self, other):
-        raise NotImplementedError("cannot directly compare geospatial scenario objects")
+        raise NotImplementedError("""
+            Cannot directly compare pvdeg.GeospatialScenario objects
+            due to larger than memory/out of memory datasets stored in 
+            GeospatialScenario.weather_data attribute.
+            """)
+                                 
 
     # add restoring from gids functionality from nsrdb
     def addLocation(
@@ -1180,7 +1188,6 @@ class GeospatialScenario(Scenario):
             "attributes": nsrdb_attributes,
         }
 
-        # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory
         geo_weather, geo_meta = pvdeg.weather.get(
             weather_db, geospatial=True, **weather_arg
         )
@@ -1222,9 +1229,7 @@ class GeospatialScenario(Scenario):
 
             self._check_set(county, set(geo_meta["county"]))
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
-
         # ======================================================
-
 
         geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(
             geo_meta, downsample_factor
@@ -2065,11 +2070,11 @@ class GeospatialScenario(Scenario):
             </div>
             <div>
                 <h3>Weather Dataset</h3>
-                {self.format_weather()}
+                {self.format_geo_weather()}
             </div>
             <div>
                 <h3>Meta Dataframe</h3>
-                {self.format_meta()}
+                {self.format_geo_meta()}
             </div>
         </div>
         <script>
@@ -2109,35 +2114,10 @@ class GeospatialScenario(Scenario):
         results_html += "</div>"
         return results_html
 
-    def format_meta(self):
+    def format_geo_meta(self):
         meta_data_html = ""
-        if isinstance(self.meta_data, pd.DataFrame):
-            if len(self.meta_data) > 10:
-                first_five = self.meta_data.head(5)
-                last_five = self.meta_data.tail(5)
-                ellipsis_row = pd.DataFrame(
-                    [["..."] * len(self.meta_data.columns)],
-                    columns=self.meta_data.columns,
-                )
 
-                # Create the custom index with ellipses
-                custom_index = np.concatenate(
-                    [
-                        np.arange(0, 5, dtype=object).astype(str),
-                        ["..."],
-                        np.arange(
-                            len(self.meta_data) - 5, len(self.meta_data), dtype=object
-                        ).astype(str),
-                    ]
-                )
-
-                # Concatenate the DataFrames
-                display_data = pd.concat(
-                    [first_five, ellipsis_row, last_five], ignore_index=True
-                )
-                display_data.index = custom_index
-            else:
-                display_data = self.meta_data
+        if self.meta_data is not None:
 
             meta_data_html = f"""
             <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
@@ -2146,8 +2126,29 @@ class GeospatialScenario(Scenario):
                     Meta Data
                 </h4>
             </div>
-            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-                {display_data.to_html()}
+            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px;">
+                {self.meta_data._repr_html_()}
             </div>
             """
+
         return meta_data_html
+
+    def format_geo_weather(self):
+        weather_data_html = ""
+
+        if self.weather_data is not None:
+
+            weather_data_html = f"""
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_weather_data" style="color: #b676c2;">►</span>
+                    Weather Data
+                </h4>
+            </div>
+            <div>
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px>
+                {self.weather_data._repr_html_()}
+            </div>
+            """
+
+        return weather_data_html
