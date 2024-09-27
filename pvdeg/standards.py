@@ -671,7 +671,6 @@ def vertical_POA(
     lcoa_nom : float [cents/kWh]
         LCOE Levelized cost of energy nominal
     """
-    return
 
     import PySAM
     import PySAM.Pvsamv1 as PV
@@ -783,7 +782,10 @@ def pysam(
     meta: dict,
     pv_model: str,
     pv_model_default: str,
-    files: dict[str: str] = None,
+    # grid_default: str,
+    # cashloan_default: str,
+    # utilityrate_default: str,
+    config_files: dict[str: str] = None,
     results: list[str] = None,
 ) -> dict:
     """
@@ -803,7 +805,7 @@ def pysam(
             options: ``pvwatts8``, ``pysamv1``, etc.
 
     pv_model_default: str
-        choose pysam config for pv model. [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
+        pysam config for pv model. [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
 
         On the docs some modules have availabile defaults listed. 
 
@@ -858,6 +860,40 @@ def pysam(
         - "PhotovoltaicWindBatteryHybridHostDeveloper"
         - "PhotovoltaicWindBatteryHybridSingleOwner"
 
+    grid_default: str
+
+        pysam default config for grid model. [Grid Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Grid.html)
+
+    cashloan_default: str
+
+        pysam default config for cashloan model. [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)  
+        - "FlatPlatePVCommercial"  
+        - "FlatPlatePVResidential"  
+        - "PVBatteryCommercial"  
+        - "PVBatteryResidential"  
+        - "PVWattsBatteryCommercial"  
+        - "PVWattsBatteryResidential"  
+        - "PVWattsCommercial"  
+        - "PVWattsResidential"  
+
+    utiltityrate_default: str
+
+        pysam default config for utilityrate5 model. [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())
+
+    config_files: dict
+        SAM configuration files. A dictionary containing a mapping to filepaths.
+
+        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`. Each key should contain a value as a string representing the file path to a SAM config file. 
+
+        ```
+        files = {
+            'pv' : 'example/path/1/pv-file.json'
+            'grid' : 'example/path/1/grid-file.json'
+            'utilityrate' : 'example/path/1/utilityrate-file.json'
+            'cashloan' : 'example/path/1/cashloan-file.json'
+        }
+        ```
+
     results: list[str]
         list of strings corresponding to pysam outputs to return.
         Pysam models such as `Pvwatts8` and `Pvsamv1` return hundreds of results.
@@ -877,6 +913,9 @@ def pysam(
     """
     import PySAM.Pvwattsv8 as pv8
     import PySAM.Pvsamv1 as pv1
+    import PySAM.Grid as Grid
+    import PySAM.Utilityrate5 as UtilityRate
+    import PySAM.Cashloan as Cashloan
     import json
 
     weather_df = utilities.add_time_columns_tmy(weather_df=weather_df)
@@ -906,6 +945,11 @@ def pysam(
         pysam_model = pv1.default(pv_model_default) # FlatPlatePVCommercial
 
     pysam_model.unassign('solar_resource_file') # unassign file
+
+    # grid = Grid.from_existing(pv_model)
+    # utility_rate = UtilityRate.from_existing(pv_model)
+    # cashloan = Cashloan.from_existing(grid, 'FlatPlatePVCommercial')
+
 
     # Duplicate Columns in the dataframe seem to cause this issue
     # Error (-4) converting nested tuple 0 into row in matrix.
