@@ -1,5 +1,7 @@
 """Class to define an analysis scenario."""
 
+import matplotlib.axes
+import matplotlib.figure
 import pvdeg
 from pvdeg import utilities
 
@@ -16,15 +18,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from copy import deepcopy
-from typing import List, Union, Optional, Tuple, Callable
+from typing import List, Union, Optional, Tuple, Callable, overload
 from functools import partial
 import pprint
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-
-### premade scenario with locations of interest. Ask Mike?
-# TODO: geospatial reset weather and addLocation from gids.
 
 
 class Scenario:
@@ -792,7 +791,7 @@ class Scenario:
         start_time: Optional[dt] = None,
         end_time: Optional[dt] = None,
         title: str = "",
-    ) -> None:
+    ) -> tuple:
         """
         Plot scenario results along an axis using `Scenario.extract`
 
@@ -844,7 +843,8 @@ class Scenario:
 
         Returns:
         -------
-        None
+        fig, ax: tuple
+            matplotlib figure and axis objects
 
         See Also:
         ---------
@@ -865,6 +865,8 @@ class Scenario:
         df.plot(ax=ax)
         ax.set_title(f"{self.name} : {title}")
         plt.show()
+
+        return fig, ax
 
     def _ipython_display_(self):
         file_url = "no file provided" 
@@ -1106,7 +1108,12 @@ class GeospatialScenario(Scenario):
         self.hpc = hpc
 
     def __eq__(self, other):
-        raise NotImplementedError("cannot directly compare geospatial scenario objects")
+        raise NotImplementedError("""
+            Cannot directly compare pvdeg.GeospatialScenario objects
+            due to larger than memory/out of memory datasets stored in 
+            GeospatialScenario.weather_data attribute.
+            """)
+                                 
 
     # add restoring from gids functionality from nsrdb
     def addLocation(
@@ -1181,7 +1188,6 @@ class GeospatialScenario(Scenario):
             "attributes": nsrdb_attributes,
         }
 
-        # nsrdb_fp = r"/datasets/NSRDB" # kestrel directory
         geo_weather, geo_meta = pvdeg.weather.get(
             weather_db, geospatial=True, **weather_arg
         )
@@ -1193,27 +1199,38 @@ class GeospatialScenario(Scenario):
             bbox_gids = pvdeg.geospatial.apply_bounding_box(geo_meta, **bbox_kwarg)
             geo_meta = geo_meta.loc[bbox_gids]
 
+
+        #                Downselect by Region
+        # ======================================================
+
         # string to list whole word list or keep list
         toList = lambda s: s if isinstance(s, list) else [s]
 
         if country:
             countries = toList(country)
+            self._check_set(countries, set(geo_meta["country"]))
             geo_meta = geo_meta[geo_meta["country"].isin(countries)]
+
+
         if state:
             states = toList(state)
             states = [
                 pvdeg.utilities._get_state(entry) if len(entry) == 2 else entry
                 for entry in states
             ]
+
+            self._check_set(states, set(geo_meta["state"]))
             geo_meta = geo_meta[geo_meta["state"].isin(states)]
+
+
         if county:
             if isinstance(county, str):
                 county = toList(county)
 
+            self._check_set(county, set(geo_meta["county"]))
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
+        # ======================================================
 
-        # we don't downsample weather data until this runs
-        # because on NSRDB we are storing weather OUT of MEMORY with dask
         geo_meta, geo_gids = pvdeg.utilities.gid_downsampling(
             geo_meta, downsample_factor
         )
@@ -1451,8 +1468,8 @@ class GeospatialScenario(Scenario):
             method to calculate elevation weights for each point.
             Options : `'mean'`, `'sum'`, `'median'`
         normalization : str, (default = 'linear')
-            function to apply when normalizing weights. Logarithmic uses log_e/ln
-            options : `'linear'`, `'logarithmic'`, '`exponential'`
+            function to apply when normalizing weights. Logarithmic uses $log_e$, $ln$
+            options : `'linear'`, `'log'`, '`exp'`, `'invert-linear'`
 
         Returns:
         --------
@@ -1533,7 +1550,7 @@ class GeospatialScenario(Scenario):
 
         return coords
 
-    def geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
+    def get_geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
         """
         Extract the geospatial weather dataset and metadata dataframe from the scenario object
 
@@ -1548,7 +1565,7 @@ class GeospatialScenario(Scenario):
 
         Returns:
         --------
-        (weather_data, meta_data): (xr.Dataset, pd.DataFrame)
+        (weather_data, meta_data): tuple[xr.Dataset, pd.DataFrame]
             A tuple of weather data as an `xarray.Dataset` and the corresponding meta data as a dataframe.
         """
         # downsample here, not done already happens at pipeline runtime
@@ -1556,6 +1573,26 @@ class GeospatialScenario(Scenario):
             chunks={"time": -1, "gid": 50}
         )
         return geo_weather_sub, self.meta_data
+
+    # @dispatch(xr.Dataset, pd.DataFrame)
+    def set_geospatial_data(self, weather_ds: xr.Dataset, meta_df: pd.DataFrame ) -> None:
+        """
+        Parameters:
+        -----------
+        weather_ds : xarray.Dataset
+            Dataset containing weather data for a block of gids.
+        meta_df : pandas.DataFrame
+            DataFrame containing meta data for a block of gids.
+
+        Modifies:
+        ----------
+        self.weather_data
+            sets to weather_ds
+        self.meta_data
+            sets to meta_df
+        """
+        self.weather_data, self.meta_data = weather_ds, meta_df
+
 
     def addJob(
         self,
@@ -1580,7 +1617,6 @@ class GeospatialScenario(Scenario):
             set flag to get a userWarning notifying the user of the job added
            to the pipeline in method call. ``default = False``
         """
-        # check if we can do geospatial analyis on desired function
         try:
             pvdeg.geospatial.template_parameters(func)
         except ValueError:
@@ -1589,10 +1625,6 @@ class GeospatialScenario(Scenario):
             )
 
         geo_job_dict = {"geospatial_job": {"job": func, "params": func_params}}
-
-        # # UNTESTED
-        # if func_params:
-        #     geo_job_dict.update(func_params)
 
         self.pipeline = geo_job_dict
 
@@ -1740,7 +1772,8 @@ class GeospatialScenario(Scenario):
                 f"self.geospatial should be True. Current value = {self.geospatial}"
             )
 
-        discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
+        # discard_weather, meta_df = Scenario._get_geospatial_data(year=2022)
+        discard_weather, meta_df = self._get_geospatial_data(year=2022)
 
         if country:
             meta_df = meta_df[meta_df["country"] == country]
@@ -1761,13 +1794,15 @@ class GeospatialScenario(Scenario):
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
         )
 
+    import matplotlib
+
     def plot_coords(
         self,
         coord_1: Optional[tuple[float]] = None,
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
-    ) -> None:
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         """
         Plot lat-long coordinate pairs on blank map. Quickly view
         geospatial datapoints before your analysis.
@@ -1789,6 +1824,11 @@ class GeospatialScenario(Scenario):
         size : float
             matplotlib scatter point size. Without any downsampling NSRDB
             points will siginficantly overlap.
+
+        Returns:
+        --------
+        fig, ax
+            matplotlib figure and axis
         """
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
@@ -1811,6 +1851,9 @@ class GeospatialScenario(Scenario):
         plt.title(f"Coordinate Pairs from '{self.name}' Meta Data")
         plt.show()
 
+        return fig, ax
+
+
     def plot_meta_classification(
         self,
         col_name: str = None,
@@ -1818,7 +1861,7 @@ class GeospatialScenario(Scenario):
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         """
         Plot classified lat-long coordinate pairs on map. Quicly view
         geospatial datapoints with binary classification in a meta_data
@@ -1844,6 +1887,11 @@ class GeospatialScenario(Scenario):
         size : float
             matplotlib scatter point size. Without any downsampling NSRDB
             points will siginficantly overlap.
+
+        Returns:
+        --------
+        fig, ax
+            matplotlib figure and axis
         """
         if not col_name:
             raise ValueError("col_name cannot be none")
@@ -1892,11 +1940,13 @@ class GeospatialScenario(Scenario):
         plt.legend()
         plt.show()
 
+        return fig, ax
+
     def plot_world(
         self,
         data_variable: str,
         cmap: str = "viridis",
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         da = (self.results)[data_variable]
 
         fig, ax = plt.subplots(
@@ -1915,6 +1965,8 @@ class GeospatialScenario(Scenario):
         ax.add_feature(cfeature.LAKES, edgecolor="black")
         plt.show()
 
+        return fig, ax
+
     # test this
     def plot_USA(
         self,
@@ -1923,7 +1975,7 @@ class GeospatialScenario(Scenario):
         cmap: str = "viridis",
         vmin: Union[int, float] = 0,
         vmax: Optional[Union[int, float]] = None,
-    ):
+    ) -> tuple[matplotlib.figure, matplotlib.axes]:
         """
         Plot a vizualization of the geospatial scenario result.
         Only works on geospatial scenarios.
@@ -1956,6 +2008,19 @@ class GeospatialScenario(Scenario):
 
         fpath if fpath else [f"os.getcwd/{self.name}-{self.results[data_from_result]}"]
         fig.savefig()
+
+        return fig, ax
+
+
+    def _check_set(self, iterable, to_check: set):
+        """Check if iterable is a subset of to_check"""
+        if not isinstance(iterable, set):
+            iterable = set(iterable)
+
+        if not iterable.issubset(to_check):
+            raise ValueError(f"All of iterable: {iterable} does not exist in {to_check}")
+
+    
 
     def format_pipeline(self):
         pipeline_html = "<div>"
@@ -2005,11 +2070,11 @@ class GeospatialScenario(Scenario):
             </div>
             <div>
                 <h3>Weather Dataset</h3>
-                {self.format_weather()}
+                {self.format_geo_weather()}
             </div>
             <div>
                 <h3>Meta Dataframe</h3>
-                {self.format_meta()}
+                {self.format_geo_meta()}
             </div>
         </div>
         <script>
@@ -2049,35 +2114,10 @@ class GeospatialScenario(Scenario):
         results_html += "</div>"
         return results_html
 
-    def format_meta(self):
+    def format_geo_meta(self):
         meta_data_html = ""
-        if isinstance(self.meta_data, pd.DataFrame):
-            if len(self.meta_data) > 10:
-                first_five = self.meta_data.head(5)
-                last_five = self.meta_data.tail(5)
-                ellipsis_row = pd.DataFrame(
-                    [["..."] * len(self.meta_data.columns)],
-                    columns=self.meta_data.columns,
-                )
 
-                # Create the custom index with ellipses
-                custom_index = np.concatenate(
-                    [
-                        np.arange(0, 5, dtype=object).astype(str),
-                        ["..."],
-                        np.arange(
-                            len(self.meta_data) - 5, len(self.meta_data), dtype=object
-                        ).astype(str),
-                    ]
-                )
-
-                # Concatenate the DataFrames
-                display_data = pd.concat(
-                    [first_five, ellipsis_row, last_five], ignore_index=True
-                )
-                display_data.index = custom_index
-            else:
-                display_data = self.meta_data
+        if self.meta_data is not None:
 
             meta_data_html = f"""
             <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
@@ -2086,8 +2126,29 @@ class GeospatialScenario(Scenario):
                     Meta Data
                 </h4>
             </div>
-            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-                {display_data.to_html()}
+            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px;">
+                {self.meta_data._repr_html_()}
             </div>
             """
+
         return meta_data_html
+
+    def format_geo_weather(self):
+        weather_data_html = ""
+
+        if self.weather_data is not None:
+
+            weather_data_html = f"""
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_weather_data" style="color: #b676c2;">►</span>
+                    Weather Data
+                </h4>
+            </div>
+            <div>
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px>
+                {self.weather_data._repr_html_()}
+            </div>
+            """
+
+        return weather_data_html

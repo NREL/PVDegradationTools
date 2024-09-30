@@ -11,7 +11,7 @@ from string import ascii_uppercase
 from collections import OrderedDict
 import xarray as xr
 from subprocess import run
-
+import cartopy.feature as cfeature
 
 def gid_downsampling(meta, n):
     """
@@ -1012,7 +1012,7 @@ def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
         min and max latitude and longitudes. Minimum latitude at lats[0].
         Maximum latitude at lats[1]. Same pattern for longs.
     """
-    if coord_1 and coord_2:
+    if coord_1 is not None and coord_2 is not None:
         lats = [coord_1[0], coord_2[0]]
         longs = [coord_1[1], coord_2[1]]
     elif coords.any():
@@ -1043,26 +1043,37 @@ def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
     return
 
 
-def _add_cartopy_features(ax):
+def _add_cartopy_features(
+        ax, 
+        features = [
+            cfeature.BORDERS,
+            cfeature.COASTLINE,
+            cfeature.LAND,
+            cfeature.OCEAN,
+            cfeature.LAKES,
+            cfeature.RIVERS,
+        ],
+    ):
     """
     Add cartopy features to an existing matplotlib.pyplot axis.
     """
-    import cartopy.feature as cfeature
-
-    features = [
-        cfeature.BORDERS,
-        cfeature.COASTLINE,
-        cfeature.LAND,
-        cfeature.OCEAN,
-        cfeature.LAKES,
-        cfeature.RIVERS,
-    ]
+   
 
     for i in features:
         if i == cfeature.BORDERS:
             ax.add_feature(i, linestyle=":")
         else:
             ax.add_feature(i)
+
+def linear_normalize(array: np.ndarray)->np.ndarray:
+    """
+    Normalize a non-negative input array.
+    """
+
+    return np.divide(
+        np.subtract(array, np.min(array)),
+        np.subtract(np.max(array), np.min(array)),
+    )
 
 
 def _calc_elevation_weights(
@@ -1090,7 +1101,7 @@ def _calc_elevation_weights(
         Options : `'mean'`, `'sum'`, `'median'`
     normalization : str, (default = 'linear')
         function to apply when normalizing weights. Logarithmic uses log_e/ln
-        options : `'linear'`, `'logarithmic'`, '`exponential'`
+        options : `'linear'`, `'log'`, '`exp'`, `'invert-linear'`
     kdtree : sklearn.neighbors.KDTree or str
         kdtree containing latitude-longitude pairs for quick lookups
         Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
@@ -1118,19 +1129,27 @@ def _calc_elevation_weights(
             delta = np.median(delta_elevation)
         weights[i] = delta
 
+    linear_weights = linear_normalize(weights)
+
     if normalization == "linear":
-        pass  # do nothing
-    elif normalization == "exponential":
-        weights = np.exp(weights)
-    elif normalization == "logarithmic":
-        weights = np.log(weights)
+        return linear_weights
 
-    normalized_weights = np.divide(
-        np.subtract(weights, np.min(weights)),
-        np.subtract(np.max(weights), np.min(weights)),
+    if normalization == "invert-linear":
+        return 1 - linear_weights
+
+    elif normalization == "exp":
+        return linear_normalize(np.exp(linear_weights))
+
+    elif normalization == "log":
+        # add 1 to shift the domain right so results of log will be positive
+        # there may be a better way to do this, the value wont be properly normalized between 0 and 1
+        return linear_normalize(np.log(linear_weights + 1)) 
+
+    raise ValueError(f"""
+        normalization method: {normalization} does not exist.
+        must be: "linear", "exp", "log"
+        """
     )
-
-    return normalized_weights
 
 
 def fix_metadata(meta):
@@ -1262,3 +1281,49 @@ def compare_templates(
             return False
 
     return True
+
+def merge_sparse(files: list[str])->xr.Dataset:
+    """
+    Merge an arbitrary number of geospatial analysis results. 
+    Creates monotonically increasing indicies.
+
+    Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.
+
+    Parameters
+    -----------
+    files: list[str]
+        A list of strings representing filepaths to netcdf (.nc) files.
+        Each file must have the same coordinates, `['latitude','longitude']` and identical datavariables.
+
+    Returns
+    -------
+    merged_ds: xr.Dataset
+        Dataset (in memory) with `coordinates = ['latitude','longitude']` and datavariables matching files in 
+        filepaths list.
+    """
+
+    datasets = [xr.open_dataset(fp, engine='h5netcdf').compute() for fp in files]
+
+    latitudes = np.concatenate([ds.latitude.values for ds in datasets])
+    longitudes = np.concatenate([ds.longitude.values for ds in datasets])
+    unique_latitudes = np.sort(np.unique(latitudes))
+    unique_longitudes = np.sort(np.unique(longitudes))
+
+    data_vars = datasets[0].data_vars
+
+    merged_ds = xr.Dataset(
+        {var: (['latitude', 'longitude'], np.full((len(unique_latitudes), len(unique_longitudes)), np.nan)) for var in data_vars},
+        coords={
+            'latitude': unique_latitudes,
+            'longitude': unique_longitudes
+        }
+    )
+
+    for ds in datasets:
+        lat_inds = np.searchsorted(unique_latitudes, ds.latitude.values)
+        lon_inds = np.searchsorted(unique_longitudes, ds.longitude.values)
+
+        for var in ds.data_vars:
+            merged_ds[var].values[np.ix_(lat_inds, lon_inds)] = ds[var].values
+
+    return merged_ds
