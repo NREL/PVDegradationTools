@@ -1065,6 +1065,16 @@ def _add_cartopy_features(
         else:
             ax.add_feature(i)
 
+def linear_normalize(array: np.ndarray)->np.ndarray:
+    """
+    Normalize a non-negative input array.
+    """
+
+    return np.divide(
+        np.subtract(array, np.min(array)),
+        np.subtract(np.max(array), np.min(array)),
+    )
+
 
 def _calc_elevation_weights(
     elevations: np.array,
@@ -1091,7 +1101,7 @@ def _calc_elevation_weights(
         Options : `'mean'`, `'sum'`, `'median'`
     normalization : str, (default = 'linear')
         function to apply when normalizing weights. Logarithmic uses log_e/ln
-        options : `'linear'`, `'logarithmic'`, '`exponential'`
+        options : `'linear'`, `'log'`, '`exp'`, `'invert-linear'`
     kdtree : sklearn.neighbors.KDTree or str
         kdtree containing latitude-longitude pairs for quick lookups
         Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
@@ -1119,19 +1129,27 @@ def _calc_elevation_weights(
             delta = np.median(delta_elevation)
         weights[i] = delta
 
+    linear_weights = linear_normalize(weights)
+
     if normalization == "linear":
-        pass  # do nothing
-    elif normalization == "exponential":
-        weights = np.exp(weights)
-    elif normalization == "logarithmic":
-        weights = np.log(weights)
+        return linear_weights
 
-    normalized_weights = np.divide(
-        np.subtract(weights, np.min(weights)),
-        np.subtract(np.max(weights), np.min(weights)),
+    if normalization == "invert-linear":
+        return 1 - linear_weights
+
+    elif normalization == "exp":
+        return linear_normalize(np.exp(linear_weights))
+
+    elif normalization == "log":
+        # add 1 to shift the domain right so results of log will be positive
+        # there may be a better way to do this, the value wont be properly normalized between 0 and 1
+        return linear_normalize(np.log(linear_weights + 1)) 
+
+    raise ValueError(f"""
+        normalization method: {normalization} does not exist.
+        must be: "linear", "exp", "log"
+        """
     )
-
-    return normalized_weights
 
 
 def fix_metadata(meta):

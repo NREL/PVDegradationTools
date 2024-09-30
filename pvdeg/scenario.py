@@ -1468,8 +1468,8 @@ class GeospatialScenario(Scenario):
             method to calculate elevation weights for each point.
             Options : `'mean'`, `'sum'`, `'median'`
         normalization : str, (default = 'linear')
-            function to apply when normalizing weights. Logarithmic uses log_e/ln
-            options : `'linear'`, `'logarithmic'`, '`exponential'`
+            function to apply when normalizing weights. Logarithmic uses $log_e$, $ln$
+            options : `'linear'`, `'log'`, '`exp'`, `'invert-linear'`
 
         Returns:
         --------
