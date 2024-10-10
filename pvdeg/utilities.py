@@ -492,8 +492,7 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-# previously: fname="materials.json"
-# add control over what parameters (O2, H2, AA)?
+### DEPRECATE ###
 def _read_material(name, fname="O2permeation.json"):
     """
     read a material from materials.json and return the parameter dictionary
@@ -1293,6 +1292,7 @@ def compare_templates(
 
     return True
 
+<<<<<<< Updated upstream
 def merge_sparse(files: list[str])->xr.Dataset:
     """
     Merge an arbitrary number of geospatial analysis results. 
@@ -1338,3 +1338,124 @@ def merge_sparse(files: list[str])->xr.Dataset:
             merged_ds[var].values[np.ix_(lat_inds, lon_inds)] = ds[var].values
 
     return merged_ds
+=======
+
+def display_json(file_path: str) -> None:
+    """
+    Interactively view a 2 level JSON file in a JupyterNotebook
+
+    Parameters:
+    ------------
+    fp: str
+        file path
+    """
+    from IPython.display import display, HTML
+
+    with open(file_path, 'r') as file:
+        data = json.load(file)
+
+    def json_to_html(data):
+        json_str = json.dumps(data, indent=2)
+        for key in data.keys():
+            json_str = json_str.replace(f'"{key}":', f'<span style="color: plum;">"{key}":</span>')
+        
+        indented_html = '<br>'.join([' ' * 4 + line for line in json_str.splitlines()])
+        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
+
+    html = f'<h2 style="color: white;">JSON Output at fp: {file_path}</h2><div>'
+    for key, value in data.items():
+        html += (
+            f'<div>'
+            f'<strong style="color: white;">{key}:</strong> '
+            f'<span onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === \'none\' ? \'block\' : \'none\'" style="cursor: pointer; color: white;">&#9660;</span>'
+            f'<div style="display: none;">{json_to_html(value)}</div>'
+            f'</div>'
+        )
+    html += '</div>'
+
+    # Display the HTML
+    display(HTML(html))
+
+def search_json(fp: str, name_or_alias: str):
+    """
+    Search through a 2 level JSON with arbitrary key names for subkeys with matching attributes of name or alias.
+
+    Parameters:
+    ------------
+    fp: str
+        file path
+    name_or_alias: str
+        searches for matching subkey value in either `name` or `alias` attributes. exits on the first matching instance.
+
+    Returns:
+    ---------
+    jsonkey: any
+        arbitrary key from json that owns the matching subattribute of `name` or `alias`.
+    """
+
+    with open(fp, "r") as file:
+        data = json.load(file)
+
+    for key, subdict in data.items():
+        if "name" in subdict and "alias" in subdict:
+            if (subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias):
+                return key
+
+    raise ValueError(f"name_or_alias: {name_or_alias} not in JSON at {fp}")
+
+
+
+
+
+
+def read_material(
+    pvdeg_file: str = None, 
+    fp: str = None, 
+    key: str = None,
+    parameters: list[str] = None,
+)-> dict:
+    """
+    Read material parameters from a `pvdeg/data` file or JSON file path.
+
+    Parameters
+    -----------
+    pvdeg_file: str
+        keyword for material json file in `pvdeg/data`. Options:
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
+    fp: str
+        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `fp` will override `pvdeg_file` if both are provided.
+    key: str
+        key corresponding to specific material in the file. In the pvdeg files these have arbitrary names. Inspect the files or use `display_json` or `search_json` to identify the key for desired material.
+    parameters: list[str]
+        parameters to grab from the file at index key. If none, will grab all items at index key. the elements in parameters must match the keys in the json exactly or the output value for the specific key/parameter in the retunred dict will be `None`.
+
+    Returns
+    --------
+    material: dict
+        dictionary of material parameters from the seleted file at the index key.
+    """
+
+    # these live in the `pvdeg/data` folder
+    pvdeg_datafiles = { 
+        "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
+        "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
+        "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
+    }
+
+    if pvdeg_file:
+        try:
+            fp = pvdeg_datafiles[pvdeg_file]
+        except KeyError:
+            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+
+    with open(fp, "r") as file:
+        data = json.load(file)
+
+    # take subdict from file
+    material_dict = data[key] 
+    
+    if parameters:
+        material_dict = {k: material_dict.get(k, None) for k in parameters} 
+
+    return material_dict
+>>>>>>> Stashed changes
