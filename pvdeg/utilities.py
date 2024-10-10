@@ -13,6 +13,15 @@ import xarray as xr
 from subprocess import run
 import cartopy.feature as cfeature
 
+
+# A mapping to simplify access to files stored in `pvdeg/data`
+pvdeg_datafiles = { 
+    "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
+    "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
+    "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
+}
+
+
 def gid_downsampling(meta, n):
     """
     Downsample the NSRDB GID grid by a factor of n
@@ -1292,7 +1301,6 @@ def compare_templates(
 
     return True
 
-<<<<<<< Updated upstream
 def merge_sparse(files: list[str])->xr.Dataset:
     """
     Merge an arbitrary number of geospatial analysis results. 
@@ -1338,20 +1346,31 @@ def merge_sparse(files: list[str])->xr.Dataset:
             merged_ds[var].values[np.ix_(lat_inds, lon_inds)] = ds[var].values
 
     return merged_ds
-=======
 
-def display_json(file_path: str) -> None:
+def display_json(
+    pvdeg_file: str = None, 
+    fp: str = None, 
+    ) -> None:
     """
     Interactively view a 2 level JSON file in a JupyterNotebook
 
     Parameters:
     ------------
+    pvdeg_file: str
+        keyword for material json file in `pvdeg/data`. Options:
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path
+        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are provided.
     """
     from IPython.display import display, HTML
 
-    with open(file_path, 'r') as file:
+    if pvdeg_file:
+        try:
+            fp = pvdeg_datafiles[pvdeg_file]
+        except KeyError:
+            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+
+    with open(fp, 'r') as file:
         data = json.load(file)
 
     def json_to_html(data):
@@ -1362,7 +1381,7 @@ def display_json(file_path: str) -> None:
         indented_html = '<br>'.join([' ' * 4 + line for line in json_str.splitlines()])
         return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
 
-    html = f'<h2 style="color: white;">JSON Output at fp: {file_path}</h2><div>'
+    html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
     for key, value in data.items():
         html += (
             f'<div>'
@@ -1376,22 +1395,36 @@ def display_json(file_path: str) -> None:
     # Display the HTML
     display(HTML(html))
 
-def search_json(fp: str, name_or_alias: str):
+
+def search_json(
+    pvdeg_file: str = None, 
+    fp: str = None, 
+    name_or_alias: str = None,
+    )-> str:
     """
     Search through a 2 level JSON with arbitrary key names for subkeys with matching attributes of name or alias.
 
-    Parameters:
+    Parameters
     ------------
+    pvdeg_file: str
+        keyword for material json file in `pvdeg/data`. Options:
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path
+        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
     name_or_alias: str
         searches for matching subkey value in either `name` or `alias` attributes. exits on the first matching instance.
 
-    Returns:
+    Returns
     ---------
-    jsonkey: any
+    jsonkey: str
         arbitrary key from json that owns the matching subattribute of `name` or `alias`.
     """
+
+    if pvdeg_file:
+        try:
+            fp = pvdeg_datafiles[pvdeg_file]
+        except KeyError:
+            raise KeyError(rf"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
 
     with open(fp, "r") as file:
         data = json.load(file)
@@ -1401,12 +1434,7 @@ def search_json(fp: str, name_or_alias: str):
             if (subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias):
                 return key
 
-    raise ValueError(f"name_or_alias: {name_or_alias} not in JSON at {fp}")
-
-
-
-
-
+    raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}")
 
 def read_material(
     pvdeg_file: str = None, 
@@ -1423,7 +1451,7 @@ def read_material(
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `fp` will override `pvdeg_file` if both are provided.
+        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
     key: str
         key corresponding to specific material in the file. In the pvdeg files these have arbitrary names. Inspect the files or use `display_json` or `search_json` to identify the key for desired material.
     parameters: list[str]
@@ -1436,12 +1464,6 @@ def read_material(
     """
 
     # these live in the `pvdeg/data` folder
-    pvdeg_datafiles = { 
-        "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
-        "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
-        "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
-    }
-
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
@@ -1458,4 +1480,3 @@ def read_material(
         material_dict = {k: material_dict.get(k, None) for k in parameters} 
 
     return material_dict
->>>>>>> Stashed changes
