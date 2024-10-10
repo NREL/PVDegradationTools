@@ -21,17 +21,22 @@ pvdeg.utilities
       
       pvdeg.utilities.compare_templates
       pvdeg.utilities.convert_tmy
+      pvdeg.utilities.display_json
       pvdeg.utilities.fix_metadata
       pvdeg.utilities.geospatial_from_csv
       pvdeg.utilities.get_kinetics
       pvdeg.utilities.get_state_bbox
       pvdeg.utilities.gid_downsampling
+      pvdeg.utilities.linear_normalize
+      pvdeg.utilities.merge_sparse
       pvdeg.utilities.meta_as_dict
       pvdeg.utilities.new_id
       pvdeg.utilities.nrel_kestrel_check
       pvdeg.utilities.quantile_df
+      pvdeg.utilities.read_material
       pvdeg.utilities.remove_scenario_filetrees
       pvdeg.utilities.restore_gids
+      pvdeg.utilities.search_json
       pvdeg.utilities.strip_normalize_tmy
       pvdeg.utilities.tilt_azimuth_scan
       pvdeg.utilities.ts_gid_df
@@ -63,6 +68,13 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.convert_tmy:
 
    .. minigallery:: pvdeg.utilities.convert_tmy
+       :add-heading:
+
+   .. autofunction:: display_json
+
+   .. _sphx_glr_backref_pvdeg.utilities.display_json:
+
+   .. minigallery:: pvdeg.utilities.display_json
        :add-heading:
 
    .. autofunction:: fix_metadata
@@ -100,6 +112,20 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.gid_downsampling
        :add-heading:
 
+   .. autofunction:: linear_normalize
+
+   .. _sphx_glr_backref_pvdeg.utilities.linear_normalize:
+
+   .. minigallery:: pvdeg.utilities.linear_normalize
+       :add-heading:
+
+   .. autofunction:: merge_sparse
+
+   .. _sphx_glr_backref_pvdeg.utilities.merge_sparse:
+
+   .. minigallery:: pvdeg.utilities.merge_sparse
+       :add-heading:
+
    .. autofunction:: meta_as_dict
 
    .. _sphx_glr_backref_pvdeg.utilities.meta_as_dict:
@@ -128,6 +154,13 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.quantile_df
        :add-heading:
 
+   .. autofunction:: read_material
+
+   .. _sphx_glr_backref_pvdeg.utilities.read_material:
+
+   .. minigallery:: pvdeg.utilities.read_material
+       :add-heading:
+
    .. autofunction:: remove_scenario_filetrees
 
    .. _sphx_glr_backref_pvdeg.utilities.remove_scenario_filetrees:
@@ -140,6 +173,13 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.restore_gids:
 
    .. minigallery:: pvdeg.utilities.restore_gids
+       :add-heading:
+
+   .. autofunction:: search_json
+
+   .. _sphx_glr_backref_pvdeg.utilities.search_json:
+
+   .. minigallery:: pvdeg.utilities.search_json
        :add-heading:
 
    .. autofunction:: strip_normalize_tmy
