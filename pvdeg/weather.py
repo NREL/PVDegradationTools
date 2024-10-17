@@ -931,3 +931,153 @@ def get_anywhere(database = "PSM3", id=None, **kwargs):
                 weather_db = {'result': 'NA'}
 
     return weather_db, meta 
+
+
+def process_pvgis_distributed(weather_df):
+    """Create an xarray.Dataset using numpy array backend from a pvgis weather dataframe"""
+
+    import dask.array as da
+
+    weather_df.index.rename('time', inplace=True)
+    weather_ds = weather_df.to_xarray().drop_vars('time').copy() 
+
+    for var in weather_ds.data_vars:
+        dask_array = da.from_array(weather_ds[var].values, chunks='auto')
+
+        weather_ds[var] = (weather_ds[var].dims, dask_array)
+
+    return weather_ds
+
+def _weather_distributed_vec(
+    database: str, 
+    coord: tuple[float], 
+    ): 
+    """
+    Distributed weather calculation for use with dask futures/delayed
+    
+    Returns ds, dict, None if unsucessfull
+    Returns None, None, Exception if unsucessfull
+    """
+        
+    try:
+        weather_df, meta_dict = get(database, coord)
+    except Exception as e:
+        return None, None, e
+
+    weather_ds = process_pvgis_distributed(weather_df=weather_df)
+
+    return weather_ds, meta_dict, None 
+
+def pvgis_empty_weather_ds(gids_size):
+    """
+    Create an empty weather dataset for pvgis hourly TMY data
+    
+    Parameters 
+    ----------
+    gids_size: int
+        number of gids, equivalent to number of unique locations
+
+    Returns
+    -------
+    weather_ds: xarray.Dataset
+        Weather dataset of the same format/shapes given by a `pvdeg.weather.get` geospatial call or `pvdeg.weather.weather_distributed` call or `GeosptialScenario.get_geospatial_data`.
+    """
+    import dask.array as da
+
+    shapes = {
+        "temp_air": ("gid", "time"),
+        "relative_humidity": ("gid", "time"),
+        "ghi": ("gid", "time"),
+        "dni": ("gid", "time"),
+        "dhi": ("gid", "time"),
+        "IR(h)": ("gid", "time"),
+        "wind_speed": ("gid", "time"),
+        "wind_direction": ("gid", "time"),
+        "pressure": ("gid", "time"),
+    }
+    attrs = {}
+    global_attrs = {}
+
+    dims = {'gid', 'time'}
+    dims_size = {'time': 8760, 'gid': gids_size}
+
+    weather_ds = xr.Dataset(
+        data_vars={
+            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
+            for var, dim in shapes.items()
+        },
+        coords={'time': pd.date_range("2022-01-01", freq="h", periods=365 * 24),
+                'gid': np.linspace(0, gids_size-1, gids_size, dtype=int)},
+        attrs=global_attrs,
+    )
+
+    return weather_ds
+
+
+def weather_distributed(database, coords):
+    """
+    Grab weather using pvgis for all of the following locations using dask for parallelization.
+    You must create a dask client with multiple processes before calling this function, otherwise no speedup will be offered.
+
+    PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads 
+    that would put you over this limit. 
+    
+    Parameters
+    ---------- 
+    database : (str)
+        'PVGIS' or 'NSRDB' (not implemented yet)
+    coords: list[tuple]
+        list of tuples containing (latitude, longitude) coordinates
+        
+        >>> [
+                (49.95, 1.5),
+                (51.95, -9.5),
+                (51.95, -8.5),
+                (51.95, -4.5),
+                (51.95, -3.5),
+            ]
+
+    Returns
+    --------
+    weather_ds : xr.Dataset
+        Weather data for all locations requested in an xarray.Dataset using a dask array backend.
+    meta_df : pd.DataFrame
+        Pandas DataFrame containing metadata for all requested locations. Each row maps to a single entry in the weather_ds.
+    gids_failed: list
+        list of index failed coordinates in input `coords`
+    """
+
+    import dask.delayed
+
+    if (database != "PVGIS"):
+        raise NotImplementedError(f"Only 'PVGIS' is implemented, you entered {database}")
+
+    futures = [dask.delayed(_weather_distributed_vec)("PVGIS", coord) for coord in coords]
+    results = dask.compute(futures)[0] # values are returned in a list with one entry
+
+    # what is the difference between these two approaches for dask distributed work, how can we schedule differently
+    # futures = [client.submit(weather_distributed, "PVGIS", coord) for coord in coords]
+    # client.gather(futures)
+
+    # results is a 2d list
+    # results[0] is the weather_ds with dask backend
+    # results[1] is meta_dict
+    weather_ds_collection = [row[0] for row in results]
+    meta_dict_collection = [row[1] for row in results]
+
+    gids_failed = []
+
+    weather_ds = pvgis_empty_weather_ds(len(results)) # create empty weather xr.dataset
+    meta_df = pd.DataFrame.from_dict(meta_dict_collection) # create populated meta pd.DataFrame 
+
+    # these gids will be spatially meaningless, they will only show corresponding entries between weather_ds and meta_df
+    for i, row in enumerate(results): # this loop can be refactored, kinda gross
+
+        if row[2]:
+            gids_failed.append(i)
+            continue
+
+        # weather_ds[dict(gid=i)] = weather_ds_collection[i].to_xarray().drop_vars('time')
+        weather_ds[dict(gid=i)] = weather_ds_collection[i]
+
+    return weather_ds, meta_df, gids_failed
