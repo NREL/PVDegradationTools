@@ -1014,13 +1014,20 @@ def pvgis_empty_weather_ds(gids_size):
     return weather_ds
 
 
+# add some check to see if a dask client exists
+# can force user to pass dask client to ensure it exists
+
+# if called without dask client we will return a xr.Dataset 
+# with dask backend that does not appear as if it failed until we compute it
 def weather_distributed(database, coords):
     """
     Grab weather using pvgis for all of the following locations using dask for parallelization.
-    You must create a dask client with multiple processes before calling this function, otherwise no speedup will be offered.
+    You must create a dask client with multiple processes before calling this function, otherwise results will not be properly calculated.
 
     PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads 
     that would put you over this limit. 
+
+    With eventual NSRDB implementation API keys will be an issue, each key is rate limited.
     
     Parameters
     ---------- 
