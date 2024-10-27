@@ -968,7 +968,7 @@ def _weather_distributed_vec(
 
     return weather_ds, meta_dict, None 
 
-def pvgis_empty_weather_ds(gids_size):
+def pvgis_hourly_empty_weather_ds(gids_size):
     """
     Create an empty weather dataset for pvgis hourly TMY data
     
@@ -1074,7 +1074,7 @@ def weather_distributed(database, coords):
 
     gids_failed = []
 
-    weather_ds = pvgis_empty_weather_ds(len(results)) # create empty weather xr.dataset
+    weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather xr.dataset
     meta_df = pd.DataFrame.from_dict(meta_dict_collection) # create populated meta pd.DataFrame 
 
     # these gids will be spatially meaningless, they will only show corresponding entries between weather_ds and meta_df

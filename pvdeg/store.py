@@ -2,6 +2,7 @@ from pathlib import Path
 import xarray as xr
 import pandas as pd
 import numpy as np
+import dask.array as da    
 import zarr
 import os
 
@@ -74,20 +75,90 @@ def store(weather_ds, meta_df):
 
     combined_ds = _combine_geo_weather_meta(weather_ds, meta_df)
 
-    # what mode should this be
-    # we want to add to indexes if need be or overwrite old ones
-    combined_ds.to_zarr(
-        store=METOROLOGICAL_DOWNLOAD_PATH, 
-        group=f"{group}-{periodicity}"
-    )
+
+    if not os.path.exists(os.path.join(METOROLOGICAL_DOWNLOAD_PATH, ".zmetadata")): # no zstore in directory
+        print("Creating Zarr")
+
+        combined_ds.to_zarr(
+            store=METOROLOGICAL_DOWNLOAD_PATH, 
+            group=f"{group}-{periodicity}",
+        )
+    else: # store already exists
+        print("adding to store")
+
+        print("opening store")
+        stored_ds = xr.open_zarr(
+            store=METOROLOGICAL_DOWNLOAD_PATH,
+            group=f"{group}-{periodicity}",
+        )
+
+        lat_lon_gid_2d_map = _make_coords_to_gid_da(ds_from_zarr=stored_ds)        
+
+        for gid, values in meta_df.iterrows():
+
+            target_lat = values["latitude"]
+            target_lon = values["longitude"]
+
+            lat_exists = np.any(lat_lon_gid_2d_map.latitude == target_lat)
+            lon_exists = np.any(lat_lon_gid_2d_map.longitude == target_lon)
+
+            if lat_exists and lon_exists:
+                print("(lat, lon) exists already")
+                stored_gid = lat_lon_gid_2d_map.sel(latitude=target_lat, longitude=target_lon)
+
+                # overwrite previous value at that lat-lon, keeps old gid
+
+                # will this be a view
+                # how can we assign the value
+                # cant slice?
+                stored_ds.sel(gid=stored_gid)[:] = combined_ds.sel(gid=gid).values()
+
+            else: # coordinate pair doesnt exist and it needs to be added, this will be a HEAVY operation
+                print("add entry to dataset")
+
+                # we are trying to save 1 "sheet" of weather (weather at a single gid)
+                # need to update the index to fit into the stored data after we concatenate
+                # we want to update the arbitrary gid in the input (combined_ds) to the next index in the gid array (starts at 0, current_gid + 1 = sizes["gid"] = new gid)
+                new_gid = stored_ds.sizes["gid"]
+                
+                # combined_ds.sel(gid=gid) = combined_ds.sel(gid=gid).assign_coords(gid=[new_gid]) # we may have the issues with this sel returning a view
+                updated_entry = combined_ds.sel(gid=gid).assign_coords(gid=[new_gid])
+
+                stored_ds = xr.concat([stored_ds, updated_entry], dim="gid")
+
+            # trigger rechunking
+            # should this happen outside of the loop
+            stored_ds = stored_ds.chunk() 
+
+        # SAVE DATASET BACK TO STORE
+        stored_ds.to_zarr(METOROLOGICAL_DOWNLOAD_PATH, group=f"{group}-{periodicity}", mode='w') # test with "a" probably wont work
 
     print(f"dataset saved to zarr store at {METOROLOGICAL_DOWNLOAD_PATH}")
+
+### THIS NEEDS TO BE DEPRECATED
+def _add_entry_to_ds(combined_ds, stored_ds, target_lat, target_lon, gid):
+
+    new_gid = stored_ds.sizes["gid"] # zero indexed so the next index will be the current size
+
+    # new_entry = combined_ds.sel(gid=gid).expand_dims(gid=new_gid)
+
+    # for var in new_entry.data_vars:
+    #     existing_data = stored_ds[var]
+    #     new_data = new_entry[var]
+
+    # updated_data = xr.concat([existing_data, new_data], dim='gid')
+    stored_ds = xr.concat([stored_ds, combined_ds.sel(gid=gid)], dim="gid")
+
+    # stored_ds[var] = updated_datag
+
+    # stored_ds['latitude'] = xr.concat([stored_ds['latitude'], xr.DataArray([target_lat], dims='gid')], dim='gid')
+    # stored_ds['longitude'] = xr.concat([stored_ds['longitude'], xr.DataArray([target_lon], dims='gid')], dim='gid')
 
 
 
 def check_store():
     """Check if you have a zarr store at the default download path defined in pvdeg.config"""
-    if os.path.exists(os.path.join(METOROLOGICAL_DOWNLOAD_PATH, ".zattrs")):
+    if os.path.exists(os.path.join(METOROLOGICAL_DOWNLOAD_PATH, ".zmetadata")):
 
         size = sum(f.stat().st_size for f in METOROLOGICAL_DOWNLOAD_PATH.glob('**/*') if f.is_file())
 
@@ -118,16 +189,14 @@ def _combine_geo_weather_meta(
     ):
     """Combine weather dataset and meta dataframe into a single dataset"""
 
-    meta_ds = xr.Dataset.from_dataframe(meta_df)
-    # we could do some encoding scheme here, dont need to store source? unless the zarr compression handles it for us
-
-    meta_ds['gid'] = meta_ds['index'].values.astype(np.int32)
-    meta_ds = meta_ds.drop_vars(["index"])
+    meta_ds = xr.Dataset.from_dataframe(meta_df).rename({'index' : 'gid'})
 
     combined = xr.merge([weather_ds, meta_ds]).assign_coords(
         latitude=("gid", meta_ds.latitude.values),
         longitude=('gid', meta_ds.longitude.values),
     )
+
+    combined["Source"] = combined["Source"].astype(str) # save as strings
 
     return combined
 
@@ -139,6 +208,8 @@ def _seperate_geo_weather_meta(
     Take loaded dataset in the zarr store schema (weather and meta combined) 
     and seperate it into `weather_ds` and `meta_df`.
     """
+
+    ds_from_zarr["Source"] = ds_from_zarr["Source"].astype(object) # geospatial.mapblocks needs this to be an object
 
     # there may be a more optimal way to do this
     data = np.column_stack(
@@ -163,7 +234,6 @@ def _make_coords_to_gid_da(
     ):
     """Create a 2D indexable array that maps coordinates (lat and lon) to gid stored in zarr store"""
 
-    import dask.array as da    
 
     # only want to do this if the arrays are dask arrays
     lats = ds_from_zarr.latitude.to_numpy()
