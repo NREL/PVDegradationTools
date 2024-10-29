@@ -6,6 +6,8 @@ import dask.array as da
 import zarr
 import os
 
+from pvdeg.weather import pvgis_hourly_empty_weather_ds
+
 from pvdeg import METOROLOGICAL_DOWNLOAD_PATH
 
 def get(group):
@@ -134,11 +136,7 @@ def store(weather_ds, meta_df):
                 weather_sheet = combined_ds.sel(gid=slice(gid))
                 updated_entry = weather_sheet.assign_coords({"gid": [new_gid]})
                 updated_entry.to_zarr(store=METOROLOGICAL_DOWNLOAD_PATH, group=f"{group}-{periodicity}", mode="a", append_dim="gid")
-
-                # new_entry_added_ds = xr.concat([stored_ds, updated_entry], dim="gid")
-
-                # new_entry_added_ds.to_zarr(store=METOROLOGICAL_DOWNLOAD_PATH, group=f"{group}-{periodicity}", mode="a", append_dim="gid")
-                
+               
     print(f"dataset saved to zarr store at {METOROLOGICAL_DOWNLOAD_PATH}")
 
 
@@ -241,3 +239,51 @@ def _make_coords_to_gid_da(
     points.set_index(latitude="latitude", longitude="longitude")
     
     return points
+
+def _create_sample_sheet(fill_value, latitude: float=999, longitude: float=999, altitude: float=-1, wind_height: int=-1, Source: str="SampleSheet"):
+    """
+    Create a dummy sample dataset containing weather for one gid. This will be called a sheet, a single location of weather_data from the dataset with the gid coordinate still present.
+
+    The sizes of the dimensions of the sheet will be {"gid": 1, "time": 8760}
+
+    Parameters
+    -----------
+    fill_value: numeric
+        value to populate weather_ds single sheet with
+    latitude: float
+        dummy latitude WSG84
+    longitude: float
+        dummy longitude WSG84
+    altitude: float
+        dummy altitude of measured data [m]
+    wind_height: int
+        dummy height of measure sample dataset's wind measurement
+
+    Returns
+    --------
+    sheet_ds : xr.Dataset
+        Dummy weather data sheet for a single location using a dask array backend. As mentioned above this will look maintain the gid coordinate. 
+    meta_df : pd.DataFrame
+        Dummy metadata for test location in pandas.DataFrame.
+    """
+
+    meta_dict = {
+        'latitude': latitude,
+        'longitude': longitude,
+        'altitude': altitude,
+        'wind_height': wind_height,
+        'Source': Source
+    }
+
+    meta_df = pd.DataFrame(meta_dict, index=[0])
+
+    sheet_ds = pvgis_hourly_empty_weather_ds(gids_size=1)
+
+    dummy_da = da.full(shape=(1,sheet_ds.sizes["time"]), fill_value=fill_value)
+
+    for var in sheet_ds.data_vars:
+
+        dim = sheet_ds[var].dims
+        sheet_ds[var] = (dim, dummy_da)
+
+    return sheet_ds, meta_df

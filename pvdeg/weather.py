@@ -975,6 +975,8 @@ def process_pvgis_distributed(weather_df):
 def _weather_distributed_vec(
     database: str, 
     coord: tuple[float], 
+    api_key: str,   # NSRDB api key
+    email: str      # NSRDB developer email
     ): 
     """
     Distributed weather calculation for use with dask futures/delayed
@@ -984,7 +986,13 @@ def _weather_distributed_vec(
     """
         
     try:
-        weather_df, meta_dict = get(database, coord)
+        if (database == "PVGIS"): # does not need api key
+            weather_df, meta_dict = get(database=database, id=coord)
+        elif (database == "PSM3"):
+            weather_df, meta_dict = get(database=database, id=coord, api_key=api_key, email=email)
+        else:
+            raise NotImplementedError(f'database {database} not implemented, options: "PVGIS", "PSM3"')
+
     except Exception as e:
         return None, None, e
 
@@ -1040,10 +1048,17 @@ def pvgis_hourly_empty_weather_ds(gids_size):
 
 # add some check to see if a dask client exists
 # can force user to pass dask client to ensure it exists
-
 # if called without dask client we will return a xr.Dataset 
 # with dask backend that does not appear as if it failed until we compute it
-def weather_distributed(database, coords):
+
+# TODO: implement rate throttling so we do not make too many requests. 
+# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
+def weather_distributed(
+    database: str, 
+    coords: list[tuple], 
+    api_key: str = None, 
+    email: str = None
+    ):
     """
     Grab weather using pvgis for all of the following locations using dask for parallelization.
     You must create a dask client with multiple processes before calling this function, otherwise results will not be properly calculated.
@@ -1051,7 +1066,8 @@ def weather_distributed(database, coords):
     PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads 
     that would put you over this limit. 
 
-    With eventual NSRDB implementation API keys will be an issue, each key is rate limited.
+    NSRDB (including `database="PSM3"`) is rate limited and your key will face restrictions after making too many requests.
+    See rates [here](https://developer.nrel.gov/docs/solar/nsrdb/guide/).
     
     Parameters
     ---------- 
@@ -1060,14 +1076,23 @@ def weather_distributed(database, coords):
     coords: list[tuple]
         list of tuples containing (latitude, longitude) coordinates
         
-        >>> [
+        .. code-block:: python
+
+            coords_example = [
                 (49.95, 1.5),
                 (51.95, -9.5),
                 (51.95, -8.5),
                 (51.95, -4.5),
-                (51.95, -3.5),
-            ]
+                (51.95, -3.5)]
 
+    api_key: str
+        Only required when making NSRDB requests using "PSM3".
+        [NSRDB developer API key](https://developer.nrel.gov/signup/)
+
+    email: str
+        Only required when making NSRDB requests using "PSM3".
+        [NSRDB developer account email associated with `api_key`](https://developer.nrel.gov/signup/)
+    
     Returns
     --------
     weather_ds : xr.Dataset
@@ -1080,10 +1105,10 @@ def weather_distributed(database, coords):
 
     import dask.delayed
 
-    if (database != "PVGIS"):
-        raise NotImplementedError(f"Only 'PVGIS' is implemented, you entered {database}")
+    if (database != "PVGIS" and database != "PSM3"):
+        raise NotImplementedError(f"Only 'PVGIS' and 'PSM3' are implemented, you entered {database}")
 
-    futures = [dask.delayed(_weather_distributed_vec)("PVGIS", coord) for coord in coords]
+    futures = [dask.delayed(_weather_distributed_vec)(database, coord, api_key, email) for coord in coords]
     results = dask.compute(futures)[0] # values are returned in a list with one entry
 
     # what is the difference between these two approaches for dask distributed work, how can we schedule differently
