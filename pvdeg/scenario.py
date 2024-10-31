@@ -1397,6 +1397,27 @@ class GeospatialScenario(Scenario):
         self.meta_data["mountain"] = (self.meta_data.index).isin(gids)
         return
 
+    def meta_KDtree(self, leaf_size=40, fp=None):
+        """
+        Create a KDTree from this scenario's current metadata
+        
+        Parameters
+        ----------
+        leaf_size:
+            Number of points at which to switch to brute-force. See sci kit docs.
+        fp: str, optional
+            Location to save pickled kdtree so we don't have to rebuild the tree.
+            If none, no file saved. must be ``.pkl`` file extension. Open saved
+            pkl file with joblib (sklearn dependency).
+
+        Returns
+        --------
+        kdtree: sklearn.neighbors.KDTree
+            kdtree containing latitude-longitude pairs for quick lookups
+        """
+
+        return pvdeg.geospatial.meta_KDtree(meta_df=self.meta_data, leaf_size=leaf_size, fp=fp)
+
     def classify_feature(
         self,
         kdtree=None,
