@@ -6,8 +6,6 @@ import dask.array as da
 import zarr
 import os
 
-from pvdeg.weather import pvgis_hourly_empty_weather_ds
-
 from pvdeg import METOROLOGICAL_DOWNLOAD_PATH
 
 def get(group):

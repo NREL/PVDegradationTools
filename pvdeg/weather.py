@@ -1034,7 +1034,13 @@ def _weather_distributed_vec(
     return weather_ds, meta_dict, None 
 
 
-def emtpy_weather_ds(gids_size, periodicity, database):
+# THE NSRDB shapes could be moved to their own definition
+# organization style question?
+def emtpy_weather_ds(
+    gids_size, 
+    periodicity, 
+    database
+    )->xr.Dataset:
     """
     Create an empty weather dataframe for generalized input.
     
@@ -1060,8 +1066,7 @@ def emtpy_weather_ds(gids_size, periodicity, database):
 
     import dask.array as da
 
-    # pvgis default shapes
-    shapes = {
+    pvgis_shapes = {
         "temp_air": ("gid", "time"),
         "relative_humidity": ("gid", "time"),
         "ghi": ("gid", "time"),
@@ -1073,15 +1078,22 @@ def emtpy_weather_ds(gids_size, periodicity, database):
         "pressure": ("gid", "time"),
     }
 
-    # additional results from NSRDB
-    nsrdb_extra_shapes = {
+    nsrdb_shapes = {
         'Year': ("gid", "time"), 
         'Month': ("gid", "time"), 
         'Day': ("gid", "time"), 
         'Hour': ("gid", "time"), 
         'Minute': ("gid", "time"), 
+        'temp_air':("gid", "time"), 
         'dew_point': ("gid", "time"), 
-        'albedo': ("gid", "time")
+        'dhi': ("gid", "time"), 
+        'dni': ("gid", "time"), 
+        'ghi': ("gid", "time"), 
+        'albedo': ("gid", "time"),
+        'pressure': ("gid", "time"), 
+        'wind_direction': ("gid", "time"), 
+        'wind_speed' : ("gid", "time"),    
+        'relative_humidity': ("gid", "time"), 
     }
 
     attrs = {}
@@ -1091,63 +1103,20 @@ def emtpy_weather_ds(gids_size, periodicity, database):
     dims_size = {'time': TIME_PERIODICITY_MAP[periodicity], 'gid': gids_size}
 
     if database == "NSRDB" or database == "PSM3":
-        shapes = shapes | nsrdb_extra_shapes
-    
+        # shapes = shapes | nsrdb_extra_shapes
+        shapes = nsrdb_shapes
+    elif database == "PVGIS":
+        shapes = pvgis_shapes
+    else:
+        raise ValueError(f"database must be PVGIS, NSRDB, PSM3 not {database}")
+
+
     weather_ds = xr.Dataset(
         data_vars={
             var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
             for var, dim in shapes.items()
         },
         coords={'time': pd.date_range("2022-01-01", freq=periodicity, periods=TIME_PERIODICITY_MAP[periodicity]),
-                'gid': np.linspace(0, gids_size-1, gids_size, dtype=int)},
-        attrs=global_attrs,
-    )
-
-    return weather_ds
-
-
-
-def pvgis_hourly_empty_weather_ds(gids_size):
-    """
-    Create an empty weather dataset for pvgis hourly TMY data
-    
-    Parameters 
-    ----------
-    gids_size: int
-        number of gids, equivalent to number of unique locations
-
-    Returns
-    -------
-    weather_ds: xarray.Dataset
-        Weather dataset of the same format/shapes given by a `pvdeg.weather.get` geospatial call or `pvdeg.weather.weather_distributed` call or `GeosptialScenario.get_geospatial_data`.
-    """
-    import dask.array as da
-
-
-
-    shapes = {
-        "temp_air": ("gid", "time"),
-        "relative_humidity": ("gid", "time"),
-        "ghi": ("gid", "time"),
-        "dni": ("gid", "time"),
-        "dhi": ("gid", "time"),
-        "IR(h)": ("gid", "time"),
-        "wind_speed": ("gid", "time"),
-        "wind_direction": ("gid", "time"),
-        "pressure": ("gid", "time"),
-    }
-    attrs = {}
-    global_attrs = {}
-
-    dims = {'gid', 'time'}
-    dims_size = {'time': 8760, 'gid': gids_size}
-
-    weather_ds = xr.Dataset(
-        data_vars={
-            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
-            for var, dim in shapes.items()
-        },
-        coords={'time': pd.date_range("2022-01-01", freq="h", periods=365 * 24),
                 'gid': np.linspace(0, gids_size-1, gids_size, dtype=int)},
         attrs=global_attrs,
     )
@@ -1162,6 +1131,7 @@ def pvgis_hourly_empty_weather_ds(gids_size):
 
 # TODO: implement rate throttling so we do not make too many requests. 
 # TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
+# TODO: this overwrites NSRDB GIDS when database == "PSM3"
 def weather_distributed(
     database: str, 
     coords: list[tuple], 
