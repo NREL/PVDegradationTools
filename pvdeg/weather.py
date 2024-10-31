@@ -18,6 +18,25 @@ import dask.dataframe as dd
 import xarray as xr
 
 
+TIME_PERIODICITY_MAP = {
+    # pandas time freq string arg
+    # ideally these should be the same
+    "h" : 8760,
+    "1h" : 8760,
+    "30min": 17520,
+    "15min": 35040,
+}
+
+ENTRIES_PERIODICITY_MAP = {
+    # pandas time freq string arg
+    # ideally these should be the same
+    8760: "1h",
+    17520: "30min",
+    35040: "15min",
+}
+
+
+
 def get(database, id=None, geospatial=False, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
@@ -957,7 +976,8 @@ def get_anywhere(database = "PSM3", id=None, **kwargs):
     return weather_db, meta 
 
 
-def process_pvgis_distributed(weather_df):
+# RENAME, THIS SHOULD NOT REFERENCE PVGIS
+def _process_weather_result_distributed(weather_df):
     """Create an xarray.Dataset using numpy array backend from a pvgis weather dataframe"""
 
     import dask.array as da
@@ -980,9 +1000,22 @@ def _weather_distributed_vec(
     ): 
     """
     Distributed weather calculation for use with dask futures/delayed
+
+    Parameters
+    ----------
+    database: str
+        database/source from `pvdeg.weather.get`
+    coord: tuple[float]
+        (latitude, longitude) coordinate pair. (`pvdeg.weather.get` id)
+    api_key: str
+        NSRDB developer api key (see `pvdeg.weather.get`)
+    email: str
+        NSRDB developer email (see `pvdeg.weather.get`)
     
-    Returns ds, dict, None if unsucessfull
-    Returns None, None, Exception if unsucessfull
+    Returns
+    --------
+        Returns ds, dict, None if unsucessful  
+        Returns None, None, Exception if unsucessful
     """
         
     try:
@@ -996,9 +1029,83 @@ def _weather_distributed_vec(
     except Exception as e:
         return None, None, e
 
-    weather_ds = process_pvgis_distributed(weather_df=weather_df)
+    weather_ds = _process_weather_result_distributed(weather_df=weather_df)
 
     return weather_ds, meta_dict, None 
+
+
+def emtpy_weather_ds(gids_size, periodicity, database):
+    """
+    Create an empty weather dataframe for generalized input.
+    
+    Parameters
+    ---------
+    gids_size: int    
+        number of entries to create along gid axis
+    periodicity: str
+        freqency, pandas `freq` string arg from `pd.date_range`.
+
+        .. code-block:: python
+            "1h"
+            "30min"
+            "15min"
+    database: str
+        database from `pvdeg.weather.get`
+    
+    Returns
+    -------
+    weather_ds: xarray.Dataset
+        Weather dataset of the same format/shapes given by a `pvdeg.weather.get` geospatial call or `pvdeg.weather.weather_distributed` call or `GeosptialScenario.get_geospatial_data`.
+    """
+
+    import dask.array as da
+
+    # pvgis default shapes
+    shapes = {
+        "temp_air": ("gid", "time"),
+        "relative_humidity": ("gid", "time"),
+        "ghi": ("gid", "time"),
+        "dni": ("gid", "time"),
+        "dhi": ("gid", "time"),
+        "IR(h)": ("gid", "time"),
+        "wind_speed": ("gid", "time"),
+        "wind_direction": ("gid", "time"),
+        "pressure": ("gid", "time"),
+    }
+
+    # additional results from NSRDB
+    nsrdb_extra_shapes = {
+        'Year': ("gid", "time"), 
+        'Month': ("gid", "time"), 
+        'Day': ("gid", "time"), 
+        'Hour': ("gid", "time"), 
+        'Minute': ("gid", "time"), 
+        'dew_point': ("gid", "time"), 
+        'albedo': ("gid", "time")
+    }
+
+    attrs = {}
+    global_attrs = {}
+
+    dims = {'gid', 'time'}
+    dims_size = {'time': TIME_PERIODICITY_MAP[periodicity], 'gid': gids_size}
+
+    if database == "NSRDB" or database == "PSM3":
+        shapes = shapes | nsrdb_extra_shapes
+    
+    weather_ds = xr.Dataset(
+        data_vars={
+            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
+            for var, dim in shapes.items()
+        },
+        coords={'time': pd.date_range("2022-01-01", freq=periodicity, periods=TIME_PERIODICITY_MAP[periodicity]),
+                'gid': np.linspace(0, gids_size-1, gids_size, dtype=int)},
+        attrs=global_attrs,
+    )
+
+    return weather_ds
+
+
 
 def pvgis_hourly_empty_weather_ds(gids_size):
     """
@@ -1015,6 +1122,8 @@ def pvgis_hourly_empty_weather_ds(gids_size):
         Weather dataset of the same format/shapes given by a `pvdeg.weather.get` geospatial call or `pvdeg.weather.weather_distributed` call or `GeosptialScenario.get_geospatial_data`.
     """
     import dask.array as da
+
+
 
     shapes = {
         "temp_air": ("gid", "time"),
@@ -1077,7 +1186,6 @@ def weather_distributed(
         list of tuples containing (latitude, longitude) coordinates
         
         .. code-block:: python
-
             coords_example = [
                 (49.95, 1.5),
                 (51.95, -9.5),
@@ -1123,17 +1231,27 @@ def weather_distributed(
 
     gids_failed = []
 
-    weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather xr.dataset
+    time_length = weather_ds_collection[0].sizes["time"]
+    periodicity = ENTRIES_PERIODICITY_MAP[time_length]
+
+    # weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather xr.dataset
+    weather_ds = emtpy_weather_ds(
+        gids_size=len(results),
+        periodicity=periodicity,
+        database=database,
+    )
+
     meta_df = pd.DataFrame.from_dict(meta_dict_collection) # create populated meta pd.DataFrame 
 
-    # these gids will be spatially meaningless, they will only show corresponding entries between weather_ds and meta_df
-    for i, row in enumerate(results): # this loop can be refactored, kinda gross
+    # gids are spatially meaningless if data is from PVGIS, they will only show corresponding entries between weather_ds and meta_df
+    # only meaningfull if data is from NSRDB
+    # this loop can be refactored, it is a little weird
+    for i, row in enumerate(results):
 
         if row[2]:
             gids_failed.append(i)
             continue
 
-        # weather_ds[dict(gid=i)] = weather_ds_collection[i].to_xarray().drop_vars('time')
         weather_ds[dict(gid=i)] = weather_ds_collection[i]
 
     return weather_ds, meta_df, gids_failed
