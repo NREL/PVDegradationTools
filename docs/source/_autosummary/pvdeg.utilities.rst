@@ -26,6 +26,8 @@ pvdeg.utilities
       pvdeg.utilities.get_kinetics
       pvdeg.utilities.get_state_bbox
       pvdeg.utilities.gid_downsampling
+      pvdeg.utilities.linear_normalize
+      pvdeg.utilities.merge_sparse
       pvdeg.utilities.meta_as_dict
       pvdeg.utilities.new_id
       pvdeg.utilities.nrel_kestrel_check
@@ -98,6 +100,20 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.gid_downsampling:
 
    .. minigallery:: pvdeg.utilities.gid_downsampling
+       :add-heading:
+
+   .. autofunction:: linear_normalize
+
+   .. _sphx_glr_backref_pvdeg.utilities.linear_normalize:
+
+   .. minigallery:: pvdeg.utilities.linear_normalize
+       :add-heading:
+
+   .. autofunction:: merge_sparse
+
+   .. _sphx_glr_backref_pvdeg.utilities.merge_sparse:
+
+   .. minigallery:: pvdeg.utilities.merge_sparse
        :add-heading:
 
    .. autofunction:: meta_as_dict

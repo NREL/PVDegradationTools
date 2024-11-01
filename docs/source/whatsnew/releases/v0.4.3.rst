@@ -1,0 +1,10 @@
+v0.4.3 (2024-11-1)
+=======================
+
+Enhancements
+-------------
+``pvdeg.geospatial.analysis`` implements autotemplating. No need to specify a template for common ``pvdeg`` functions during analysis. Manually creating and providing templates is still an option. Docstrings updated with examples.
+
+Contributors
+~~~~~~~~~~~~
+* Tobin Ford (:ghuser:`tobin-ford`)
