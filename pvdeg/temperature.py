@@ -196,7 +196,7 @@ def cell(
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.
 
-    Parameters:
+    Parameters
     -----------
     weather_df : (pd.dataframe)
         Data Frame with minimum requirements of 'temp_air' and 'wind_speed'
@@ -304,7 +304,7 @@ def temperature(
     Calculate the PV cell or module temperature using PVLIB
     Current supports the following temperature models:
 
-    Parameters:
+    Parameters
     -----------
     cell_or_mod : (str)
         choose to calculate the cell or module temperature. Use
@@ -347,12 +347,12 @@ def temperature(
         keyword argument dictionary used for the pvlib temperature model calculation.
         See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
-    Return:
+    Return
     -------
     temp_cell : pandas.DataFrame
         This is the temperature of the cell in a module at every time step.[°C]
 
-    References:
+    References
     -----------
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
