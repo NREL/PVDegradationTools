@@ -1092,6 +1092,8 @@ class GeospatialScenario(Scenario):
         geospatial=False,
         weather_data: xr.Dataset = None,
         meta_data: pd.DataFrame = None,
+        func: Callable = None,
+        template: xr.Dataset = None,
     ):
         super().__init__(
             name=name,
@@ -1106,6 +1108,8 @@ class GeospatialScenario(Scenario):
         )
         self.geospatial = geospatial
         self.hpc = hpc
+        self.func = func
+        self.template = template
 
     def __eq__(self, other):
         raise NotImplementedError("""
@@ -1658,7 +1662,7 @@ class GeospatialScenario(Scenario):
         if template is None:
 
             # take the weather datapoints specified by metadata and create a template based on them.
-            geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index)
+            self.weather_data = self.weather_data.sel(gid=self.meta_data.index)
             template = pvdeg.geospatial.auto_template(func=func, ds_gids=self.weather_data)
 
         self.template = template
