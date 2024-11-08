@@ -2060,7 +2060,7 @@ class GeospatialScenario(Scenario):
             </div>
             <div>
                 <h3>Geospatial Job</h3>
-                Function : {self.func}
+                Function : {self.func.__name__}
                 {self.format_template()}
             </div>
             <div>
