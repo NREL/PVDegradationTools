@@ -1594,49 +1594,88 @@ class GeospatialScenario(Scenario):
         self.weather_data, self.meta_data = weather_ds, meta_df
 
 
+    # def addJob(
+    #     self,
+    #     func: Callable = None,
+    #     func_params: dict = {},
+    #     see_added: bool = False,
+    # ):
+    #     """
+    #     Add a pvdeg function to the scenario pipeline
+
+    #     Parameters:
+    #     -----------
+    #     func : function
+    #         pvdeg function to use for geospatial analysis.
+    #         *Note: geospatial analysis is only available with a limited subset of pvdeg
+    #         functions*
+    #         Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``,
+    #         ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
+    #     func_params : dict
+    #         job specific keyword argument dictionary to provide to the function
+    #     see_added : bool
+    #         set flag to get a userWarning notifying the user of the job added
+    #        to the pipeline in method call. ``default = False``
+    #     """
+    #     try:
+    #         pvdeg.geospatial.template_parameters(func)
+    #     except ValueError:
+    #         return ValueError(
+    #             f"{func.__name__} does does not have a valid geospatial results template or does not exist"
+    #         )
+
+    #     geo_job_dict = {"geospatial_job": {"job": func, "params": func_params}}
+
+    #     self.pipeline = geo_job_dict
+
+    #     if see_added:
+    #         message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
+    #         warnings.warn(message, UserWarning)
+
     def addJob(
         self,
-        func: Callable = None,
+        func: Callable,
+        template: xr.Dataset = None,
         func_params: dict = {},
-        see_added: bool = False,
-    ):
+        see_added: bool = False
+    ) -> None:
         """
-        Add a pvdeg function to the scenario pipeline
+        Add a pvdeg geospatial function to the scenario pipeline. If no template is provided, `addJob` attempts to use `geospatial.auto_template` this will raise an 
 
         Parameters:
         -----------
         func : function
-            pvdeg function to use for geospatial analysis.
-            *Note: geospatial analysis is only available with a limited subset of pvdeg
-            functions*
-            Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``,
-            ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
+            pvdeg function to use for geospatial analysis. 
+        template : xarray.Dataset
+            Template for output data. Only required if a function is not supported by `geospatial.auto_template`.
         func_params : dict
             job specific keyword argument dictionary to provide to the function
         see_added : bool
             set flag to get a userWarning notifying the user of the job added
-           to the pipeline in method call. ``default = False``
+            to the pipeline in method call. ``default = False``
         """
-        try:
-            pvdeg.geospatial.template_parameters(func)
-        except ValueError:
-            return ValueError(
-                f"{func.__name__} does does not have a valid geospatial results template or does not exist"
-            )
 
-        geo_job_dict = {"geospatial_job": {"job": func, "params": func_params}}
+        if template is None:
 
-        self.pipeline = geo_job_dict
+            # take the weather datapoints specified by metadata and create a template based on them.
+            geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index)
+            template = pvdeg.geospatial.auto_template(func=func, ds_gids=self.weather_data)
+
+        self.template = template
+        self.func = func
+        self.func_params = func_params
 
         if see_added:
-            message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
+            message = f"{func.__name__} added to scenario with arguments {func_params} using template: {template}"
             warnings.warn(message, UserWarning)
+
+
 
     def run(self, hpc_worker_conf: Optional[dict] = None) -> None:
         """
-        Run the function in the geospatial pipeline.
-        GeospatialScenario only supports one geospatial pipeline job at a time
-        unlike Scenario which supports unlimited conventional pipeline jobs.
+        Run the geospatial scenario stored in the geospatial scenario object.
+
+        Only supports one function at a time. Unlike `Scenario` which supports unlimited conventional pipeline jobs.
         Results are stored in the `GeospatialScenario.results` attribute.
 
         Creates a dask cluster or client using the hpc_worker_conf parameter.
@@ -1675,20 +1714,14 @@ class GeospatialScenario(Scenario):
         """
         client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
 
-        geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index)
+        analysis_result = pvdeg.geospatial.analysis(
+            weather_ds=self.weather_data,
+            meta_df=self.meta_data,
+            func=self.func,
+            template=self.template, # provided or generated via autotemplate in GeospatialScenario.addJob
+        )
 
-        func = self.pipeline["geospatial_job"]["job"]
-
-        if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
-            geo = {
-                "func": func,
-                "weather_ds": geo_weather_sub,
-                "meta_df": self.meta_data,
-            }
-
-            analysis_result = pvdeg.geospatial.analysis(**geo)
-
-            self.results = analysis_result
+        self.results = analysis_result
 
         client.shutdown()
 

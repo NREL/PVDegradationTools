@@ -7,6 +7,7 @@ from . import (
     humidity,
     letid,
     utilities,
+    decorators,
 )
 
 import xarray as xr
@@ -328,6 +329,7 @@ def output_template(
 
 # This has been replaced with pvdeg.geospatial.auto_templates inside of pvdeg.geospatial.analysis.
 # it is here for completeness. it can be removed.
+@decorators.deprecated(reason="use geospatial.auto_template or create a template with geospatial.output_template")
 def template_parameters(func):
     """
     Output parameters for xarray template.
@@ -445,6 +447,28 @@ def zero_template(
 
     return res
 
+def can_auto_template(func) -> None:
+    """
+    Check if we can use `geospatial.auto_template on a given function.
+
+    Raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
+    No error raised if we can run `geospatial.auto_template` on provided function, `func`.
+    
+    Parameters
+    ----------
+    func: callable
+        function to create template from. 
+
+    Returns
+    -------
+    None
+    """
+    if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
+        raise ValueError(
+            f"{func.__name__} cannot be autotemplated. create a template manually"
+        )
+
+
 
 def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
@@ -484,10 +508,11 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
         Template for output data.
     """
 
-    if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
-        raise ValueError(
-            f"{func.__name__} cannot be autotemplated. create a template manually"
-        )
+    can_auto_template(func=func)
+    # if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
+    #     raise ValueError(
+    #         f"{func.__name__} cannot be autotemplated. create a template manually"
+    #     )
 
     if func.numeric_or_timeseries == 0:
         shapes = {datavar: ("gid",) for datavar in func.shape_names}
