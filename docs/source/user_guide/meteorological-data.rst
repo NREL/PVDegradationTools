@@ -3,7 +3,7 @@
 Meterological Data
 ==================
 
-PVDeg seeks to automate the tedious parts of degredation analysis by providing simple tools to work with weather data. 
+PVDeg seeks to automate the tedious parts of degradation analysis by providing simple tools to work with weather data. 
 ``pvdeg.weather.get`` seeks to unify this functionality into a simple function.
 
 The PVDeg tutorials and examples use two datasets, `NSRDB`_ and `PVGIS`_. These are serially complete data including meteorological data and solar radiation (irradiance) measurements.
