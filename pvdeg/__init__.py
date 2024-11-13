@@ -9,10 +9,11 @@ from . import degradation
 from . import design
 from . import fatigue
 from . import geospatial
+from .geospatialscenario import GeospatialScenario
 from . import humidity
 from . import letid
 from . import montecarlo
-from .scenario import Scenario, GeospatialScenario
+from .scenario import Scenario
 from . import spectral
 from . import symbolic
 from . import standards
