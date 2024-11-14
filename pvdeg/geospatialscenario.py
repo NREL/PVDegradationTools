@@ -11,11 +11,14 @@ import xarray as xr
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List, Union, Optional, Callable
+from dask.distributed import Client
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
 from pvdeg.scenario import Scenario
+
+pvdeg.geospatial.start_dask
 
 class GeospatialScenario(Scenario):
     def __init__(
@@ -33,6 +36,7 @@ class GeospatialScenario(Scenario):
         meta_data: pd.DataFrame = None,
         func: Callable = None,
         template: xr.Dataset = None,
+        dask_client: Client = None,
     ):
         super().__init__(
             name=name,
@@ -49,6 +53,7 @@ class GeospatialScenario(Scenario):
         self.hpc = hpc
         self.func = func
         self.template = template
+        self.dask_client = dask_client
         self.kdtree = None # sklearn kdtree
 
     def __eq__(self, other):
@@ -57,8 +62,46 @@ class GeospatialScenario(Scenario):
             due to larger than memory/out of memory datasets stored in 
             GeospatialScenario.weather_data attribute.
             """)
-                                 
 
+    def start_dask(self, hpc=None) -> None:
+        """
+            Starts a dask cluster for parallel processing.
+
+            Parameters
+            ----------
+            hpc : dict
+                Dictionary containing dask hpc settings (see examples below).
+                Supply `None` for a default configuration.
+
+            Examples
+            --------
+            Local cluster:
+
+            .. code-block:: python
+
+                hpc = {'manager': 'local',
+                    'n_workers': 1,
+                    'threads_per_worker': 8,
+                    'memory_limit': '10GB'}
+
+            SLURM cluster:
+
+            .. code-block:: python
+
+                kestrel = {
+                    'manager': 'slurm',
+                    'n_jobs': 1,  # Max number of nodes used for parallel processing
+                    'cores': 104,
+                    'memory': '246GB',
+                    'account': 'pvsoiling',
+                    'walltime': '4:00:00',
+                    'processes': 52,
+                    'local_directory': '/tmp/scratch',
+                    'job_extra_directives': ['-o ./logs/slurm-%j.out'],
+                    'death_timeout': 600,}
+        """
+        self.dask_client = pvdeg.geospatial.start_dask()
+                                 
     # add restoring from gids functionality from nsrdb
     def addLocation(
         self,
@@ -605,12 +648,13 @@ class GeospatialScenario(Scenario):
         Only supports one function at a time. Unlike `Scenario` which supports unlimited conventional pipeline jobs.
         Results are stored in the `GeospatialScenario.results` attribute.
 
-        Creates a dask cluster or client using the hpc_worker_conf parameter.
+        Creates a dask client if it has not been initialized previously with `GeospatialScenario.start_dask`.
 
         Parameters:
         -----------
         hpc_worker_conf : dict
             Dictionary containing dask hpc settings (see examples below).
+            When `None`, a default configuration is used. 
 
             Examples
             --------
@@ -639,7 +683,12 @@ class GeospatialScenario(Scenario):
                     'job_extra_directives': ['-o ./logs/slurm-%j.out'],
                     'death_timeout': 600,}
         """
-        client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
+        if self.dask_client and hpc_worker_conf:
+            raise ValueError(f"Dask Client already exists, cannot configure new client.")
+        elif not self.dask_client:
+            self.dask_client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
+        
+        print("Dashboard:", self.dask_client.dashboard_link)
 
         analysis_result = pvdeg.geospatial.analysis(
             weather_ds=self.weather_data,
@@ -650,7 +699,7 @@ class GeospatialScenario(Scenario):
 
         self.results = analysis_result
 
-        client.shutdown()
+        self.dask_client.shutdown()
 
     def restore_result_gids(self):
         """
@@ -987,6 +1036,15 @@ class GeospatialScenario(Scenario):
                 <p><strong>self.template:</strong> {self.format_template()}</p>
             """
 
+        return ""
+
+    def format_dask_link(self):
+        if self.dask_client:
+            return f"""
+                <a href="{self.dask_client.dashboard_link}" target="_blank">{self.dask_client.dashboard_link}</a></p>
+            """
+        return ""
+
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
@@ -1014,6 +1072,10 @@ class GeospatialScenario(Scenario):
             <div>
                 <h3>self.meta_data</h3>
                 {self.format_geo_meta()}
+            </div>
+            <div>
+                <h3>self.dask_client</h3>
+                {self.format_dask_link()}
             </div>
         </div>
         <p><i>All attributes can be accessed by the names shown above.</i></p>
