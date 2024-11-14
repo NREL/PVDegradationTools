@@ -236,6 +236,7 @@ class Scenario:
         module_name: str = None,
         racking: str = "open_rack_glass_polymer",
         material: str = "OX003",
+        material_file: str = "O2permeation",
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
@@ -245,23 +246,27 @@ class Scenario:
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
         the given scenario.
 
-        Parameters:
+        Parameters
         -----------
-        module_name : (str)
+        module_name : str
             unique name for the module. adding multiple modules of the same name will replace the
             existing entry.
-        racking : (str)
+        racking : str
             temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
-        material : (str)
+        material : str
             Key of the material desired. For a complete list, see pvdeg/data/O2permeation.json
             or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
-        temp_model : (str)
+        material_file : str
+            Material file used to access parameters from.
+            Use material json file in `pvdeg/data`. Options:
+            >>> "AApermeation", "H2Opermeation", "O2permeation"
+        temp_model : str
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
             Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
-        model_kwarg : (dict), optional
+        model_kwarg : dict, (optional)
             provide a dictionary of temperature model coefficents to be used
             instead of pvlib defaults. Some models will require additional
             arguments such as ``ross`` which requires nominal operating cell
@@ -269,14 +274,15 @@ class Scenario:
             should be provided.
             Pvlib temp models:
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
-        irradiance_kwarg : (dict), optional
+        irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         see_added : (bool), optional
         """
 
         try:
-            mat_params = utilities._read_material(name=material)
+            mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
+            # mat_params = utilities._read_material(name=material)
         except KeyError:
             print("Material Not Found - No module added to scenario.")
             print("If you need to add a custom material, use .add_material()")
@@ -302,9 +308,9 @@ class Scenario:
         if see_added:
             print(f'Module "{module_name}" added.')
 
-    # test this?
+    # add testing
     def add_material(
-        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True
+        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname="O2permeation.json",
     ):
         """
         add a new material type to main list
@@ -319,6 +325,7 @@ class Scenario:
             Eap=Eap,
             Po=Po,
             fickian=fickian,
+            fname="O2permeation.json",
         )
         print("Material has been added.")
         print("To add the material as a module in your current scene, run .addModule()")
