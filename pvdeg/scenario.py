@@ -325,7 +325,7 @@ class Scenario:
             Eap=Eap,
             Po=Po,
             fickian=fickian,
-            fname="O2permeation.json",
+            fname=fname,
         )
         print("Material has been added.")
         print("To add the material as a module in your current scene, run .addModule()")
