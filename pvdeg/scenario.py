@@ -875,32 +875,33 @@ class Scenario:
 
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
-            <h2>{self.name}: Scenario Analysis</h2>
-            <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>GIDs:</strong> {self.gids}</p>
-            <p><strong>Email:</strong> {self.email}</p>
-            <p><strong>API Key:</strong> {self.api_key}</p>
+            <h2>self.name: {self.name}</h2>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.gids:</strong> {self.gids}</p>
+            <p><strong>self.email:</strong> {self.email}</p>
+            <p><strong>self.api_key:</strong> {self.api_key}</p>
             <div>
-                <h3>Results</h3>
+                <h3>self.results</h3>
                 {self.format_results() if self.results else None}
             </div>
             <div>
-                <h3>Pipeline</h3>
+                <h3>self.pipeline</h3>
                 {self.format_pipeline()}
             </div>
             <div>
-                <h3>Modules</h3>
+                <h3>self.modules</h3>
                 {self.format_modules()}
             </div>
             <div>
-                <h3>Weather Data</h3>
+                <h3>self.weather_data</h3>
                 {self.format_weather()}
             </div>
             <div>
-                <h3>Meta Data</h3>
+                <h3>self.meta_data</h3>
                 {self.meta_data}
             </div>
         </div>
+        <p><i>All attributes can be accessed by the names shown above.</i></p>
         <script>
             function toggleVisibility(id) {{
                 var content = document.getElementById(id);

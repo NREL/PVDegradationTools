@@ -980,64 +980,43 @@ class GeospatialScenario(Scenario):
         if not iterable.issubset(to_check):
             raise ValueError(f"All of iterable: {iterable} does not exist in {to_check}")
 
-    
-    # GeospatialScenario no longer uses pipeline, instead job attributes are stored in attrbutes "func", "template"
-    # def format_pipeline(self):
-    #     pipeline_html = "<div>"
-    #     if "geospatial_job" in self.pipeline:
-    #         step_name = "geospatial_job"
-    #         step = self.pipeline[step_name]
-    #         params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
-
-    #         step_content = f"""
-    #         <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
-    #             <h4 style="font-family: monospace; margin: 0;">
-    #                 <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
-    #                 {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
-    #             </h4>
-    #         </div>
-    #         <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-    #             <p>Job: {step['job'].__name__}</p>
-    #             <p>Parameters:</p>
-    #             <div style="margin-left: 20px;">
-    #                 {params_html}
-    #             </div>
-    #         </div>
-    #         """
-    #         pipeline_html += step_content
-    #     pipeline_html += "</div>"
-    #     return pipeline_html
+    def format_geospatial_work(self):
+        if self.func:
+            return f"""
+                <p><strong>self.func:</strong> {self.func.__name__}</p>
+                <p><strong>self.template:</strong> {self.format_template()}</p>
+            """
 
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
-            <h2>{self.name}: Scenario Analysis</h2>
-            <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
-            <p><strong>GIDs:</strong> {self.gids}</p>
+            <h2>self.name: {self.name}</h2>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.hpc:</strong> {self.hpc}</p>
+            <p><strong>self.gids:</strong> {self.gids}</p>
             <div>
-                <h3>Results</h3>
+                <h3>self.results</h3>
                 {self.format_results() if self.results else None}
             </div>
             <div>
-                <h3>Geospatial Job</h3>
-                Function : {self.func.__name__}
-                {self.format_template()}
+                <h3>Geospatial Work</h3>
+                {self.format_geospatial_work()}
             </div>
             <div>
-                <h3>Modules</h3>
+                <h3>self.modules</h3>
                 {super().format_modules()}
             </div>
             <div>
-                <h3>Weather Dataset</h3>
+                <h3>self.weather_data</h3>
                 {self.format_geo_weather()}
             </div>
             <div>
-                <h3>Meta Dataframe</h3>
+                <h3>self.meta_data</h3>
                 {self.format_geo_meta()}
             </div>
         </div>
+        <p><i>All attributes can be accessed by the names shown above.</i></p>
         <script>
             function toggleVisibility(id) {{
                 var content = document.getElementById(id);
