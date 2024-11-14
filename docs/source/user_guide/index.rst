@@ -11,7 +11,7 @@ User Guide
    meteorological-data
    NSRDB_API_Key
    montecarlo
-   geospatial-templates
+   geospatial
    pv-variables-terms
    contributing
    

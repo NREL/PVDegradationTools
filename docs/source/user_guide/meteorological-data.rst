@@ -9,6 +9,7 @@ PVDeg seeks to automate the tedious parts of degradation analysis by providing s
 The PVDeg tutorials and examples use two datasets, `NSRDB`_ and `PVGIS`_. These are serially complete data including meteorological data and solar radiation (irradiance) measurements.
 The methodology for these datasets varies but both are gridded geospatial datasets with similar attributes.
 
+.. _NSRDB:
 NSRDB 
 ------
 The NSRDB is produced by NREL and combines multiple datasets but we are most concerned with `Physical Solar Model 3 (PSM3) <https://developer.nrel.gov/docs/solar/nsrdb/psm3-2-2-download/>`_. This data was generated using satellite data from multiple channels to derive cloud 
@@ -31,6 +32,8 @@ NSRDB data are seperated by satellite/model source. Each dataset is shown below,
 
 `<https://nsrdb.nrel.gov/about/what-is-the-nsrdb>`_
 
+
+.. _PVGIS:
 PVGIS
 ------
 `PVGIS`_ is the European counterpart of the `NSRDB`_. The data was sourced similarly. With PVGIS we are most concerned with a `typical meteorological year <https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-tools/pvgis-typical-meteorological-year-tmy-generator_en>`_.
@@ -55,4 +58,32 @@ Sources for PVGIS 5.3
 
 `<https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-53_en>`_ 
 
-**demonstrations of ``weather.get`` for each type**
+.. _GIDS:
+Issues with Gids
+----------------
+
+"Gids", plural or "gid" singular refer to a geospatial id. This is where the simplicity ends because gids are largely meaningless.
+
+When using ``pvdeg.weather.get`` to grab PVGIS data as follows. We will get a gid back but it will always be the same because PVGIS gids are meaningless. The gids created during this process only serve as indexes.
+
+.. code-block:: Python
+
+    weather_df, meta_df = pvdeg.weather.get(
+        database="PVGIS",
+        id = (<lat>, <lon>),
+    )
+
+
+When using the NSRDB PSM3 dataset, gids are unique only to their satellite. Because of this, gids can only be treated as unique if we can guarantee only one satellite source is being utilized. 
+This is possible but causes headaches.
+
+.. code-block:: Python
+
+    weather_df, meta_df = pvdeg.weather.get(
+        database="PSM3",
+        id = (<lat>, <lon>),
+        email = <myemail>,
+        api_key = <api_key>,
+    )
+
+Takeaway: gids are not unique or necessarily meaningful, be careful when using them. Duplicate gids can exist in geospatial data and will be loaded using Xarray without raising an error.
