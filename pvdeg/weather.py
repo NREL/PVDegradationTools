@@ -16,9 +16,10 @@ import numpy as np
 import h5py
 import dask.dataframe as dd
 import xarray as xr
+from geopy.geocoders import Nominatim
 
 
-def get(database, id=None, geospatial=False, **kwargs):
+def get(database, id=None, geospatial=False, find_meta: bool=None , **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function
@@ -35,6 +36,9 @@ def get(database, id=None, geospatial=False, **kwargs):
         dask dataframe. This is useful for large scale geospatial analyses on
         distributed compute systems. Geospaital analyses are only supported for
         NSRDB data and locally stored h5 files that follow pvlib conventions.
+    find_meta : (bool)
+        if true, this instructs the code to look up additional meta data. 
+        The default is True if geospatial is False.
     **kwargs :
         Additional keyword arguments to pass to the get_weather function
         (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
@@ -47,6 +51,8 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
     """
 
+    if find_meta == None:
+        find_meta = not(geospatial)
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     if type(id) is tuple:
@@ -97,6 +103,8 @@ def get(database, id=None, geospatial=False, **kwargs):
         # switch weather data headers and metadata to pvlib standard
         map_weather(weather_df)
         map_meta(meta)
+        if find_meta:
+            meta=find_metadata(meta)
 
         if "relative_humidity" not in weather_df.columns:
             print('\r','Column "relative_humidity" not found in DataFrame. Calculating...', end='')
@@ -121,7 +129,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         return weather_ds, meta_df
 
 
-def read(file_in, file_type, map_variables=True, **kwargs):
+def read(file_in, file_type, map_variables=True, find_meta=True, **kwargs):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
@@ -163,6 +171,8 @@ def read(file_in, file_type, map_variables=True, **kwargs):
     if map_variables == True:
         map_weather(weather_df)
         map_meta(meta)
+    if find_meta:
+        meta=find_metadata(meta)
 
     if weather_df.index.tzinfo is None:
         tz = "Etc/GMT%+d" % -meta["tz"]
@@ -265,12 +275,24 @@ def map_meta(meta):
         "Dew Point": "dew_point",
         "Longitude": "longitude",
         "Latitude": "latitude",
+        "state": "State",
+        "county": "County",
+        "country": "Country",
+        "Neighborhood": "neighbourhood" ,
+        "country_code": "Country Code" ,
+        "postcode": "Zipcode",
+        "road": "Street",
+        "village": "City",
+        "city": "City",
+        "town": "City",
     }
 
     # map meta-names as needed
     for key in [*meta.keys()]:
         if key in META_MAP.keys():
             meta[META_MAP[key]] = meta.pop(key)
+    if "Country Code" in meta.keys():
+        meta["Country Code"]=meta["Country Code"].upper()
 
     return meta
 
@@ -931,3 +953,33 @@ def get_anywhere(database = "PSM3", id=None, **kwargs):
                 weather_db = {'result': 'NA'}
 
     return weather_db, meta 
+
+def find_metadata(meta):
+    """
+    Fills in missing meta data for a geographic location. 
+    The meta dictionary must have longitude and latitude information.
+    Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
+    It will only replace empty keys and those with one character of length.
+
+    Parameters:
+    -----------
+    meta : (dict)
+        Dictionary of metadata for the weather data
+
+    Returns:
+    --------
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
+    geolocator = Nominatim(user_agent="geoapiexercises")
+    location = geolocator.reverse(str(meta['latitude']) + ',' + str(meta['longitude'])).raw['address']
+    map_meta(location)
+
+    for key in [*location.keys()]:
+        if key in meta.keys():
+            if len(meta[key])<2:
+                meta[key] = location[key]
+        else:
+            meta[key] = location[key]
+
+    return meta
