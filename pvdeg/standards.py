@@ -208,7 +208,7 @@ def standoff(
     weather_df: pd.DataFrame = None,
     meta: dict = None,
     weather_kwarg: dict = None,
-    tilt: Union[float, int] = None,
+    tilt: Union[float, int, str] = None,
     azimuth: Union[float, int] = None,
     sky_model: str = "isotropic",
     temp_model: str = "sapm",
@@ -220,6 +220,7 @@ def standoff(
     x_0: float = 6.5,  # [cm]
     wind_factor: float = 0.33,
     irradiance_kwarg={},
+    tracker_irradiance_kwarg={},
     model_kwarg={},
 ) -> pd.DataFrame:
     """
@@ -239,7 +240,8 @@ def standoff(
     weather_kwarg : dict
         other variables needed to access a particular weather dataset.
     tilt : float, optional
-        Tilt angle of PV system relative to horizontal. [°]
+        Tilt angle of rack mounted PV system relative to horizontal. [°]
+        If tracker mounted, specify keyword '1_axis'
     azimuth : float, optional
         Azimuth angle of PV system relative to north. [°]
     sky_model : str, optional
@@ -316,16 +318,29 @@ def standoff(
 
     solar_position = spectral.solar_position(weather_df, meta)
 
-    irradiance_dict = {
-        "sol_position": solar_position,
-        "tilt": tilt,
-        "azimuth": azimuth,
-        "sky_model": sky_model,
-    }
+    if tilt == "1_axis":
+        irradiance_dict = {
+            "sol_position": solar_position,
+            "axis_azimuth": azimuth,
+            "sky_model": sky_model,
+        }
+        poa = spectral.poa_irradiance_tracker(
+            weather_df=weather_df,
+            meta=meta,
+            **irradiance_dict | tracker_irradiance_kwarg,
+        )
 
-    poa = spectral.poa_irradiance(
-        weather_df=weather_df, meta=meta, **irradiance_dict | irradiance_kwarg
-    )
+    else:
+        irradiance_dict = {
+            "sol_position": solar_position,
+            "tilt": tilt,
+            "azimuth": azimuth,
+            "sky_model": sky_model,
+        }
+
+        poa = spectral.poa_irradiance(
+            weather_df=weather_df, meta=meta, **irradiance_dict | irradiance_kwarg
+        )
 
     T_0 = temperature.temperature(
         cell_or_mod="cell",
