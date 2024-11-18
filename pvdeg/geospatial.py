@@ -85,7 +85,7 @@ def start_dask(hpc=None):
 
     client = Client(cluster)
     print("Dashboard:", client.dashboard_link)
-    client.wait_for_workers(n_workers=1)
+    # client.wait_for_workers(n_workers=1)
 
     return client
 
@@ -927,7 +927,10 @@ def elevation_stochastic_downselect(
 
 
 def interpolate_analysis(
-    result: xr.Dataset, data_var: str, method="nearest", resolution=100j,
+    result: xr.Dataset,
+    data_var: str,
+    method="nearest",
+    resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Interpolate sparse spatial result data against DataArray coordinates.
@@ -965,12 +968,12 @@ def interpolate_analysis(
 
 # api could be updated to match that of plot_USA
 def plot_sparse_analysis(
-    result: xr.Dataset, 
-    data_var: str, 
-    method="nearest", 
-    resolution:complex=100j,
-    figsize:tuple=(10,8),
-    show_plot:bool=False,
+    result: xr.Dataset,
+    data_var: str,
+    method="nearest",
+    resolution: complex = 100j,
+    figsize: tuple = (10, 8),
+    show_plot: bool = False,
 ) -> None:
     """
     Plot the output of a sparse geospatial analysis using interpolation.
@@ -982,7 +985,7 @@ def plot_sparse_analysis(
     data_var: str
         name of datavariable to plot from result
     method: str
-        interpolation method. 
+        interpolation method.
         Options: `'nearest', 'linear', 'cubic'`
         See [`scipy.interpolate.griddata`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html)
     resolution: complex
@@ -1000,7 +1003,9 @@ def plot_sparse_analysis(
     )
 
     fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False) # these should be the same ccrs
+    ax = fig.add_axes(
+        [0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False
+    )  # these should be the same ccrs
     ax.patch.set_visible(False)
 
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
@@ -1010,7 +1015,7 @@ def plot_sparse_analysis(
         extent=extent,
         origin="lower",
         cmap="viridis",
-        transform=ccrs.PlateCarree(), # why are ccrs different
+        transform=ccrs.PlateCarree(),  # why are ccrs different
     )
 
     shapename = "admin_1_states_provinces_lakes"
@@ -1031,22 +1036,22 @@ def plot_sparse_analysis(
     plt.title(f"Interpolated Sparse Analysis, {data_var}")
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
-    
+
     if show_plot:
         plt.show()
 
     return fig, ax
 
+
 def plot_sparse_analysis_land(
-    result: xr.Dataset, 
-    data_var: str, 
-    method="nearest", 
-    resolution:complex=100j,
-    figsize:tuple=(10,8),
-    show_plot:bool=False,
+    result: xr.Dataset,
+    data_var: str,
+    method="nearest",
+    resolution: complex = 100j,
+    figsize: tuple = (10, 8),
+    show_plot: bool = False,
     proj=ccrs.PlateCarree(),
 ):
-
     import matplotlib.path as mpath
     from cartopy.mpl.patch import geos_to_path
 
@@ -1061,7 +1066,7 @@ def plot_sparse_analysis_land(
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
     ax.set_extent(extent, crs=proj)
 
-    mesh = ax.pcolormesh(lon, lat, grid_values, transform=proj, cmap='viridis')
+    mesh = ax.pcolormesh(lon, lat, grid_values, transform=proj, cmap="viridis")
 
     land_path = geos_to_path(list(cfeature.LAND.geometries()))
     land_path = mpath.Path.make_compound_path(*land_path)
@@ -1078,15 +1083,15 @@ def plot_sparse_analysis_land(
         proj,
         facecolor="none",
         edgecolor="black",
-        linestyle=':'
+        linestyle=":",
     )
 
     cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
     cbar.set_label("Value")
 
     utilities._add_cartopy_features(
-        ax=ax, 
-        features = [
+        ax=ax,
+        features=[
             cfeature.BORDERS,
             cfeature.COASTLINE,
             cfeature.LAND,
