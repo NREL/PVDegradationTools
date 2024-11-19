@@ -131,6 +131,7 @@ def poa_irradiance_fixed(
     tilt=None,
     azimuth=None,
     sky_model="isotropic",
+    **kwargs_irradiance,
 ) -> pd.DataFrame:
     """
     Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
@@ -164,7 +165,7 @@ def poa_irradiance_fixed(
         try:
             tilt = float(meta["tilt"])
         except:
-            tilt = float(meta["latitude"])
+            tilt = float(abs(meta["latitude"]))
             print(
                 f"The array tilt angle was not provided, therefore the latitude tilt of {tilt:.1f} was used."
             )
@@ -218,6 +219,7 @@ def poa_irradiance_tracker(
     gcr=0.2857142857142857,
     cross_axis_tilt=0,
     sky_model="isotropic",
+    **kwargs_irradiance,
 ) -> pd.DataFrame:
     """
     Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
@@ -247,17 +249,15 @@ def poa_irradiance_tracker(
          'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
     """
 
-    if axis_azimuth is None:  # Sets the default orientation to equator facing.
+    if axis_azimuth is None:  # Sets the default orientation to north-south.
         try:
-            axis_azimuth = float(meta["azimuth"])
+            axis_azimuth = float(meta["axis_azimuth"])
         except:
             if float(meta["latitude"]) < 0:
                 axis_azimuth = 0
             else:
                 axis_azimuth = 180
-                print(
-                    f"The array azimuth was not provided, therefore an azimuth of {axis_azimuth:.1f} was used."
-                )
+                print(f"The array axis_azimuth was not provided, therefore an azimuth of {axis_azimuth:.1f} was used.")
 
     if sol_position is None:
         sol_position = solar_position(weather_df, meta)
