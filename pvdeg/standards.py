@@ -241,7 +241,7 @@ def standoff(
         other variables needed to access a particular weather dataset.
     tilt : float, optional
         Tilt angle of rack mounted PV system relative to horizontal. [°]
-        If tracker mounted, specify keyword '1_axis'
+        If single-axis tracker mounted, specify keyword 'single_axis'
     azimuth : float, optional
         Azimuth angle of PV system relative to north. [°]
     sky_model : str, optional
@@ -318,7 +318,7 @@ def standoff(
 
     solar_position = spectral.solar_position(weather_df, meta)
 
-    if tilt == "1_axis":
+    if tilt == "single_axis":
         irradiance_dict = {
             "sol_position": solar_position,
             "axis_azimuth": azimuth,
