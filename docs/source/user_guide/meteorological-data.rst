@@ -1,4 +1,4 @@
-.. _meteorological-data.rst:
+.. _meteorological-data:
 
 Meterological Data
 ==================
@@ -44,19 +44,10 @@ PVGIS is free to use and does NOT require an api-key. It has a rate limit of 30 
 The PVDeg tutorials and examples use two datasets, `NSRDB`_ and `PVGIS`_. These are serially complete data including meteorological data and solar radiation (irradiance) measurements.
 The methodology for these datasets varies but both are gridded geospatial datasets with similar attributes.
 
-PVGIS data are seperated by satellite/model source. Each satellite source for PVGIS 5.2 is shown below.
+PVGIS data are seperated by satellite/model source. Visit the links below for more information about the datasets.
 
-.. image::  meteorological-data-details/pvgis-52.png
-    :alt: PVGIS 5.2 satellite sources, image missing
-
-`<https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-52_en>`_
-
-Sources for PVGIS 5.3
-
-.. image::  meteorological-data-details/pvgis-53.png
-    :alt: PVGIS 5.3 satellite sources, image missing
-
-`<https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-53_en>`_ 
+- `PVGIS 5.2 <https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-52_en>`_
+- `PVGIS 5.3 <https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-53_en>`_ 
 
 .. _GIDS:
 Issues with Gids

@@ -12,6 +12,7 @@ User Guide
    NSRDB_API_Key
    montecarlo
    geospatial
+   materials
    pv-variables-terms
    contributing
    
