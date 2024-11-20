@@ -24,23 +24,23 @@ def map_model(temp_model: str, cell_or_mod: str) -> callable:
 
     # double check that models are in correct maps
     module = {  # only module
-        "sapm": pvlib.temperature.sapm_module,
-        "sapm_mod": pvlib.temperature.sapm_module,
+        "sapm"          : pvlib.temperature.sapm_module,
+        "sapm_mod"      : pvlib.temperature.sapm_module,
     }
 
     cell = {  # only cell
-        "sapm": pvlib.temperature.sapm_cell,
-        "sapm_cell": pvlib.temperature.sapm_cell,
-        "pvsyst": pvlib.temperature.pvsyst_cell,
-        "ross": pvlib.temperature.ross,
-        "noct_sam": pvlib.temperature.noct_sam,
+        "sapm"          : pvlib.temperature.sapm_cell,
+        "sapm_cell"     : pvlib.temperature.sapm_cell,
+        "pvsyst"        : pvlib.temperature.pvsyst_cell,
+        "ross"          : pvlib.temperature.ross,
+        "noct_sam"      : pvlib.temperature.noct_sam,
         "generic_linear": pvlib.temperature.generic_linear,
     }
 
     agnostic = {  # module or cell
-        "faiman": pvlib.temperature.faiman,
-        "faiman_rad": pvlib.temperature.faiman_rad,
-        "fuentes": pvlib.temperature.fuentes,
+        "faiman"        : pvlib.temperature.faiman,
+        "faiman_rad"    : pvlib.temperature.faiman_rad,
+        "fuentes"       : pvlib.temperature.fuentes,
     }
 
     super_map = {"module": module, "cell": cell}
@@ -409,3 +409,23 @@ def temperature(
     temperature = func(**model_args)
 
     return temperature
+
+def _mixed_res(weather_df, meta):
+    """
+    geospatial test function. returns have mixed dimensions. the first is a timeseries, the second is a float.
+    This function is meant to discover problems with geospatial.analysis and its subroutines.
+
+    .. code_block : Python 
+
+        Shapes = {
+            "temperatures" : ("gid", "time"),
+            "avg_temp" : ("gid", ),
+        }
+    """
+
+    timeseries_df = pd.DataFrame(pvdeg.temperature.module(weather_df, meta))
+    avg_temp = timeseries_df[0].mean()
+
+    # now we have this problem. how can we run this
+    # return {'temperatures' : timeseries_df, 'avg_temp' : avg_temp}
+    return timeseries_df, avg_temp

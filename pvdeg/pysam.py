@@ -1,5 +1,11 @@
+""" 
+Pysam Integration for pvdeg, supports single site and geospatial calculations.
+Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
+"""
+
 import dask.dataframe as dd
 import pandas as pd
+import pickle
 import json
 import sys
 import os
@@ -14,6 +20,7 @@ import PySAM.Cashloan as Cashloan
 from pvdeg import (
     weather,
     utilities,
+    DATA_DIR
 )
 
 def vertical_POA(
@@ -316,7 +323,7 @@ def pysam(
 
     # Duplicate Columns in the dataframe seem to cause this issue
     # Error (-4) converting nested tuple 0 into row in matrix.
-    pysam_model.SolarResource.solar_resource_data = solar_resource 
+    pysam_model.SolarResource.solar_resource_data = sr 
     pysam_model.execute()
     outputs = pysam_model.Outputs.export()
 
@@ -359,11 +366,51 @@ def pysam_hourly_trivial(weather_df, meta):
 
     return outputs
 
+# required to safely unpack results during geospatial.analysis
+class inspirePysamReturn():
+    def __init__(self, annual_poa, ground_irradiance, timeseries_index):
+        self.annual_poa = annual_poa
+        self.ground_irradiance = ground_irradiance
+        self.timeseries_index = timeseries_index
+
+
+# rename?
+import xarray as xr
+def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
+    """Handle a pysam return object and transform it to an xarray"""
+
+    import dask.array as da
+    import numpy as np
+
+    # redo this using numba?
+    ground_irradiance_values = da.from_array([row[1:] for row in pysam_res.ground_irradiance[1:]])
+
+    single_location_ds = xr.Dataset(
+        data_vars={
+            "annual_poa" : pysam_res.annual_poa, # scalar variable
+            "ground_irradiance" : (("time", "distance"), ground_irradiance_values)
+        },
+        coords={
+            # "time" : np.arange(17520), # this will probably break because of the values assigned here, should be a pd.datetimeindex instead
+            "time" : pysam_res.timeseries_index,
+            # "distance" : np.array(pysam_res.ground_irradiance[0][1:])
+            "distance" : np.arange(10), # this matches the dimension axis of the output_temlate dataset
+        }
+    ) 
+
+    return single_location_ds
+
+
 # annual_poa_nom, annual_poa_front, annual_poa_rear, poa_nom, poa_front, or poa_rear
-# TODO: add config file
+# TODO: add config file, multiple config files.
 def inspire_ground_irradiance(weather_df, meta):
     """
     Get ground irradiance array and annual poa irradiance for a given point using pvsamv1
+
+    Returns
+    --------
+    result : inspirePysamReturn
+        returns an custom class object so we can unpack it later.
     """
 
     sr = solar_resource_dict(weather_df=weather_df, meta=meta)
@@ -373,13 +420,25 @@ def inspire_ground_irradiance(weather_df, meta):
     model.execute()
     outputs = model.Outputs.export()
 
-    # we only want these two
+    outputs = pysam(
+        weather_df = weather_df,
+        meta = meta,
+        pv_model = "pysamv1",
+        pv_model_default = "FlatPlatePVCommercial", # should use config file instead
+        results = ["subarray1_ground_rear_spatial", "annual_poa_front"],
+    )
 
-    inspire_res = {}
-    inspire_res["subarray1_ground_rear_spatial"] = outputs["subarray1_ground_rear_spatial"]
-    inspire_res["annual_poa_front"] = outputs["annual_poa_front"]
+    # these will be of very different shapes
+    # annual_poa_front is a single numeric
+    # subarray1_ground_rear_spatial is a 2d result
 
-    return inspire_res
+    result = inspirePysamReturn(
+            ground_irradiance = outputs["subarray1_ground_rear_spatial"],
+            annual_poa = outputs["annual_poa_front"],
+            timeseries_index=weather_df.index,
+        )
+
+    return result
 
 def solar_resource_dict(weather_df, meta):
     """
@@ -409,3 +468,10 @@ def solar_resource_dict(weather_df, meta):
     }
 
     return sr 
+
+def sample_pysam_result(weather_df, meta): # throw weather, meta away
+    """returns a sample inspirePysamReturn"""
+    with open(os.path.join(DATA_DIR,"inspireInstance.pkl"), "rb") as file:
+        inspireInstance = pickle.load(file)
+
+    return inspireInstance
