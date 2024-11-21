@@ -366,8 +366,13 @@ def pysam_hourly_trivial(weather_df, meta):
 
     return outputs
 
-# required to safely unpack results during geospatial.analysis
+# TODO: add slots
 class inspirePysamReturn():
+    """simple struct to facilitate handling weirdly shaped pysam simulation return values"""
+
+    # removes __dict__ atribute and breaks pickle
+    # __slots__ = ("annual_poa", "ground_irradiance", "timeseries_index")
+
     def __init__(self, annual_poa, ground_irradiance, timeseries_index):
         self.annual_poa = annual_poa
         self.ground_irradiance = ground_irradiance
@@ -427,10 +432,6 @@ def inspire_ground_irradiance(weather_df, meta):
         pv_model_default = "FlatPlatePVCommercial", # should use config file instead
         results = ["subarray1_ground_rear_spatial", "annual_poa_front"],
     )
-
-    # these will be of very different shapes
-    # annual_poa_front is a single numeric
-    # subarray1_ground_rear_spatial is a 2d result
 
     result = inspirePysamReturn(
             ground_irradiance = outputs["subarray1_ground_rear_spatial"],
