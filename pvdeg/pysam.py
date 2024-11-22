@@ -155,7 +155,7 @@ def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
     pv_model: str,
-    pv_model_default: str,
+    pv_model_default: str = None,
     # grid_default: str,
     # cashloan_default: str,
     # utilityrate_default: str,
@@ -257,7 +257,7 @@ def pysam(
     config_files: dict
         SAM configuration files. A dictionary containing a mapping to filepaths.
 
-        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`. Each key should contain a value as a string representing the file path to a SAM config file. 
+        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`. Each key should contain a value as a string representing the file path to a SAM config file. Cannot deal with the entire SAM config json.
 
         ```
         files = {
@@ -288,37 +288,32 @@ def pysam(
 
     sr = solar_resource_dict(weather_df=weather_df, meta=meta)
 
-    # weather_df = utilities.add_time_columns_tmy(weather_df=weather_df)
-
-    # solar_resource = {
-    #     'lat': meta['latitude'],
-    #     'lon': meta['longitude'],
-    #     'tz': meta['tz'] if 'tz' in meta.keys() else 0,
-    #     'elev': meta['altitude'],
-    #     'year': list(weather_df['Year']),
-    #     'month': list(weather_df['Month']),
-    #     'day': list(weather_df['Day']),
-    #     'hour': list(weather_df['Hour']),
-    #     'minute': list(weather_df['Minute']),
-    #     'dn': list(weather_df['dni']),
-    #     'df': list(weather_df['dhi']),
-    #     'wspd': list(weather_df['wind_speed']),
-    #     'tdry': list(weather_df['temp_air']),
-    #     'alb' : weather_df['albedo'] if 'albedo' in weather_df.columns.values else [0.2]*len(weather_df)
-    # }
-
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvwattsv8.html
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvsamv1.html
-    if pv_model == "pvwatts8": 
-        pysam_model = pv8.default(pv_model_default) # PVWattsCommercial
-    elif pv_model == "pysamv1":
-        pysam_model = pv1.default(pv_model_default) # FlatPlatePVCommercial
+    model_map = {
+        "pvwatts8"  : pv8,
+        "pysamv1"   : pv1,
+    }
+
+    model_module = model_map[pv_model]
+    if pv_model_default:
+        pysam_model = model_module.default(pv_model_default)
+    elif pv_model_default is None:
+        pysam_model = model_module.new()
+
+        with open( config_files['pv'], 'r') as f:
+            pv_inputs = json.load( f )
+
+        # these break the model when being loaded using InSpire doubleday configs
+        bad_parameters = {'adjust_constant', 'adjust_en_timeindex', 'adjust_en_periods', 'adjust_timeindex', 'adjust_periods', 'dc_adjust_constant', 'dc_adjust_en_timeindex', 'dc_adjust_en_periods', 'dc_adjust_timeindex', 'dc_adjust_periods'}
+
+        for k, v in pv_inputs.items():
+            if k not in ({'number_inputs', 'solar_resource_file'} | bad_parameters):
+                pysam_model.value(k, v)
+
+
 
     pysam_model.unassign('solar_resource_file') # unassign file
-
-    # grid = Grid.from_existing(pv_model)
-    # utility_rate = UtilityRate.from_existing(pv_model)
-    # cashloan = Cashloan.from_existing(grid, 'FlatPlatePVCommercial')
 
 
     # Duplicate Columns in the dataframe seem to cause this issue
@@ -330,9 +325,11 @@ def pysam(
     if not results:
         return outputs
 
-    pysam_res = {}
-    for key in results:
-        pysam_res[key] = outputs[key]
+    # pysam_res = {}
+    # for key in results:
+    #     pysam_res[key] = outputs[key]
+
+    pysam_res = {key: outputs[key] for key in results}
     return pysam_res
 
 def pysam_hourly_trivial(weather_df, meta):
@@ -388,6 +385,7 @@ def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
     import numpy as np
 
     # redo this using numba?
+    distances = pysam_res.ground_irradiance[0][1:]
     ground_irradiance_values = da.from_array([row[1:] for row in pysam_res.ground_irradiance[1:]])
 
     single_location_ds = xr.Dataset(
@@ -396,9 +394,8 @@ def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
             "ground_irradiance" : (("time", "distance"), ground_irradiance_values)
         },
         coords={
-            # "time" : np.arange(17520), # this will probably break because of the values assigned here, should be a pd.datetimeindex instead
             "time" : pysam_res.timeseries_index,
-            # "distance" : np.array(pysam_res.ground_irradiance[0][1:])
+            # "distance" : distances,
             "distance" : np.arange(10), # this matches the dimension axis of the output_temlate dataset
         }
     ) 
@@ -408,9 +405,19 @@ def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
 
 # annual_poa_nom, annual_poa_front, annual_poa_rear, poa_nom, poa_front, or poa_rear
 # TODO: add config file, multiple config files.
-def inspire_ground_irradiance(weather_df, meta):
+def inspire_ground_irradiance(weather_df, meta, config_files):
     """
     Get ground irradiance array and annual poa irradiance for a given point using pvsamv1
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        weather dataframe
+    meta : dict
+        meta data
+    config_files : dict[str]
+        see pvdeg.pysam.pysam
+        # config_files={'pv' : <stringpathtofile>},
 
     Returns
     --------
@@ -418,18 +425,11 @@ def inspire_ground_irradiance(weather_df, meta):
         returns an custom class object so we can unpack it later.
     """
 
-    sr = solar_resource_dict(weather_df=weather_df, meta=meta)
-
-    model = pv1.default("FlatPlatePVCommercial")
-    model.SolarResource.solar_resource_data = sr
-    model.execute()
-    outputs = model.Outputs.export()
-
     outputs = pysam(
         weather_df = weather_df,
         meta = meta,
         pv_model = "pysamv1",
-        pv_model_default = "FlatPlatePVCommercial", # should use config file instead
+        config_files=config_files,
         results = ["subarray1_ground_rear_spatial", "annual_poa_front"],
     )
 
@@ -476,3 +476,16 @@ def sample_pysam_result(weather_df, meta): # throw weather, meta away
         inspireInstance = pickle.load(file)
 
     return inspireInstance
+
+def ground_irradiance_monthly(inspire_res_ds : xr.Dataset) -> xr.Dataset:
+    """
+    Many rows are not populated because the model only calculates ground irradiance when certain measurements are met.
+    Drop the rows and calculate the monthly average irradiance at each distance.
+    """
+
+    nonzero_mask = (inspire_res_ds["ground_irradiance"] != 0).any(dim="distance")
+    filtered_data = inspire_res_ds["ground_irradiance"].where(nonzero_mask, drop=True)
+
+    monthly_avg_ground_irradiance = filtered_data.groupby(filtered_data.time.dt.month).mean()
+    return monthly_avg_ground_irradiance 
+
