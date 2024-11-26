@@ -1170,7 +1170,8 @@ class GeospatialScenario(Scenario):
         weather_db = "NSRDB"
         weather_arg = {
             "satellite": satellite,
-            "names": year,
+            # "names": year, # allow user to choose tmy or year
+            "names":"TMY",
             "NREL_HPC": True,
             "attributes": nsrdb_attributes,
         }

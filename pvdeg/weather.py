@@ -633,7 +633,17 @@ def get_NSRDB(
         return weather_df, meta.to_dict()
 
     elif geospatial:
+        # new versions have multiple files per satellite-year to reduce filesizes
+        # this is great for yearly data but TMY has multiple files
+        # the year attached to the TMY file in the filesystem/name is seemingly
+        # the year it was created. this creates problems, we only want to combine the files
+        # if they are NOT TMY
+
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
+
+        if (isinstance(names, str) and names.lower() in ["tmy", "tmy3"]):
+            nsrdb_fnames = nsrdb_fnames[-1:] # maintain as list with last element
+
         weather_ds, meta_df = ini_h5_geospatial(nsrdb_fnames)
 
         if attributes is not None:
