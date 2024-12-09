@@ -20,9 +20,14 @@ pvdeg.temperature
 
       
       pvdeg.temperature.cell
+<<<<<<< HEAD
       pvdeg.temperature.chamber_sample_temperature
       pvdeg.temperature.fdm_temperature
+=======
+      pvdeg.temperature.map_model
+>>>>>>> development
       pvdeg.temperature.module
+      pvdeg.temperature.temperature
 
    
    
@@ -45,6 +50,7 @@ pvdeg.temperature
    .. minigallery:: pvdeg.temperature.cell
        :add-heading:
 
+<<<<<<< HEAD
    .. autofunction:: chamber_sample_temperature
 
    .. _sphx_glr_backref_pvdeg.temperature.chamber_sample_temperature:
@@ -57,6 +63,13 @@ pvdeg.temperature
    .. _sphx_glr_backref_pvdeg.temperature.fdm_temperature:
 
    .. minigallery:: pvdeg.temperature.fdm_temperature
+=======
+   .. autofunction:: map_model
+
+   .. _sphx_glr_backref_pvdeg.temperature.map_model:
+
+   .. minigallery:: pvdeg.temperature.map_model
+>>>>>>> development
        :add-heading:
 
    .. autofunction:: module
@@ -64,6 +77,13 @@ pvdeg.temperature
    .. _sphx_glr_backref_pvdeg.temperature.module:
 
    .. minigallery:: pvdeg.temperature.module
+       :add-heading:
+
+   .. autofunction:: temperature
+
+   .. _sphx_glr_backref_pvdeg.temperature.temperature:
+
+   .. minigallery:: pvdeg.temperature.temperature
        :add-heading:
    
    

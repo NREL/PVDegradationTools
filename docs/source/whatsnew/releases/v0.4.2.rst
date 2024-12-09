@@ -1,0 +1,16 @@
+
+v0.4.2 (2024-09-13)
+=======================
+
+Bug Fixes
+---------
+* Remove duplicate gid's from `pvdeg.geospatial.elevation_stochastic_downselection`
+
+Tests
+-----
+* Added a test for Xmin in `test_standards.py` and removed dependency on pvgis.
+
+Contributors
+~~~~~~~~~~~~
+* Martin Springer (:ghuser:`martin-springer`)
+* Aidan Wesley (:ghuser:`AidanWesley``)

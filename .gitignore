@@ -105,3 +105,6 @@ TEMP/
 
 # Slurm log files
 slurm-*.out
+
+# Run information
+tests\data\h5_pytest.h5

@@ -2,11 +2,28 @@
 
 import numpy as np
 import pandas as pd
+<<<<<<< HEAD
 from numba import jit, njit, vectorize, guvectorize, float64
 from typing import Union
 
 from . import temperature
 from . import spectral
+=======
+import pvlib
+from numba import njit
+from rex import NSRDBX
+from rex import Outputs
+from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor, as_completed
+
+from . import (
+    temperature,
+    spectral,
+    weather
+)
+
+from pvdeg.decorators import geospatial_quick_shape
+>>>>>>> development
 
 
 def _ambient(weather_df):
@@ -46,7 +63,7 @@ def _ambient(weather_df):
 
 
 # TODO: When is dew_yield used?
-@jit(nopython=True, error_model="python")
+@njit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """
     Estimates the dew yield in [mm/day].  Calculation taken from:
@@ -383,7 +400,10 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
+<<<<<<< HEAD
 # @jit(nopython=True)
+=======
+>>>>>>> development
 @njit
 def Ce_numba(
     start,
@@ -645,6 +665,7 @@ def backsheet(
     return backsheet
 
 
+@geospatial_quick_shape(1, ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
 def module(
     weather_df,
     meta,
@@ -724,8 +745,8 @@ def module(
     )
 
     temp_module = temperature.module(
-        weather_df,
-        meta,
+        weather_df=weather_df,
+        meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf,
