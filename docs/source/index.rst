@@ -39,15 +39,14 @@ How the Model Works
 ===================
 
 Coupled with pvlib for module performan and weather/irradiance calculations,
-the PVDegradation Tool estimates degradations, and accelerated factors on
+PVDegradation Tool estimates degradations, and accelerated factors on
 user-defined parameters. The `Data Library` is under development as part of the
 PVDegradationTool project, compiling literature parameters and functions.
 
 The PVDegradationTool simulatineously reads tens of terabytes of time-series
 solar data from state-of-art resource data set National Solar Radiation Database
-(NSRDB), publicly avialable no the cloud, enabling the execution of pvdeg
+(NSRDB), publicly available on the cloud, enabling the execution of pvdeg
 beyond the confines of NREL's high-performance computing capabilities.
-
 
 Citing PVDegradation Tools
 ==========================
