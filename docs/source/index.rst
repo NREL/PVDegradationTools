@@ -3,9 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: ../../tutorials_and_tools/pvdeg_logo.png
-   :width: 500
+.. .. image:: ../../tutorials_and_tools/pvdeg_logo.png
+..    :width: 500
 
+.. image:: ./_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg
 
 
 Welcome to pvdeg!
@@ -30,7 +31,7 @@ The source code for pvdeg is hosted on `github <https://github.com/NREL/pvdeg>`_
 See :ref:`tutorials` to learn how to use and experiment with various functionalities
 
 
-.. image::  PVDeg-Flow.svg
+.. image::  ./_static/PVDeg-Flow.svg
     :alt: PVDeg-Flow diagram.
 
 
