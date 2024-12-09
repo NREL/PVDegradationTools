@@ -2,28 +2,25 @@
 
 import numpy as np
 import pandas as pd
-<<<<<<< HEAD
 from numba import jit, njit, vectorize, guvectorize, float64
 from typing import Union
 
 from . import temperature
 from . import spectral
-=======
-import pvlib
+# import pvlib
 from numba import njit
-from rex import NSRDBX
-from rex import Outputs
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, as_completed
+# from rex import NSRDBX
+# from rex import Outputs
+# from pathlib import Path
+# from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from . import (
     temperature,
     spectral,
-    weather
+    # weather
 )
 
 from pvdeg.decorators import geospatial_quick_shape
->>>>>>> development
 
 
 def _ambient(weather_df):
@@ -400,10 +397,6 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-<<<<<<< HEAD
-# @jit(nopython=True)
-=======
->>>>>>> development
 @njit
 def Ce_numba(
     start,

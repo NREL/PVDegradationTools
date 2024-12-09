@@ -1,10 +1,14 @@
 """
-<<<<<<< HEAD
-Collection of functions to calculate diffusion of diffusants/solutes into a host material
+Collection of functions to calculate diffusion of permeants/diffsants into PV modules.
 """
-
 import numpy as np
 import pandas as pd
+
+import os
+import json
+import pandas as pd
+from pvdeg import DATA_DIR
+import numpy as np
 
 def _calc_diff_substeps(
     water_new, water_old, n_steps, t, delta_t, dis, delta_dis, Fo
@@ -146,17 +150,6 @@ def module_front(
 
     return results
 
-=======
-Collection of classes and functions to calculate diffusion of permeants into a PV module.
-"""
-
-import os
-import json
-import pandas as pd
-from pvdeg import DATA_DIR
-from numba import jit
-import numpy as np
-from typing import Callable
 
 def esdiffusion(
     temperature, 
@@ -439,4 +432,3 @@ def esdiffusion(
     perm = np.vstack([positions, perm])
 
     return pd.DataFrame(perm[1:, 1:], index=perm[1:, 0], columns=perm[0, 1:])
->>>>>>> development

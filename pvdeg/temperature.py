@@ -287,7 +287,6 @@ def cell(
 
     return temp_cell
 
-<<<<<<< HEAD
 # @njit
 def chamber_sample_temperature(
     irradiance_340: float,
@@ -408,7 +407,6 @@ def fdm_temperature_irradiance(
 
 
 
-=======
 
 # test not providing poa
 # what if we dont need the cell or mod param, only matters for sapm
@@ -535,4 +533,3 @@ def temperature(
     temperature = func(**model_args)
 
     return temperature
->>>>>>> development

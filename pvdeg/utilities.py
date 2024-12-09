@@ -5,10 +5,8 @@ import numpy as np
 from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
-<<<<<<< HEAD
 import math
 from numba import njit
-=======
 import inspect
 from random import choices
 from string import ascii_uppercase
@@ -19,12 +17,11 @@ import cartopy.feature as cfeature
 
 
 # A mapping to simplify access to files stored in `pvdeg/data`
-pvdeg_datafiles = { 
+PVDEG_DATAFILES = { 
     "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
 }
->>>>>>> development
 
 
 def gid_downsampling(meta, n):
@@ -506,7 +503,6 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-<<<<<<< HEAD
 def _shift(arr, num, fill_value=np.timedelta64(0, "m")):
     """
     Fast numpy shift.
@@ -524,12 +520,8 @@ def _shift(arr, num, fill_value=np.timedelta64(0, "m")):
         result[:] = arr
     return result
 
-
-def _read_material(name, fname="materials.json"):
-=======
 ### DEPRECATE ###
 def _read_material(name, fname="O2permeation.json"):
->>>>>>> development
     """
     read a material from materials.json and return the parameter dictionary
 
@@ -746,7 +738,6 @@ def tilt_azimuth_scan(
     return tilt_azimuth_series
 
 
-<<<<<<< HEAD
 def plot_water_2d(water: np.ndarray[float]):
     """
     Plot a heatmap of water module using a 2d numpy array.
@@ -777,7 +768,6 @@ def kj_mol_to_ev(energy: float) -> float:
     """
 
     return energy / 96.485
-=======
 def _meta_df_from_csv(file_paths: list[str]):
     """
     Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
@@ -1425,9 +1415,9 @@ def display_json(
 
     if pvdeg_file:
         try:
-            fp = pvdeg_datafiles[pvdeg_file]
+            fp = PVDEG_DATAFILES[pvdeg_file]
         except KeyError:
-            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {PVDEG_DATAFILES.keys()}")
 
     with open(fp, 'r') as file:
         data = json.load(file)
@@ -1481,9 +1471,9 @@ def search_json(
 
     if pvdeg_file:
         try:
-            fp = pvdeg_datafiles[pvdeg_file]
+            fp = PVDEG_DATAFILES[pvdeg_file]
         except KeyError:
-            raise KeyError(rf"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(rf"{pvdeg_file} does not exist in pvdeg/data. Options are {PVDEG_DATAFILES.keys()}")
 
     with open(fp, "r") as file:
         data = json.load(file)
@@ -1525,9 +1515,9 @@ def read_material(
     # these live in the `pvdeg/data` folder
     if pvdeg_file:
         try:
-            fp = pvdeg_datafiles[pvdeg_file]
+            fp = PVDEG_DATAFILES[pvdeg_file]
         except KeyError:
-            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {PVDEG_DATAFILES.keys()}")
 
     with open(fp, "r") as file:
         data = json.load(file)
@@ -1539,4 +1529,3 @@ def read_material(
         material_dict = {k: material_dict.get(k, None) for k in parameters} 
 
     return material_dict
->>>>>>> development

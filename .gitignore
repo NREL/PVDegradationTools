@@ -108,3 +108,6 @@ slurm-*.out
 
 # Run information
 tests\data\h5_pytest.h5
+
+# ruff linter and formatter
+.ruff_cache

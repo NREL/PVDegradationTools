@@ -11,7 +11,10 @@ from typing import Union
 import json
 import os
 import matplotlib.pyplot as plt
-from IPython.display import display
+from IPython.display import display, HTML
+
+import io
+import base64
 
 from pvdeg import (
     humidity,
@@ -68,9 +71,10 @@ def start_times(df: pd.DataFrame) -> pd.DataFrame:
 
 #     return df
 
+
 def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Create setpoints columns with values shifted by 1. 
+    Create setpoints columns with values shifted by 1.
     At row k, the shifted value will come from row k - 1.
     """
 
@@ -81,7 +85,7 @@ def add_previous_setpoints(df: pd.DataFrame) -> pd.DataFrame:
 
     # only care about setpoints, not ramp rates
     setpoints = set(df.columns).difference(ignore_columns)
-    setpoint_names = {name.rstrip("_ramp") for name in setpoints} 
+    setpoint_names = {name.rstrip("_ramp") for name in setpoints}
 
     for name in setpoint_names:
         df[f"previous_{name}"] = df[name].shift(1)
@@ -150,9 +154,9 @@ def fill_linear_region(
     if rate != 0:
         ramp_time = linear_ramp_time(y_0=set_0, y_f=set_f, rate=rate)
 
-        if ramp_time > step_time: # adding a tolerance
-        # not np.isclose(ramp_time, step_time, rtol=0.01):
-        # if ramp_time > step_time:
+        if ramp_time > step_time:  # adding a tolerance
+            # not np.isclose(ramp_time, step_time, rtol=0.01):
+            # if ramp_time > step_time:
             raise ValueError(
                 f"""
                 Ramp speed is too slow, will not finish ramping up before next set point.
@@ -348,7 +352,6 @@ def _temp_calc_no_irradiance(
 # the temperature increase from irradiance at a timestep has a constant factor of
 # K = surface area * absorptance so we can bring this out of the loop if we refactor the temperature irradiance
 
-
 # @njit
 def _temp_calc_irradiance(
     temps: np.ndarray,
@@ -409,10 +412,10 @@ def sample_temperature(
     if not isinstance(air_temperature, np.ndarray):
         raise ValueError("Air_temperature must be a numpy array or pandas series")
 
-    if "irradiance_full" in setpoints_df.columns:
+    if "setpoint_irradiance_full" in setpoints_df.columns:
         sample_temp = _temp_calc_irradiance(
             temps=air_temperature,
-            irradiances=setpoints_df["irradiance_full"].to_numpy(),
+            irradiances=setpoints_df["setpoint_irradiance_full"].to_numpy(),
             times=setpoints_df.index.to_numpy(),
             tau=tau_s,
             temp_0=sample_temp_0,
@@ -422,7 +425,7 @@ def sample_temperature(
 
     else:
         print(f"""
-              "irradiance_full" not in setpoints_df.columns 
+              "setpoint_irradiance_full" not in setpoints_df.columns 
               Current column names {setpoints_df.columns}.
               calculating sample temperature without irradiance"
               """)
@@ -475,8 +478,9 @@ class Sample:
         length=None,
         width=None,
     ):
-        f = open(os.path.join(DATA_DIR, "materials.json"))
-        self.materials = json.load(f)
+        # f = utilities.read_material()
+        # f = open(os.path.join(DATA_DIR, "materials.json"))
+        # self.materials = json.load(f)
 
         self.absorptance = absorptance
         self.length = length
@@ -488,7 +492,7 @@ class Sample:
         if encapsulant:
             self.setEncapsulant(encapsulant_thickness)
 
-    def setEncapsulant(self, id: str, thickness: float) -> None:
+    def setEncapsulant(self, pvdeg_file: str, key: str, thickness: float, fp: str = None) -> None:
         """
         Set encapsulant diffusivity activation energy, prefactor and solubility activation energy, prefactor.
 
@@ -496,18 +500,35 @@ class Sample:
 
         Parameters:
         -----------
-        id: str
-            name of material from `PVDegradationTools/data/materials.json`
+        pvdeg_file: str
+            keyword for material json file in `pvdeg/data`. Options:
+            >>> "AApermeation", "H2Opermeation", "O2permeation"
+        fp: str
+            file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
+        key: str
+            key corresponding to specific material in the file. In the pvdeg files these have arbitrary names. Inspect the files or use `display_json` or `search_json` to identify the key for desired material.
         thickness: float
             thickness of encapsulant [mm]
         """
-        self.diffusivity_encap_ea = (self.materials)[id]["Ead"]
-        self.diffusivity_encap_pre = (self.materials)[id]["Do"]
-        self.solubility_encap_ea = (self.materials)[id]["Eas"]
-        self.solubility_encap_pre = (self.materials)[id]["So"]
+
+        material_dict = utilities.read_material(
+            pvdeg_file=pvdeg_file,
+            fp=fp,
+            key=key,
+        )
+
+        self.diffusivity_encap_ea = material_dict["Ead"]
+        self.diffusivity_encap_pre = material_dict["Do"]
+        self.solubility_encap_ea = material_dict["Eas"]
+        self.solubility_encap_pre = material_dict["So"]
+
+        # self.diffusivity_encap_ea = (self.materials)[key]["Ead"]
+        # self.diffusivity_encap_pre = (self.materials)[key]["Do"]
+        # self.solubility_encap_ea = (self.materials)[key]["Eas"]
+        # self.solubility_encap_pre = (self.materials)[key]["So"]
         self.encap_thickness = thickness
 
-    def setBacksheet(self, id: str, thickness: float) -> None:
+    def setBacksheet(self, pvdeg_file: str, key: str, thickness: float, fp: str = None ) -> None:
         """
         Set backsheet permiability activation energy and prefactor.
 
@@ -519,9 +540,31 @@ class Sample:
             name of material from `PVDegradationTools/data/materials.json`
         thickness: float
             thickness of backsheet [mm]
+
+        Parameters:
+        -----------
+        pvdeg_file: str
+            keyword for material json file in `pvdeg/data`. Options:
+            >>> "AApermeation", "H2Opermeation", "O2permeation"
+        fp: str
+            file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
+        key: str
+            key corresponding to specific material in the file. In the pvdeg files these have arbitrary names. Inspect the files or use `display_json` or `search_json` to identify the key for desired material.
+        thickness: float
+            thickness of backsheet [mm]
         """
-        self.permiability_back_ea = (self.materials)[id]["Eap"]
-        self.permiability_back_pre = (self.materials)[id]["Po"]
+
+        material_dict = utilities.read_material(
+            pvdeg_file=pvdeg_file,
+            fp=fp,
+            key=key,
+        )
+
+        self.permiability_back_ea = material_dict["Eap"]
+        self.permiability_back_pre = material_dict["Po"]
+
+        # self.permiability_back_ea = (self.materials)[id]["Eap"]
+        # self.permiability_back_pre = (self.materials)[id]["Po"]
         self.back_thickness = thickness
 
     def setDimensions(self, length: float = None, width: float = None) -> None:
@@ -621,15 +664,16 @@ class Chamber(Sample):
         )
 
         if (
-            "irradiance_340" in self.setpoints.columns
-            and "irradiance_full" not in self.setpoints.columns
+            "setpoint_irradiance_340" in self.setpoints.columns
+            and "setpoint_irradiance_full" not in self.setpoints.columns
         ):
             # gti calculation is very slow because of integration
             print("Calculating GTI...")
-            self.setpoints["irradiance_full"] = spectral.get_GTI_from_irradiance_340(
-                self.setpoints["irradiance_340"]
+            # should this be setpoint irradiance full, it is not a setpoint
+            self.setpoints["setpoint_irradiance_full"] = spectral.get_GTI_from_irradiance_340(
+                self.setpoints["setpoint_irradiance_340"]
             )  # this may be misleading
-            print('Saved in self.setpoints as "irradiance_full')
+            print('Saved in self.setpoints as "setpoints_irradiance_full')
 
         self.sample_temperature = sample_temperature(
             self.setpoints,
@@ -683,14 +727,19 @@ class Chamber(Sample):
 
     def calc_back_encapsulant_moisture(self, n_steps: int = 20):
         """Calculate the moisture on the backside of the encapsulant"""
+
+        # kJ/mol -> eV
+        permiability = utilities.kj_mol_to_ev(self.permiability_back_ea)
+
         res, _ = humidity.moisture_eva_back(
             eva_moisture_0=self.equilibrium_encapsulant_water.iloc[0],
             sample_temp=self.sample_temperature,
             rh_at_sample_temp=self.sample_relative_humidity,
             equilibrium_eva_water=self.equilibrium_encapsulant_water,
-            pet_permiability=utilities.kj_mol_to_ev(
-                self.permiability_back_ea
-            ),  # kJ/mol -> eV
+            # pet_permiability=utilities.kj_mol_to_ev(
+            #     self.permiability_back_ea
+            # ),  # kJ/mol -> eV
+            pet_permiability=permiability,
             pet_prefactor=self.permiability_back_pre,
             thickness_eva=self.encap_thickness,  # mm
             thickness_pet=self.back_thickness,  # mm
@@ -698,7 +747,10 @@ class Chamber(Sample):
         )
 
         self.back_encapsulant_moisture = pd.Series(
-            res, index=self.setpoints.index, name="Back Encapsulant Moisture"
+            # res, index=self.setpoints.index, name="Back Encapsulant Moisture"
+            res, 
+            index=self.setpoints.index, 
+            name="Back Encapsulant Moisture"
         )
 
     def calc_relative_humidity_internal_on_back_of_cells(self):
@@ -710,8 +762,11 @@ class Chamber(Sample):
             ),
             rh_at_sample_temp=self.sample_relative_humidity.to_numpy(dtype=np.float64),
         )
+
         self.relative_humidity_internal_on_back_of_cells = pd.Series(
-            res, self.setpoints.index, name="Relative Humidity Internal Cells Backside"
+            res, 
+            self.setpoints.index, 
+            name="Relative Humidity Internal Cells Backside"
         )
 
     def calc_dew_point(self):
@@ -808,14 +863,72 @@ class Chamber(Sample):
         gti: pd.Series
             full spectrum irradiance using ASTM G173-03 AM1.5 spectrum.
         """
-        self.setpoints["irradiance_full"] = spectral.get_GTI_from_irradiance_340(
+        self.setpoints["setpoint_irradiance_full"] = spectral.get_GTI_from_irradiance_340(
             self.setpoints["setpoint_irradiance_340"]
         )
 
-        return self.setpoints["irradiance_full"]
+        return self.setpoints["setpoint_irradiance_full"]
 
     def _ipython_display_(self):
         """
         Display the setpoints of the chamber instance.
         """
-        display(self.setpoints)
+
+        # Create the plot
+        fig, ax = plt.subplots(figsize=(8, 4))
+        self.setpoints.plot(ax=ax)
+        ax.set_title("Setpoints Plot (Units Not Demonstrated on Y Axis)")
+        ax.set_xlabel("Index")
+        ax.set_ylabel("Value")
+        plt.tight_layout()
+
+        # Save the plot to a BytesIO object
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png', bbox_inches='tight')
+        plt.close(fig)
+        img_buffer.seek(0)
+
+        # Encode the image as base64
+        img_base64 = base64.b64encode(img_buffer.read()).decode('utf-8')
+
+        html_content = f"""
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
+            <h2>Chamber Simulation</h2>
+
+            <div id="setpoints_dataframe" onclick="toggleVisibility('content_setpoints_dataframe')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_setpoints_dataframe" style="color: #b676c2;">►</span>
+                     Setpoints Dataframe
+                </h4>
+            </div>
+            <div id="content_setpoints_dataframe" style="display:none; margin-left: 20px; padding: 5px;">
+                {self.setpoints._repr_html_()}
+            </div>
+
+            <div id="setpoints_plot" onclick="toggleVisibility('content_setpoints_plot')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_setpoints_plot" style="color: #b676c2;">►</span>
+                     Setpoints Plot
+                </h4>
+            </div>
+            <div id="content_setpoints_plot" style="display:none; margin-left: 20px; padding: 5px;">
+                <h3>Setpoints Plot</h3>
+                <img src="data:image/png;base64,{img_base64}" alt="Setpoints Plot" style="max-width:100%; height:auto;">
+            </div>
+
+        </div>
+        <script>
+            function toggleVisibility(id) {{
+                var content = document.getElementById(id);
+                var arrow = document.getElementById('arrow_' + id);
+                if (content.style.display === 'none') {{
+                    content.style.display = 'block';
+                    arrow.innerHTML = '▼';
+                }} else {{
+                    content.style.display = 'none';
+                    arrow.innerHTML = '►';
+                }}
+            }}
+        </script>
+        """
+        display(HTML(html_content))

@@ -3,15 +3,10 @@ Collection of classes and functions to obtain spectral parameters.
 """
 
 import pvlib
-<<<<<<< HEAD
-from numba import njit, prange, cuda
+from numba import njit, prange
 import numpy as np
 import pandas as pd
-=======
-import pandas as pd
 from pvdeg.decorators import geospatial_quick_shape
->>>>>>> development
-
 
 @geospatial_quick_shape(
     1,

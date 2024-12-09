@@ -8,31 +8,27 @@ from scipy.constants import elementary_charge
 import photovoltaic as pv
 
 
-def collection_probability(x, thickness, s, l, d):
+def collection_probability(x, thickness: float, s: float, l: float, d: float):
     """
     Returns the collection probability (unit 0 to 1) at a distance x (cm) from the junction.
     See [1]_.
 
     Parameters
     ----------
-    x : array-like
+    x: array-like
         array of x positions from a junction to a surface (typically [cm]).
-
-    thickness : numeric
+    thickness: numeric
         Layer thickness [cm].
-
-    s : numeric
+    s: numeric
         Surface recombination velocity [cm/s].
-
-    l : numeric
+    l: numeric
         Minority carrier diffusion length [cm].
-
-    d : numeric
+    d: numeric
         Minority carrier diffusivity [cm^2/Vs].
 
     Returns
     -------
-    cp : array-like
+    cp: array-like
         Collection probability along x.
 
     References

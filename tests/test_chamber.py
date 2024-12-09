@@ -32,8 +32,13 @@ def test_chamber_conditions():
 
 def test_chamber_sample_conditions():
     test_chamber.setpoints = test_chamber.setpoints  # .iloc[:100]
-    test_chamber.setBacksheet(id="ST504", thickness=0.5)  # PET
-    test_chamber.setEncapsulant(id="EVA", thickness=0.1)  # EVA
+
+    test_chamber.setBacksheet(pvdeg_file="O2permeation", key="OX002", thickness=0.5) # ST504/PET1
+    test_chamber.setEncapsulant(pvdeg_file="O2permeation", key="OX003", thickness=0.1)  # EVA
+
+    # test_chamber.setBacksheet(id="ST504", thickness=0.5)  # PET
+    # test_chamber.setEncapsulant(key="EVA", thickness=0.1)  # EVA
+    
     sample_result = test_chamber.sample_conditions(
         tau_s=15, sample_temp_0=25, n_steps=20
     )
