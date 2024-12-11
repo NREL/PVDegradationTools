@@ -891,7 +891,7 @@ def degradation(
 
         - `data`: Spectral irradiance values for each wavelength [W/m^2 nm].
         - `index`: pd.DateTimeIndex
-        - `columns`: Wavelengths as floats (e.g., 280, 300, etc.).
+        - `columns`: Wavelengths as floats (e.g., 280, 300, etc.) [nm].
 
         Example::
 
@@ -1007,108 +1007,6 @@ def deg(
     degradation = C * np.sum(dD)
 
     return degradation
-
-
-# @deprecated("old double integral degradation function will be replaced 'pvdegradation' in an updated version of pvdeg")
-# def degradation(
-#     spectra: pd.Series,
-#     rh_module: pd.Series,
-#     temp_module: pd.Series,
-#     wavelengths: Union[int, np.ndarray[float]],
-#     Ea: float = 40.0,
-#     n: float = 1.0,
-#     p: float = 0.5,
-#     C2: float = 0.07,
-#     C: float = 1.0,
-# ) -> float:
-#     """
-#     Compute degredation as double integral of Arrhenius (Activation
-#     Energy, RH, Temperature) and spectral (wavelength, irradiance)
-#     functions over wavelength and time.
-
-#     .. math::
-
-#         D = C \\int_{0}^{t} RH(t)^n \\cdot e^{\\frac{-E_a}{RT(t)}} \\int_{\\lambda} [e^{-C_2 \\lambda} \\cdot G(\\lambda, t)]^p d\\lambda dt
-
-#     Parameters
-#     ----------
-#     spectra : pd.Series type=Float
-#         front or rear irradiance at each wavelength in "wavelengths" [W/m^2 nm]
-#     rh_module : pd.Series type=Float
-#         module RH, time indexed [%]
-#     temp_module : pd.Series type=Float
-#         module temperature, time indexed [C]
-#     wavelengths : int-array
-#         integer array (or list) of wavelengths tested w/ uniform delta
-#         in nanometers [nm]
-#     Ea : float
-#         Arrhenius activation energy. The default is 40. [kJ/mol]
-#     n : float
-#         Fit paramter for RH sensitivity. The default is 1.
-#     p : float
-#         Fit parameter for irradiance sensitivity. Typically
-#         0.6 +- 0.22
-#     C2 : float
-#         Fit parameter for sensitivity to wavelength exponential.
-#         Typically 0.07
-#     C : float
-#         Fit parameter for the Degradation equaiton
-#         Typically 1.0
-
-#     Returns
-#     -------
-#     degradation : float
-#         Total degredation factor over time and wavelength.
-#     """
-#     # --- TO DO ---
-#     # unpack input-dataframe
-#     # spectra = df['spectra']
-#     # temp_module = df['temp_module']
-#     # rh_module = df['rh_module']
-
-#     # Constants
-#     R = 0.0083145  # Gas Constant in [kJ/mol*K]
-
-#     wav_bin = list(np.diff(wavelengths))
-#     wav_bin.append(wav_bin[-1])  # Adding a bin for the last wavelength
-
-#     # Integral over Wavelength
-#     try:
-#         irr = pd.DataFrame(spectra.tolist(), index=spectra.index)
-#         irr.columns = wavelengths
-#     except:
-#         # TODO: Fix this except it works on some cases, veto it by cases
-#         print("Removing brackets from spectral irradiance data")
-#         # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
-#         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
-#         irr.columns = wavelengths
-
-
-#     # double integral calculation
-#     sensitivitywavelengths = np.exp(-C2 * wavelengths)
-#     irr = irr * sensitivitywavelengths
-#     irr *= np.array(wav_bin)
-#     irr = irr**p
-#     data = pd.DataFrame(index=spectra.index)
-#     data["G_integral"] = irr.sum(axis=1)
-
-#     EApR = -Ea / R
-#     C4 = np.exp(EApR / temp_module)
-
-#     RHn = rh_module**n
-
-#     data["Arr_integrand"] = C4 * RHn
-
-#     print("arr integral", data["Arr_integrand"])  
-#     print("wavelength integral", data["G_integral"] )
-
-#     data["dD"] = data["G_integral"] * data["Arr_integrand"]
-
-#     print(f"delta degradation ", data["dD"])
-
-#     degradation = C * data["dD"].sum(axis=0)
-
-#     return degradation
 
 
 # change it to take pd.DataFrame? instead of np.ndarray

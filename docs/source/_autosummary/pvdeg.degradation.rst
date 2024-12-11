@@ -22,6 +22,7 @@ pvdeg.degradation
       pvdeg.degradation.IwaArrhenius
       pvdeg.degradation.IwaVantHoff
       pvdeg.degradation.arrhenius_deg
+      pvdeg.degradation.deg
       pvdeg.degradation.degradation
       pvdeg.degradation.vantHoff_deg
       pvdeg.degradation.vecArrhenius
@@ -59,6 +60,13 @@ pvdeg.degradation
    .. _sphx_glr_backref_pvdeg.degradation.arrhenius_deg:
 
    .. minigallery:: pvdeg.degradation.arrhenius_deg
+       :add-heading:
+
+   .. autofunction:: deg
+
+   .. _sphx_glr_backref_pvdeg.degradation.deg:
+
+   .. minigallery:: pvdeg.degradation.deg
        :add-heading:
 
    .. autofunction:: degradation
