@@ -1009,7 +1009,7 @@ def _calc_qss_substeps(
     return moisture
 
 
-@njit
+# @njit
 def rh_internal_cell_backside(
     back_eva_moisture: Union[float, np.ndarray],
     equilibrium_eva_water: Union[float, np.ndarray],

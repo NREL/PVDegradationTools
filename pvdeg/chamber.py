@@ -478,10 +478,6 @@ class Sample:
         length=None,
         width=None,
     ):
-        # f = utilities.read_material()
-        # f = open(os.path.join(DATA_DIR, "materials.json"))
-        # self.materials = json.load(f)
-
         self.absorptance = absorptance
         self.length = length
         self.width = width
@@ -521,11 +517,6 @@ class Sample:
         self.diffusivity_encap_pre = material_dict["Do"]
         self.solubility_encap_ea = material_dict["Eas"]
         self.solubility_encap_pre = material_dict["So"]
-
-        # self.diffusivity_encap_ea = (self.materials)[key]["Ead"]
-        # self.diffusivity_encap_pre = (self.materials)[key]["Do"]
-        # self.solubility_encap_ea = (self.materials)[key]["Eas"]
-        # self.solubility_encap_pre = (self.materials)[key]["So"]
         self.encap_thickness = thickness
 
     def setBacksheet(self, pvdeg_file: str, key: str, thickness: float, fp: str = None ) -> None:
@@ -606,7 +597,7 @@ class Sample:
 
 
 class Chamber(Sample):
-    def __init__(self, fp: str = None, setpoint_names: list[str] = None, **kwargs):
+    def __init__(self, fp: str = None, setpoint_names: list[str] = None, setpoints: pd.DataFrame=None, **kwargs):
         """
         Create a chamber stress test object.
 
@@ -619,7 +610,14 @@ class Chamber(Sample):
         """
 
         super().__init__()
-        self.setpoint_timeseries(fp, setpoint_names=setpoint_names, **kwargs)
+
+        if setpoints is not None:
+            if setpoints.isna().any().any():
+                    raise ValueError("self.setpoints dataframe contains NaN's, may break simulation results, remove the nan's to continue")
+
+            self.setpoints = setpoints
+        else:
+            self.setpoint_timeseries(fp, setpoint_names=setpoint_names, **kwargs)
 
     def setpoint_timeseries(
         self, fp: str, setpoint_names: list[str] = None, **kwargs
@@ -627,13 +625,18 @@ class Chamber(Sample):
         """
         Read a setpoints CSV and create a timeseries of setpoint values
         """
+
         self.setpoints = setpoints_timeseries_from_csv(fp, setpoint_names, **kwargs)
 
     def plot_setpoints(self) -> None:
         """
         Plot setpoint timeseries values
         """
-        self.setpoints.plot(title="Chamber Setpoints")
+        fig, ax = plt.subplots(figsize=(12, 6))  # Adjust the width (12) and height (6)
+        self.setpoints.plot(title="Chamber Setpoints", ax=ax)
+
+        plt.show()
+
 
     def calc_temperatures(
         self, air_temp_0: float, sample_temp_0: float, tau_c: float, tau_s: float
@@ -667,12 +670,12 @@ class Chamber(Sample):
             "setpoint_irradiance_340" in self.setpoints.columns
             and "setpoint_irradiance_full" not in self.setpoints.columns
         ):
-            # gti calculation is very slow because of integration
             print("Calculating GTI...")
             # should this be setpoint irradiance full, it is not a setpoint
-            self.setpoints["setpoint_irradiance_full"] = spectral.get_GTI_from_irradiance_340(
+            # this may be misleading
+            self.setpoints["setpoint_irradiance_full"] = spectral.calc_full_from_irradiance_340(
                 self.setpoints["setpoint_irradiance_340"]
-            )  # this may be misleading
+            ) 
             print('Saved in self.setpoints as "setpoints_irradiance_full')
 
         self.sample_temperature = sample_temperature(
@@ -696,9 +699,19 @@ class Chamber(Sample):
             self.air_temperature.to_numpy(dtype=np.float64),
             self.setpoints["setpoint_relative_humidity"].to_numpy(dtype=np.float64),
         )
+
+        name = "Water Vapor Pressure"
+        index = self.setpoints.index
+
         self.water_vapor_pressure = pd.Series(
-            res, index=self.setpoints.index, name="Water Vapor Pressure"
+            res, 
+            index=index, 
+            name=name
         )
+
+        # self.water_vapor_pressure = pd.Series(
+        #     res, index=self.setpoints.index, name="Water Vapor Pressure"
+        # )
 
     def calc_sample_relative_humidity(self):
         """Calculate sample percent relative humidity"""
@@ -732,14 +745,11 @@ class Chamber(Sample):
         permiability = utilities.kj_mol_to_ev(self.permiability_back_ea)
 
         res, _ = humidity.moisture_eva_back(
-            eva_moisture_0=self.equilibrium_encapsulant_water.iloc[0],
-            sample_temp=self.sample_temperature,
-            rh_at_sample_temp=self.sample_relative_humidity,
-            equilibrium_eva_water=self.equilibrium_encapsulant_water,
-            # pet_permiability=utilities.kj_mol_to_ev(
-            #     self.permiability_back_ea
-            # ),  # kJ/mol -> eV
-            pet_permiability=permiability,
+            eva_moisture_0=self.equilibrium_encapsulant_water.iloc[0], # 33100 nans
+            sample_temp=self.sample_temperature, # no nans
+            rh_at_sample_temp=self.sample_relative_humidity, # 33100 nans
+            equilibrium_eva_water=self.equilibrium_encapsulant_water, # above
+            pet_permiability=permiability, 
             pet_prefactor=self.permiability_back_pre,
             thickness_eva=self.encap_thickness,  # mm
             thickness_pet=self.back_thickness,  # mm
@@ -747,7 +757,6 @@ class Chamber(Sample):
         )
 
         self.back_encapsulant_moisture = pd.Series(
-            # res, index=self.setpoints.index, name="Back Encapsulant Moisture"
             res, 
             index=self.setpoints.index, 
             name="Back Encapsulant Moisture"
@@ -830,6 +839,10 @@ class Chamber(Sample):
             pandas dataframe containing
             [sample temperature, sample relative humidity, equilibrium encapsulant water, back encapsulant moisture, relative humidity internal on back of cells]
         """
+
+        if self.setpoints.isna().any().any():
+            raise ValueError("self.setpoints dataframe contains NaN's, may break simulation results, remove the nan's to continue")
+
         self.sample_temperature = sample_temperature(
             self.setpoints,
             air_temperature=self.air_temperature,
@@ -854,7 +867,7 @@ class Chamber(Sample):
         ).T
         return sample_df
 
-    def gti_from_irradiance_340(self) -> pd.Series:
+    def full_from_irradiance_340(self) -> pd.Series:
         """
         Calculate full spectrum GTI from irradiance at 340 nm
 
@@ -863,7 +876,7 @@ class Chamber(Sample):
         gti: pd.Series
             full spectrum irradiance using ASTM G173-03 AM1.5 spectrum.
         """
-        self.setpoints["setpoint_irradiance_full"] = spectral.get_GTI_from_irradiance_340(
+        self.setpoints["setpoint_irradiance_full"] = spectral.calc_full_from_irradiance_340(
             self.setpoints["setpoint_irradiance_340"]
         )
 

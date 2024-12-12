@@ -27,24 +27,19 @@ pvdeg.utilities
       pvdeg.utilities.get_kinetics
       pvdeg.utilities.get_state_bbox
       pvdeg.utilities.gid_downsampling
-<<<<<<< HEAD
       pvdeg.utilities.kj_mol_to_ev
-      pvdeg.utilities.meta_as_dict
-      pvdeg.utilities.plot_water_2d
-      pvdeg.utilities.quantile_df
-=======
       pvdeg.utilities.linear_normalize
       pvdeg.utilities.merge_sparse
       pvdeg.utilities.meta_as_dict
       pvdeg.utilities.new_id
       pvdeg.utilities.nrel_kestrel_check
+      pvdeg.utilities.plot_water_2d
       pvdeg.utilities.quantile_df
       pvdeg.utilities.read_material
       pvdeg.utilities.remove_scenario_filetrees
       pvdeg.utilities.restore_gids
       pvdeg.utilities.search_json
       pvdeg.utilities.strip_normalize_tmy
->>>>>>> development
       pvdeg.utilities.tilt_azimuth_scan
       pvdeg.utilities.ts_gid_df
       pvdeg.utilities.write_gids
@@ -119,13 +114,13 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.gid_downsampling
        :add-heading:
 
-<<<<<<< HEAD
    .. autofunction:: kj_mol_to_ev
 
    .. _sphx_glr_backref_pvdeg.utilities.kj_mol_to_ev:
 
    .. minigallery:: pvdeg.utilities.kj_mol_to_ev
-=======
+       :add-heading:
+
    .. autofunction:: linear_normalize
 
    .. _sphx_glr_backref_pvdeg.utilities.linear_normalize:
@@ -138,7 +133,6 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.merge_sparse:
 
    .. minigallery:: pvdeg.utilities.merge_sparse
->>>>>>> development
        :add-heading:
 
    .. autofunction:: meta_as_dict
@@ -148,13 +142,6 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.meta_as_dict
        :add-heading:
 
-<<<<<<< HEAD
-   .. autofunction:: plot_water_2d
-
-   .. _sphx_glr_backref_pvdeg.utilities.plot_water_2d:
-
-   .. minigallery:: pvdeg.utilities.plot_water_2d
-=======
    .. autofunction:: new_id
 
    .. _sphx_glr_backref_pvdeg.utilities.new_id:
@@ -167,7 +154,13 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.nrel_kestrel_check:
 
    .. minigallery:: pvdeg.utilities.nrel_kestrel_check
->>>>>>> development
+       :add-heading:
+
+   .. autofunction:: plot_water_2d
+
+   .. _sphx_glr_backref_pvdeg.utilities.plot_water_2d:
+
+   .. minigallery:: pvdeg.utilities.plot_water_2d
        :add-heading:
 
    .. autofunction:: quantile_df
@@ -177,8 +170,6 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.quantile_df
        :add-heading:
 
-<<<<<<< HEAD
-=======
    .. autofunction:: read_material
 
    .. _sphx_glr_backref_pvdeg.utilities.read_material:
@@ -214,7 +205,6 @@ pvdeg.utilities
    .. minigallery:: pvdeg.utilities.strip_normalize_tmy
        :add-heading:
 
->>>>>>> development
    .. autofunction:: tilt_azimuth_scan
 
    .. _sphx_glr_backref_pvdeg.utilities.tilt_azimuth_scan:

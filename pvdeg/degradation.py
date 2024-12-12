@@ -13,7 +13,8 @@ from . import temperature
 from . import spectral
 from . import weather
 
-from pvdeg.decorators import geospatial_quick_shape
+from typing import Optional
+from pvdeg.decorators import geospatial_quick_shape, deprecated
 
 # TODO: Clean up all those functions and add gaps functionality
 
@@ -862,33 +863,70 @@ def _gJtoMJ(gJ):
     return MJ
 
 
+# new version of degradation
 def degradation(
-    spectra: pd.Series,
-    rh_module: pd.Series,
-    temp_module: pd.Series,
-    wavelengths: Union[int, np.ndarray[float]],
+    spectra_df: pd.DataFrame,
+    conditions_df: pd.DataFrame = None,
+    temp_module: pd.Series = None,
+    rh_module: pd.Series = None,
     Ea: float = 40.0,
     n: float = 1.0,
     p: float = 0.5,
     C2: float = 0.07,
     C: float = 1.0,
-) -> float:
+)-> float:
     """
     Compute degredation as double integral of Arrhenius (Activation
     Energy, RH, Temperature) and spectral (wavelength, irradiance)
     functions over wavelength and time.
 
+    .. math::
+
+        D = C \\int_{0}^{t} RH(t)^n \\cdot e^{\\frac{-E_a}{RT(t)}} \\int_{\\lambda} [e^{-C_2 \\lambda} \\cdot G(\\lambda, t)]^p d\\lambda dt
+
     Parameters
     ----------
-    spectra : pd.Series type=Float
-        front or rear irradiance at each wavelength in "wavelengths" [W/m^2 nm]
-    rh_module : pd.Series type=Float
-        module RH, time indexed [%]
-    temp_module : pd.Series type=Float
-        module temperature, time indexed [C]
-    wavelengths : int-array
-        integer array (or list) of wavelengths tested w/ uniform delta
-        in nanometers [nm]
+    spectra_df : pd.DataFrame
+        front or rear irradiance data in dataframe format
+
+        - `data`: Spectral irradiance values for each wavelength [W/m^2 nm].
+        - `index`: pd.DateTimeIndex
+        - `columns`: Wavelengths as floats (e.g., 280, 300, etc.).
+
+        Example::
+
+            timestamp                 280     300     320     340     360     380     400
+            2021-03-09 10:00:00    0.6892  0.4022  0.6726  0.0268  0.3398  0.9432  0.7411
+            2021-03-09 11:00:00    0.1558  0.5464  0.6896  0.7828  0.5050  0.9336  0.4652
+            2021-03-09 12:00:00    0.2278  0.9057  0.2639  0.0572  0.9906  0.9370  0.1800
+            2021-03-09 13:00:00    0.3742  0.0358  0.4052  0.9578  0.1044  0.8917  0.4876
+
+    conditions_df : pd.DataFrame, optional
+        Environmental conditions including temperature and relative humidity.
+
+        - `index`: pd.DateTimeIndex
+        - `columns`:  (required)
+            - "temperature" [°C or K]
+            - "relative_humidity" [%]
+
+        Example::
+
+            timestamp                 temperature  relative_humidity
+            2021-03-09 10:00:00         298.0               45.0
+            2021-03-09 11:00:00         303.0               50.0
+            2021-03-09 12:00:00         310.0               55.0
+            2021-03-09 13:00:00         315.0               60.0
+
+    temp_module : pd.Series, optional
+        Module temperatures [°C]. Required if `conditions_df` is not provided. Time indexed same as spectra_df
+
+    rh_module : pd.Series, optional
+        Relative humidity values [%]. Required if `conditions_df` is not provided. Time indexed same as spectra_df
+
+        Example::
+
+            30 = 30%
+
     Ea : float
         Arrhenius activation energy. The default is 40. [kJ/mol]
     n : float
@@ -907,49 +945,170 @@ def degradation(
     -------
     degradation : float
         Total degredation factor over time and wavelength.
-
     """
-    # --- TO DO ---
-    # unpack input-dataframe
-    # spectra = df['spectra']
-    # temp_module = df['temp_module']
-    # rh_module = df['rh_module']
 
-    # Constants
+
+    if conditions_df is not None and (temp_module is not None or rh_module is not None):
+        raise ValueError("Provide either conditions_df or temp_module and rh_module")
+
+    if conditions_df is not None:
+        rh = conditions_df["relative_humidity"].values
+        temps = conditions_df["temperature"].values
+    else:
+        rh = rh_module.values
+        temps = temp_module.values
+
+    wavelengths = spectra_df.columns.values.astype(float)
+    irr = spectra_df.values  # irradiance as array
+
+    # call numba compiled function
+    return deg(
+        wavelengths=wavelengths, 
+        irr=irr,
+        rh=rh, 
+        temps=temps, 
+        Ea=Ea, 
+        C2=C2, 
+        p=p, 
+        n=n, 
+        C=C
+    )
+
+# @njit 
+def deg(
+    wavelengths: np.ndarray, 
+    irr: np.ndarray, 
+    rh: np.ndarray, 
+    temps: np.ndarray, 
+    Ea: float, 
+    C2: float, 
+    p: float, 
+    n: float, 
+    C: float
+) -> float:
+
     R = 0.0083145  # Gas Constant in [kJ/mol*K]
 
-    wav_bin = list(np.diff(wavelengths))
-    wav_bin.append(wav_bin[-1])  # Adding a bin for the last wavelength
+    wav_bin = np.diff(wavelengths)
+    wav_bin = np.append(wav_bin, wav_bin[-1])  # Extend last bin
+    
+    # inner integral
+    # wavelength d lambda
+    irr_weighted = irr * np.exp(-C2 * wavelengths) # weight irradiances
+    irr_weighted *= wav_bin                       
+    irr_pow = irr_weighted ** p
+    wavelength_integral = np.sum(irr_pow, axis=1) # sum over wavelengths
 
-    # Integral over Wavelength
-    try:
-        irr = pd.DataFrame(spectra.tolist(), index=spectra.index)
-        irr.columns = wavelengths
-    except:
-        # TODO: Fix this except it works on some cases, veto it by cases
-        print("Removing brackets from spectral irradiance data")
-        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
-        irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
-        irr.columns = wavelengths
+    # outer integral
+    # arrhenius integral dt
+    time_integrand = (rh ** n) * np.exp(-Ea / (R * temps))
 
-    sensitivitywavelengths = np.exp(-C2 * wavelengths)
-    irr = irr * sensitivitywavelengths
-    irr *= np.array(wav_bin)
-    irr = irr**p
-    data = pd.DataFrame(index=spectra.index)
-    data["G_integral"] = irr.sum(axis=1)
-
-    EApR = -Ea / R
-    C4 = np.exp(EApR / temp_module)
-
-    RHn = rh_module**n
-    data["Arr_integrand"] = C4 * RHn
-
-    data["dD"] = data["G_integral"] * data["Arr_integrand"]
-
-    degradation = C * data["dD"].sum(axis=0)
+    dD = wavelength_integral * time_integrand
+    degradation = C * np.sum(dD)
 
     return degradation
+
+
+# @deprecated("old double integral degradation function will be replaced 'pvdegradation' in an updated version of pvdeg")
+# def degradation(
+#     spectra: pd.Series,
+#     rh_module: pd.Series,
+#     temp_module: pd.Series,
+#     wavelengths: Union[int, np.ndarray[float]],
+#     Ea: float = 40.0,
+#     n: float = 1.0,
+#     p: float = 0.5,
+#     C2: float = 0.07,
+#     C: float = 1.0,
+# ) -> float:
+#     """
+#     Compute degredation as double integral of Arrhenius (Activation
+#     Energy, RH, Temperature) and spectral (wavelength, irradiance)
+#     functions over wavelength and time.
+
+#     .. math::
+
+#         D = C \\int_{0}^{t} RH(t)^n \\cdot e^{\\frac{-E_a}{RT(t)}} \\int_{\\lambda} [e^{-C_2 \\lambda} \\cdot G(\\lambda, t)]^p d\\lambda dt
+
+#     Parameters
+#     ----------
+#     spectra : pd.Series type=Float
+#         front or rear irradiance at each wavelength in "wavelengths" [W/m^2 nm]
+#     rh_module : pd.Series type=Float
+#         module RH, time indexed [%]
+#     temp_module : pd.Series type=Float
+#         module temperature, time indexed [C]
+#     wavelengths : int-array
+#         integer array (or list) of wavelengths tested w/ uniform delta
+#         in nanometers [nm]
+#     Ea : float
+#         Arrhenius activation energy. The default is 40. [kJ/mol]
+#     n : float
+#         Fit paramter for RH sensitivity. The default is 1.
+#     p : float
+#         Fit parameter for irradiance sensitivity. Typically
+#         0.6 +- 0.22
+#     C2 : float
+#         Fit parameter for sensitivity to wavelength exponential.
+#         Typically 0.07
+#     C : float
+#         Fit parameter for the Degradation equaiton
+#         Typically 1.0
+
+#     Returns
+#     -------
+#     degradation : float
+#         Total degredation factor over time and wavelength.
+#     """
+#     # --- TO DO ---
+#     # unpack input-dataframe
+#     # spectra = df['spectra']
+#     # temp_module = df['temp_module']
+#     # rh_module = df['rh_module']
+
+#     # Constants
+#     R = 0.0083145  # Gas Constant in [kJ/mol*K]
+
+#     wav_bin = list(np.diff(wavelengths))
+#     wav_bin.append(wav_bin[-1])  # Adding a bin for the last wavelength
+
+#     # Integral over Wavelength
+#     try:
+#         irr = pd.DataFrame(spectra.tolist(), index=spectra.index)
+#         irr.columns = wavelengths
+#     except:
+#         # TODO: Fix this except it works on some cases, veto it by cases
+#         print("Removing brackets from spectral irradiance data")
+#         # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+#         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
+#         irr.columns = wavelengths
+
+
+#     # double integral calculation
+#     sensitivitywavelengths = np.exp(-C2 * wavelengths)
+#     irr = irr * sensitivitywavelengths
+#     irr *= np.array(wav_bin)
+#     irr = irr**p
+#     data = pd.DataFrame(index=spectra.index)
+#     data["G_integral"] = irr.sum(axis=1)
+
+#     EApR = -Ea / R
+#     C4 = np.exp(EApR / temp_module)
+
+#     RHn = rh_module**n
+
+#     data["Arr_integrand"] = C4 * RHn
+
+#     print("arr integral", data["Arr_integrand"])  
+#     print("wavelength integral", data["G_integral"] )
+
+#     data["dD"] = data["G_integral"] * data["Arr_integrand"]
+
+#     print(f"delta degradation ", data["dD"])
+
+#     degradation = C * data["dD"].sum(axis=0)
+
+#     return degradation
 
 
 # change it to take pd.DataFrame? instead of np.ndarray
@@ -958,7 +1117,11 @@ def vecArrhenius(
     poa_global: np.ndarray, module_temp: np.ndarray, ea: float, x: float, lnr0: float
 ) -> float:
     """
-    Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
+    Calculate arrhenius degradation using vectorized operations. To eliminate the irradiance term set the irradiance sensitivity to 0.
+    
+    .. math::
+
+        R_D = R_0 \\cdot I^X \\cdot e^{\\frac{-E_a}{kT}}
 
     Parameters
     ----------
@@ -972,7 +1135,7 @@ def vecArrhenius(
         Activation energy [kJ/mol]
 
     x : float
-        Irradiance relation [unitless]
+        Irradiance sensitivity [unitless]
 
     lnR0 : float
         prefactor [ln(%/h)]

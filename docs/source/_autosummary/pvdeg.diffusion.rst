@@ -19,6 +19,7 @@ pvdeg.diffusion
       :nosignatures:
 
       
+      pvdeg.diffusion.esdiffusion
       pvdeg.diffusion.module_front
 
    
@@ -34,6 +35,13 @@ pvdeg.diffusion
    ---------
 
    
+
+   .. autofunction:: esdiffusion
+
+   .. _sphx_glr_backref_pvdeg.diffusion.esdiffusion:
+
+   .. minigallery:: pvdeg.diffusion.esdiffusion
+       :add-heading:
 
    .. autofunction:: module_front
 

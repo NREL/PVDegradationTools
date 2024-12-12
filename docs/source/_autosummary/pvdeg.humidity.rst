@@ -31,10 +31,7 @@ pvdeg.humidity
       pvdeg.humidity.module
       pvdeg.humidity.moisture_eva_back
       pvdeg.humidity.psat
-<<<<<<< HEAD
       pvdeg.humidity.rh_internal_cell_backside
-=======
->>>>>>> development
       pvdeg.humidity.surface_outside
 
    
@@ -135,7 +132,6 @@ pvdeg.humidity
    .. minigallery:: pvdeg.humidity.psat
        :add-heading:
 
-<<<<<<< HEAD
    .. autofunction:: rh_internal_cell_backside
 
    .. _sphx_glr_backref_pvdeg.humidity.rh_internal_cell_backside:
@@ -143,8 +139,6 @@ pvdeg.humidity
    .. minigallery:: pvdeg.humidity.rh_internal_cell_backside
        :add-heading:
 
-=======
->>>>>>> development
    .. autofunction:: surface_outside
 
    .. _sphx_glr_backref_pvdeg.humidity.surface_outside:

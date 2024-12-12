@@ -131,12 +131,26 @@ def test_degradation():
 
     data = pd.read_csv(INPUT_SPECTRA)
     wavelengths = np.array(range(280, 420, 20))
-    degradation = pvdeg.degradation.degradation(
-        spectra=data["Spectra"],
-        rh_module=data["RH"],
-        temp_module=data["Temperature"],
-        wavelengths=wavelengths,
+
+    # convert to expected format
+    spectra = data["Spectra"]
+    spectra_df = pd.DataFrame(spectra.tolist(), index=spectra.index)
+    spectra_df = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
+    spectra_df.columns = wavelengths
+
+    conditions_df = pd.DataFrame(
+        index=spectra_df.index,
+        data={
+            "relative_humidity": data["RH"],
+            "temperature": data["Temperature"],
+        }
     )
+
+    degradation = pvdeg.degradation.degradation(
+        spectra_df=spectra_df,
+        conditions_df=conditions_df
+    )
+
     assert degradation == pytest.approx(4.4969e-38, abs=0.02e-38)
 
 

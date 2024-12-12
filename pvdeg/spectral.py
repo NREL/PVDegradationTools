@@ -6,7 +6,7 @@ import pvlib
 from numba import njit, prange
 import numpy as np
 import pandas as pd
-from pvdeg.decorators import geospatial_quick_shape
+from pvdeg.decorators import geospatial_quick_shape, deprecated
 
 @geospatial_quick_shape(
     1,
@@ -140,9 +140,17 @@ def poa_irradiance(
 
 # Deprication Warning: pvlib.spectrum.get_am15g was depricated in pvlib v0.11.0
 # will be removed in v0.12.0, currently pvdeg should be using v0.10.3
-def get_GTI_from_irradiance_340(irradiance_340: pd.Series) -> pd.Series:
+
+@deprecated("utilizes a deprecated pvlib function, this will be updated in a new pvdeg version")
+def calc_full_from_irradiance_340(irradiance_340: pd.Series) -> pd.Series:
     """
     Calculate the Global Tilt Irradiance of a module with 37 degrees of tile from irradiance at 340 nm.
+
+    This method assumes we are at a mid latitudes, and our solar spectrum matches ASTM G173-03 AM1.5 reference spectrum.
+
+    .. math::
+
+        \\text{GTI} = \\frac{ \\text{Irradiance}_{340} }{ \\text{Spectrum}_{340} } * \\text{Total Reference Irradiance}
 
     Parameters:
     -----------
@@ -159,29 +167,10 @@ def get_GTI_from_irradiance_340(irradiance_340: pd.Series) -> pd.Series:
     wavelengths = am15.index.to_numpy(dtype=np.float64)
     spectrum = am15.to_numpy(dtype=np.float64)
 
-    gti = _GTI_from_irradiance_340(
-        irradiance_340=irradiance_340.to_numpy(dtype=np.float64),
-        wavelengths=wavelengths,
-        spectrum=spectrum,
-    )
+    spectrum_340 = spectrum[120]  # 340nm at 120th index
+    total_reference_irradiance = np.trapz(spectrum, wavelengths) # numba?
+
+    scaling_factor = irradiance_340 / spectrum_340
+    gti = scaling_factor * total_reference_irradiance
 
     return pd.Series(gti, index=irradiance_340.index, name="GTI")
-
-
-# this is very inneficient
-# we probably dont need to integrate here
-# according to the spectrum, we know that the ratio of 340 to full spectrum is the same compared to the refenece so this is just a proportion calculation
-@njit(parallel=True, cache=True)
-def _GTI_from_irradiance_340(
-    irradiance_340: np.ndarray, wavelengths: np.ndarray, spectrum: np.ndarray
-) -> np.ndarray:
-    gti = np.empty_like(irradiance_340)
-    spectrum_340 = spectrum[120]  # 340nm at 120th index
-
-    for i in prange(irradiance_340.shape[0]):
-        scaling_factor = irradiance_340[i] / spectrum_340
-        scaled_irradiance = scaling_factor * spectrum
-        total_irradiance = np.trapz(scaled_irradiance, wavelengths)
-        gti[i] = total_irradiance
-
-    return gti

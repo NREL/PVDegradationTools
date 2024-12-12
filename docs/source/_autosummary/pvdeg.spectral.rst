@@ -19,7 +19,7 @@ pvdeg.spectral
       :nosignatures:
 
       
-      pvdeg.spectral.get_GTI_from_irradiance_340
+      pvdeg.spectral.calc_full_from_irradiance_340
       pvdeg.spectral.poa_irradiance
       pvdeg.spectral.solar_position
 
@@ -37,11 +37,11 @@ pvdeg.spectral
 
    
 
-   .. autofunction:: get_GTI_from_irradiance_340
+   .. autofunction:: calc_full_from_irradiance_340
 
-   .. _sphx_glr_backref_pvdeg.spectral.get_GTI_from_irradiance_340:
+   .. _sphx_glr_backref_pvdeg.spectral.calc_full_from_irradiance_340:
 
-   .. minigallery:: pvdeg.spectral.get_GTI_from_irradiance_340
+   .. minigallery:: pvdeg.spectral.calc_full_from_irradiance_340
        :add-heading:
 
    .. autofunction:: poa_irradiance

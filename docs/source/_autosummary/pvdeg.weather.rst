@@ -23,10 +23,7 @@ pvdeg.weather
       pvdeg.weather.get
       pvdeg.weather.get_NSRDB
       pvdeg.weather.get_NSRDB_fnames
-<<<<<<< HEAD
-=======
       pvdeg.weather.get_anywhere
->>>>>>> development
       pvdeg.weather.get_satellite
       pvdeg.weather.ini_h5_geospatial
       pvdeg.weather.is_leap_year
@@ -79,8 +76,6 @@ pvdeg.weather
    .. minigallery:: pvdeg.weather.get_NSRDB_fnames
        :add-heading:
 
-<<<<<<< HEAD
-=======
    .. autofunction:: get_anywhere
 
    .. _sphx_glr_backref_pvdeg.weather.get_anywhere:
@@ -88,7 +83,6 @@ pvdeg.weather
    .. minigallery:: pvdeg.weather.get_anywhere
        :add-heading:
 
->>>>>>> development
    .. autofunction:: get_satellite
 
    .. _sphx_glr_backref_pvdeg.weather.get_satellite:
