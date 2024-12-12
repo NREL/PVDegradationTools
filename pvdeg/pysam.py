@@ -425,6 +425,13 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
         returns an custom class object so we can unpack it later.
     """
 
+    if (not isinstance(weather_df, pd.DataFrame) or not isinstance(meta, dict)):
+        raise ValueError(f"""
+            weather_df must be pandas DataFrame, meta must be dict.
+            weather_df type : {type(weather_df)}
+            meta type : {type(meta)}
+        """)
+
     outputs = pysam(
         weather_df = weather_df,
         meta = meta,
@@ -448,7 +455,7 @@ def solar_resource_dict(weather_df, meta):
     Works on PVGIS and appears to work on NSRDB (NOT PSM3).
     """
 
-    weather_df = weather_df.reset_index(drop=True) # Probably dont need to do this
+    # weather_df = weather_df.reset_index(drop=True) # Probably dont need to do this
     weather_df = utilities.add_time_columns_tmy(weather_df) # only supports hourly data
     
     sr = {
