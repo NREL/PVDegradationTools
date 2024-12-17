@@ -1,8 +1,10 @@
-v0.4.3 (2024-10-10)
-===================
+v0.4.3 (2024-11-1)
+=======================
 
 Enhancements
-------------
+-------------
+``pvdeg.geospatial.analysis`` implements autotemplating. No need to specify a template for common ``pvdeg`` functions during analysis. Manually creating and providing templates is still an option. Docstrings updated with examples.
+
 Suite of utility functions to facilitate accessing material parameter json files.
 
 * ``pvdeg.utilities.read_material`` creates a public api to replace the private ``pvdeg.untility._read_material`` function (to be deprecated soon)  

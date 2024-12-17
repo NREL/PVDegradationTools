@@ -1,0 +1,45 @@
+
+v0.4.5 (2024-12-11)
+===================
+
+Breaking Change
+------------
+* Changed function signature of ``pvdeg.degradation.degradation``.  
+    - New function takes ``spectra_df`` instead of ``spectra`` and ``wavelengths`` disparate arguments.
+    Also takes ``conditions_df`` instead of disparate ``rh_module`` and ``temp_module`` pandas series.
+        
+        spectra_df : pd.DataFrame
+                front or rear irradiance data in dataframe format
+
+                - `data`: Spectral irradiance values for each wavelength [W/m^2/nm].
+                - `index`: pd.DateTimeIndex
+                - `columns`: Wavelengths as floats (e.g., 280, 300, etc.) [nm].
+
+                Example::
+
+                    timestamp                 280     300     320     340     360     380     400
+                    2021-03-09 10:00:00    0.6892  0.4022  0.6726  0.0268  0.3398  0.9432  0.7411
+                    2021-03-09 11:00:00    0.1558  0.5464  0.6896  0.7828  0.5050  0.9336  0.4652
+                    2021-03-09 12:00:00    0.2278  0.9057  0.2639  0.0572  0.9906  0.9370  0.1800
+                    2021-03-09 13:00:00    0.3742  0.0358  0.4052  0.9578  0.1044  0.8917  0.4876
+
+            conditions_df : pd.DataFrame, optional
+                Environmental conditions including temperature and relative humidity.
+
+                - `index`: pd.DateTimeIndex
+                - `columns`:  (required)
+                    - "temperature" [°C or K]
+                    - "relative_humidity" [%]
+
+                Example::
+
+                    timestamp                 temperature  relative_humidity
+                    2021-03-09 10:00:00         298.0               45.0
+                    2021-03-09 11:00:00         303.0               50.0
+                    2021-03-09 12:00:00         310.0               55.0
+                    2021-03-09 13:00:00         315.0               60.0
+
+
+Contributors
+-----------
+* Tobin Ford (:ghuser:`tobin-ford`)

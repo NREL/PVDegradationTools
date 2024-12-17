@@ -59,6 +59,31 @@ def _ambient(weather_df):
     return weather_df
 
 
+# should this take the weather_df as everything else does
+def precipitable_water(dew_point, pressure):
+    """
+    calculate precipitable water vapor (PWV) in cm.
+
+    Parameters
+    ===========
+    - dew_point: numeric
+        Dew point temperature in °C (array or single value)
+    - pressure: numeric
+        Atmospheric pressure in hPa (array or single value)
+
+    Returns
+    ===========
+    - PWV: numeric
+        PWV in cm
+    """
+    # Calculate saturation vapor pressure (e_s) at dew point
+    e_s = 6.1094 * np.exp((17.625 * dew_point) / (dew_point + 243.04))
+    
+    # Calculate precipitable water vapor (PWV)
+    PWV = (0.1 * e_s) / pressure
+    return PWV
+
+
 # TODO: When is dew_yield used?
 @njit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
