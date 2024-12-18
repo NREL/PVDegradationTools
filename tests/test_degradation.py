@@ -128,6 +128,7 @@ def test_degradation():
     # test RH, Temp, Spectral Irradiance sensitive degradation
     # requires TMY3-like weather data
     # requires spectral irradiance data
+    INPUT_SPECTRA = os.path.join(TEST_DATA_DIR, r"spectra_pytest.csv")
 
     data = pd.read_csv(INPUT_SPECTRA)
     wavelengths = np.array(range(280, 420, 20))
@@ -138,13 +139,16 @@ def test_degradation():
     spectra_df = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
     spectra_df.columns = wavelengths
 
+    # from input data, this was lost during our original conversion to the dataframe
+    spectra_df.index = pd.date_range("2021-03-09 10:00:00", freq='1h', periods=10)
+
     conditions_df = pd.DataFrame(
-        index=spectra_df.index,
         data={
             "relative_humidity": data["RH"],
             "temperature": data["Temperature"],
         }
     )
+    conditions_df.index = spectra_df.index
 
     degradation = pvdeg.degradation.degradation(
         spectra_df=spectra_df,
@@ -152,7 +156,6 @@ def test_degradation():
     )
 
     assert degradation == pytest.approx(4.4969e-38, abs=0.02e-38)
-
 
 # def test_hours_rh_above_85():
 #     values = np.arange(0,100)
