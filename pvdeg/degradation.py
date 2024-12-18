@@ -864,6 +864,7 @@ def _gJtoMJ(gJ):
 
 
 # new version of degradation
+# we can make this work with varying timedelta sizes
 def degradation(
     spectra_df: pd.DataFrame,
     conditions_df: pd.DataFrame = None,
@@ -878,7 +879,8 @@ def degradation(
     """
     Compute degredation as double integral of Arrhenius (Activation
     Energy, RH, Temperature) and spectral (wavelength, irradiance)
-    functions over wavelength and time.
+    functions over wavelength and time. Using dataframe input with
+    pd.TimeIndex with constant timedelta.
 
     .. math::
 
@@ -890,7 +892,7 @@ def degradation(
         front or rear irradiance data in dataframe format
 
         - `data`: Spectral irradiance values for each wavelength [W/m^2 nm].
-        - `index`: pd.DateTimeIndex
+        - `index`: pd.DateTimeIndex with constant timedelta
         - `columns`: Wavelengths as floats (e.g., 280, 300, etc.) [nm].
 
         Example::
@@ -904,9 +906,9 @@ def degradation(
     conditions_df : pd.DataFrame, optional
         Environmental conditions including temperature and relative humidity.
 
-        - `index`: pd.DateTimeIndex
+        - `index`: pd.DateTimeIndex identical to spectra_df.index
         - `columns`:  (required)
-            - "temperature" [°C or K]
+            - "temperature" [°K]
             - "relative_humidity" [%]
 
         Example::
@@ -946,7 +948,8 @@ def degradation(
     degradation : float
         Total degredation factor over time and wavelength.
     """
-
+    if not isinstance(spectra_df.index, pd.DatetimeIndex):
+        raise ValueError(f"spectra_df must have pd.DatetimeIndex, has {type(spectra_df.index)}")
 
     if conditions_df is not None and (temp_module is not None or rh_module is not None):
         raise ValueError("Provide either conditions_df or temp_module and rh_module")
@@ -960,6 +963,7 @@ def degradation(
 
     wavelengths = spectra_df.columns.values.astype(float)
     irr = spectra_df.values  # irradiance as array
+    dt = (spectra_df.index[1] - spectra_df.index[0]).total_seconds() / 3600.0
 
     # call numba compiled function
     return deg(
@@ -967,6 +971,7 @@ def degradation(
         irr=irr,
         rh=rh, 
         temps=temps, 
+        dt=dt,
         Ea=Ea, 
         C2=C2, 
         p=p, 
@@ -974,12 +979,13 @@ def degradation(
         C=C
     )
 
-@njit 
+# @njit 
 def deg(
     wavelengths: np.ndarray, 
     irr: np.ndarray, 
     rh: np.ndarray, 
     temps: np.ndarray, 
+    dt: float, # timestep in hours 
     Ea: float, 
     C2: float, 
     p: float, 
@@ -1003,7 +1009,7 @@ def deg(
     # arrhenius integral dt
     time_integrand = (rh ** n) * np.exp(-Ea / (R * temps))
 
-    dD = wavelength_integral * time_integrand
+    dD = wavelength_integral * time_integrand * dt
     degradation = C * np.sum(dD)
 
     return degradation
