@@ -1000,10 +1000,10 @@ def deg(
     
     # inner integral
     # wavelength d lambda
-    irr_weighted = irr * np.exp(-C2 * wavelengths) # weight irradiances
-    irr_weighted *= wav_bin                       
-    irr_pow = irr_weighted ** p
-    wavelength_integral = np.sum(irr_pow, axis=1) # sum over wavelengths
+    irr_weighted = irr * np.exp(-C2 * wavelengths)  # weight irradiances
+    irr_weighted *= wav_bin                         # multiply instantanous irradiance by bin size for rectangular integration
+    irr_pow = irr_weighted ** p                     # dependence on irradiance
+    wavelength_integral = np.sum(irr_pow, axis=1)   # sum over wavelengths for integration
 
     # outer integral
     # arrhenius integral dt
