@@ -67,10 +67,71 @@ def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 def poa_irradiance(
     weather_df: pd.DataFrame,
     meta: dict,
+    module_mount="fixed",
+    sol_position=None,
+    **kwargs_irradiance,
+) -> pd.DataFrame:
+    """
+    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
+    National Solar Radiation Database (NSRDB) for a given location (gid).
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        The file path to the NSRDB file.
+    meta : dict
+        The geographical location ID in the NSRDB file.
+    module_mount: string
+        Module mounting configuration. Can either be `fixed` for fixed tilt systems or
+        `1_axis` for single-axis tracker systems.
+    sol_position : pd.DataFrame, optional
+        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
+    kwargs_irradiance : dict
+        Contains kwarg arguments for the poa model based on mounting configuration. See
+        `poa_irradiance_fixed` or `poa_irradiance_tracker` for details.
+
+    Returns
+    -------
+    poa : pandas.DataFrame
+         Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
+         'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
+    """
+
+    if sol_position is None:
+        sol_position = solar_position(weather_df, meta)
+
+    if module_mount == "fixed":
+        poa = poa_irradiance_fixed(weather_df, meta, sol_position, **kwargs_irradiance)
+    elif module_mount == "1_axis":
+        poa = poa_irradiance_tracker(
+            weather_df, meta, sol_position, **kwargs_irradiance
+        )
+    else:
+        raise NotImplementedError(
+            f"The input module_mount '{module_mount}' is not implemented"
+        )
+
+    return poa
+
+
+@geospatial_quick_shape(
+    1,
+    [
+        "poa_global",
+        "poa_direct",
+        "poa_diffuse",
+        "poa_sky_diffuse",
+        "poa_ground_diffuse",
+    ],
+)
+def poa_irradiance_fixed(
+    weather_df: pd.DataFrame,
+    meta: dict,
     sol_position=None,
     tilt=None,
     azimuth=None,
     sky_model="isotropic",
+    **kwargs_irradiance,
 ) -> pd.DataFrame:
     """
     Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
@@ -104,7 +165,7 @@ def poa_irradiance(
         try:
             tilt = float(meta["tilt"])
         except:
-            tilt = float(meta["latitude"])
+            tilt = float(abs(meta["latitude"]))
             print(
                 f"The array tilt angle was not provided, therefore the latitude tilt of {tilt:.1f} was used."
             )
@@ -135,3 +196,92 @@ def poa_irradiance(
     )
 
     return poa
+
+
+@geospatial_quick_shape(
+    1,
+    [
+        "poa_global",
+        "poa_direct",
+        "poa_diffuse",
+        "poa_sky_diffuse",
+        "poa_ground_diffuse",
+    ],
+)
+def poa_irradiance_tracker(
+    weather_df: pd.DataFrame,
+    meta: dict,
+    sol_position=None,
+    axis_tilt=0,
+    axis_azimuth=None,
+    max_angle=90,
+    backtrack=True,
+    gcr=0.2857142857142857,
+    cross_axis_tilt=0,
+    sky_model="isotropic",
+    **kwargs_irradiance,
+) -> pd.DataFrame:
+    """
+    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
+    National Solar Radiation Database (NSRDB) for a given location (gid).
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        The file path to the NSRDB file.
+    meta : dict
+        The geographical location ID in the NSRDB file.
+    sol_position : pd.DataFrame, optional
+        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
+    tilt : float, optional
+        The tilt angle of the PV panels in degrees, if None, the latitude of the
+        location is used.
+    azimuth : float, optional
+        The azimuth angle of the PV panels in degrees. Equatorial facing by default.
+    sky_model : str, optional
+        The pvlib sky model to use, 'isotropic' by default.
+        Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
+
+    Returns
+    -------
+    tracker_poa : pandas.DataFrame
+         Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
+         'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
+    """
+
+    if axis_azimuth is None:  # Sets the default orientation to north-south.
+        try:
+            axis_azimuth = float(meta["axis_azimuth"])
+        except:
+            if float(meta["latitude"]) < 0:
+                axis_azimuth = 0
+            else:
+                axis_azimuth = 180
+                print(f"The array axis_azimuth was not provided, therefore an azimuth of {axis_azimuth:.1f} was used.")
+
+    if sol_position is None:
+        sol_position = solar_position(weather_df, meta)
+
+    tracker_data = pvlib.tracking.singleaxis(
+        sol_position["apparent_zenith"],
+        sol_position["azimuth"],
+        axis_tilt=axis_tilt,
+        axis_azimuth=axis_azimuth,
+        max_angle=max_angle,
+        backtrack=backtrack,
+        gcr=gcr,
+        cross_axis_tilt=cross_axis_tilt,
+    )
+
+    tracker_poa = pvlib.irradiance.get_total_irradiance(
+        surface_tilt=tracker_data["surface_tilt"],
+        surface_azimuth=tracker_data["surface_azimuth"],
+        dni=weather_df["dni"],
+        ghi=weather_df["ghi"],
+        dhi=weather_df["dhi"],
+        solar_zenith=sol_position["apparent_zenith"],
+        solar_azimuth=sol_position["azimuth"],
+        model=sky_model,
+    )
+
+    return tracker_poa
