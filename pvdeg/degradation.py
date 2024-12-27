@@ -979,7 +979,7 @@ def degradation(
         C=C
     )
 
-# @njit 
+@njit 
 def deg(
     wavelengths: np.ndarray, 
     irr: np.ndarray, 
@@ -1001,8 +1001,8 @@ def deg(
     # inner integral
     # wavelength d lambda
     irr_weighted = irr * np.exp(-C2 * wavelengths)  # weight irradiances
-    irr_weighted *= wav_bin                         # multiply instantanous irradiance by bin size for rectangular integration
     irr_pow = irr_weighted ** p                     # dependence on irradiance
+    irr_weighted *= wav_bin                         # multiply instantanous irradiance by bin size for rectangular integration
     wavelength_integral = np.sum(irr_pow, axis=1)   # sum over wavelengths for integration
 
     # outer integral
