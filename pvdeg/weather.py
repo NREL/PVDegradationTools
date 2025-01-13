@@ -2,6 +2,7 @@
 Collection of classes and functions to obtain spectral parameters.
 """
 
+import dask.distributed
 from pvdeg import humidity
 from pvdeg.utilities import nrel_kestrel_check
 
@@ -1182,6 +1183,13 @@ def weather_distributed(
     """
 
     import dask.delayed
+    import dask.distributed
+
+    try:
+        client = dask.distributed.get_client()
+        print("Connected to a Dask scheduler | Dashboard:", client.dashboard_link)
+    except ValueError:
+        raise RuntimeError("No Dask scheduler found. Ensure a dask client is running.")
 
     if (database != "PVGIS" and database != "PSM3"):
         raise NotImplementedError(f"Only 'PVGIS' and 'PSM3' are implemented, you entered {database}")
@@ -1190,6 +1198,7 @@ def weather_distributed(
     results = dask.compute(futures)[0] # values are returned in a list with one entry
 
     # what is the difference between these two approaches for dask distributed work, how can we schedule differently
+    # i believe futures might be better for our needs
     # futures = [client.submit(weather_distributed, "PVGIS", coord) for coord in coords]
     # client.gather(futures)
 
