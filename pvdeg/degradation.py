@@ -865,6 +865,7 @@ def _gJtoMJ(gJ):
 
 # new version of degradation
 # we can make this work with varying timedelta sizes
+# take C rather than K
 def degradation(
     spectra_df: pd.DataFrame,
     conditions_df: pd.DataFrame = None,
@@ -908,19 +909,19 @@ def degradation(
 
         - `index`: pd.DateTimeIndex identical to spectra_df.index
         - `columns`:  (required)
-            - "temperature" [°K]
+            - "temperature" [°C]
             - "relative_humidity" [%]
 
         Example::
 
             timestamp                 temperature  relative_humidity
-            2021-03-09 10:00:00         298.0               45.0
-            2021-03-09 11:00:00         301.0               50.0
-            2021-03-09 12:00:00         315.0               55.0
-            2021-03-09 13:00:00         150.0               60.0
+            2021-03-09 10:00:00         98.0               45.0
+            2021-03-09 11:00:00         31.0               50.0
+            2021-03-09 12:00:00         35.0               55.0
+            2021-03-09 13:00:00         50.0               60.0
 
     temp_module : pd.Series, optional
-        Module temperatures [°K]. Required if `conditions_df` is not provided. Time indexed same as spectra_df
+        Module temperatures [°C]. Required if `conditions_df` is not provided. Time indexed same as spectra_df
 
     rh_module : pd.Series, optional
         Relative humidity values [%]. Required if `conditions_df` is not provided. Time indexed same as spectra_df
@@ -960,6 +961,8 @@ def degradation(
     else:
         rh = rh_module.values
         temps = temp_module.values
+
+    temps += 273.15
 
     wavelengths = spectra_df.columns.values.astype(float)
     irr = spectra_df.values  # irradiance as array
