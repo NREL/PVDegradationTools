@@ -67,6 +67,7 @@ docs = [
     "nbsphinx",
     "sphinx_toggleprompt",
     "pydata_sphinx_theme",
+    "mistune==3.0.0",
 ]
 test = [
     "pytest",

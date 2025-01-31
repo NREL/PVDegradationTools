@@ -1092,6 +1092,8 @@ class GeospatialScenario(Scenario):
         geospatial=False,
         weather_data: xr.Dataset = None,
         meta_data: pd.DataFrame = None,
+        func: Callable = None,
+        template: xr.Dataset = None,
     ):
         super().__init__(
             name=name,
@@ -1106,6 +1108,8 @@ class GeospatialScenario(Scenario):
         )
         self.geospatial = geospatial
         self.hpc = hpc
+        self.func = func
+        self.template = template
 
     def __eq__(self, other):
         raise NotImplementedError("""
@@ -1614,50 +1618,50 @@ class GeospatialScenario(Scenario):
         """
         self.weather_data, self.meta_data = weather_ds, meta_df
 
-
     def addJob(
         self,
-        func: Callable = None,
+        func: Callable,
+        template: xr.Dataset = None,
         func_params: dict = {},
-        see_added: bool = False,
-    ):
+        see_added: bool = False
+    ) -> None:
         """
-        Add a pvdeg function to the scenario pipeline
+        Add a pvdeg geospatial function to the scenario pipeline. If no template is provided, `addJob` attempts to use `geospatial.auto_template` this will raise an 
 
         Parameters:
         -----------
         func : function
-            pvdeg function to use for geospatial analysis.
-            *Note: geospatial analysis is only available with a limited subset of pvdeg
-            functions*
-            Current supported functions for geospatial analysis: ``pvdeg.standards.standoff``,
-            ``pvdeg.humidity.module``, ``pvdeg.letid.calc_letid_outdoors``
+            pvdeg function to use for geospatial analysis. 
+        template : xarray.Dataset
+            Template for output data. Only required if a function is not supported by `geospatial.auto_template`.
         func_params : dict
             job specific keyword argument dictionary to provide to the function
         see_added : bool
             set flag to get a userWarning notifying the user of the job added
-           to the pipeline in method call. ``default = False``
+            to the pipeline in method call. ``default = False``
         """
-        try:
-            pvdeg.geospatial.template_parameters(func)
-        except ValueError:
-            return ValueError(
-                f"{func.__name__} does does not have a valid geospatial results template or does not exist"
-            )
 
-        geo_job_dict = {"geospatial_job": {"job": func, "params": func_params}}
+        if template is None:
 
-        self.pipeline = geo_job_dict
+            # take the weather datapoints specified by metadata and create a template based on them.
+            self.weather_data = self.weather_data.sel(gid=self.meta_data.index)
+            template = pvdeg.geospatial.auto_template(func=func, ds_gids=self.weather_data)
+
+        self.template = template
+        self.func = func
+        self.func_params = func_params
 
         if see_added:
-            message = f"{func.__name__} added to pipeline as \n {geo_job_dict}"
+            message = f"{func.__name__} added to scenario with arguments {func_params} using template: {template}"
             warnings.warn(message, UserWarning)
+
+
 
     def run(self, hpc_worker_conf: Optional[dict] = None) -> None:
         """
-        Run the function in the geospatial pipeline.
-        GeospatialScenario only supports one geospatial pipeline job at a time
-        unlike Scenario which supports unlimited conventional pipeline jobs.
+        Run the geospatial scenario stored in the geospatial scenario object.
+
+        Only supports one function at a time. Unlike `Scenario` which supports unlimited conventional pipeline jobs.
         Results are stored in the `GeospatialScenario.results` attribute.
 
         Creates a dask cluster or client using the hpc_worker_conf parameter.
@@ -1696,20 +1700,14 @@ class GeospatialScenario(Scenario):
         """
         client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
 
-        geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index)
+        analysis_result = pvdeg.geospatial.analysis(
+            weather_ds=self.weather_data,
+            meta_df=self.meta_data,
+            func=self.func,
+            template=self.template, # provided or generated via autotemplate in GeospatialScenario.addJob
+        )
 
-        func = self.pipeline["geospatial_job"]["job"]
-
-        if func == pvdeg.standards.standoff or func == pvdeg.humidity.module:
-            geo = {
-                "func": func,
-                "weather_ds": geo_weather_sub,
-                "meta_df": self.meta_data,
-            }
-
-            analysis_result = pvdeg.geospatial.analysis(**geo)
-
-            self.results = analysis_result
+        self.results = analysis_result
 
         client.shutdown()
 
@@ -2042,32 +2040,32 @@ class GeospatialScenario(Scenario):
             raise ValueError(f"All of iterable: {iterable} does not exist in {to_check}")
 
     
+    # GeospatialScenario no longer uses pipeline, instead job attributes are stored in attrbutes "func", "template"
+    # def format_pipeline(self):
+    #     pipeline_html = "<div>"
+    #     if "geospatial_job" in self.pipeline:
+    #         step_name = "geospatial_job"
+    #         step = self.pipeline[step_name]
+    #         params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
 
-    def format_pipeline(self):
-        pipeline_html = "<div>"
-        if "geospatial_job" in self.pipeline:
-            step_name = "geospatial_job"
-            step = self.pipeline[step_name]
-            params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
-
-            step_content = f"""
-            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
-                <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
-                    {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
-                </h4>
-            </div>
-            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-                <p>Job: {step['job'].__name__}</p>
-                <p>Parameters:</p>
-                <div style="margin-left: 20px;">
-                    {params_html}
-                </div>
-            </div>
-            """
-            pipeline_html += step_content
-        pipeline_html += "</div>"
-        return pipeline_html
+    #         step_content = f"""
+    #         <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+    #             <h4 style="font-family: monospace; margin: 0;">
+    #                 <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
+    #                 {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
+    #             </h4>
+    #         </div>
+    #         <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+    #             <p>Job: {step['job'].__name__}</p>
+    #             <p>Parameters:</p>
+    #             <div style="margin-left: 20px;">
+    #                 {params_html}
+    #             </div>
+    #         </div>
+    #         """
+    #         pipeline_html += step_content
+    #     pipeline_html += "</div>"
+    #     return pipeline_html
 
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
@@ -2082,8 +2080,9 @@ class GeospatialScenario(Scenario):
                 {self.format_results() if self.results else None}
             </div>
             <div>
-                <h3>Pipeline</h3>
-                {self.format_pipeline()}
+                <h3>Geospatial Job</h3>
+                Function : {self.func.__name__}
+                {self.format_template()}
             </div>
             <div>
                 <h3>Modules</h3>
@@ -2153,6 +2152,25 @@ class GeospatialScenario(Scenario):
             """
 
         return meta_data_html
+
+    def format_template(self):
+        template_html = ""
+
+        if self.meta_data is not None:
+
+            template_html = f"""
+            <div id="template" onclick="toggleVisibility('content_template')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <h4 style="font-family: monospace; margin: 0;">
+                    <span id="arrow_content_template" style="color: #b676c2;">►</span>
+                    Template
+                </h4>
+            </div>
+            <div id="content_template" style="display:none; margin-left: 20px; padding: 5px;">
+                {self.template._repr_html_()}
+            </div>
+            """
+
+        return template_html
 
     def format_geo_weather(self):
         weather_data_html = ""

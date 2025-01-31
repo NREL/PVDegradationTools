@@ -7,6 +7,7 @@ from . import (
     humidity,
     letid,
     utilities,
+    decorators,
 )
 
 import xarray as xr
@@ -190,7 +191,12 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
 
 def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     """
-    Applies a function to each gid of a weather dataset.
+    Applies a function to each gid of a weather dataset. `analysis` will attempt to create a template using `geospatial.auto_template`.
+    If this process fails you will have to provide a geospatial template to the template argument.
+
+    ValueError: <function-name> cannot be autotemplated. create a template manually with `geospatial.output_template`
+
+
 
     Parameters
     ----------
@@ -212,8 +218,10 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     """
 
     if template is None:
-        param = template_parameters(func)
-        template = output_template(weather_ds, **param)
+        template = auto_template(
+            func=func,
+            ds_gids=weather_ds
+        )
 
     # future_meta_df = client.scatter(meta_df)
     kwargs = {"func": func, "future_meta_df": meta_df, "func_kwargs": func_kwargs}
@@ -241,13 +249,42 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
 
 
 def output_template(
-    ds_gids, shapes, attrs=dict(), global_attrs=dict(), add_dims=dict()
+    ds_gids: xr.Dataset,
+    shapes: dict, 
+    attrs=dict(), 
+    global_attrs=dict(), 
+    add_dims=dict()
 ):
     """
     Generates a xarray template for output data. Output variables and
     associated dimensions need to be specified via the shapes dictionary.
     The dimension length are derived from the input data. Additonal output
     dimensions can be defined with the add_dims argument.
+
+    Examples
+    --------
+    Providing the shapes dictionary can be confusing. Here is what the `shapes` dictionary should look like for `pvdeg.standards.standoff`.
+    Refer to the docstring, the function will have one result per location so the only dimension for each return value is "gid", a geospatial ID number.
+
+    .. code-block:: python
+        shapes = {
+            "x": ("gid",),
+            "T98_inf": ("gid",),
+            "T98_0": ("gid",),
+        }
+    
+    **Note: The dimensions are stored in a tuple, this this why all of the parenthesis have commas after the single string, otherwise python will interpret the value as a string.**
+
+    This is what the shapes dictinoary should look like for `pvdeg.humidity.module`. Refering to the docstring,
+    we can see that the function will return a timeseries result for each location. This means we need dimensions of "gid" and "time".
+
+    .. code-block:: python
+        shapes = {
+            "RH_surface_outside": ("gid", "time"),
+            "RH_front_encap": ("gid", "time"),
+            "RH_back_encap": ("gid", "time"),
+            "RH_backsheet": ("gid", "time"),
+        }
 
     Parameters
     ----------
@@ -290,9 +327,9 @@ def output_template(
     return output_template
 
 
-# we should be able to get rid of this with the new autotemplating function and decorator
-# this is helpful for users so we should move it to a section in the documenation,
-# discuss with group
+# This has been replaced with pvdeg.geospatial.auto_templates inside of pvdeg.geospatial.analysis.
+# it is here for completeness. it can be removed.
+@decorators.deprecated(reason="use geospatial.auto_template or create a template with geospatial.output_template")
 def template_parameters(func):
     """
     Output parameters for xarray template.
@@ -410,6 +447,28 @@ def zero_template(
 
     return res
 
+def can_auto_template(func) -> None:
+    """
+    Check if we can use `geospatial.auto_template on a given function.
+
+    Raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
+    No error raised if we can run `geospatial.auto_template` on provided function, `func`.
+    
+    Parameters
+    ----------
+    func: callable
+        function to create template from. 
+
+    Returns
+    -------
+    None
+    """
+    if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
+        raise ValueError(
+            f"{func.__name__} cannot be autotemplated. create a template manually"
+        )
+
+
 
 def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
@@ -417,11 +476,10 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     Only works on functions that have the `numeric_or_timeseries` and `shape_names` attributes.
     These attributes are assigned at function definition with the `@geospatial_quick_shape` decorator.
 
-    Otherwise you will have to create your own template.
-    Don't worry, this is easy. See the Geospatial Templates Notebook
-    for more information.
+    Otherwise you will have to create your own template using `geospatial.output_template`.
+    See the Geospatial Templates Notebook for more information.
 
-    examples:
+    Examples
     ---------
 
     the function returns a numeric value
@@ -430,17 +488,31 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     the function returns a timeseries result
     >>> pvdeg.module.humidity
 
-    counter example:
+    Counter example:
     ----------------
     the function could either return a single numeric or a series based on changed in
     the input. Because it does not have a known result shape we cannot determine the
     attributes required for autotemplating ahead of time.
+
+    Parameters
+    ----------
+    func: callable
+        function to create template from. This will raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
+    ds_gids : xarray.Dataset
+        Dataset containing the gids and their associated dimensions. (geospatial weather dataset)
+        Dataset should already be chunked.
+
+    Returns
+    -------
+    output_template : xarray.Dataset
+        Template for output data.
     """
 
-    if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
-        raise ValueError(
-            f"{func.__name__} cannot be autotemplated. create a template manually"
-        )
+    can_auto_template(func=func)
+    # if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
+    #     raise ValueError(
+    #         f"{func.__name__} cannot be autotemplated. create a template manually"
+    #     )
 
     if func.numeric_or_timeseries == 0:
         shapes = {datavar: ("gid",) for datavar in func.shape_names}
