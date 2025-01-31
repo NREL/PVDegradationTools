@@ -1037,7 +1037,7 @@ def _weather_distributed_vec(
 
 # THE NSRDB shapes could be moved to their own definition
 # organization style question?
-def emtpy_weather_ds(
+def empty_weather_ds(
     gids_size, 
     periodicity, 
     database
@@ -1214,7 +1214,7 @@ def weather_distributed(
     periodicity = ENTRIES_PERIODICITY_MAP[time_length]
 
     # weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather xr.dataset
-    weather_ds = emtpy_weather_ds(
+    weather_ds = empty_weather_ds(
         gids_size=len(results),
         periodicity=periodicity,
         database=database,
@@ -1242,60 +1242,60 @@ def weather_distributed(
 #     map_weather(weather_df=weather_df)
 #     map_meta(meta)
 
-#     # check if weather is localized, convert to GMT (like pvgis)
-#     # check if time index is on the hour or 30 minutes
-#         # weather_df.index - pd.Timedelta("30m")
+    # check if weather is localized, convert to GMT (like pvgis)
+    # check if time index is on the hour or 30 minutes
+        # weather_df.index - pd.Timedelta("30m")
         
-#     # NSRDB datavars
-#     # Year  Month  Day  Hour  Minute  dew_point  dhi
-#     # dni  ghi  albedo  pressure  temp_air
-#     # wind_direction  wind_speed  relative_humidity
+    # NSRDB datavars
+    # Year  Month  Day  Hour  Minute  dew_point  dhi
+    # dni  ghi  albedo  pressure  temp_air
+    # wind_direction  wind_speed  relative_humidity
 
-#     weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
-#     meta_dropables = [...]
+    # weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
+    # meta_dropables = [...]
 
-#     # NSRDB meta
-#     # {'Source': 'NSRDB',
-#     #  'Location ID': '145809',
-#     #  'City': '-',
-#     #  'State': '-',
-#     #  'Country': '-',
-#     #  'Dew Point Units': 'c',
-#     #  'DHI Units': 'w/m2',
-#     #  'DNI Units': 'w/m2',
-#     #  'GHI Units': 'w/m2',
-#     #  'Temperature Units': 'c',
-#     #  'Pressure Units': 'mbar',
-#     #  'Wind Direction Units': 'Degrees',
-#     #  'Wind Speed Units': 'm/s',
-#     #  'Surface Albedo Units': 'N/A',
-#     #  'Version': '3.2.0',
-#     #  'latitude': 39.73,
-#     #  'longitude': -105.18,
-#     #  'altitude': 1820,
-#     #  'tz': -7,
-#     #  'wind_height': 2}
-#     ...
+    # NSRDB meta
+    # {'Source': 'NSRDB',
+    #  'Location ID': '145809',
+    #  'City': '-',
+    #  'State': '-',
+    #  'Country': '-',
+    #  'Dew Point Units': 'c',
+    #  'DHI Units': 'w/m2',
+    #  'DNI Units': 'w/m2',
+    #  'GHI Units': 'w/m2',
+    #  'Temperature Units': 'c',
+    #  'Pressure Units': 'mbar',
+    #  'Wind Direction Units': 'Degrees',
+    #  'Wind Speed Units': 'm/s',
+    #  'Surface Albedo Units': 'N/A',
+    #  'Version': '3.2.0',
+    #  'latitude': 39.73,
+    #  'longitude': -105.18,
+    #  'altitude': 1820,
+    #  'tz': -7,
+    #  'wind_height': 2}
+    ...
 
 # def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
-#     map_weather(weather_df=weather_df)
-#     map_meta(meta)
+    # map_weather(weather_df=weather_df)
+    # map_meta(meta)
 
-#     # drop meaningless variables
+    # drop meaningless variables
 
-#     # pvgis datavars
-#     # temp_air  relative_humidity   ghi  dni   dhi
-#     # IR(h)  wind_speed  wind_direction  pressure
+    # pvgis datavars
+    # temp_air  relative_humidity   ghi  dni   dhi
+    # IR(h)  wind_speed  wind_direction  pressure
 
-#     weather_dropables = ["IR(h)"]
-#     meta_dropables = ['irradiance_time_offset', ...]
+    # weather_dropables = ["IR(h)"]
+    # meta_dropables = ['irradiance_time_offset', ...]
 
-#     # pvgis meta
-#     # {'latitude': 24.7136,
-#     #   'longitude': 46.6753,
-#     #   'irradiance_time_offset': -0.1955,
-#     #   'altitude': 646.0,
-#     #   'wind_height': 10,
-#     #   'Source': 'PVGIS'})
-#     ...
+    # pvgis meta
+    # {'latitude': 24.7136,
+    #   'longitude': 46.6753,
+    #   'irradiance_time_offset': -0.1955,
+    #   'altitude': 646.0,
+    #   'wind_height': 10,
+    #   'Source': 'PVGIS'})
+    # ...
