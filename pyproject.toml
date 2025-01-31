@@ -55,6 +55,7 @@ dependencies = [
     "xarray",
     "pre-commit",
     "sympy",
+    "zarr",
 ]
 dynamic = ["version"]
 
