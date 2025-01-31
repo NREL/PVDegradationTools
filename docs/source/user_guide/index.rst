@@ -8,9 +8,11 @@ User Guide
 
    installation
    package_overview
+   meteorological-data
    NSRDB_API_Key
    montecarlo
-   geospatial-templates
+   geospatial
+   materials
    pv-variables-terms
    contributing
    
