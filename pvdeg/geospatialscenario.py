@@ -9,6 +9,7 @@ import warnings
 import pandas as pd
 import xarray as xr
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from typing import List, Union, Optional, Callable
 from dask.distributed import Client
@@ -796,14 +797,13 @@ class GeospatialScenario(Scenario):
     def plot(self):
         """
         Not Usable in GeospatialScenario class instance, only in Scenario instance.
-        python has no way to hide a parent class method in the child,
-        so this only exists to prevent access
         """
+        # python has no way to hide a parent class method in the child, so this only exists to prevent access
+        #
         raise AttributeError(
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
         )
 
-    import matplotlib
 
     def plot_coords(
         self,
