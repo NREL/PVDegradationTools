@@ -1102,6 +1102,7 @@ class GeospatialScenario(Scenario):
     def __eq__(self, other):
         raise NotImplementedError("cannot directly compare geospatial scenario objects")
 
+ 
     # add restoring from gids functionality from nsrdb
     def addLocation(
         self,
@@ -1140,6 +1141,7 @@ class GeospatialScenario(Scenario):
             combination of states or provinces to include from NSRDB.  
             Supports two-letter codes for American states. Can mix two-letter
             codes with full length strings. Can take single string, or list of strings (len >= 1)
+
             Examples:
             - ``state='Washington'``
             - ``state=WA`` (state abbr is case insensitive)
@@ -1154,8 +1156,19 @@ class GeospatialScenario(Scenario):
         year : int
             year of data to use from NSRDB, default = ``2022``
         nsrdb_attributes : list(str)
-            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).\
-            Default = ``['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']``
+            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).
+
+                Valid Options:
+                - 'air_temperature'  
+                - 'dew_point'  
+                - 'dhi'  
+                - 'dni'  
+                - 'ghi'  
+                - 'surface_albedo'   
+                - 'surface_pressure'   
+                - 'wind_direction'   
+                - 'wind_speed'  
+
         see_added : bool
             flag true if you want to see a runtime notification for added location/gids
         """
@@ -1208,10 +1221,12 @@ class GeospatialScenario(Scenario):
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
 
         # we don't downsample weather data until this runs 
-        # because on NSRDB we are storing weather OUT of MEMORY with dask
+        # because on NSRDB we are storing weather out of memory with dask
         geo_meta, geo_gids = pvdeg.utilities.gid_downsampling( 
             geo_meta, downsample_factor
         )
+
+        geo_weather = pvdeg.weather.map_weather(geo_weather)
 
         self.weather_data = geo_weather
         self.meta_data = geo_meta
@@ -1222,6 +1237,20 @@ class GeospatialScenario(Scenario):
             warnings.warn(message, UserWarning)
 
         return
+
+    def downselect_CONUS(
+        self,
+    ) -> None:
+        """Downselect US to contiguous US geospatial data"""
+
+        geo_weather, geo_meta = self.geospatial_data()
+
+        geo_meta = geo_meta[geo_meta['state'] != "Alaska"]
+        geo_meta = geo_meta[geo_meta['state'] != "Hawaii"]
+        geo_weather = geo_weather.sel(gid=geo_meta.index)
+
+        self.weather_data = geo_weather
+        self.meta_data = geo_meta
 
     def location_bounding_box(
         self,

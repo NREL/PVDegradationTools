@@ -76,8 +76,11 @@ test = [
 books = [
     "jupyter-book",
 ]
+sam = [
+    "pysam",
+]
 all = [
-    "pvdeg[docs,test,books]",
+    "pvdeg[docs,test,books,sam]",
 ]
 
 [project.entry-points.pvdeg]

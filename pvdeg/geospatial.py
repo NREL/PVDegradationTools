@@ -10,7 +10,6 @@ from . import (
     pysam,
 )
 
-
 import xarray as xr
 import dask.array as da
 import pandas as pd
@@ -92,13 +91,24 @@ def start_dask(hpc=None):
 
     return client
 
+# rename this?
+# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt really doing anything anymore
+# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset already then we dont want to anything
 def _ds_from_arbitrary(res, func):
     """
     Convert an arbitrary return type to xarray.Dataset. 
     """
 
-    if isinstance(res, pysam.inspirePysamReturn):
-        return pysam._handle_pysam_return(res)
+    ######## STRUCTURAL #########
+    # functions can just return xr.Dataset to take advantage of geospatial
+    # this should not be required to implement a new geospatial function
+
+    if isinstance(res, xr.Dataset):
+        return res
+
+
+    # if isinstance(res, pysam.inspirePysamReturn):
+    #     return pysam._handle_pysam_return(res)
     # add more conditionals if we have special cases 
     # or add general case for mixed return dimensions: HARD
     
@@ -992,7 +1002,7 @@ def elevation_stochastic_downselect(
 
 
 def interpolate_analysis(
-    result: xr.Dataset, data_var: str, method="nearest"
+    result: xr.Dataset, data_var: str, method="nearest", res = 100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Interpolate sparse spatial result data against DataArray coordinates.
@@ -1016,8 +1026,8 @@ def interpolate_analysis(
     )  # probably a nicer way to do this
 
     grid_lat, grid_lon = np.mgrid[
-        df["latitude"].min() : df["latitude"].max() : 100j,
-        df["longitude"].min() : df["longitude"].max() : 100j,
+        df["latitude"].min() : df["latitude"].max() : res,
+        df["longitude"].min() : df["longitude"].max() : res,
     ]
 
     grid_z = griddata(data[:, 0:2], data[:, 2], xi=(grid_lat, grid_lon), method=method)
@@ -1025,14 +1035,28 @@ def interpolate_analysis(
     return grid_z, grid_lat, grid_lon
 
 
-def plot_sparse_analysis(result: xr.Dataset, data_var: str, method="nearest") -> None:
+def plot_sparse_analysis(
+    result: xr.Dataset, 
+    data_var: str, 
+    method="nearest", 
+    res=100j, 
+    cmap='viridis',
+    ax=None
+
+) -> None:
     grid_values, lat, lon = interpolate_analysis(
-        result=result, data_var=data_var, method=method
+        result=result, data_var=data_var, method=method, res=res
     )
 
-    fig = plt.figure()
-    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
-    ax.patch.set_visible(False)
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
+        ax.patch.set_visible(False)
+
+        show = True
+    else:
+        fig = None
+        show = False
 
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
     ax.set_extent(extent)
@@ -1040,9 +1064,9 @@ def plot_sparse_analysis(result: xr.Dataset, data_var: str, method="nearest") ->
         grid_values,
         extent=extent,
         origin="lower",
-        cmap="viridis",
+        cmap=cmap,
         transform=ccrs.PlateCarree(),
-    )  # should this be trnsposed
+    )
 
     shapename = "admin_1_states_provinces_lakes"
     states_shp = shpreader.natural_earth(
@@ -1056,10 +1080,16 @@ def plot_sparse_analysis(result: xr.Dataset, data_var: str, method="nearest") ->
         edgecolor="gray",
     )
 
-    cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
-    cbar.set_label("Value")
+    if fig is not None:
+        cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
+        cbar.set_label("Value")
 
-    plt.title("Interpolated Heatmap")
-    plt.xlabel("Longitude")
-    plt.ylabel("Latitude")
-    plt.show()
+    if fig is not None:
+        plt.title("Interpolated Heatmap")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
+
+    if show and fig is not None:
+        plt.show()
+
+    return fig, ax
