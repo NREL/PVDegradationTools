@@ -1157,6 +1157,7 @@ def weather_distributed(
         list of tuples containing (latitude, longitude) coordinates
         
         .. code-block:: python
+
             coords_example = [
                 (49.95, 1.5),
                 (51.95, -9.5),
@@ -1208,7 +1209,7 @@ def weather_distributed(
     weather_ds_collection = [row[0] for row in results]
     meta_dict_collection = [row[1] for row in results]
 
-    gids_failed = []
+    indexes_failed = []
 
     time_length = weather_ds_collection[0].sizes["time"]
     periodicity = ENTRIES_PERIODICITY_MAP[time_length]
@@ -1228,12 +1229,12 @@ def weather_distributed(
     for i, row in enumerate(results):
 
         if row[2]:
-            gids_failed.append(i)
+            indexes_failed.append(i)
             continue
 
         weather_ds[dict(gid=i)] = weather_ds_collection[i]
 
-    return weather_ds, meta_df, gids_failed
+    return weather_ds, meta_df, indexes_failed
 
 
 
