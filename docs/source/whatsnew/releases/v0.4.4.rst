@@ -4,8 +4,10 @@ v0.4.4 (2024-11-19)
 Enhancements
 ------------
 * Documenation overhaul. Significant ``User Guide`` improvements. Added geospatial information with visual aids, added meteorological data page and materials access page.
-Suite of utility functions to facilitate accessing material parameter json files.
+* Suite of utility functions to facilitate accessing material parameter json files.
 * New Logo!
+* Moved ``GeospatialScenario`` class definition to ``geospatialscenario.py``
+* Remove kdtree as required argument from ``GeospatialScenario`` downselection methods, kdtree objects are now generated on the fly when required and saved to scenario object for future use.
 
 Contributors
 -----------
