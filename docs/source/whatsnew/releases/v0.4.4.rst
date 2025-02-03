@@ -1,11 +1,48 @@
-v0.4.4 (2024-11-19)
+v0.4.4 (2025-2-3)
 ===================
 
 Enhancements
 ------------
 * Documenation overhaul. Significant ``User Guide`` improvements. Added geospatial information with visual aids, added meteorological data page and materials access page.
-Suite of utility functions to facilitate accessing material parameter json files.
-* New Logo!
+* Suite of utility functions to facilitate accessing material parameter json files.  
+* New Logo!🎉🎉🎉
+* ``decorators.geospatial_quick_shape`` arguments modified. ``numeric_or_timeseries``, now takes a string ``('numeric', 'timeseries')`` to determine type of outputs rather than a ``Bool`` or ``Int``
+    - previously, ``0`` or ``False`` represented a numeric/scalar result, now this is represented by ``'numeric'``
+    - previosuly, ``1`` or ``True`` represented a timeseries result, now this is represented by ``'timeseries'``
+* ``decorators.py`` namespace changed to default ``pvdeg`` namespace. now this can be directly accessed via ``pvdeg.decorators``. This reduces the need for an extra import.  
+    -  ``geospatial_quick_shape`` decorator namespace changed to defualt pvdeg namespace  
+
+Previously, 
+
+.. code-block:: Python
+
+    import pvdeg
+    from pvdeg.decorator import geospatial_quick_shape
+
+    @geospatial_quick_shape(0, ...)
+    def myfunc(...):
+        ....
+
+Now, either of the following options work.
+
+.. code-block:: Python
+
+    import pvdeg
+
+    # now takes string instead of integer or boolean value
+    @pvdeg.decorators.geospatial_quick_shape('numeric', ...)
+    def myfunc(...):
+        ....
+
+.. code-block:: Python
+
+    # this is the style used in the PVDeg package implementations
+    import pvdeg.decorators
+
+    @decorators.geospatial_quick_shape('numeric', ...)
+    def myfunc(...):
+        ....
+
 
 Contributors
 -----------

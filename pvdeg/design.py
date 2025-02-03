@@ -1,7 +1,10 @@
 """Collection of functions for PV module design considertations."""
 
-from . import humidity
-from pvdeg.decorators import geospatial_quick_shape
+from . import (
+    humidity,
+    decorators
+)
+
 import pandas as pd
 
 
@@ -42,7 +45,7 @@ def edge_seal_ingress_rate(avg_psat):
     return k
 
 
-@geospatial_quick_shape(0, ["width"])
+@decorators.geospatial_quick_shape('numeric', ["width"])
 def edge_seal_width(
     weather_df: pd.DataFrame,
     meta: dict,

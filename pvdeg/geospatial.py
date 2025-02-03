@@ -509,15 +509,13 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
 
     can_auto_template(func=func)
-    # if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
-    #     raise ValueError(
-    #         f"{func.__name__} cannot be autotemplated. create a template manually"
-    #     )
 
-    if func.numeric_or_timeseries == 0:
+    if func.numeric_or_timeseries == 'numeric':
         shapes = {datavar: ("gid",) for datavar in func.shape_names}
-    elif func.numeric_or_timeseries == 1:
+    elif func.numeric_or_timeseries == 'timeseries':
         shapes = {datavar: ("gid", "time") for datavar in func.shape_names}
+    else:
+        raise ValueError(f"{func.__name__} 'numeric_or_timseries' attribute invalid. is {func.numeric_or_timeseries} should be 'numeric' or 'timeseries'")
 
     template = output_template(ds_gids=ds_gids, shapes=shapes)  # zeros_template?
 

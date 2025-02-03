@@ -3,8 +3,12 @@ Collection of classes and functions to calculate different temperatures.
 """
 
 import pvlib
-import pvdeg
-from pvdeg.decorators import geospatial_quick_shape
+# import pvdeg
+
+from pvdeg import (
+    spectral,
+    decorators,
+)
 import pandas as pd
 from typing import Union
 from functools import partial
@@ -92,7 +96,7 @@ def _wind_speed_factor(temp_model: str, meta: dict, wind_factor: float):
     return wind_speed_factor
 
 
-@geospatial_quick_shape(1, ["module_temperature"])
+@decorators.geospatial_quick_shape('timeseries', ["module_temperature"])
 def module(
     weather_df,
     meta,
@@ -130,7 +134,7 @@ def module(
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta)
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
@@ -183,7 +187,7 @@ def module(
     return module_temperature
 
 
-@geospatial_quick_shape(1, ["cell_temperature"])
+@decorators.geospatial_quick_shape('timeseries', ["cell_temperature"])
 def cell(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -374,7 +378,7 @@ def temperature(
             parameters = {k: v for k, v in parameters.items() if k != "deltaT"}
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
+        poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     # irrelevant key,value pair will be ignored (NO ERROR)
     weather_args = {
