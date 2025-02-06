@@ -6,14 +6,19 @@
             "module_name": "test-module",
             "racking": "open_rack_glass_polymer",
             "material_params": {
-                "alias": "EVA",
+                
+                "name": "EVA",
+                "alias": "EVA-1",
+                "contributor": "Michael Kempe",
+                "source": "unpublished measurements",
                 "Fickian": true,
-                "Ead": 29.43,
-                "Do": 0.13,
-                "Eas": 32.31,
-                "So": 87.8,
-                "Eap": 61.74,
-                "Po": 97900000000.0
+                "Ead": 29.43112031,
+                "Do": 0.129061678,
+                "Eas": 16.6314948252219,
+                "So": 0.136034525059804,
+                "Eap": 49.1083457348515,
+                "Po": 528718258.338532
+
             },
             "temp_model": "sapm",
             "model_kwarg": {},

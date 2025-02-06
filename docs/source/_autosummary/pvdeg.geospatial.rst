@@ -34,6 +34,7 @@ pvdeg.geospatial
       pvdeg.geospatial.plot_Europe
       pvdeg.geospatial.plot_USA
       pvdeg.geospatial.plot_sparse_analysis
+      pvdeg.geospatial.plot_sparse_analysis_land
       pvdeg.geospatial.start_dask
       pvdeg.geospatial.template_parameters
       pvdeg.geospatial.zero_template
@@ -155,6 +156,13 @@ pvdeg.geospatial
    .. _sphx_glr_backref_pvdeg.geospatial.plot_sparse_analysis:
 
    .. minigallery:: pvdeg.geospatial.plot_sparse_analysis
+       :add-heading:
+
+   .. autofunction:: plot_sparse_analysis_land
+
+   .. _sphx_glr_backref_pvdeg.geospatial.plot_sparse_analysis_land:
+
+   .. minigallery:: pvdeg.geospatial.plot_sparse_analysis_land
        :add-heading:
 
    .. autofunction:: start_dask

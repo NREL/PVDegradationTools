@@ -2,7 +2,7 @@
 Collection of classes and functions for geospatial analysis.
 """
 
-from . import (
+from pvdeg import (
     standards,
     humidity,
     letid,
@@ -28,7 +28,6 @@ import cartopy.feature as cfeature
 from typing import Tuple
 from shapely import LineString, MultiLineString
 
-# {var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var)) for var, dim in shapes.items()}
 
 def start_dask(hpc=None):
     """
@@ -316,7 +315,11 @@ def output_template(
 
     output_template = xr.Dataset(
         data_vars={
-            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var)) # this will produce a dask array with 1 chunk of the same size as the input
+            var: (
+                dim,
+                da.empty([dims_size[d] for d in dim]),
+                attrs.get(var),
+            )  # this will produce a dask array with 1 chunk of the same size as the input
             for var, dim in shapes.items()
         },
         # moved as part of the above changes
@@ -973,7 +976,7 @@ def elevation_stochastic_downselect(
         Options : `'mean'`, `'sum'`, `'median'`
     normalization : str, (default = 'linear')
         function to apply when normalizing weights. Logarithmic uses log_e/ln
-        options : `'linear'`, `'logarithmic'`, '`exponential'`
+        options : `'linear'`, `'log'`, '`exp'`, `'invert-linear'`
 
     Returns:
     --------
@@ -998,11 +1001,11 @@ def elevation_stochastic_downselect(
         a=len(coords), p=normalized_weights / np.sum(normalized_weights), size=m
     )
 
-    return selected_indicies
+    return np.unique(selected_indicies)
 
 
 def interpolate_analysis(
-    result: xr.Dataset, data_var: str, method="nearest", res = 100j,
+    result: xr.Dataset, data_var: str, method="nearest", resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Interpolate sparse spatial result data against DataArray coordinates.
@@ -1010,6 +1013,9 @@ def interpolate_analysis(
 
     Parameters:
     -----------
+    resolution: complex
+        Change the amount the input is interpolated.
+        For more interpolation set higher (200j is more than 100j)
 
     Result:
     -------
@@ -1026,8 +1032,8 @@ def interpolate_analysis(
     )  # probably a nicer way to do this
 
     grid_lat, grid_lon = np.mgrid[
-        df["latitude"].min() : df["latitude"].max() : res,
-        df["longitude"].min() : df["longitude"].max() : res,
+        df["latitude"].min() : df["latitude"].max() : resolution,
+        df["longitude"].min() : df["longitude"].max() : resolution,
     ]
 
     grid_z = griddata(data[:, 0:2], data[:, 2], xi=(grid_lat, grid_lon), method=method)
@@ -1035,6 +1041,7 @@ def interpolate_analysis(
     return grid_z, grid_lat, grid_lon
 
 
+# api could be updated to match that of plot_USA
 def plot_sparse_analysis(
     result: xr.Dataset, 
     data_var: str, 

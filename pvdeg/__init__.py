@@ -13,13 +13,14 @@ from . import humidity
 from . import letid
 from . import montecarlo
 from . import pysam
-from . import scenario
+from .scenario import Scenario, GeospatialScenario
 from . import spectral
 from . import symbolic
 from . import standards
 from . import temperature
 from . import utilities
 from . import weather
+from . import diffusion
 
 __version__ = version("pvdeg")
 
