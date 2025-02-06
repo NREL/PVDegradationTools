@@ -1109,8 +1109,8 @@ class GeospatialScenario(Scenario):
         country: Optional[str] = None,
         state: Optional[str] = None,
         county: Optional[str] = None,
-        year: int = 2022,
         satellite: str = "Americas",
+        year: Union[str, int] = "TMY",
         nsrdb_attributes: List[str] = [
             "air_temperature",
             "wind_speed",
@@ -1154,7 +1154,7 @@ class GeospatialScenario(Scenario):
         downsample_factor : int
             downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         year : int
-            year of data to use from NSRDB, default = ``2022``
+            year of data to use from NSRDB, default = ``TMY`` otherwise provide integer like ``2022`` for psm3 yearly data.
         nsrdb_attributes : list(str)
             list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).
 
@@ -1173,18 +1173,18 @@ class GeospatialScenario(Scenario):
             flag true if you want to see a runtime notification for added location/gids
         """
 
-        if self.gids is not None:
-            print(
-                "Scenario already has designated project points.\nNothing has been added."
-            )
-            print(self.gids)
-            return
+#        if self.gids is not None:
+#            print(
+#                "Scenario already has designated project points.\nNothing has been added."
+#            )
+#            print(self.gids)
+#            return
+        self.gids, self.weather_data, self.meta_data = None, None, None
 
         weather_db = "NSRDB"
         weather_arg = {
             "satellite": satellite,
-            # "names": year, # allow user to choose tmy or year
-            "names":"TMY",
+            "names": year,
             "NREL_HPC": True,
             "attributes": nsrdb_attributes,
         }

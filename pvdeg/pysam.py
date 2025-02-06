@@ -162,11 +162,11 @@ def pysam(
     meta: dict,
     pv_model: str,
     pv_model_default: str = None,
+    config_files: dict[str: str] = None,
+    results: list[str] = None,
     # grid_default: str,
     # cashloan_default: str,
     # utilityrate_default: str,
-    config_files: dict[str: str] = None,
-    results: list[str] = None,
 ) -> dict:
     """
     Run pySam simulation. Only works with pysam weather.
@@ -311,7 +311,19 @@ def pysam(
             pv_inputs = json.load( f )
 
         # these break the model when being loaded using InSpire doubleday configs
-        bad_parameters = {'adjust_constant', 'adjust_en_timeindex', 'adjust_en_periods', 'adjust_timeindex', 'adjust_periods', 'dc_adjust_constant', 'dc_adjust_en_timeindex', 'dc_adjust_en_periods', 'dc_adjust_timeindex', 'dc_adjust_periods'}
+        # this is NREL-PySAM version dependent, these are problematic on 5.1.0
+        bad_parameters = {
+            'adjust_constant', 
+            'adjust_en_timeindex', 
+            'adjust_en_periods', 
+            'adjust_timeindex', 
+            'adjust_periods', 
+            'dc_adjust_constant', 
+            'dc_adjust_en_timeindex', 
+            'dc_adjust_en_periods', 
+            'dc_adjust_timeindex', 
+            'dc_adjust_periods'
+        }
 
         for k, v in pv_inputs.items():
             if k not in ({'number_inputs', 'solar_resource_file'} | bad_parameters):
@@ -528,7 +540,7 @@ def solar_resource_dict(weather_df, meta):
     if 'wind_direction' in weather_df.columns.values:
         sr['wdir'] = list(weather_df['wind_direction']) 
 
-    print(sr['alb'])
+    # print(sr['alb'])
 
     return sr 
 
