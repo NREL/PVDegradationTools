@@ -7,8 +7,10 @@ from . import (
     humidity,
     letid,
     utilities,
+    pysam,
     decorators,
 )
+
 
 import xarray as xr
 import dask.array as da
@@ -90,8 +92,31 @@ def start_dask(hpc=None):
 
     return client
 
+def _ds_from_arbitrary(res, func):
+    """
+    Convert an arbitrary return type to xarray.Dataset. 
+    """
+
+    if isinstance(res, pysam.inspirePysamReturn):
+        return pysam._handle_pysam_return(res)
+    # add more conditionals if we have special cases 
+    # or add general case for mixed return dimensions: HARD
+    
+    # handles collections with elements of same shapes
+    df = _df_from_arbitrary(res=res, func=func)
+    ds = xr.Dataset.from_dataframe(df)
+
+    if not df.index.name:
+        ds = ds.isel(index=0, drop=True)
+
+    return ds
+
 
 def _df_from_arbitrary(res, func):
+    """
+    Convert an arbitrary return type to dataframe.
+    Results must be of similar shape currently. Either all numerics or all timeseries.
+    """
     numerics = (int, float, np.number)
     arrays = (np.ndarray, pd.Series)
 
@@ -104,12 +129,13 @@ def _df_from_arbitrary(res, func):
     elif isinstance(res, tuple) and all(isinstance(item, numerics) for item in res):
         return pd.DataFrame([res])
     elif isinstance(res, tuple) and all(isinstance(item, arrays) for item in res):
+        # add check for same size, raise value error otherwise
         return pd.concat(
             res, axis=1
         )  # they must all be the same length here or this will error out
     else:
         raise NotImplementedError(
-            f"function return type: {type(res)} not available for geospatial analysis yet."
+            f"function return type: {type(res)} not available for geospatial analysis yet. This could be result of mismatched coordinates of outputs. EX. tuple(dataframe, int)."
         )
 
 
@@ -139,20 +165,15 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     if type(meta_gid["latitude"]) == dict:
         meta_gid = utilities.fix_metadata(meta_gid)
 
-    df_weather = (
-        ds_gid.to_dataframe()
-    )  # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    df_weather = ds_gid.to_dataframe()  
     if isinstance(
         df_weather.index, pd.MultiIndex
     ):  # check for multiindex and convert to just time index, don't know what was causing this
         df_weather = df_weather.reset_index().set_index("time")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
-    df_res = _df_from_arbitrary(res, func)  # convert all return types to dataframe
-    ds_res = xr.Dataset.from_dataframe(df_res)
-
-    if not df_res.index.name:
-        ds_res = ds_res.isel(index=0, drop=True)
+    ds_res = _ds_from_arbitrary(res, func)
 
     return ds_res
 
@@ -306,6 +327,19 @@ def output_template(
     dims = set([d for dim in shapes.values() for d in dim])
     dims_size = dict(ds_gids.sizes) | add_dims
 
+    # we need to properly add the dimensions
+    # can we redo with dictionary comprehension
+    # best approach @martin?
+    coords = {}
+    for dim in dims:
+        if dim in ds_gids:
+            coords[dim] = ds_gids[dim]
+        elif dim in add_dims:
+            coords[dim] = np.arange(dims_size[dim]) # i dont like this
+        else:
+            raise ValueError(f"dim: {dim} not in ds_gids or add_dims")
+
+
     output_template = xr.Dataset(
         data_vars={
             var: (
@@ -315,13 +349,20 @@ def output_template(
             )  # this will produce a dask array with 1 chunk of the same size as the input
             for var, dim in shapes.items()
         },
-        coords={dim: ds_gids[dim] for dim in dims},
+        # moved as part of the above changes
+        # coords={dim: ds_gids[dim] for dim in dims},
+        coords=coords,
         attrs=global_attrs,
-    )
+    ) 
 
-    if ds_gids.chunks:  # chunk to match input
+    # chunk to match input
+    if ds_gids.chunks: 
         output_template = output_template.chunk(
-            {dim: ds_gids.chunks[dim] for dim in dims}
+            {   
+                dim: ds_gids.chunks[dim] 
+                for dim in dims
+                if dim in ds_gids
+            }   # only chunk dimensions existing in the input
         )
 
     return output_template
@@ -371,6 +412,33 @@ def template_parameters(func):
 
         add_dims = {}
 
+    elif func == standards.vertical_POA:
+        # res = {"annual_gh": x, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
+
+        shapes = {
+            "annual_gh": ("gid",),
+            "annual_energy": ("gid",),
+            "lcoe_nom": ("gid",),
+
+        }
+
+        attrs = {
+            "annual_gh": {"long_name": "SAM Annual GHI", "units": "Wh/m2/yr"},
+            "annual_energy": {
+                "long_name": "Annual AC energy",
+                "units": "kWh",
+            },
+            "lcoe_nom": {
+                "long_name": "LCOE Levelized cost of energy nominal",
+                "units": "cents/kWh",
+            },
+        }
+
+        global_attrs = {
+            "long_name": "Vertical dataset",
+        }
+        add_dims = {}
+        
     elif func == humidity.module:
         shapes = {
             "RH_surface_outside": ("gid", "time"),
