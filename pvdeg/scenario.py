@@ -1198,8 +1198,8 @@ class GeospatialScenario(Scenario):
         country: Optional[str] = None,
         state: Optional[str] = None,
         county: Optional[str] = None,
-        year: int = 2022,
         satellite: str = "Americas",
+        year: Union[str, int] = "TMY",
         nsrdb_attributes: List[str] = [
             "air_temperature",
             "wind_speed",
@@ -1230,6 +1230,7 @@ class GeospatialScenario(Scenario):
             combination of states or provinces to include from NSRDB.
             Supports two-letter codes for American states. Can mix two-letter
             codes with full length strings. Can take single string, or list of strings (len >= 1)
+
             Examples:
             - ``state='Washington'``
             - ``state=WA`` (state abbr is case insensitive)
@@ -1242,26 +1243,37 @@ class GeospatialScenario(Scenario):
         downsample_factor : int
             downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         year : int
-            year of data to use from NSRDB, default = ``2022``
+            year of data to use from NSRDB, default = ``TMY`` otherwise provide integer like ``2022`` for psm3 yearly data.
         nsrdb_attributes : list(str)
-            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).\
-            Default = ``['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']``
+            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).
+
+                Valid Options:
+                - 'air_temperature'  
+                - 'dew_point'  
+                - 'dhi'  
+                - 'dni'  
+                - 'ghi'  
+                - 'surface_albedo'   
+                - 'surface_pressure'   
+                - 'wind_direction'   
+                - 'wind_speed'  
+
         see_added : bool
             flag true if you want to see a runtime notification for added location/gids
         """
 
-        if self.gids is not None:
-            print(
-                "Scenario already has designated project points.\nNothing has been added."
-            )
-            print(self.gids)
-            return
+#        if self.gids is not None:
+#            print(
+#                "Scenario already has designated project points.\nNothing has been added."
+#            )
+#            print(self.gids)
+#            return
+        self.gids, self.weather_data, self.meta_data = None, None, None
 
         weather_db = "NSRDB"
         weather_arg = {
             "satellite": satellite,
-            # "names": year, # allow user to choose tmy or year
-            "names":"TMY",
+            "names": year,
             "NREL_HPC": True,
             "attributes": nsrdb_attributes,
         }
@@ -1313,6 +1325,8 @@ class GeospatialScenario(Scenario):
             geo_meta, downsample_factor
         )
 
+        geo_weather = pvdeg.weather.map_weather(geo_weather)
+
         self.weather_data = geo_weather
         self.meta_data = geo_meta
         self.gids = geo_gids
@@ -1322,6 +1336,20 @@ class GeospatialScenario(Scenario):
             warnings.warn(message, UserWarning)
 
         return
+
+    def downselect_CONUS(
+        self,
+    ) -> None:
+        """Downselect US to contiguous US geospatial data"""
+
+        geo_weather, geo_meta = self.geospatial_data()
+
+        geo_meta = geo_meta[geo_meta['state'] != "Alaska"]
+        geo_meta = geo_meta[geo_meta['state'] != "Hawaii"]
+        geo_weather = geo_weather.sel(gid=geo_meta.index)
+
+        self.weather_data = geo_weather
+        self.meta_data = geo_meta
 
     def location_bounding_box(
         self,

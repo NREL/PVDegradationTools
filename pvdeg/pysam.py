@@ -4,7 +4,10 @@ Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
 """
 
 import dask.dataframe as dd
+import dask.array as da
 import pandas as pd
+import xarray as xr
+import numpy as np
 import pickle
 import json
 import sys
@@ -162,11 +165,11 @@ def pysam(
     meta: dict,
     pv_model: str,
     pv_model_default: str = None,
+    config_files: dict[str: str] = None,
+    results: list[str] = None,
     # grid_default: str,
     # cashloan_default: str,
     # utilityrate_default: str,
-    config_files: dict[str: str] = None,
-    results: list[str] = None,
 ) -> dict:
     """
     Run pySam simulation. Only works with pysam weather.
@@ -322,7 +325,19 @@ def pysam(
             pv_inputs = json.load( f )
 
         # these break the model when being loaded using InSpire doubleday configs
-        bad_parameters = {'adjust_constant', 'adjust_en_timeindex', 'adjust_en_periods', 'adjust_timeindex', 'adjust_periods', 'dc_adjust_constant', 'dc_adjust_en_timeindex', 'dc_adjust_en_periods', 'dc_adjust_timeindex', 'dc_adjust_periods'}
+        # this is NREL-PySAM version dependent, these are problematic on 5.1.0
+        bad_parameters = {
+            'adjust_constant', 
+            'adjust_en_timeindex', 
+            'adjust_en_periods', 
+            'adjust_timeindex', 
+            'adjust_periods', 
+            'dc_adjust_constant', 
+            'dc_adjust_en_timeindex', 
+            'dc_adjust_en_periods', 
+            'dc_adjust_timeindex', 
+            'dc_adjust_periods'
+        }
 
         for k, v in pv_inputs.items():
             if k not in ({'number_inputs', 'solar_resource_file'} | bad_parameters):
@@ -349,7 +364,20 @@ def pysam(
     pysam_res = {key: outputs[key] for key in results}
     return pysam_res
 
+# TODO: remove 
 def pysam_hourly_trivial(weather_df, meta):
+
+    try:
+        import PySAM
+        import PySAM.Pvsamv1 as pv1
+        import PySAM.Pvwattsv8 as pv8
+        import PySAM.Grid as Grid
+        import PySAM.Utilityrate5 as UtilityRate
+        import PySAM.Cashloan as Cashloan
+    except ModuleNotFoundError:
+        print("pysam not found. run pip install pvdeg[sam] to install the NREL-PySAM dependency")
+        return
+
 
     sr = solar_resource_dict(weather_df=weather_df, meta=meta)
     # weather_df = weather_df.reset_index(drop=True)
@@ -381,37 +409,59 @@ def pysam_hourly_trivial(weather_df, meta):
     return outputs
 
 # TODO: add slots
-class inspirePysamReturn():
-    """simple struct to facilitate handling weirdly shaped pysam simulation return values"""
+# class inspirePysamReturn():
+#     """simple struct to facilitate handling weirdly shaped pysam simulation return values"""
 
-    # removes __dict__ atribute and breaks pickle
-    # __slots__ = ("annual_poa", "ground_irradiance", "timeseries_index")
+#     # removes __dict__ atribute and breaks pickle
+#     # __slots__ = ("annual_poa", "ground_irradiance", "timeseries_index")
 
-    def __init__(self, annual_poa, ground_irradiance, timeseries_index):
-        self.annual_poa = annual_poa
-        self.ground_irradiance = ground_irradiance
-        self.timeseries_index = timeseries_index
+#     def __init__(self, annual_poa, ground_irradiance, timeseries_index, annual_energy, poa_front, poa_rear, subarray1_poa_front, subarray1_poa_rear):
+#         self.annual_energy = annual_energy
+#         self.annual_poa = annual_poa
+#         self.ground_irradiance = ground_irradiance
+#         self.timeseries_index = timeseries_index
+#         self.poa_front = poa_front
+#         self.poa_rear = poa_rear
+#         self.subarray1_poa_front = subarray1_poa_front
+#         self.subarray1_poa_rear = subarray1_poa_rear
 
-
-# rename?
-import xarray as xr
-def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
+# def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
+def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.Dataset:
     """Handle a pysam return object and transform it to an xarray"""
 
-    import dask.array as da
-    import numpy as np
+    ground_irradiance = pysam_res_dict["subarray1_ground_rear_spatial"]
+
+    annual_poa = pysam_res_dict["annual_poa_front"]
+    annual_energy = pysam_res_dict["annual_energy"]
+
+    poa_front = pysam_res_dict["poa_front"][:8760] # 25 * 8760 entries, all pairs of 8760 entries are identical
+    poa_rear = pysam_res_dict["poa_rear"][:8760] # same for the following
+    subarray1_poa_front = pysam_res_dict["subarray1_poa_front"][:8760]
+    subarray1_poa_rear = pysam_res_dict["subarray1_poa_rear"][:8760]
+
+    timeseries_index = weather_df.index
 
     # redo this using numba?
-    distances = pysam_res.ground_irradiance[0][1:]
-    ground_irradiance_values = da.from_array([row[1:] for row in pysam_res.ground_irradiance[1:]])
+    distances = ground_irradiance[0][1:]
+    ground_irradiance_values = da.from_array([row[1:] for row in ground_irradiance[1:]])
 
     single_location_ds = xr.Dataset(
         data_vars={
-            "annual_poa" : pysam_res.annual_poa, # scalar variable
-            "ground_irradiance" : (("time", "distance"), ground_irradiance_values)
+            # scalars
+            "annual_poa" : annual_poa,
+            "annual_energy" : annual_energy,
+
+            # simple timeseries
+            "poa_front" : (("time", ), da.array(poa_front)),
+            "poa_rear" : (("time", ), da.array(poa_rear)),
+            "subarray1_poa_front" : (("time", ), da.array(subarray1_poa_front)),
+            "subarray1_poa_rear" : (("time", ), da.array(subarray1_poa_rear)),
+
+            # spatio-temporal
+            "ground_irradiance" : (("time", "distance"), ground_irradiance_values),
         },
         coords={
-            "time" : pysam_res.timeseries_index,
+            "time" : timeseries_index,
             # "distance" : distances,
             "distance" : np.arange(10), # this matches the dimension axis of the output_temlate dataset
         }
@@ -420,7 +470,24 @@ def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
     return single_location_ds
 
 
+INSPIRE_NSRDB_ATTRIBUTES = [
+    "air_temperature",
+    "wind_speed",
+    "wind_direction",
+    "dhi",
+    "ghi",
+    "dni",
+    "relative_humidity",
+    "surface_albedo",
+]
+
 # annual_poa_nom, annual_poa_front, annual_poa_rear, poa_nom, poa_front, or poa_rear
+
+# annual energy
+# front_poa, rear_poa (timeseries, repeating 25 times, we can just take the first year)
+# annual_poa_rear_gain_percent (rear side gain, bifacial factor) (rear poa / front poa) * bifacial factor
+
+# should be be using poa_front or subarray1_poa_front (same for poa_rear?)
 # TODO: add config file, multiple config files.
 def inspire_ground_irradiance(weather_df, meta, config_files):
     """
@@ -449,21 +516,19 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
             meta type : {type(meta)}
         """)
 
+    # force localize utc from tmy to local time by moving rows
+    weather_df = weather.roll_tmy(weather_df, meta)
+
     outputs = pysam(
         weather_df = weather_df,
         meta = meta,
         pv_model = "pysamv1",
         config_files=config_files,
-        results = ["subarray1_ground_rear_spatial", "annual_poa_front"],
     )
 
-    result = inspirePysamReturn(
-            ground_irradiance = outputs["subarray1_ground_rear_spatial"],
-            annual_poa = outputs["annual_poa_front"],
-            timeseries_index=weather_df.index,
-        )
+    ds_result = _handle_pysam_return(pysam_res_dict=outputs, weather_df=weather_df)
 
-    return result
+    return ds_result
 
 def solar_resource_dict(weather_df, meta):
     """
@@ -474,23 +539,35 @@ def solar_resource_dict(weather_df, meta):
 
     # weather_df = weather_df.reset_index(drop=True) # Probably dont need to do this
     weather_df = utilities.add_time_columns_tmy(weather_df) # only supports hourly data
+
+    # enforce tmy scheme
+    times = pd.date_range(start="2001-01-01", periods=8760, freq="1h")
     
+    # all options
+    # lat,lon,tz,elev,year,month,hour,minute,gh,dn,df,poa,tdry,twet,tdew,rhum,pres,snow,alb,aod,wspd,wdir
     sr = {
         'lat': meta['latitude'],
         'lon': meta['longitude'],
         'tz': meta['tz'] if 'tz' in meta.keys() else 0,
         'elev': meta['altitude'],
-        'year': list(weather_df['Year']),
-        'month': list(weather_df['Month']),
-        'day': list(weather_df['Day']),
-        'hour': list(weather_df['Hour']),
-        'minute': list(weather_df['Minute']),
+        'year': list(times.year), #list(weather_df['Year']),
+        'month': list(times.month),
+        'day': list(times.day),
+        'hour': list(times.hour),
+        'minute': list(times.minute),
+        'gh': list(weather_df['ghi']),
         'dn': list(weather_df['dni']),
         'df': list(weather_df['dhi']),
         'wspd': list(weather_df['wind_speed']),
         'tdry': list(weather_df['temp_air']),
-        'alb' : weather_df['albedo'] if 'albedo' in weather_df.columns.values else [0.2]*len(weather_df)
+        'alb' : list(weather_df['albedo']) if 'albedo' in weather_df.columns.values else [0.2] * len(weather_df)
     }
+
+    # if we have wind direction then add it
+    if 'wind_direction' in weather_df.columns.values:
+        sr['wdir'] = list(weather_df['wind_direction']) 
+
+    # print(sr['alb'])
 
     return sr 
 

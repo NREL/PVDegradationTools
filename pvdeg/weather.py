@@ -353,18 +353,27 @@ def map_weather(weather_df):
         "Wind Speed": "wind_speed",
         "Wind Direction": "wind_direction",
         "Surface Albedo": "albedo",
+        "surface_albedo": "albedo",
         "Precipitable Water": "precipitable_water",
         "Module_Temperature": "module_temperature",
     }
 
-    for column_name in weather_df.columns:
-        if column_name in [*DSET_MAP.keys()]:
-            weather_df.rename(
-                columns={column_name: DSET_MAP[column_name]}, inplace=True
-            )
+    if isinstance(weather_df, pd.DataFrame):
+        for column_name in weather_df.columns:
+            if column_name in [*DSET_MAP.keys()]:
+                weather_df.rename(
+                    columns={column_name: DSET_MAP[column_name]}, inplace=True
+                )
 
-    return weather_df
+        return weather_df
 
+    elif isinstance(weather_df, xr.Dataset):
+        weather_df = weather_df.rename({key: value for key, value in DSET_MAP.items() if key in weather_df.data_vars})
+        
+        return weather_df
+    
+    else:
+        raise TypeError("input must be pd.DataFrame or xr.Dataset")
 
 def read_h5(gid, file, attributes=None, **_):
     """
@@ -985,6 +994,112 @@ def get_anywhere(database = "PSM3", id=None, **kwargs):
                 weather_db = {'result': 'NA'}
 
     return weather_db, meta 
+
+
+def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
+    """
+    Roll/wrap the ends of a TMY UTC DataFrame to align with local times based on timezone offset.
+
+    Parameters:
+    ----------
+    weather_df : pd.DataFrame
+        The input DataFrame containing TMY data with a UTC datetime index.
+    meta : dict
+        Metadata dictionary containing at least the 'tz' key, representing timezone offset in hours
+        (e.g., -8 for UTC-8).
+
+    Returns:
+    -------
+    pd.DataFrame
+        The rolled DataFrame aligned to local times with a new datetime index spanning a typical year.
+
+    Raises:
+    ------
+    ValueError
+        If the timezone offset is not a multiple of the data frequency or if the frequency cannot be inferred.
+    """
+    # Extract timezone offset in hours
+    tz_offset = meta.get('tz', 0)  # Default to UTC if not specified
+
+    # Step 1: Localize the index to UTC
+    weather_df_local = weather_df.copy()
+    weather_df_local.index = pd.to_datetime(weather_df_local.index)
+    weather_df_local = weather_df_local.tz_localize('UTC')
+
+    # Step 2: Convert to desired local timezone
+    # 'Etc/GMT+X' corresponds to UTC-X
+    if tz_offset >= 0:
+        local_tz = f'Etc/GMT-{tz_offset}'
+    else:
+        local_tz = f'Etc/GMT+{abs(tz_offset)}'
+
+    try:
+        weather_df_local = weather_df_local.tz_convert(local_tz)
+    except Exception as e:
+        raise ValueError(f"Invalid timezone offset: {tz_offset}. Error: {e}")
+
+    # Step 3: Make timezone-naive
+    weather_df_naive = weather_df_local.tz_localize(None)
+
+    # Step 4: Determine frequency
+    freq = pd.infer_freq(weather_df_naive.index)
+    if freq is None:
+        raise ValueError("Cannot infer frequency of the DataFrame index. Ensure it is regular.")
+
+    # Step 5: Calculate the shift amount
+    # To align local time to start at 00:00, shift by -tz_offset hours
+    # For example, tz_offset = -8 (UTC-8) => shift by +8 hours
+    total_shift = pd.Timedelta(hours=-tz_offset)
+
+    if freq.isalpha():
+        freq = "1" + freq
+
+    row_timedelta = pd.to_timedelta(freq) # this probably broke because it was a string without an hourly frequency
+
+    if total_shift % row_timedelta != pd.Timedelta(0):
+        raise ValueError("Timezone offset must be a multiple of the data frequency.")
+
+    num_shift = int(total_shift / row_timedelta)
+
+    # Step 6: Perform the shift (roll the DataFrame)
+    if num_shift > 0:
+        rearranged = pd.concat([
+            weather_df_naive.iloc[num_shift:],
+            weather_df_naive.iloc[:num_shift]
+        ])
+    elif num_shift < 0:
+        rearranged = pd.concat([
+            weather_df_naive.iloc[num_shift:],
+            weather_df_naive.iloc[:num_shift]
+        ])
+    else:
+        rearranged = weather_df_naive.copy()
+
+    # Step 7: Assign a new datetime index spanning a typical non-leap year
+    # Preserve the original start time's hour, minute, second, etc.
+    # Using year 2001 as it is not a leap year
+
+    # Extract the time component from the first timestamp
+    original_start_time = rearranged.index[0].time()
+    start_time = pd.Timestamp('2001-01-01') + pd.Timedelta(
+        hours=0,
+        minutes=original_start_time.minute,
+    )
+
+    expected_num_rows = rearranged.shape[0]
+
+    # Create the new datetime index with the preserved start time
+    new_index = pd.date_range(start=start_time, periods=expected_num_rows, freq=freq)
+
+    # Handle potential leap day if present in new_index
+    # Since 2001 is not a leap year, ensure no Feb 29 exists
+    new_index = new_index[~((new_index.month == 2) & (new_index.day == 29))]
+
+    # Assign the new index to the rearranged DataFrame
+    rearranged = rearranged.iloc[:len(new_index)]  # Ensure lengths match
+    rearranged.index = new_index
+
+    return rearranged
 
 
 # RENAME, THIS SHOULD NOT REFERENCE PVGIS

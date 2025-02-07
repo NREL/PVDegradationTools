@@ -78,8 +78,11 @@ test = [
 books = [
     "jupyter-book",
 ]
+sam = [
+    "NREL-PySAM==5.1.0",
+]
 all = [
-    "pvdeg[docs,test,books]",
+    "pvdeg[docs,testrpp,books,sam]",
 ]
 
 [project.entry-points.pvdeg]

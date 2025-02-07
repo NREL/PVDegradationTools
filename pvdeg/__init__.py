@@ -14,8 +14,8 @@ from .geospatialscenario import GeospatialScenario
 from . import humidity
 from . import letid
 from . import montecarlo
-from .scenario import Scenario
 from . import pysam
+from .scenario import Scenario, GeospatialScenario
 from . import spectral
 from . import store
 from . import symbolic

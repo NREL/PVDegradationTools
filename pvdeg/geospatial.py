@@ -2,7 +2,7 @@
 Collection of classes and functions for geospatial analysis.
 """
 
-from . import (
+from pvdeg import (
     standards,
     humidity,
     letid,
@@ -10,7 +10,6 @@ from . import (
     pysam,
     decorators,
 )
-
 
 import xarray as xr
 import dask.array as da
@@ -92,13 +91,24 @@ def start_dask(hpc=None):
 
     return client
 
+# rename this?
+# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt really doing anything anymore
+# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset already then we dont want to anything
 def _ds_from_arbitrary(res, func):
     """
     Convert an arbitrary return type to xarray.Dataset. 
     """
 
-    if isinstance(res, pysam.inspirePysamReturn):
-        return pysam._handle_pysam_return(res)
+    ######## STRUCTURAL #########
+    # functions can just return xr.Dataset to take advantage of geospatial
+    # this should not be required to implement a new geospatial function
+
+    if isinstance(res, xr.Dataset):
+        return res
+
+
+    # if isinstance(res, pysam.inspirePysamReturn):
+    #     return pysam._handle_pysam_return(res)
     # add more conditionals if we have special cases 
     # or add general case for mixed return dimensions: HARD
     
@@ -1106,40 +1116,24 @@ def plot_sparse_analysis(
     result: xr.Dataset, 
     data_var: str, 
     method="nearest", 
-    resolution:complex=100j,
-    figsize:tuple=(10,8),
-    show_plot:bool=False,
+    res=100j, 
+    cmap='viridis',
+    ax=None
+
 ) -> None:
-    """
-    Plot the output of a sparse geospatial analysis using interpolation.
-
-    Parameters
-    -----------
-    result: xr.Dataset
-        xarray dataset in memory containing coordinates['longitude', 'latitude'] and at least one datavariable.
-    data_var: str
-        name of datavariable to plot from result
-    method: str
-        interpolation method. 
-        Options: `'nearest', 'linear', 'cubic'`
-        See [`scipy.interpolate.griddata`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html)
-    resolution: complex
-        Change the amount the input is interpolated.
-        For more interpolation set higher (200j is more than 100j)
-
-    Returns
-    -------
-    fig, ax: tuple
-        matplotlib figure and axes of plot
-    """
-
     grid_values, lat, lon = interpolate_analysis(
-        result=result, data_var=data_var, method=method, resolution=resolution
+        result=result, data_var=data_var, method=method, res=res
     )
 
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False) # these should be the same ccrs
-    ax.patch.set_visible(False)
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
+        ax.patch.set_visible(False)
+
+        show = True
+    else:
+        fig = None
+        show = False
 
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
     ax.set_extent(extent)
@@ -1147,8 +1141,8 @@ def plot_sparse_analysis(
         grid_values,
         extent=extent,
         origin="lower",
-        cmap="viridis",
-        transform=ccrs.PlateCarree(), # why are ccrs different
+        cmap=cmap,
+        transform=ccrs.PlateCarree(),
     )
 
     shapename = "admin_1_states_provinces_lakes"
@@ -1163,76 +1157,16 @@ def plot_sparse_analysis(
         edgecolor="gray",
     )
 
-    cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
-    cbar.set_label("Value")
+    if fig is not None:
+        cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
+        cbar.set_label("Value")
 
-    plt.title(f"Interpolated Sparse Analysis, {data_var}")
-    plt.xlabel("Longitude")
-    plt.ylabel("Latitude")
-    
-    if show_plot:
-        plt.show()
+    if fig is not None:
+        plt.title("Interpolated Heatmap")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
 
-    return fig, ax
-
-def plot_sparse_analysis_land(
-    result: xr.Dataset, 
-    data_var: str, 
-    method="nearest", 
-    resolution:complex=100j,
-    figsize:tuple=(10,8),
-    show_plot:bool=False,
-    proj=ccrs.PlateCarree(),
-):
-
-    import matplotlib.path as mpath
-    from cartopy.mpl.patch import geos_to_path
-
-    grid_values, lat, lon = interpolate_analysis(
-        result=result, data_var=data_var, method=method, resolution=resolution
-    )
-
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes([0, 0, 1, 1], projection=proj, frameon=False)
-    ax.patch.set_visible(False)
-
-    extent = [lon.min(), lon.max(), lat.min(), lat.max()]
-    ax.set_extent(extent, crs=proj)
-
-    mesh = ax.pcolormesh(lon, lat, grid_values, transform=proj, cmap='viridis')
-
-    land_path = geos_to_path(list(cfeature.LAND.geometries()))
-    land_path = mpath.Path.make_compound_path(*land_path)
-    plate_carre_data_transform = proj._as_mpl_transform(ax)
-    mesh.set_clip_path(land_path, plate_carre_data_transform)
-
-    shapename = "admin_1_states_provinces_lakes"
-    states_shp = shpreader.natural_earth(
-        resolution="110m", category="cultural", name=shapename
-    )
-
-    ax.add_geometries(
-        shpreader.Reader(states_shp).geometries(),
-        proj,
-        facecolor="none",
-        edgecolor="black",
-        linestyle=':'
-    )
-
-    cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
-    cbar.set_label("Value")
-
-    utilities._add_cartopy_features(
-        ax=ax, 
-        features = [
-            cfeature.BORDERS,
-            cfeature.COASTLINE,
-            cfeature.LAND,
-            cfeature.OCEAN,
-        ],
-    )
-
-    if show_plot:
+    if show and fig is not None:
         plt.show()
 
     return fig, ax
