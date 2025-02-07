@@ -10,12 +10,7 @@ import json
 import sys
 import os
 
-import PySAM
-import PySAM.Pvsamv1 as pv1
-import PySAM.Pvwattsv8 as pv8
-import PySAM.Grid as Grid
-import PySAM.Utilityrate5 as UtilityRate
-import PySAM.Cashloan as Cashloan
+
 
 from pvdeg import (
     weather,
@@ -53,6 +48,17 @@ def vertical_POA(
     lcoa_nom : float [cents/kWh]
         LCOE Levelized cost of energy nominal
     """
+
+    try:
+        import PySAM
+        import PySAM.Pvsamv1 as pv1
+        import PySAM.Pvwattsv8 as pv8
+        import PySAM.Grid as Grid
+        import PySAM.Utilityrate5 as UtilityRate
+        import PySAM.Cashloan as Cashloan
+    except ModuleNotFoundError:
+        print("pysam not found. run pip install pvdeg[sam] to install the NREL-PySAM dependency")
+        return
 
    
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
@@ -285,6 +291,17 @@ def pysam(
         dictionary of outputs. Keys are result name and value is the corresponding result. 
         If `results` is not specified, the dictionary will contain every calculation from the model.
     """
+
+    try:
+        import PySAM
+        import PySAM.Pvsamv1 as pv1
+        import PySAM.Pvwattsv8 as pv8
+        import PySAM.Grid as Grid
+        import PySAM.Utilityrate5 as UtilityRate
+        import PySAM.Cashloan as Cashloan
+    except ModuleNotFoundError:
+        print("pysam not found. run pip install pvdeg[sam] to install the NREL-PySAM dependency")
+        return
 
     sr = solar_resource_dict(weather_df=weather_df, meta=meta)
 
