@@ -336,7 +336,7 @@ def _temp_calc_no_irradiance(
 
     for i in range(0, temps.shape[0] - 1):
         delta_t = times[i + 1] - times[i]
-        delta_t = delta_t.astype("timedelta64[m]").astype(int)
+        delta_t = delta_t.astype("timedelta64[m]").astype(float) # this was init previously, probably fine because we were using constant 1 min timesteps for this case but should be float
 
         res[i + 1] = fdm_temperature(
             t_current=res[i],
@@ -385,17 +385,33 @@ def _temp_calc_irradiance(
 
 
 # calculate the air temperature in a chamber using finite difference method
+# REDO THESE TO USE REDUCE DUPLICATE CODE
 def air_temperature(
-    setpoints_df: pd.DataFrame, tau_c: float, air_temp_0: float
+    setpoints_df: pd.DataFrame, tau_c_air: float, air_temp_0: float
 ) -> np.ndarray:
     air_temp = _temp_calc_no_irradiance(
         temps=setpoints_df["setpoint_temperature"].to_numpy(),
-        times=setpoints_df.index.to_numpy(),
-        tau=tau_c,
+        times=setpoints_df.index.to_numpy(dtype="timedelta64[ns]"),
+        tau=tau_c_air,
         temp_0=air_temp_0,
     )
 
     return pd.Series(air_temp, index=setpoints_df.index, name="Air Temperature")
+
+# COMBINE WITH ABOVE
+def chamber_rh(
+    setpoints_df: pd.DataFrame, tau_c_rh: float, rh_0: float
+) -> np.ndarray:
+    air_temp = _temp_calc_no_irradiance(
+        temps=setpoints_df["setpoint_relative_humidity"].to_numpy(),
+        times=setpoints_df.index.to_numpy(dtype="timedelta64[ns]"),
+        tau=tau_c_rh,
+        temp_0=rh_0,
+    )
+
+    return pd.Series(air_temp, index=setpoints_df.index, name="Relative Humidity")
+
+
 
 
 def sample_temperature(
@@ -663,7 +679,7 @@ class Chamber(Sample):
             pandas series of sample temperatures inside of test chamber [C]
         """
         self.air_temperature = air_temperature(
-            self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
+            self.setpoints, tau_c_air=tau_c, air_temp_0=air_temp_0
         )
 
         if (
@@ -804,7 +820,7 @@ class Chamber(Sample):
         """
 
         self.air_temperature = air_temperature(
-            self.setpoints, tau_c=tau_c, air_temp_0=air_temp_0
+            self.setpoints, tau_c_air=tau_c, air_temp_0=air_temp_0
         )
         self.calc_water_vapor_pressure()
         self.calc_dew_point()
