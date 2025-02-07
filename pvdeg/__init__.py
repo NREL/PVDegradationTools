@@ -5,6 +5,7 @@ from .config import *
 
 # from . import cli
 from . import collection
+from . import decorators
 from . import degradation
 from . import design
 from . import fatigue
