@@ -18,7 +18,6 @@ import warnings
 import pandas as pd
 import xarray as xr
 import numpy as np
-import matplotlib.pyplot as plt
 from collections import OrderedDict
 from copy import deepcopy
 from typing import List, Union, Optional, Tuple, Callable
@@ -28,27 +27,6 @@ from IPython.display import display, HTML
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from dask.distributed import Client
-# import cartopy.crs as ccrs
-# import cartopy.feature as cfeature
-
-import pvdeg
-from pvdeg import utilities
-
-import os
-import warnings
-import pandas as pd
-import xarray as xr
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-from typing import List, Union, Optional, Callable
-from dask.distributed import Client
-from IPython.display import display, HTML
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-
-from pvdeg.scenario import Scenario
-
 
 class Scenario:
     """
@@ -1803,7 +1781,7 @@ class GeospatialScenario(Scenario):
                     'death_timeout': 600,}
         """
         if self.dask_client and hpc_worker_conf:
-            raise ValueError(f"Dask Client already exists, cannot configure new client.")
+            raise ValueError("Dask Client already exists, cannot configure new client.")
         elif not self.dask_client:
             self.dask_client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
         

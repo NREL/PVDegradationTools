@@ -1525,7 +1525,7 @@ def read_material(
         material_dict = {k: material_dict.get(k, None) for k in parameters} 
 
     return material_dict
-=========
+
 def add_time_columns_tmy(weather_df, coerce_year=1979):
     """
     Add time columns to a tmy weather dataframe.
@@ -1570,4 +1570,4 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
 
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
->>>>>>>>> Temporary merge branch 2
+
