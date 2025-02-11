@@ -1,6 +1,6 @@
 .. _geospatial:
 
-Geospatial
+Geospatial 🌍
 ==========
 
 Geospatial data is time based data that maps to a location on Earth. PVDeg supports single site and geospatial analyses using meteorological and solar radiation data,

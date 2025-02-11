@@ -33,6 +33,7 @@ pvdeg.weather
       pvdeg.weather.read
       pvdeg.weather.read_h5
       pvdeg.weather.repeat_annual_time_series
+      pvdeg.weather.roll_tmy
       pvdeg.weather.weather_distributed
       pvdeg.weather.write
 
@@ -146,6 +147,13 @@ pvdeg.weather
    .. _sphx_glr_backref_pvdeg.weather.repeat_annual_time_series:
 
    .. minigallery:: pvdeg.weather.repeat_annual_time_series
+       :add-heading:
+
+   .. autofunction:: roll_tmy
+
+   .. _sphx_glr_backref_pvdeg.weather.roll_tmy:
+
+   .. minigallery:: pvdeg.weather.roll_tmy
        :add-heading:
 
    .. autofunction:: weather_distributed
