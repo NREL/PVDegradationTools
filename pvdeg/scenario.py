@@ -1320,7 +1320,7 @@ class GeospatialScenario(Scenario):
     ) -> None:
         """Downselect US to contiguous US geospatial data"""
 
-        geo_weather, geo_meta = self.geospatial_data()
+        geo_weather, geo_meta = self.get_geospatial_data()
 
         geo_meta = geo_meta[geo_meta['state'] != "Alaska"]
         geo_meta = geo_meta[geo_meta['state'] != "Hawaii"]
@@ -1497,7 +1497,7 @@ class GeospatialScenario(Scenario):
         return
 
     def classify_feature(
-        self,
+       self,
         feature_name=None,
         resolution="10m",
         radius=None,
@@ -1594,7 +1594,7 @@ class GeospatialScenario(Scenario):
             normalization=normalization,
         )
 
-        self.meta_data = self.meta_data.iloc[gids]
+        self.meta_data = self.meta_data.loc[gids]
         return
 
     def gid_downsample(self, downsample_factor: int) -> None:
@@ -1895,7 +1895,6 @@ class GeospatialScenario(Scenario):
         Not Usable in GeospatialScenario class instance, only in Scenario instance.
         """
         # python has no way to hide a parent class method in the child, so this only exists to prevent access
-        #
         raise AttributeError(
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
         )
@@ -1928,7 +1927,7 @@ class GeospatialScenario(Scenario):
             the most extreme coordinates for the United States coastline information.
         size : float
             matplotlib scatter point size. Without any downsampling NSRDB
-            points will siginficantly overlap.
+            points will siginficantly overlap and plot may appear as a solid color.
 
         Returns:
         --------
@@ -1938,7 +1937,7 @@ class GeospatialScenario(Scenario):
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
 
-        if (coord_1 and coord_2) or (coords != None):
+        if (coord_1 and coord_2) or (coords is not None):
             utilities._plot_bbox_corners(
                 ax=ax, coord_1=coord_1, coord_2=coord_2, coords=coords
             )
@@ -2151,7 +2150,7 @@ class GeospatialScenario(Scenario):
             <p><strong>self.gids:</strong> {self.gids}</p>
             <div>
                 <h3>self.results</h3>
-                {self.format_results() if self.results else None}
+                {self.format_results() if self.results else ''}
             </div>
             <div>
                 <h3>Geospatial Work</h3>
@@ -2168,6 +2167,10 @@ class GeospatialScenario(Scenario):
             <div>
                 <h3>self.meta_data</h3>
                 {self.format_geo_meta()}
+            </div>
+            <div>
+                <h3>self.kdtree</h3>
+                {self.kdtree or ''}
             </div>
             <div>
                 <h3>self.dask_client</h3>

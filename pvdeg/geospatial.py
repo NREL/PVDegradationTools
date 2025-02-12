@@ -1071,7 +1071,9 @@ def elevation_stochastic_downselect(
         a=len(coords), p=normalized_weights / np.sum(normalized_weights), size=m
     )
 
-    return np.unique(selected_indicies)
+    return meta_df.index.values[np.unique(selected_indicies)]
+    #return meta_df.iloc[np.unique(selected_indicies)].index.values
+    #return np.unique(selected_indicies)
 
 
 def interpolate_analysis(

@@ -46,6 +46,10 @@ Now, either of the following options work.
     def myfunc(...):
         ....
 
+Bug Fixes
+-------------
+- fixed an issue where pvdeg.geospatial.elevation_stochastic_downselect would return metadata row indicies which were downselected instead of named gids.
+
 
 Contributors
 -----------

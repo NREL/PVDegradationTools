@@ -3,7 +3,7 @@ import xarray as xr
 import pandas as pd
 import numpy as np
 import dask.array as da    
-import zarr
+#import zarr
 import os
 
 from pvdeg import METOROLOGICAL_DOWNLOAD_PATH
