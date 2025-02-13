@@ -18,9 +18,11 @@ import os
 from pvdeg import (
     weather,
     utilities,
+    decorators,
     DATA_DIR
 )
 
+@decorators.deprecated("unverified")
 def vertical_POA(
     weather_df,
     meta,
@@ -60,14 +62,11 @@ def vertical_POA(
         import PySAM.Utilityrate5 as UtilityRate
         import PySAM.Cashloan as Cashloan
     except ModuleNotFoundError:
-        print("pysam not found. run pip install pvdeg[sam] to install the NREL-PySAM dependency")
+        print("pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM dependency")
         return
 
    
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
-    #print("weather_df KEYs", weather_df.keys())
-    #print("meta KEYs", meta.keys())
-
     
     if isinstance(weather_df, dd.DataFrame):
         weather_df = weather_df[parameters].compute()
@@ -103,7 +102,6 @@ def vertical_POA(
                         # This prevents the failure "UnicodeDecodeError: 'utf-8' codec can't decode byte... 
                         # This bug will be fixed on a newer version of pysam (currently not working on 5.1.0)
                     if 'adjust_' in k:  # This check is needed for Python 3.10.7 and some others. Not needed for 3.7.4
-                        #print(k)
                         k = k.split('adjust_')[1]
                     module.value(k, v)
                 except AttributeError:
@@ -112,16 +110,11 @@ def vertical_POA(
 
     pv4.unassign('solar_resource_file')
                 
-    #print("Type meta ", meta)
-
     if 'tz' not in meta:
         meta['tz'] = '+0'
         
-    #if meta.get('tz') == None: 
-        #meta.loc['tz'] = '+0'
-
     if "albedo" not in weather_df.columns:
-        #weather_df['albedo'] = 0.2 # new pandas cries with this. dumb.
+        print("using placeholder albedo of 0.2 for all timesteps")
         weather_df.loc[:,'albedo'] = 0.2
 
     data = {'dn':list(weather_df.dni),
@@ -160,6 +153,7 @@ def vertical_POA(
 
     return df_res
 
+# TODO: add grid_default, cashloan_default, utilityrate_defaults for expanded pysam simulation capabilities
 def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -167,9 +161,6 @@ def pysam(
     pv_model_default: str = None,
     config_files: dict[str: str] = None,
     results: list[str] = None,
-    # grid_default: str,
-    # cashloan_default: str,
-    # utilityrate_default: str,
 ) -> dict:
     """
     Run pySam simulation. Only works with pysam weather.
@@ -303,7 +294,7 @@ def pysam(
         import PySAM.Utilityrate5 as UtilityRate
         import PySAM.Cashloan as Cashloan
     except ModuleNotFoundError:
-        print("pysam not found. run pip install pvdeg[sam] to install the NREL-PySAM dependency")
+        print("pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM dependency")
         return
 
     sr = solar_resource_dict(weather_df=weather_df, meta=meta)
@@ -357,58 +348,9 @@ def pysam(
     if not results:
         return outputs
 
-    # pysam_res = {}
-    # for key in results:
-    #     pysam_res[key] = outputs[key]
-
     pysam_res = {key: outputs[key] for key in results}
     return pysam_res
 
-# TODO: remove 
-def pysam_hourly_trivial(weather_df, meta):
-
-    try:
-        import PySAM
-        import PySAM.Pvsamv1 as pv1
-        import PySAM.Pvwattsv8 as pv8
-        import PySAM.Grid as Grid
-        import PySAM.Utilityrate5 as UtilityRate
-        import PySAM.Cashloan as Cashloan
-    except ModuleNotFoundError:
-        print("pysam not found. run pip install pvdeg[sam] to install the NREL-PySAM dependency")
-        return
-
-
-    sr = solar_resource_dict(weather_df=weather_df, meta=meta)
-    # weather_df = weather_df.reset_index(drop=True)
-    # weather_df = utilities.add_time_columns_tmy(weather_df) # only supports hourly data
-    
-    # sr = {
-    #     'lat': meta['latitude'],
-    #     'lon': meta['longitude'],
-    #     'tz': meta['tz'] if 'tz' in meta.keys() else 0,
-    #     'elev': meta['altitude'],
-    #     'year': list(weather_df['Year']),
-    #     'month': list(weather_df['Month']),
-    #     'day': list(weather_df['Day']),
-    #     'hour': list(weather_df['Hour']),
-    #     'minute': list(weather_df['Minute']),
-    #     'dn': list(weather_df['dni']),
-    #     'df': list(weather_df['dhi']),
-    #     'wspd': list(weather_df['wind_speed']),
-    #     'tdry': list(weather_df['temp_air']),
-    #     'alb' : weather_df['albedo'] if 'albedo' in weather_df.columns.values else [0.2]*len(weather_df)
-    # }
-    
-    # model = pv8.default("PVWattsCommercial")
-    model = pv1.default("FlatPlatePVCommercial")
-    model.SolarResource.solar_resource_data = sr
-    model.execute()
-    outputs = model.Outputs.export()
-
-    return outputs
-
-# TODO: add slots
 # class inspirePysamReturn():
 #     """simple struct to facilitate handling weirdly shaped pysam simulation return values"""
 
@@ -452,6 +394,7 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.
             "annual_energy" : annual_energy,
 
             # simple timeseries
+            # which poa do we want to use, we can elimiate one of the pairs to save a lot of memory
             "poa_front" : (("time", ), da.array(poa_front)),
             "poa_rear" : (("time", ), da.array(poa_rear)),
             "subarray1_poa_front" : (("time", ), da.array(subarray1_poa_front)),
@@ -463,7 +406,9 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.
         coords={
             "time" : timeseries_index,
             # "distance" : distances,
-            "distance" : np.arange(10), # this matches the dimension axis of the output_temlate dataset
+            # would be convient to define distances after being calculated 
+            # by pysam but we need to know ahead of time to create the template
+            "distance" : np.arange(10), # convient way to match the distances in the template
         }
     ) 
 
@@ -481,14 +426,6 @@ INSPIRE_NSRDB_ATTRIBUTES = [
     "surface_albedo",
 ]
 
-# annual_poa_nom, annual_poa_front, annual_poa_rear, poa_nom, poa_front, or poa_rear
-
-# annual energy
-# front_poa, rear_poa (timeseries, repeating 25 times, we can just take the first year)
-# annual_poa_rear_gain_percent (rear side gain, bifacial factor) (rear poa / front poa) * bifacial factor
-
-# should be be using poa_front or subarray1_poa_front (same for poa_rear?)
-# TODO: add config file, multiple config files.
 def inspire_ground_irradiance(weather_df, meta, config_files):
     """
     Get ground irradiance array and annual poa irradiance for a given point using pvsamv1
@@ -567,16 +504,42 @@ def solar_resource_dict(weather_df, meta):
     if 'wind_direction' in weather_df.columns.values:
         sr['wdir'] = list(weather_df['wind_direction']) 
 
-    # print(sr['alb'])
-
     return sr 
 
-def sample_pysam_result(weather_df, meta): # throw weather, meta away
-    """returns a sample inspirePysamReturn"""
-    with open(os.path.join(DATA_DIR,"inspireInstance.pkl"), "rb") as file:
-        inspireInstance = pickle.load(file)
+def sample_inspire_result(weather_df, meta): # throw weather, meta away
+    """
+    returns a sample inspire_ground_irradiance xarray. Dataset for geospatial testing. 
+    Weather_df and meta exist to provide a homogenous arugment structure for geospatial calculations but are not used.
+    
+    Parameters
+    ----------
+    weather: pd.Dataframe
+        weather dataframe, is thrown away
+    meta: dict
+        metadata dictionary, is thrown away
 
-    return inspireInstance
+    Returns
+    -------
+    inspire_ground_irradiance: xr.Dataset
+        returns an xarray dataset of the same shape generated by inpspire_ground_irradiance()
+    """
+
+    return xr.Dataset(
+        data_vars={
+        'poa_rear': (('time',), np.zeros((8760,))), 
+        'ground_irradiance': (('time', 'distance'), np.zeros((8760, 10))),
+        'annual_energy': ((), 0), 
+        'annual_poa': ((), 0),
+        'subarray1_poa_front': (('time',), np.zeros((8760,))), 
+        'subarray1_poa_rear': (('time',), np.zeros((8760,))), 
+        'poa_front': (('time',), np.zeros((8760,))),   
+        },
+        coords={
+            'time':pd.date_range(start="2001-01-01 00:30:00", periods=8760, freq='h'),
+            'distance':np.arange(10),
+        }
+    )
+
 
 def ground_irradiance_monthly(inspire_res_ds : xr.Dataset) -> xr.Dataset:
     """

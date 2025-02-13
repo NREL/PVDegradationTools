@@ -94,32 +94,32 @@ def start_dask(hpc=None):
 # rename this?
 # and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt really doing anything anymore
 # we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset already then we dont want to anything
-def _ds_from_arbitrary(res, func):
-    """
-    Convert an arbitrary return type to xarray.Dataset. 
-    """
+# def _ds_from_arbitrary(res, func):
+#     """
+#     Convert an arbitrary return type to xarray.Dataset. 
+#     """
 
-    ######## STRUCTURAL #########
-    # functions can just return xr.Dataset to take advantage of geospatial
-    # this should not be required to implement a new geospatial function
+#     ######## STRUCTURAL #########
+#     # functions can just return xr.Dataset to take advantage of geospatial
+#     # this should not be required to implement a new geospatial function
 
-    if isinstance(res, xr.Dataset):
-        return res
+#     if isinstance(res, xr.Dataset):
+#         return res
 
 
-    # if isinstance(res, pysam.inspirePysamReturn):
-    #     return pysam._handle_pysam_return(res)
-    # add more conditionals if we have special cases 
-    # or add general case for mixed return dimensions: HARD
+#     # if isinstance(res, pysam.inspirePysamReturn):
+#     #     return pysam._handle_pysam_return(res)
+#     # add more conditionals if we have special cases 
+#     # or add general case for mixed return dimensions: HARD
     
-    # handles collections with elements of same shapes
-    df = _df_from_arbitrary(res=res, func=func)
-    ds = xr.Dataset.from_dataframe(df)
+#     # handles collections with elements of same shapes
+#     df = _df_from_arbitrary(res=res, func=func)
+#     ds = xr.Dataset.from_dataframe(df)
 
-    if not df.index.name:
-        ds = ds.isel(index=0, drop=True)
+#     if not df.index.name:
+#         ds = ds.isel(index=0, drop=True)
 
-    return ds
+#     return ds
 
 
 def _df_from_arbitrary(res, func):
@@ -183,7 +183,19 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
         df_weather = df_weather.reset_index().set_index("time")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
-    ds_res = _ds_from_arbitrary(res, func)
+    # res is the type returned by func
+    # can be float, tuple, list, dataframe, dataset, etc.
+    # need to convert it to a dataset
+
+    if isinstance(res, xr.Dataset):
+        return res
+   
+    # handles collections with elements of same shapes
+    df = _df_from_arbitrary(res=res, func=func)
+    ds_res = xr.Dataset.from_dataframe(df)
+
+    if not df.index.name:
+        ds_res = ds_res.isel(index=0, drop=True)
 
     return ds_res
 
@@ -337,15 +349,13 @@ def output_template(
     dims = set([d for dim in shapes.values() for d in dim])
     dims_size = dict(ds_gids.sizes) | add_dims
 
-    # we need to properly add the dimensions
-    # can we redo with dictionary comprehension
-    # best approach @martin?
+    # update the coordinates with the dims which include add_dims
     coords = {}
     for dim in dims:
         if dim in ds_gids:
             coords[dim] = ds_gids[dim]
         elif dim in add_dims:
-            coords[dim] = np.arange(dims_size[dim]) # i dont like this
+            coords[dim] = np.arange(dims_size[dim]) # placeholder array (edge case)
         else:
             raise ValueError(f"dim: {dim} not in ds_gids or add_dims")
 
@@ -359,20 +369,20 @@ def output_template(
             )  # this will produce a dask array with 1 chunk of the same size as the input
             for var, dim in shapes.items()
         },
-        # moved as part of the above changes
-        # coords={dim: ds_gids[dim] for dim in dims},
         coords=coords,
         attrs=global_attrs,
     ) 
 
-    # chunk to match input
+    # we can only chunk dimensions existing in the input
+    # added dimensions will fail if chunked under this scheme 
+    # because they do not exist in ds gids
     if ds_gids.chunks: 
         output_template = output_template.chunk(
             {   
                 dim: ds_gids.chunks[dim] 
                 for dim in dims
                 if dim in ds_gids
-            }   # only chunk dimensions existing in the input
+            }
         )
 
     return output_template
@@ -1162,8 +1172,6 @@ def plot_sparse_analysis(
     if fig is not None:
         cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
         cbar.set_label("Value")
-
-    if fig is not None:
         plt.title("Interpolated Heatmap")
         plt.xlabel("Longitude")
         plt.ylabel("Latitude")

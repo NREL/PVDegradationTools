@@ -82,7 +82,7 @@ sam = [
     "NREL-PySAM==5.1.0",
 ]
 all = [
-    "pvdeg[docs,testrpp,books,sam]",
+    "pvdeg[docs,test,books,sam]",
 ]
 
 [project.entry-points.pvdeg]

@@ -1,12 +1,12 @@
-"""Class to define an analysis scenario."""
+"""
+Scenario objects and methods for accelerated analysis
+"""
 
-# cleanup imports
-# import matplotlib.axes
-import matplotlib.figure
 import pvdeg
 from pvdeg import utilities
 
 import matplotlib
+import matplotlib.figure
 import matplotlib.pyplot as plt
 from datetime import date
 from datetime import datetime as dt
@@ -284,7 +284,6 @@ class Scenario:
 
         try:
             mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
-            # mat_params = utilities._read_material(name=material)
         except KeyError:
             print("Material Not Found - No module added to scenario.")
             print("If you need to add a custom material, use .add_material()")
@@ -1170,7 +1169,6 @@ class GeospatialScenario(Scenario):
         """
         self.dask_client = pvdeg.geospatial.start_dask()
                                  
-    # add restoring from gids functionality from nsrdb
     def addLocation(
         self,
         country: Optional[str] = None,
@@ -1192,9 +1190,9 @@ class GeospatialScenario(Scenario):
         see_added: bool = False,
     ) -> None:
         """
-        Add a location to the scenario. This can be done in three ways: Pass (region, region_col) for gid list.
+        Add locations to the GeospatialScenario. Existing weather and meta data will be overwritten with weather and meta data gathered by this method.
 
-        Parameters:
+        Parameters
         -----------
         country : str
             country to include from NSRDB. Currently supports full string names only.
@@ -1240,12 +1238,7 @@ class GeospatialScenario(Scenario):
             flag true if you want to see a runtime notification for added location/gids
         """
 
-#        if self.gids is not None:
-#            print(
-#                "Scenario already has designated project points.\nNothing has been added."
-#            )
-#            print(self.gids)
-#            return
+        # overwrite old location information
         self.gids, self.weather_data, self.meta_data = None, None, None
 
         weather_db = "NSRDB"

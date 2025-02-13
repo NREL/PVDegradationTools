@@ -35,7 +35,7 @@ def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -
     >>> func.shape_names = ["T98", "x_eff"] # function attribute names
 
     * Note: we cannot autotemplate functions with ambiguous return types that depend on runtime input,
-    the function will need strictly return a timeseries or numeric.
+    the function will need to strictly return a timeseries or numeric.
 
     * Note: this is accessed through the ``decorators.geospatial_quick_shape`` namespace
 

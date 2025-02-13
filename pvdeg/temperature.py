@@ -415,22 +415,3 @@ def temperature(
 
     return temperature
 
-def _mixed_res(weather_df, meta):
-    """
-    geospatial test function. returns have mixed dimensions. the first is a timeseries, the second is a float.
-    This function is meant to discover problems with geospatial.analysis and its subroutines.
-
-    .. code_block : Python 
-
-        Shapes = {
-            "temperatures" : ("gid", "time"),
-            "avg_temp" : ("gid", ),
-        }
-    """
-
-    timeseries_df = pd.DataFrame(pvdeg.temperature.module(weather_df, meta))
-    avg_temp = timeseries_df[0].mean()
-
-    # now we have this problem. how can we run this
-    # return {'temperatures' : timeseries_df, 'avg_temp' : avg_temp}
-    return timeseries_df, avg_temp
