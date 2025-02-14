@@ -1,10 +1,13 @@
-"""Class to define an analysis scenario."""
+"""
+Scenario objects and methods for accelerated analysis
+"""
 
-import matplotlib.axes
-import matplotlib.figure
 import pvdeg
 from pvdeg import utilities
 
+import matplotlib
+import matplotlib.figure
+import matplotlib.pyplot as plt
 from datetime import date
 from datetime import datetime as dt
 import os
@@ -15,16 +18,15 @@ import warnings
 import pandas as pd
 import xarray as xr
 import numpy as np
-import matplotlib.pyplot as plt
 from collections import OrderedDict
 from copy import deepcopy
-from typing import List, Union, Optional, Tuple, Callable, overload
+from typing import List, Union, Optional, Tuple, Callable
 from functools import partial
 import pprint
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-
+from dask.distributed import Client
 
 class Scenario:
     """
@@ -236,6 +238,7 @@ class Scenario:
         module_name: str = None,
         racking: str = "open_rack_glass_polymer",
         material: str = "OX003",
+        material_file: str = "O2permeation",
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
@@ -245,23 +248,27 @@ class Scenario:
         Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
         the given scenario.
 
-        Parameters:
+        Parameters
         -----------
-        module_name : (str)
+        module_name : str
             unique name for the module. adding multiple modules of the same name will replace the
             existing entry.
-        racking : (str)
+        racking : str
             temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
-        material : (str)
+        material : str
             Key of the material desired. For a complete list, see pvdeg/data/O2permeation.json
             or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
-        temp_model : (str)
+        material_file : str
+            Material file used to access parameters from.
+            Use material json file in `pvdeg/data`. Options:
+            >>> "AApermeation", "H2Opermeation", "O2permeation"
+        temp_model : str
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
             Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
-        model_kwarg : (dict), optional
+        model_kwarg : dict, (optional)
             provide a dictionary of temperature model coefficents to be used
             instead of pvlib defaults. Some models will require additional
             arguments such as ``ross`` which requires nominal operating cell
@@ -269,14 +276,14 @@ class Scenario:
             should be provided.
             Pvlib temp models:
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
-        irradiance_kwarg : (dict), optional
+        irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         see_added : (bool), optional
         """
 
         try:
-            mat_params = utilities._read_material(name=material)
+            mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
         except KeyError:
             print("Material Not Found - No module added to scenario.")
             print("If you need to add a custom material, use .add_material()")
@@ -302,9 +309,9 @@ class Scenario:
         if see_added:
             print(f'Module "{module_name}" added.')
 
-    # test this?
+    # add testing
     def add_material(
-        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True
+        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname="O2permeation.json",
     ):
         """
         add a new material type to main list
@@ -319,6 +326,7 @@ class Scenario:
             Eap=Eap,
             Po=Po,
             fickian=fickian,
+            fname=fname,
         )
         print("Material has been added.")
         print("To add the material as a module in your current scene, run .addModule()")
@@ -875,32 +883,33 @@ class Scenario:
 
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
-            <h2>{self.name}: Scenario Analysis</h2>
-            <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>GIDs:</strong> {self.gids}</p>
-            <p><strong>Email:</strong> {self.email}</p>
-            <p><strong>API Key:</strong> {self.api_key}</p>
+            <h2>self.name: {self.name}</h2>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.gids:</strong> {self.gids}</p>
+            <p><strong>self.email:</strong> {self.email}</p>
+            <p><strong>self.api_key:</strong> {self.api_key}</p>
             <div>
-                <h3>Results</h3>
+                <h3>self.results</h3>
                 {self.format_results() if self.results else None}
             </div>
             <div>
-                <h3>Pipeline</h3>
+                <h3>self.pipeline</h3>
                 {self.format_pipeline()}
             </div>
             <div>
-                <h3>Modules</h3>
+                <h3>self.modules</h3>
                 {self.format_modules()}
             </div>
             <div>
-                <h3>Weather Data</h3>
+                <h3>self.weather_data</h3>
                 {self.format_weather()}
             </div>
             <div>
-                <h3>Meta Data</h3>
+                <h3>self.meta_data</h3>
                 {self.meta_data}
             </div>
         </div>
+        <p><i>All attributes can be accessed by the names shown above.</i></p>
         <script>
             function toggleVisibility(id) {{
                 var content = document.getElementById(id);
@@ -1094,6 +1103,7 @@ class GeospatialScenario(Scenario):
         meta_data: pd.DataFrame = None,
         func: Callable = None,
         template: xr.Dataset = None,
+        dask_client: Client = None,
     ):
         super().__init__(
             name=name,
@@ -1110,6 +1120,8 @@ class GeospatialScenario(Scenario):
         self.hpc = hpc
         self.func = func
         self.template = template
+        self.dask_client = dask_client
+        self.kdtree = None # sklearn kdtree
 
     def __eq__(self, other):
         raise NotImplementedError("""
@@ -1117,16 +1129,53 @@ class GeospatialScenario(Scenario):
             due to larger than memory/out of memory datasets stored in 
             GeospatialScenario.weather_data attribute.
             """)
-                                 
 
-    # add restoring from gids functionality from nsrdb
+    def start_dask(self, hpc=None) -> None:
+        """
+            Starts a dask cluster for parallel processing.
+
+            Parameters
+            ----------
+            hpc : dict
+                Dictionary containing dask hpc settings (see examples below).
+                Supply `None` for a default configuration.
+
+            Examples
+            --------
+            Local cluster:
+
+            .. code-block:: python
+
+                hpc = {'manager': 'local',
+                    'n_workers': 1,
+                    'threads_per_worker': 8,
+                    'memory_limit': '10GB'}
+
+            SLURM cluster:
+
+            .. code-block:: python
+
+                kestrel = {
+                    'manager': 'slurm',
+                    'n_jobs': 1,  # Max number of nodes used for parallel processing
+                    'cores': 104,
+                    'memory': '246GB',
+                    'account': 'pvsoiling',
+                    'walltime': '4:00:00',
+                    'processes': 52,
+                    'local_directory': '/tmp/scratch',
+                    'job_extra_directives': ['-o ./logs/slurm-%j.out'],
+                    'death_timeout': 600,}
+        """
+        self.dask_client = pvdeg.geospatial.start_dask()
+                                 
     def addLocation(
         self,
         country: Optional[str] = None,
         state: Optional[str] = None,
         county: Optional[str] = None,
-        year: int = 2022,
         satellite: str = "Americas",
+        year: Union[str, int] = "TMY",
         nsrdb_attributes: List[str] = [
             "air_temperature",
             "wind_speed",
@@ -1141,9 +1190,9 @@ class GeospatialScenario(Scenario):
         see_added: bool = False,
     ) -> None:
         """
-        Add a location to the scenario. This can be done in three ways: Pass (region, region_col) for gid list.
+        Add locations to the GeospatialScenario. Existing weather and meta data will be overwritten with weather and meta data gathered by this method.
 
-        Parameters:
+        Parameters
         -----------
         country : str
             country to include from NSRDB. Currently supports full string names only.
@@ -1157,6 +1206,7 @@ class GeospatialScenario(Scenario):
             combination of states or provinces to include from NSRDB.
             Supports two-letter codes for American states. Can mix two-letter
             codes with full length strings. Can take single string, or list of strings (len >= 1)
+
             Examples:
             - ``state='Washington'``
             - ``state=WA`` (state abbr is case insensitive)
@@ -1169,20 +1219,27 @@ class GeospatialScenario(Scenario):
         downsample_factor : int
             downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
         year : int
-            year of data to use from NSRDB, default = ``2022``
+            year of data to use from NSRDB, default = ``TMY`` otherwise provide integer like ``2022`` for psm3 yearly data.
         nsrdb_attributes : list(str)
-            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).\
-            Default = ``['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']``
+            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).
+
+                Valid Options:
+                - 'air_temperature'  
+                - 'dew_point'  
+                - 'dhi'  
+                - 'dni'  
+                - 'ghi'  
+                - 'surface_albedo'   
+                - 'surface_pressure'   
+                - 'wind_direction'   
+                - 'wind_speed'  
+
         see_added : bool
             flag true if you want to see a runtime notification for added location/gids
         """
 
-        if self.gids is not None:
-            print(
-                "Scenario already has designated project points.\nNothing has been added."
-            )
-            print(self.gids)
-            return
+        # overwrite old location information
+        self.gids, self.weather_data, self.meta_data = None, None, None
 
         weather_db = "NSRDB"
         weather_arg = {
@@ -1239,6 +1296,8 @@ class GeospatialScenario(Scenario):
             geo_meta, downsample_factor
         )
 
+        geo_weather = pvdeg.weather.map_weather(geo_weather)
+
         self.weather_data = geo_weather
         self.meta_data = geo_meta
         self.gids = geo_gids
@@ -1248,6 +1307,20 @@ class GeospatialScenario(Scenario):
             warnings.warn(message, UserWarning)
 
         return
+
+    def downselect_CONUS(
+        self,
+    ) -> None:
+        """Downselect US to contiguous US geospatial data"""
+
+        geo_weather, geo_meta = self.get_geospatial_data()
+
+        geo_meta = geo_meta[geo_meta['state'] != "Alaska"]
+        geo_meta = geo_meta[geo_meta['state'] != "Hawaii"]
+        geo_weather = geo_weather.sel(gid=geo_meta.index)
+
+        self.weather_data = geo_weather
+        self.meta_data = geo_meta
 
     def location_bounding_box(
         self,
@@ -1285,14 +1358,22 @@ class GeospatialScenario(Scenario):
 
         self.meta_data = self.meta_data.loc[bbox_gids]
 
+    def set_kdtree(self, kdtree = None) -> None:
+        """Initialize a kidtree and save it to the GeospatialScenario"""
+        if kdtree is None:
+            self.kdtree = pvdeg.geospatial.meta_KDtree(meta_df=self.meta_data)
+        else:
+            self.kdtree = kdtree
+
+
     def classify_mountains_radii(
         self,
-        kdtree,
         rad_1: Union[float, int] = 12,
         rad_2: Union[float, int] = 1,
         threshold_factor: Union[float, int] = 1.25,
         elevation_floor: Union[float, int] = 0,
         bbox_kwarg: Optional[dict] = {},
+        kdtree = None,
     ):
         """
         Find mountains from elevation metadata using sklearn kdtree for fast lookup.
@@ -1306,9 +1387,6 @@ class GeospatialScenario(Scenario):
         -----------
         meta_df : pd.DataFrame
             Dataframe of metadata as generated by pvdeg.weather.get for geospatial
-        kdtree : sklearn.neighbors.KDTree
-            kdtree containing latitude-longitude pairs for quick lookups
-            Generate using ``pvdeg.geospatial.meta_KDTree``
         rad_1 : float
             radius of the larger search area whose elevations are compared against
             the smaller search area. controls the kdtree query region.
@@ -1325,15 +1403,21 @@ class GeospatialScenario(Scenario):
         elevation_floor : int
             minimum inclusive elevation in meters. If a point has smaller location
             it will be clipped from result.
+        kdtree : sklearn.neighbors.KDTree
+            Generated automatically but can be provided externally.
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``
 
         Returns:
         --------
-        None, strictly updates meta_data attribute of geospatial scenari instance.
+        None, strictly updates meta_data attribute of GeospatialScenario instance.
         """
+
+        self.set_kdtree(kdtree=kdtree)
 
         gids = pvdeg.geospatial.identify_mountains_radii(
             meta_df=self.meta_data,
-            kdtree=kdtree,
+            kdtree=self.kdtree,
             rad_1=rad_1,
             rad_2=rad_2,
             threshold_factor=threshold_factor,
@@ -1346,12 +1430,12 @@ class GeospatialScenario(Scenario):
 
     def classify_mountains_weights(
         self,
-        kdtree,
         threshold: int = 0,
         percentile: int = 75,
         k_neighbors: int = 3,
         method: str = "mean",
         normalization: str = "linear",
+        kdtree = None,
     ):
         """
         Add a column to the scenario meta_data dataframe containing a boolean
@@ -1360,10 +1444,6 @@ class GeospatialScenario(Scenario):
 
         Parameters:
         -----------
-        kdtree : sklearn.neighbors.KDTree or str
-            kdtree containing latitude-longitude pairs for quick lookups
-            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
-            kdtree as a path to the .pkl file.
         threshold : float
             minimum weight that a mountain can be identifed.
             value between `[0,1]` (inclusive)
@@ -1379,6 +1459,11 @@ class GeospatialScenario(Scenario):
         normalization : str, (default = 'linear')
             function to apply when normalizing weights. Logarithmic uses log_e/ln
             options : `'linear'`, `'logarithmic'`, '`exponential'`
+        kdtree : sklearn.neighbors.KDTree or str
+            Generated automatically but can be provided externally.
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+            kdtree as a path to the .pkl file.
 
         Returns:
         --------
@@ -1388,9 +1473,12 @@ class GeospatialScenario(Scenario):
         ---------
         `pvdeg.geospatial.identify_mountains_weights`
         """
+
+        self.set_kdtree(kdtree=kdtree)
+
         gids = pvdeg.geospatial.identify_mountains_weights(
             meta_df=self.meta_data,
-            kdtree=kdtree,
+            kdtree=self.kdtree,
             threshold=threshold,
             percentile=percentile,
             k_neighbors=k_neighbors,
@@ -1402,18 +1490,14 @@ class GeospatialScenario(Scenario):
         return
 
     def classify_feature(
-        self,
-        kdtree=None,
+       self,
         feature_name=None,
         resolution="10m",
         radius=None,
+        kdtree=None,
         bbox_kwarg={},
     ):
         """
-        kdtree : sklearn.neighbors.KDTree or str
-            kdtree containing latitude-longitude pairs for quick lookups
-            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
-            kdtree as a path to the .pkl file.
         feature_name : str
             cartopy.feature.NaturalEarthFeature feature key.
             Options: ``'lakes'``, ``'rivers_lake_centerlines'``, ``'coastline'``
@@ -1424,6 +1508,11 @@ class GeospatialScenario(Scenario):
             Area around feature coordinates to include in the downsampled result.
             Bigger area means larger radius and more samples included.
             pass
+        kdtree : sklearn.neighbors.KDTree or str
+            Generated automatically but can be provided externally.
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+            kdtree as a path to the .pkl file.
 
         Returns:
         --------
@@ -1434,9 +1523,11 @@ class GeospatialScenario(Scenario):
         `pvdeg.geospatial.feature_downselect`
         """
 
+        self.set_kdtree(kdtree=kdtree)
+
         feature_gids = pvdeg.geospatial.feature_downselect(
             meta_df=self.meta_data,
-            kdtree=kdtree,
+            kdtree=self.kdtree,
             feature_name=feature_name,
             resolution=resolution,
             radius=radius,
@@ -1448,11 +1539,11 @@ class GeospatialScenario(Scenario):
 
     def downselect_elevation_stochastic(
         self,
-        kdtree,
         downselect_prop,
         k_neighbors=3,
         method="mean",
         normalization="linear",
+        kdtree = None,
     ):
         """
         Prefenetially downselect data points based on elevation and update
@@ -1460,10 +1551,6 @@ class GeospatialScenario(Scenario):
 
         Parameters:
         -----------
-        kdtree : sklearn.neighbors.KDTree or str
-            kdtree containing latitude-longitude pairs for quick lookups
-            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
-            kdtree as a path to the .pkl file.
         downselect_prop : float
             proportion of original datapoints to keep in output gids list
         k_neighbors : int, (default = 3)
@@ -1474,6 +1561,11 @@ class GeospatialScenario(Scenario):
         normalization : str, (default = 'linear')
             function to apply when normalizing weights. Logarithmic uses $log_e$, $ln$
             options : `'linear'`, `'log'`, '`exp'`, `'invert-linear'`
+        kdtree : sklearn.neighbors.KDTree or str
+            Generated automatically but can be provided externally.
+            kdtree containing latitude-longitude pairs for quick lookups
+            Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
+            kdtree as a path to the .pkl file.
 
         Returns:
         --------
@@ -1483,16 +1575,19 @@ class GeospatialScenario(Scenario):
         ---------
         `pvdeg.geospatial.elevation_stochastic_downselect` for more info/docs
         """
+
+        self.set_kdtree(kdtree=kdtree)
+
         gids = pvdeg.geospatial.elevation_stochastic_downselect(
             meta_df=self.meta_data,
-            kdtree=kdtree,
+            kdtree=self.kdtree,
             downselect_prop=downselect_prop,
             k_neighbors=k_neighbors,
             method=method,
             normalization=normalization,
         )
 
-        self.meta_data = self.meta_data.iloc[gids]
+        self.meta_data = self.meta_data.loc[gids]
         return
 
     def gid_downsample(self, downsample_factor: int) -> None:
@@ -1643,12 +1738,13 @@ class GeospatialScenario(Scenario):
         Only supports one function at a time. Unlike `Scenario` which supports unlimited conventional pipeline jobs.
         Results are stored in the `GeospatialScenario.results` attribute.
 
-        Creates a dask cluster or client using the hpc_worker_conf parameter.
+        Creates a dask client if it has not been initialized previously with `GeospatialScenario.start_dask`.
 
         Parameters:
         -----------
         hpc_worker_conf : dict
             Dictionary containing dask hpc settings (see examples below).
+            When `None`, a default configuration is used. 
 
             Examples
             --------
@@ -1677,7 +1773,12 @@ class GeospatialScenario(Scenario):
                     'job_extra_directives': ['-o ./logs/slurm-%j.out'],
                     'death_timeout': 600,}
         """
-        client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
+        if self.dask_client and hpc_worker_conf:
+            raise ValueError("Dask Client already exists, cannot configure new client.")
+        elif not self.dask_client:
+            self.dask_client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
+        
+        print("Dashboard:", self.dask_client.dashboard_link)
 
         analysis_result = pvdeg.geospatial.analysis(
             weather_ds=self.weather_data,
@@ -1688,7 +1789,7 @@ class GeospatialScenario(Scenario):
 
         self.results = analysis_result
 
-        client.shutdown()
+        self.dask_client.shutdown()
 
     def restore_result_gids(self):
         """
@@ -1785,14 +1886,12 @@ class GeospatialScenario(Scenario):
     def plot(self):
         """
         Not Usable in GeospatialScenario class instance, only in Scenario instance.
-        python has no way to hide a parent class method in the child,
-        so this only exists to prevent access
         """
+        # python has no way to hide a parent class method in the child, so this only exists to prevent access
         raise AttributeError(
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
         )
 
-    import matplotlib
 
     def plot_coords(
         self,
@@ -1821,7 +1920,7 @@ class GeospatialScenario(Scenario):
             the most extreme coordinates for the United States coastline information.
         size : float
             matplotlib scatter point size. Without any downsampling NSRDB
-            points will siginficantly overlap.
+            points will siginficantly overlap and plot may appear as a solid color.
 
         Returns:
         --------
@@ -1831,7 +1930,7 @@ class GeospatialScenario(Scenario):
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
 
-        if (coord_1 and coord_2) or (coords != None):
+        if (coord_1 and coord_2) or (coords is not None):
             utilities._plot_bbox_corners(
                 ax=ax, coord_1=coord_1, coord_2=coord_2, coords=coords
             )
@@ -2018,64 +2117,60 @@ class GeospatialScenario(Scenario):
         if not iterable.issubset(to_check):
             raise ValueError(f"All of iterable: {iterable} does not exist in {to_check}")
 
-    
-    # GeospatialScenario no longer uses pipeline, instead job attributes are stored in attrbutes "func", "template"
-    # def format_pipeline(self):
-    #     pipeline_html = "<div>"
-    #     if "geospatial_job" in self.pipeline:
-    #         step_name = "geospatial_job"
-    #         step = self.pipeline[step_name]
-    #         params_html = f"<pre>{json.dumps(step['params'], indent=2)}</pre>"
+    def format_geospatial_work(self):
+        if self.func:
+            return f"""
+                <p><strong>self.func:</strong> {self.func.__name__}</p>
+                <p><strong>self.template:</strong> {self.format_template()}</p>
+            """
 
-    #         step_content = f"""
-    #         <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
-    #             <h4 style="font-family: monospace; margin: 0;">
-    #                 <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
-    #                 {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
-    #             </h4>
-    #         </div>
-    #         <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-    #             <p>Job: {step['job'].__name__}</p>
-    #             <p>Parameters:</p>
-    #             <div style="margin-left: 20px;">
-    #                 {params_html}
-    #             </div>
-    #         </div>
-    #         """
-    #         pipeline_html += step_content
-    #     pipeline_html += "</div>"
-    #     return pipeline_html
+        return ""
+
+    def format_dask_link(self):
+        if self.dask_client:
+            return f"""
+                <a href="{self.dask_client.dashboard_link}" target="_blank">{self.dask_client.dashboard_link}</a></p>
+            """
+        return ""
 
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
-            <h2>{self.name}: Scenario Analysis</h2>
-            <p><strong>Path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
-            <p><strong>HPC Configuration:</strong> {self.hpc}</p>
-            <p><strong>GIDs:</strong> {self.gids}</p>
+            <h2>self.name: {self.name}</h2>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.hpc:</strong> {self.hpc}</p>
+            <p><strong>self.gids:</strong> {self.gids}</p>
             <div>
-                <h3>Results</h3>
-                {self.format_results() if self.results else None}
+                <h3>self.results</h3>
+                {self.format_results() if self.results else ''}
             </div>
             <div>
-                <h3>Geospatial Job</h3>
-                Function : {self.func.__name__}
-                {self.format_template()}
+                <h3>Geospatial Work</h3>
+                {self.format_geospatial_work()}
             </div>
             <div>
-                <h3>Modules</h3>
+                <h3>self.modules</h3>
                 {super().format_modules()}
             </div>
             <div>
-                <h3>Weather Dataset</h3>
+                <h3>self.weather_data</h3>
                 {self.format_geo_weather()}
             </div>
             <div>
-                <h3>Meta Dataframe</h3>
+                <h3>self.meta_data</h3>
                 {self.format_geo_meta()}
             </div>
+            <div>
+                <h3>self.kdtree</h3>
+                {self.kdtree or ''}
+            </div>
+            <div>
+                <h3>self.dask_client</h3>
+                {self.format_dask_link()}
+            </div>
         </div>
+        <p><i>All attributes can be accessed by the names shown above.</i></p>
         <script>
             function toggleVisibility(id) {{
                 var content = document.getElementById(id);
@@ -2170,3 +2265,5 @@ class GeospatialScenario(Scenario):
             """
 
         return weather_data_html
+
+

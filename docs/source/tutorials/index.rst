@@ -50,3 +50,20 @@ You can also run the tutorial locally in a virtual environment, i.e., `venv` or
 1. Use the file explorer in Jupyter lab to browse to `tutorials`
    and start the first Tutorial.
 
+NREL HPC (Kestrel)
+------------------
+
+Running notebooks on Kestrel is documented on the `NREL HPC Docs <https://nrel.github.io/HPC/Documentation/Development/Jupyter/>`_.
+
+**NOTE**: To run jupyter notebooks on Kestrel you must add a custom iPykernel. This section is borrowed from the NREL HPC docs.
+
+
+   A kernel is what allows Jupyter to use your customized conda environment inside Jupyter, in a notebook. Use ipykernel to build your kernel. Inside your custom conda environment, run:
+
+   ``python -m ipykernel install --user --name=myjupyter``
+
+   If you already have a Jupyter server running, restart it to load the new kernel.
+
+   The new kernel will appear in the drop-down as an option to open a new notebook.
+
+   You can have multiple kernels, allowing you to load different conda environments for your different projects into Notebooks.

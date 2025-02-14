@@ -12,5 +12,5 @@ Suite of utility functions to facilitate accessing material parameter json files
 * ``pvdeg.utilities.display_json`` to view 2 level jsons in Jupyter Notebooks using HTML.  
 
 Contributors
------------
+--------------
 * Tobin Ford (:ghuser:`tobin-ford`)

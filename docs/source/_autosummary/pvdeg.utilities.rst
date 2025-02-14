@@ -19,6 +19,7 @@ pvdeg.utilities
       :nosignatures:
 
       
+      pvdeg.utilities.add_time_columns_tmy
       pvdeg.utilities.compare_templates
       pvdeg.utilities.convert_tmy
       pvdeg.utilities.display_json
@@ -55,6 +56,13 @@ pvdeg.utilities
    ---------
 
    
+
+   .. autofunction:: add_time_columns_tmy
+
+   .. _sphx_glr_backref_pvdeg.utilities.add_time_columns_tmy:
+
+   .. minigallery:: pvdeg.utilities.add_time_columns_tmy
+       :add-heading:
 
    .. autofunction:: compare_templates
 

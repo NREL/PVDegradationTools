@@ -55,6 +55,7 @@ dependencies = [
     "xarray",
     "pre-commit",
     "sympy",
+    "zarr",
 ]
 dynamic = ["version"]
 
@@ -77,8 +78,11 @@ test = [
 books = [
     "jupyter-book",
 ]
+sam = [
+    "NREL-PySAM==5.1.0",
+]
 all = [
-    "pvdeg[docs,test,books]",
+    "pvdeg[docs,test,books,sam]",
 ]
 
 [project.entry-points.pvdeg]

@@ -78,3 +78,23 @@ This is possible but causes headaches.
     )
 
 Takeaway: gids are not unique or necessarily meaningful, be careful when using them. Duplicate gids can exist in geospatial data and will be loaded using Xarray without raising an error.
+
+
+
+.. _PARALLEL_DOWNLOADS:
+Accelerated Downloads
+----------------------
+
+``PVDeg`` provides tools for the accelerated downloading of meteorological data outside of HPC environments. This is particularly useul for ``PVGIS`` which allows us to download up to
+30 locations per second of tmy data. Due to the single-threaded nature of Python, we are traditionally limited to 1 request at a time. Often, ``PVGIS`` takes 2-3 seconds per location. 
+This cumulates in massive download times for large datasets. We can use ``Dask`` for parallelization to greatly accellerate this process and approach the 30 requests per second rate limit.  
+
+.. 
+    .. image::  meteorological-data-letails/parallel-download.svg
+        :alt: parallel downloading visualization
+ 
+We can see that abstract potential speedup offered by parallelization. It is easy to utilize this funtionality as provided by ``pvdeg.weather.weather_distributed``.
+
+.. autofunction:: pvdeg.weather.weather_distributed
+
+

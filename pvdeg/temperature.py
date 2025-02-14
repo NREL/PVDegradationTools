@@ -3,8 +3,12 @@ Collection of classes and functions to calculate different temperatures.
 """
 
 import pvlib
-import pvdeg
-from pvdeg.decorators import geospatial_quick_shape
+# import pvdeg
+
+from pvdeg import (
+    spectral,
+    decorators,
+)
 import pandas as pd
 from typing import Union
 from functools import partial
@@ -24,23 +28,23 @@ def map_model(temp_model: str, cell_or_mod: str) -> callable:
 
     # double check that models are in correct maps
     module = {  # only module
-        "sapm": pvlib.temperature.sapm_module,
-        "sapm_mod": pvlib.temperature.sapm_module,
+        "sapm"          : pvlib.temperature.sapm_module,
+        "sapm_mod"      : pvlib.temperature.sapm_module,
     }
 
     cell = {  # only cell
-        "sapm": pvlib.temperature.sapm_cell,
-        "sapm_cell": pvlib.temperature.sapm_cell,
-        "pvsyst": pvlib.temperature.pvsyst_cell,
-        "ross": pvlib.temperature.ross,
-        "noct_sam": pvlib.temperature.noct_sam,
+        "sapm"          : pvlib.temperature.sapm_cell,
+        "sapm_cell"     : pvlib.temperature.sapm_cell,
+        "pvsyst"        : pvlib.temperature.pvsyst_cell,
+        "ross"          : pvlib.temperature.ross,
+        "noct_sam"      : pvlib.temperature.noct_sam,
         "generic_linear": pvlib.temperature.generic_linear,
     }
 
     agnostic = {  # module or cell
-        "faiman": pvlib.temperature.faiman,
-        "faiman_rad": pvlib.temperature.faiman_rad,
-        "fuentes": pvlib.temperature.fuentes,
+        "faiman"        : pvlib.temperature.faiman,
+        "faiman_rad"    : pvlib.temperature.faiman_rad,
+        "fuentes"       : pvlib.temperature.fuentes,
     }
 
     super_map = {"module": module, "cell": cell}
@@ -92,7 +96,7 @@ def _wind_speed_factor(temp_model: str, meta: dict, wind_factor: float):
     return wind_speed_factor
 
 
-@geospatial_quick_shape(1, ["module_temperature"])
+@decorators.geospatial_quick_shape('timeseries', ["module_temperature"])
 def module(
     weather_df,
     meta,
@@ -130,7 +134,7 @@ def module(
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta)
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
@@ -183,7 +187,7 @@ def module(
     return module_temperature
 
 
-@geospatial_quick_shape(1, ["cell_temperature"])
+@decorators.geospatial_quick_shape('timeseries', ["cell_temperature"])
 def cell(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -374,7 +378,7 @@ def temperature(
             parameters = {k: v for k, v in parameters.items() if k != "deltaT"}
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
+        poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     # irrelevant key,value pair will be ignored (NO ERROR)
     weather_args = {
@@ -410,3 +414,4 @@ def temperature(
     temperature = func(**model_args)
 
     return temperature
+

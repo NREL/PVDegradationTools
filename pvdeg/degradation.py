@@ -9,11 +9,12 @@ from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Union
 
-from . import temperature
-from . import spectral
-from . import weather
-
-from pvdeg.decorators import geospatial_quick_shape
+from . import (
+    temperature,
+    spectral,
+    weather,
+    decorators,
+)
 
 # TODO: Clean up all those functions and add gaps functionality
 
@@ -236,7 +237,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-@geospatial_quick_shape(0, ["Iwa"])
+@decorators.geospatial_quick_shape('numeric', ["Iwa"])
 def IwaVantHoff(
     weather_df,
     meta,
