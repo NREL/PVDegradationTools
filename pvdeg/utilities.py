@@ -1571,3 +1571,16 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
 
+def get_usa_shapefile():
+
+    import cartopy.io.shapereader as shpreader
+
+    shapefile_path = shpreader.natural_earth(resolution='110m', category='cultural', name='admin_0_countries')
+    shape_reader = shpreader.Reader(shapefile_path)
+
+    usa_shape = None
+    for record, geometry in zip(shape_reader.records(), shape_reader.geometries()):
+        if record.attributes["SOVEREIGNT"] == "United States of America":  # Filter for the USA
+            return geometry
+
+    raise ValueError("usa shape not found")
