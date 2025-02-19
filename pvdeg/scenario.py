@@ -116,7 +116,7 @@ class Scenario:
             and self.path == other.path
             and np.array_equal(self.gids, other.gids)
             and self.modules == other.modules
-            and compare_ordereddict_values(self.pipeline, other.pipeline)
+            and compare_ordereddict_values(self.pipeline, other.pipeline) # keys are random
             and self.file == other.file
             and self.results == other.results
             and (
