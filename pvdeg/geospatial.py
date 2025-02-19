@@ -1128,13 +1128,13 @@ def plot_sparse_analysis(
     result: xr.Dataset, 
     data_var: str, 
     method="nearest", 
-    res=100j, 
+    resolution=100j, 
     cmap='viridis',
     ax=None
 
 ) -> None:
     grid_values, lat, lon = interpolate_analysis(
-        result=result, data_var=data_var, method=method, res=res
+        result=result, data_var=data_var, method=method, resolution=resolution
     )
 
     if ax is None:
