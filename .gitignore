@@ -47,6 +47,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# pvdeg scenario output files generated during testing
+tests/pvd_*
+
 # Translations
 *.mo
 *.pot

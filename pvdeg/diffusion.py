@@ -8,25 +8,24 @@ import pandas as pd
 from pvdeg import DATA_DIR
 from numba import jit
 import numpy as np
+from typing import Callable
 
 def esdiffusion(
     temperature, 
-    edge_seal=None, 
-    encapsulant=None, 
+    edge_seal="OX005", 
+    encapsulant="OX003", 
     edge_seal_width=1.5, 
     encapsulant_width=10, 
     seal_nodes=20, 
     encapsulant_nodes=50,
     press = 0.209,
     repeat = 1,
-    Dos=None,
-    Eads=None,
-    Sos=None,
-    Eass=None,
-    Doe=None,
-    Eade=None,
-    Soe=None,
-    Ease=None,
+    Dos=None, Eads=None, Sos=None,Eass=None, Doe=None, Eade=None, Soe=None, Ease=None,
+    react_func = None,
+    deg_func = None,
+    deg = None,
+    perm = None,
+    printout = True,
     **kwarg
     ):
 
@@ -58,40 +57,68 @@ def esdiffusion(
         This is the partial pressure of oxygen.
     repeat : integer, optional
         This is the number of times to do the calculation for the whole dataset. E.g. repeat the 1-y data for 10 years.
+    react_func : string, optional
+        This is the name of the function that will be calculating the consumption of oxygen.
+    deg_func :string, optional
+        This is the name of the function that will be calculating the degradation.
+    printout : Boolean
+        This allows you to suppress printing messages during code execution by setting it to false.
+    deg : Numpy Array
+        One can send in an array with predefined degradation data already in it if desired. 
+        I.e. you can have some pre degradation or areas that require more degradation.
+    perm : Numpy Array
+        One can send in an array with the permeant already in it if desired.
     kwargs : dict, optional
-        If es or enc are left at 'None' then the use parameters, Dos, Eads, Sos, Eass, Doe, Eade, Soe, Ease in units of
+        If edge_seal or encapsulant are set at 'None' then you can enter your own parameters for, Dos, Eads, Sos, Eass, Doe, Eade, Soe, Ease in units of
         [cm²/s], [g/cm³], or [kJ/mol] for diffusivity, solubility, or activation energy respectively. If specific parameters are provided,
-        then the JSON ones can be overridden.
+        then the JSON ones will be overridden.
+        Should also contain any key word arguments that need to be passed to the function calculating consumption of the permeant or degradation.
 
     Returns
     -------
     ingress_data : pandas.DataFrame
-        This will give the concentration profile as a function of temperature along with degradation parameters in futur iterations..
+        This will give the concentration profile as a function of time.
+        If there is a degradation function called, this data will also be inclueded on a node by node basis under a third index.
     """
 
     with open(os.path.join(DATA_DIR, "O2permeation.json")) as user_file:
         O2 = json.load(user_file)
         user_file.close()
-    # O2
-    if edge_seal == None:
-        esp = O2.get("OX005")  # This is the number for the edge seal in the json file
-    else:
+    with open(os.path.join(DATA_DIR, "H2Opermeation.json")) as user_file:
+        H2O = json.load(user_file)
+        user_file.close()
+
+    if edge_seal[0:2]=="OX":
         esp = O2.get(edge_seal)
-
-    if encapsulant == None:
-        encp = O2.get(
-            "OX003"
-        )  # This is the number for the encapsulant in the json file
+        if printout:
+            print("Oxygen ingress parameters loaded for the edge seal.")
     else:
+        if edge_seal[0:1]=="W":
+            esp = H2O.get(edge_seal)
+            if printout:
+                print("Water ingress parameters loaded for the edge seal.")
+        else:
+            print("Edge seal material not found")
+
+    if encapsulant[0:2]=="OX":
         encp = O2.get(encapsulant)
+        if printout:
+            print("Oxygen ingress parameters loaded for the encapsulant.")
+    else:
+        if encapsulant[0:1]=="W":
+            encp = H2O.get(encapsulant)
+            if printout:
+                print("Water ingress parameters loaded for the eencapsulant.")
+        else:
+            print("Encapsulant material not found")
+    if printout:
+        try:
+            print("The edge seal is", esp.get("name"), ".")
+            print("The encapsulant is", encp.get("name"), ".")
+        except:
+            print("Unknown material selected.")
 
-    try:
-        print("The edge seal is", esp.get("name"), ".")
-        print("The encapsulant is", encp.get("name"), ".")
-    except:
-        print("")
-
-    # These are the edge seal oxygen permeation parameters
+    # These are the edge seal oxygen or water permeation parameters
     if Dos == None:
         Dos = esp.get("Do")
     if Eads == None:
@@ -136,12 +163,14 @@ def esdiffusion(
 
     perm_mid = np.array(
         np.zeros((seal_nodes + encapsulant_nodes + 3)), dtype=np.float64
-    )  # This is the profile at a transition point between output points.
-    perm = np.array(
-        np.zeros(
-            (len(temperature) * repeat - repeat + 1, seal_nodes + encapsulant_nodes + 3), dtype=np.float64
-        )
-    )  # It adds in two nodes for the interface concentration for both materials and one for the hour column.
+        )  # This is the profile at a transition point between output points.
+    if perm == None:
+        perm = np.array(
+            np.zeros(
+                (len(temperature) * repeat - repeat + 1, seal_nodes + encapsulant_nodes + 3), dtype=np.float64
+            )
+        )  # It adds in two nodes for the interface concentration for both materials and one for the hour column.
+
     temperature = pd.DataFrame(
         temperature, columns=["module_temperature", "time", "time_step"]
     )  # This adds the number of time steps to be used as a subdivision between data points. [s]
@@ -163,7 +192,8 @@ def esdiffusion(
                 time_step[row] = np.trunc(fos / f_max) + 1
             else:
                 time_step[row] = np.trunc(foe / f_max) + 1
-
+    if deg_func != None and deg == None: # Sets up an array to do the degradation calculation.
+        deg=perm
     perm[0][1] = Sos * np.exp(-Eass / met_data[0][0])
     perm_mid = perm[0]
     for rp_num in range(repeat):
@@ -187,10 +217,9 @@ def esdiffusion(
                 )
                 # Cs edge seal/Ce encapsulant
                 r1 = so * np.exp(-eas / (met_data[row][0] + dtemp * mid_point))
-                r2 = (
-                    dod * np.exp(-ead / (met_data[row][0] + dtemp * mid_point))
-                    * r1 * encapsulant_width / edge_seal_width
-                )  # Ds/De*Cs/Ce*We/Ws
+                r2 = dod * np.exp(-ead / (met_data[row][0] + dtemp * mid_point)
+                                  )* r1 * encapsulant_width / edge_seal_width
+                  # Ds/De*Cs/Ce*We/Ws
                 # Calculates the edge seal nodes. Adjusted to not calculate ends and to have the first node be temperature.
                 for node in range(2, seal_nodes):
                     perm[row + 1 + rp_row][node] = perm_mid[node] + fos * (
@@ -201,35 +230,53 @@ def esdiffusion(
                     perm[row + 1 + rp_row][node] = perm_mid[node] + foe * (
                         perm_mid[node - 1] + perm_mid[node + 1] - 2 * perm_mid[node]
                     )
-                # Calculates the center encapsulant node. Accounts for temperature and two interfade nodes.
+                # Calculates the center encapsulant node. Accounts for temperature and two interface nodes.
                 perm[row + 1 + rp_row][encapsulant_nodes + seal_nodes + 2] = perm_mid[
-                    encapsulant_nodes + seal_nodes + 2
-                ] + 2 * foe * (perm_mid[encapsulant_nodes + seal_nodes + 1] - perm_mid[encapsulant_nodes + seal_nodes + 2])
+                    encapsulant_nodes + seal_nodes + 2] + 2 * foe * (
+                        perm_mid[encapsulant_nodes + seal_nodes + 1] - 
+                        perm_mid[encapsulant_nodes + seal_nodes + 2])
+                
                 # Calculated edge seal node adjacent to the first encapsulant node. Node numbers shifted.
                 perm[row + 1 + rp_row][seal_nodes] = perm_mid[seal_nodes] + fos * (
                     perm_mid[seal_nodes - 1]
                     + perm_mid[seal_nodes + 3] * r1 * 2 / (1 + r2)
-                    - perm_mid[seal_nodes] * (1 + 2 / (1 + r2))
-                )
+                    - perm_mid[seal_nodes] * (1 + 2 / (1 + r2)))
+  
                 # Calculated encapsulant node adjacent to the last edge seal node. Node numbers shifted.
                 perm[row + 1 + rp_row][seal_nodes + 3] = perm_mid[seal_nodes + 3] + foe * (
                     perm_mid[seal_nodes] / r1 * 2 / (1 + 1 / r2)
                     + perm_mid[seal_nodes + 4]
-                    - perm_mid[seal_nodes + 3] * (1 + 2 / (1 + 1 / r2))
-                )
+                    - perm_mid[seal_nodes + 3] * (1 + 2 / (1 + 1 / r2)))
+                
                 # sets the concentration at the edge seal to air interface.
                 perm[row + 1 + rp_row][1] = Sos * np.exp(
                     -Eass / (met_data[row + 1][0] + dtemp * mid_point)
                 )
+
+
+                # Runs the degradation calculation.            
+                if deg_func != None:
+                    print('oops')
+                # Runs the reaction with permeant function.
+                if react_func != None:
+                    print('oops')
+                    
                 perm_mid = perm[row + 1 + rp_row]
 
-            # calculate edge seal at interface to encapsulant.
-            perm[row + 1 + rp_row][seal_nodes + 1] = (
-                perm_mid[seal_nodes + 3] / r2 * r1 + perm_mid[seal_nodes]
-            ) / (1 / r2 + 1)
-            # calculate encapsulant at interface to the edge seal.
-            perm[row + 1 + rp_row][seal_nodes + 2] = perm[row + 1 + rp_row][seal_nodes + 1] / r1
+            # Calculate edge seal at interface to encapsulant.
+            # Blocked out code did weird things and was based on equal fluxes. Actually using a simple averaging. This looks better and is not used in the diffusion calculations.
+            #perm[row + 1 + rp_row][seal_nodes + 1] = (perm_mid[seal_nodes + 3]*r1  
+            #                                          + perm_mid[seal_nodes]*r2) / (1+r2)
+            perm[row + 1 + rp_row][seal_nodes + 1] = perm_mid[seal_nodes ]+(perm_mid[seal_nodes]-perm_mid[seal_nodes-1])/2
+
+            # Calculate encapsulant at interface to the edge seal.
+            #perm[row + 1 + rp_row][seal_nodes + 2] = perm[row + 1 + rp_row][seal_nodes + 1] / r1
+            perm[row + 1 + rp_row][seal_nodes + 2] = perm_mid[seal_nodes + 3]+(perm_mid[seal_nodes + 4]-perm_mid[seal_nodes+3])/2
+
+            # Puts in the time for the first column.
             perm[row + 1 + rp_row][0] = rp_time + met_data[row + 1][1]
+
+
 
         # Because it is cycling around, it needs to start with the last temperature.
         met_data[0][0] = met_data[met_data.shape[0] - 1][0]

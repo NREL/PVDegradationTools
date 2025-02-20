@@ -1,4 +1,4 @@
-<img src="tutorials_and_tools/pvdeg_logo.png" width="200">
+<img src="docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg" width="600">  
 
 <table>
 <tr>

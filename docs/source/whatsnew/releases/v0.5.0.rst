@@ -1,0 +1,56 @@
+v0.5.0 (2025-2-7)
+===================
+
+Enhancements
+--------------
+- New Logo!🎉🎉🎉
+- Created utilities for parallelized downloads of ``PVGIS`` and ``NSRDB`` so users can download geospatial data for at home simulations. This will interface nicely with the soon to be released ``GeoGridStore``, allowing users to grow stores of geospatial data overtime as their needs grow for at-home, large-scale analyses.
+- Documenation overhaul. Significant ``User Guide`` improvements. Added geospatial information with visual aids, added meteorological data page and materials access page.
+- Suite of utility functions to facilitate accessing material parameter json files.
+- Moved ``GeospatialScenario`` class definition to ``geospatialscenario.py``
+- Remove kdtree as required argument from ``GeospatialScenario`` downselection methods, kdtree objects are now generated on the fly when required and saved to scenario object for future use.
+- ``decorators.geospatial_quick_shape`` arguments modified. ``numeric_or_timeseries``, now takes a string ``('numeric', 'timeseries')`` to determine type of outputs rather than a ``Bool`` or ``Int``
+    - previously, ``0`` or ``False`` represented a numeric/scalar result, now this is represented by ``'numeric'``
+    - previosuly, ``1`` or ``True`` represented a timeseries result, now this is represented by ``'timeseries'``
+- ``decorators.py`` namespace changed to default ``pvdeg`` namespace. now this can be directly accessed via ``pvdeg.decorators``. This reduces the need for an extra import.  
+    -  ``geospatial_quick_shape`` decorator namespace changed to defualt pvdeg namespace  
+
+Previously, 
+
+.. code-block:: Python
+
+    import pvdeg
+    from pvdeg.decorator import geospatial_quick_shape
+
+    @geospatial_quick_shape(0, ...)
+    def myfunc(...):
+        ....
+
+Now, either of the following options work.
+
+.. code-block:: Python
+
+    import pvdeg
+
+    # now takes string instead of integer or boolean value
+    @pvdeg.decorators.geospatial_quick_shape('numeric', ...)
+    def myfunc(...):
+        ....
+
+.. code-block:: Python
+
+    # this is the style used in the PVDeg package implementations
+    import pvdeg.decorators
+
+    @decorators.geospatial_quick_shape('numeric', ...)
+    def myfunc(...):
+        ....
+
+Bug Fixes
+-------------
+- fixed an issue where pvdeg.geospatial.elevation_stochastic_downselect would return metadata row indicies which were downselected instead of named gids.
+
+
+Contributors
+-----------
+- Tobin Ford (:ghuser:`tobin-ford`)

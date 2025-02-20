@@ -24,6 +24,7 @@ pvdeg.geospatial
       pvdeg.geospatial.auto_template
       pvdeg.geospatial.calc_block
       pvdeg.geospatial.calc_gid
+      pvdeg.geospatial.can_auto_template
       pvdeg.geospatial.elevation_stochastic_downselect
       pvdeg.geospatial.feature_downselect
       pvdeg.geospatial.identify_mountains_radii
@@ -85,6 +86,13 @@ pvdeg.geospatial
    .. _sphx_glr_backref_pvdeg.geospatial.calc_gid:
 
    .. minigallery:: pvdeg.geospatial.calc_gid
+       :add-heading:
+
+   .. autofunction:: can_auto_template
+
+   .. _sphx_glr_backref_pvdeg.geospatial.can_auto_template:
+
+   .. minigallery:: pvdeg.geospatial.can_auto_template
        :add-heading:
 
    .. autofunction:: elevation_stochastic_downselect
