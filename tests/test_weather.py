@@ -33,6 +33,16 @@ DSETS = [
 ]
 META_KEYS = [""]
 
+def monkeypatch_weather_get_psm3(*args, **kwargs) -> None:
+    """
+    mocker function to be monkey patched at runtime for weather.get to avoid psm3 api calls and use local weather files instead.
+    """
+
+    PSM_FILE = os.path.join(TEST_DATA_DIR, r"psm3_pytest.csv")
+    weather_df, meta = pvdeg.weather.read(PSM_FILE, "psm")
+
+    return weather_df, meta
+
 DISTRIBUTED_PVGIS_WEATHER = xr.load_dataset(os.path.join( TEST_DATA_DIR, "distributed_pvgis_weather.nc"))
 DISTRIBUTED_PVGIS_META = pd.read_csv(os.path.join( TEST_DATA_DIR, "distributed_pvgis_meta.csv"), index_col=0)
 
@@ -151,3 +161,31 @@ def test_empty_weather_ds_invalid_database():
     
     with pytest.raises(ValueError, match=f"database must be PVGIS, NSRDB, PSM3 not {invalid_database}"):
         pvdeg.weather.empty_weather_ds(gids_size, periodicity, invalid_database)
+
+# DOESNT PASS
+def test_weather_distributed_psm3_monkeypatch(monkeypatch):
+
+    monkeypatch.setattr(
+        target=pvdeg.weather, 
+        name="get",
+        value=monkeypatch_weather_get_psm3
+    )
+
+    weather, meta, failed_gids = pvdeg.weather.weather_distributed(
+        database="PSM3",
+        coords=[
+            (0, 0),
+            (0, 0),
+        ]
+    )
+
+    weather_df, meta = monkeypatch_weather_get_psm3()
+
+    weather_df.index.name = "time"
+    a = xr.Dataset.from_dataframe(weather_df).expand_dims({'gid':[0]})
+    b = xr.Dataset.from_dataframe(weather_df).expand_dims({'gid':[1]})
+
+    res = xr.concat([a, b], dim="gid")
+    res['time'] = res.time.astype("datetime64[ns]")
+    
+    # then we can compare res and weather
