@@ -25,7 +25,6 @@ def _chunksize_from_processes(n_proc: int, dataset_size: int, max_chunk_size: in
     """
 
     min_num_tasks = int(np.ceil(dataset_size / max_chunk_size))
-    print(f"lambda (min_num_tasks): {min_num_tasks}")
 
     sigma = -1
 
@@ -37,14 +36,9 @@ def _chunksize_from_processes(n_proc: int, dataset_size: int, max_chunk_size: in
     if sigma == -1:
         raise ValueError("no suitable number of processes found")
 
-    print("sigma", sigma)
-
     good_tasks_num = sigma + n_proc
-    print("good_tasks_num", good_tasks_num)
 
     target_task_size = dataset_size / good_tasks_num
-    print("target task size [B]", target_task_size)
-    print("target task size [MB]", target_task_size / 1e6)
 
     return target_task_size
 
@@ -61,6 +55,6 @@ def chunk_via_processes(ds: xr.Dataset, n_proc: int, max_chunk_size: int = 2e8):
 
     single_location_size = single_location_single_time_size * ds.sizes["time"]
 
-    num_locations_per_task = target_task_size / single_location_size
+    num_locations_per_task = target_task_size // single_location_size
 
     return ds.chunk({"gid": num_locations_per_task, "time": -1})
