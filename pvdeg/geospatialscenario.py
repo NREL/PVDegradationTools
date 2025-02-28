@@ -760,7 +760,7 @@ class GeospatialScenario(pvdeg.Scenario):
 
         self.results = self.results.assign(gids=gids_da)
 
-    @pvdeg.decorators.deprecated("to be removed shortly")
+    @pvdeg.decorators.deprecated("removing complexity")
     def _get_geospatial_data(year: int):
         """
         Helper function. gets geospatial weather dataset and metadata dictionary.
@@ -793,7 +793,7 @@ class GeospatialScenario(pvdeg.Scenario):
 
         return weather_ds, meta_df
 
-    @pvdeg.decorators.deprecated("function to be removed")
+    @pvdeg.decorators.deprecated("removing co")
     def getValidRegions(
         self,
         country: Optional[str] = None,
