@@ -11,6 +11,7 @@ from . import design
 from . import fatigue
 from . import geospatial
 #from .geospatialscenario import GeospatialScenario
+from . import hpc
 from . import humidity
 from . import letid
 from . import montecarlo
