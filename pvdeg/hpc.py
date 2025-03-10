@@ -26,9 +26,8 @@ def _chunksize_from_processes(n_proc: int, dataset_size: int, max_chunk_size: in
 
     min_num_tasks = int(np.ceil(dataset_size / max_chunk_size))
 
-    sigma = min_num_tasks // n_proc
-    good_tasks_num = sigma + n_proc
 
+    good_tasks_num = (min_num_tasks // n_proc) * n_proc + n_proc
     target_task_size = dataset_size / good_tasks_num
 
     return target_task_size
