@@ -400,6 +400,16 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.
             "subarray1_poa_front" : (("time", ), da.array(subarray1_poa_front)),
             "subarray1_poa_rear" : (("time", ), da.array(subarray1_poa_rear)),
 
+            # weather data
+            "temp_air":(("time", ), da.array(weather_df["temp_air"].values)),
+            "wind_speed":(("time", ), da.array(weather_df["wind_speed"].values)),
+            "wind_direction":(("time", ), da.array(weather_df["wind_direction"].values)),
+            "dhi":(("time", ), da.array(weather_df["dhi"].values)),
+            "ghi":(("time", ), da.array(weather_df["ghi"].values)),
+            "dni":(("time", ), da.array(weather_df["dni"].values)),
+            "relative_humidity":(("time", ), da.array(weather_df["relative_humidity"].values)),
+            "albedo":(("time", ), da.array(weather_df["albedo"].values)),
+
             # spatio-temporal
             "ground_irradiance" : (("time", "distance"), ground_irradiance_values),
         },
@@ -425,6 +435,24 @@ INSPIRE_NSRDB_ATTRIBUTES = [
     "relative_humidity",
     "surface_albedo",
 ]
+
+INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
+    "annual_poa": ("gid",),
+    "annual_energy": ("gid",),
+    "poa_front": ("gid", "time"),
+    "poa_rear": ("gid", "time"),
+    "subarray1_poa_front": ("gid", "time"),
+    "subarray1_poa_rear": ("gid", "time"),
+    "temp_air": ("gid", "time"),
+    "wind_speed": ("gid", "time"),
+    "wind_direction": ("gid", "time"),
+    "dhi": ("gid", "time"),
+    "ghi": ("gid", "time"),
+    "dni": ("gid", "time"),
+    "relative_humidity": ("gid", "time"),
+    "albedo": ("gid", "time"),
+    "ground_irradiance": ("gid", "time", "distance")
+}
 
 def inspire_ground_irradiance(weather_df, meta, config_files):
     """
