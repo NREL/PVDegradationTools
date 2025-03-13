@@ -752,6 +752,7 @@ def x_eff_temperature_estimate(
     )
 
     if x_eff == None:
+        T_inf.columns = ('Cell Temperature')
         return T_inf
     else:
         T_0 = temperature.temperature(
@@ -765,5 +766,6 @@ def x_eff_temperature_estimate(
             model_kwarg=model_kwarg,
         )
         T_x_eff = T_0 - (T_0 - T_inf) * (1 - np.exp(-x_eff / x_0))
+        T_x_eff.columns = ('Cell Temperature')
 
         return T_x_eff
