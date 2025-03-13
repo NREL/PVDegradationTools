@@ -222,22 +222,33 @@ def poa_irradiance_tracker(
     **kwargs_irradiance,
 ) -> pd.DataFrame:
     """
-    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
-    National Solar Radiation Database (NSRDB) for a given location (gid).
+    Calculate plane-of-array (POA) irradiance using pvlib based on supplied weather data.
 
     Parameters
     ----------
     weather_df : pd.DataFrame
-        The file path to the NSRDB file.
+        The weather data.
     meta : dict
-        The geographical location ID in the NSRDB file.
+        The geographical location information.
     sol_position : pd.DataFrame, optional
         pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
-    tilt : float, optional
-        The tilt angle of the PV panels in degrees, if None, the latitude of the
-        location is used.
-    azimuth : float, optional
-        The azimuth angle of the PV panels in degrees. Equatorial facing by default.
+    axis_tilt : float, optional
+        The tilt angle of the array along the long axis of a single axis tracker [degrees]. 
+        If None, horizontal is used.
+    axis_azimuth : float, optional
+        The azimuth angle of the long, non-rotating axis of the array panels [degrees]. 
+        North-south orientation by default.
+    max_angle : float
+        This is the maximum angle of the rotating axis achievable relative to the horizon.
+    backtrack : boolean
+        If true, the tilt will backtrack to avoid row to row shading.
+    gcr : float
+        Ground coverage ratio (GCR). The ratio of the width of the PV array to the distance between rows. 
+        This affects the backtracking funciton.
+    cross_axis_tilt : float
+        angle, relative to horizontal, of the line formed by the intersection between the slope containing 
+        the tracker axes and a plane perpendicular to the tracker axes [degrees]
+        Fixes backtracking for a slope not parallel with the axis azimuth. 
     sky_model : str, optional
         The pvlib sky model to use, 'isotropic' by default.
         Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
@@ -258,6 +269,13 @@ def poa_irradiance_tracker(
             else:
                 axis_azimuth = 180
                 print(f"The array axis_azimuth was not provided, therefore an azimuth of {axis_azimuth:.1f} was used.")
+                
+    if axis_tilt is None:  # Sets the default orientation to horizontal.
+        try:
+            axis_tilt = float(meta["axis_tilt"])
+        except:
+            axis_tilt = 0
+            print(f"The array axis_tilt was not provided, therefore an axis tilt of 0° was used.")
 
     if sol_position is None:
         sol_position = solar_position(weather_df, meta)
