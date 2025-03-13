@@ -41,7 +41,7 @@ def get(database, id=None, geospatial=False, find_meta: bool=None , **kwargs):
         The default is True if geospatial is False.
     **kwargs :
         Additional keyword arguments to pass to the get_weather function
-        (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
+        (see pvlib.iotools.get_psm3 for NSRDB)
 
     Returns:
     --------
