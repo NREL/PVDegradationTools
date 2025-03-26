@@ -351,23 +351,6 @@ def pysam(
     pysam_res = {key: outputs[key] for key in results}
     return pysam_res
 
-# class inspirePysamReturn():
-#     """simple struct to facilitate handling weirdly shaped pysam simulation return values"""
-
-#     # removes __dict__ atribute and breaks pickle
-#     # __slots__ = ("annual_poa", "ground_irradiance", "timeseries_index")
-
-#     def __init__(self, annual_poa, ground_irradiance, timeseries_index, annual_energy, poa_front, poa_rear, subarray1_poa_front, subarray1_poa_rear):
-#         self.annual_energy = annual_energy
-#         self.annual_poa = annual_poa
-#         self.ground_irradiance = ground_irradiance
-#         self.timeseries_index = timeseries_index
-#         self.poa_front = poa_front
-#         self.poa_rear = poa_rear
-#         self.subarray1_poa_front = subarray1_poa_front
-#         self.subarray1_poa_rear = subarray1_poa_rear
-
-# def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
 def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.Dataset:
     """Handle a pysam return object and transform it to an xarray"""
 
@@ -436,22 +419,26 @@ INSPIRE_NSRDB_ATTRIBUTES = [
     "surface_albedo",
 ]
 
+# it is better to explicitly define these in the template shapes
+scalar = ("gid",)
+temporal = ("gid", "time")
+spatio_temporal = ("gid", "time", "distance")
+
 INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
-    "annual_poa": ("gid",),
-    "annual_energy": ("gid",),
-    "poa_front": ("gid", "time"),
-    "poa_rear": ("gid", "time"),
-    "subarray1_poa_front": ("gid", "time"),
-    "subarray1_poa_rear": ("gid", "time"),
-    "temp_air": ("gid", "time"),
-    "wind_speed": ("gid", "time"),
-    "wind_direction": ("gid", "time"),
-    "dhi": ("gid", "time"),
-    "ghi": ("gid", "time"),
-    "dni": ("gid", "time"),
-    "relative_humidity": ("gid", "time"),
-    "albedo": ("gid", "time"),
-    "ground_irradiance": ("gid", "time", "distance")
+    "annual_poa": scalar,
+    "annual_energy": scalar,
+    "dhi": temporal,
+    "ghi": temporal,
+    "dni": temporal,
+    "albedo": temporal,
+    "temp_air": temporal,
+    "poa_rear": temporal,
+    "poa_front": temporal,
+    "wind_speed": temporal,
+    "wind_direction": temporal,
+    "relative_humidity": temporal,
+    "subarray1_poa_rear": temporal,
+    "ground_irradiance": spatio_temporal,
 }
 
 def inspire_ground_irradiance(weather_df, meta, config_files):
@@ -580,4 +567,5 @@ def ground_irradiance_monthly(inspire_res_ds : xr.Dataset) -> xr.Dataset:
 
     monthly_avg_ground_irradiance = filtered_data.groupby(filtered_data.time.dt.month).mean()
     return monthly_avg_ground_irradiance 
+
 
