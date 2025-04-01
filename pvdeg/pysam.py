@@ -14,7 +14,6 @@ import sys
 import os
 
 
-
 from pvdeg import (
     weather,
     utilities,
@@ -161,6 +160,8 @@ def pysam(
     pv_model_default: str = None,
     config_files: dict[str: str] = None,
     results: list[str] = None,
+    pitch_override: float = None,
+    tilt_override: float = None,
 ) -> dict:
     """
     Run pySam simulation. Only works with pysam weather.
@@ -279,6 +280,11 @@ def pysam(
 
         This may cause some undesired behavior with geospatial calculations if the lengths of the results within the list are different. 
 
+    pitch_override: float
+        override defined pitch from pv config file (fixed tilt systems only)
+    tilt_override: float
+        override defined tilt from pv config file (fixed tilt systems only)
+
     Returns
     -------
     pysam_res: dict
@@ -334,10 +340,13 @@ def pysam(
             if k not in ({'number_inputs', 'solar_resource_file'} | bad_parameters):
                 pysam_model.value(k, v)
 
-
+    # need to determien names and assign pysam_model.value
+    if pitch_override:
+        raise NotImplementedError()
+    if tilt_override:
+        raise NotImplementedError()
 
     pysam_model.unassign('solar_resource_file') # unassign file
-
 
     # Duplicate Columns in the dataframe seem to cause this issue
     # Error (-4) converting nested tuple 0 into row in matrix.
@@ -359,10 +368,16 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.
     annual_poa = pysam_res_dict["annual_poa_front"]
     annual_energy = pysam_res_dict["annual_energy"]
 
-    poa_front = pysam_res_dict["poa_front"][:8760] # 25 * 8760 entries, all pairs of 8760 entries are identical
-    poa_rear = pysam_res_dict["poa_rear"][:8760] # same for the following
+    # removed these, we should just use subarray 1
+    # poa_front = pysam_res_dict["poa_front"][:8760] # 25 * 8760 entries, all pairs of 8760 entries are identical
+    # poa_rear = pysam_res_dict["poa_rear"][:8760] # same for the following
+
     subarray1_poa_front = pysam_res_dict["subarray1_poa_front"][:8760]
     subarray1_poa_rear = pysam_res_dict["subarray1_poa_rear"][:8760]
+
+    subarray1_celltemp = pysam_res_dict["subarray1_celltemp"][:8760]
+    subarray1_dc_gross = pysam_res_dict["subarray1_dc_gross"][:8760]
+
 
     timeseries_index = weather_df.index
 
@@ -372,16 +387,20 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.
 
     single_location_ds = xr.Dataset(
         data_vars={
-            # scalars
+            # scalars (tilt and pitch used to calculate distances)
+            # we will calculate these for some configs.
+            "tilt": -999,  # placeholder
+            "pitch": -999, # placeholder
+
             "annual_poa" : annual_poa,
             "annual_energy" : annual_energy,
 
             # simple timeseries
             # which poa do we want to use, we can elimiate one of the pairs to save a lot of memory
-            "poa_front" : (("time", ), da.array(poa_front)),
-            "poa_rear" : (("time", ), da.array(poa_rear)),
             "subarray1_poa_front" : (("time", ), da.array(subarray1_poa_front)),
             "subarray1_poa_rear" : (("time", ), da.array(subarray1_poa_rear)),
+            "subarray1_celltemp" : (("time", ), da.array(subarray1_celltemp)),
+            "subarray1_dc_gross" : (("time", ), da.array(subarray1_dc_gross)),
 
             # weather data
             "temp_air":(("time", ), da.array(weather_df["temp_air"].values)),
@@ -398,9 +417,8 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame) -> xr.
         },
         coords={
             "time" : timeseries_index,
-            # "distance" : distances,
-            # would be convient to define distances after being calculated 
-            # by pysam but we need to know ahead of time to create the template
+            # distances vary for config and locations (on fixed tilt configs)
+            # so we need to use a distance "index" that is not spatially meaningful
             "distance" : np.arange(10), # convient way to match the distances in the template
         }
     ) 
@@ -419,31 +437,131 @@ INSPIRE_NSRDB_ATTRIBUTES = [
     "surface_albedo",
 ]
 
-# it is better to explicitly define these in the template shapes
 scalar = ("gid",)
 temporal = ("gid", "time")
 spatio_temporal = ("gid", "time", "distance")
 
 INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
+    "tilt":scalar,
+    "pitch":scalar,
     "annual_poa": scalar,
     "annual_energy": scalar,
+
     "dhi": temporal,
     "ghi": temporal,
     "dni": temporal,
     "albedo": temporal,
     "temp_air": temporal,
-    "poa_rear": temporal,
-    "poa_front": temporal,
+    # "poa_rear": temporal, # removed to use subarray values instead
+    # "poa_front": temporal,
     "wind_speed": temporal,
     "wind_direction": temporal,
     "relative_humidity": temporal,
-    "subarray1_poa_rear": temporal,
+    "subarray1_poa_front" : temporal,
+    "subarray1_poa_rear" : temporal,
+    "subarray1_celltemp" : temporal,
+    "subarray1_dc_gross" : temporal,
+
     "ground_irradiance": spatio_temporal,
 }
+
+# TODO: should this be two functions (gcr and pitch) and should this be in standards or design (or other)?
+def optimal_pitch(meta: dict, cw: float = 2) -> float:
+    """
+    determine pitch for fixed tilt systems according to latitude and optimal GCR parameters
+
+    .. math::
+
+        GCR = \frac{P}{1 + e^{-k(\alpha - \alpha_0)}} + GCR_0
+
+    Inter-row energy yield loss 5% Bifacial Parameters:
+
+    +-----------+--------+-----------+
+    | Parameter | Value  | Units     |
+    +===========+========+===========+
+    | P         | 0.560  | unitless  |
+    | K         | 0.133  | 1/°       |
+    | α₀        | 40.2   | °         |
+    | GCR₀      | 0.70   | unitless  |
+    +-----------+--------+-----------+
+
+    Parameters
+    ------------
+    meta: dict
+        metadata dictionary containing "latitude" key
+    cw: float
+        collector width [m]
+
+    References
+    -----------
+    Erin M. Tonita, Annie C.J. Russell, Christopher E. Valdivia, Karin Hinzer,
+    Optimal ground coverage ratios for tracked, fixed-tilt, and vertical photovoltaic systems for latitudes up to 75°N,
+    Solar Energy,
+    Volume 258,
+    2023,
+    Pages 8-15,
+    ISSN 0038-092X,
+    https://doi.org/10.1016/j.solener.2023.04.038.
+    (https://www.sciencedirect.com/science/article/pii/S0038092X23002682)
+
+    Optimal GCR from Equation 4 
+    Parameters from Table 1
+    """
+
+    p = 0.560 
+    k = 0.133 
+    alpha_0 = 40.2 
+    gcr_0 = 0.70 
+
+    # optimal gcr
+    gcr = ( (p) / 1 + np.exp(-k * (meta['latitude'] - alpha_0)) ) + gcr_0
+
+    # gcr -> pitch
+    pitch = cw / gcr
+
+    return pitch
+
+def inspire_practical_pitch(meta: dict):
+    """
+    Calculate pitch for fixed tilt systems for InSPIRE Agrivoltaics Irradiance Dataset.
+
+    We cannot use the optimal pitch due to certain real world restrictions so we will apply some constraints.
+
+    We are using latitude tilt but we cannot use tilts > 40 deg, due to racking constraints, cap at 40 deg for latitudes above 40 deg.
+
+    pitch minimum: 3.8 m 
+    pitch maximum:  12 m
+
+    tilt max: 40 deg (latitude tilt)
+
+    Parameters
+    ----------
+    meta: dict
+        metadata dictionary
+
+    Returns
+    -------
+    tilt: float
+        tilt for a fixed tilt system with practical considerations [deg]
+    pitch: float
+        pitch for a fixed tilt system with practical consideration [m] 
+    """
+
+    pitch = optimal_pitch(meta=meta)
+
+    pitch = min(pitch, 12)
+    pitch = max(pitch, 3.8)
+
+    tilt = min(meta['latitude'], 40)
+
+    return tilt, pitch
+
 
 def inspire_ground_irradiance(weather_df, meta, config_files):
     """
     Get ground irradiance array and annual poa irradiance for a given point using pvsamv1
+
+    REQUIRES: input weather data time index in UTC time.
 
     Parameters
     ----------
@@ -467,6 +585,13 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
             weather_df type : {type(weather_df)}
             meta type : {type(meta)}
         """)
+
+    ### determine which config we are using
+    ### if fixed tilt, get practical tilt and pitch
+    ### update the config file?
+    ### then read pitch and tilt used from the outputs into the result ds
+
+    #### verify that our equations are correct. plot the world, view to see if practical applications have been applied.
 
     # force localize utc from tmy to local time by moving rows
     weather_df = weather.roll_tmy(weather_df, meta)
