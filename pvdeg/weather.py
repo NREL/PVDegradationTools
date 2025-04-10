@@ -2,6 +2,7 @@
 Collection of classes and functions to obtain spectral parameters.
 """
 
+import dask.distributed
 from pvdeg import humidity
 from pvdeg.utilities import nrel_kestrel_check
 
@@ -18,15 +19,34 @@ import dask.dataframe as dd
 import xarray as xr
 
 
+TIME_PERIODICITY_MAP = {
+    # pandas time freq string arg
+    # ideally these should be the same
+    "h" : 8760,
+    "1h" : 8760,
+    "30min": 17520,
+    "15min": 35040,
+}
+
+ENTRIES_PERIODICITY_MAP = {
+    # pandas time freq string arg
+    # ideally these should be the same
+    8760: "1h",
+    17520: "30min",
+    35040: "15min",
+}
+
+
+
 def get(database, id=None, geospatial=False, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
-    tools function
+    tools function.
 
-    Parameters:
+    Parameters
     -----------
     database : (str)
-        'NSRDB' or 'PVGIS'
+        'NSRDB' or 'PVGIS'. Use "PSM3" for tmy NSRDB data.
     id : (int or tuple)
         If NSRDB, id is the gid for the desired location. 
         If PVGIS, id is a tuple of (latitude, longitude) for the desired location
@@ -39,12 +59,36 @@ def get(database, id=None, geospatial=False, **kwargs):
         Additional keyword arguments to pass to the get_weather function
         (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
 
-    Returns:
+    Returns
     --------
     weather_df : (pd.DataFrame)
         DataFrame of weather data
     meta : (dict)
         Dictionary of metadata for the weather data
+
+
+    Example
+    --------
+    Collecting a single site of PSM3 NSRDB data. *Api key and email must be replaced with your personal api key and email*. [Request a key!](https://developer.nrel.gov/signup/)
+
+    .. code-block:: python
+
+        weather_arg = {
+            'api_key': <api_key>,
+            'email': <email>,
+            'names': 'tmy',
+            'attributes': [],
+            'map_variables': True
+        }
+
+        weather_df, meta_dict = pvdeg.weather.get(database="PSM3", id=(25.783388, -80.189029), **weather_arg)
+
+
+    Collecting a single site of PVGIS TMY data
+
+    .. code-block:: python
+
+        weather_df, meta_dict = pvdeg.weather.get(database="PVGIS", id=(49.95, 1.5))
     """
 
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
@@ -309,18 +353,27 @@ def map_weather(weather_df):
         "Wind Speed": "wind_speed",
         "Wind Direction": "wind_direction",
         "Surface Albedo": "albedo",
+        "surface_albedo": "albedo",
         "Precipitable Water": "precipitable_water",
         "Module_Temperature": "module_temperature",
     }
 
-    for column_name in weather_df.columns:
-        if column_name in [*DSET_MAP.keys()]:
-            weather_df.rename(
-                columns={column_name: DSET_MAP[column_name]}, inplace=True
-            )
+    if isinstance(weather_df, pd.DataFrame):
+        for column_name in weather_df.columns:
+            if column_name in [*DSET_MAP.keys()]:
+                weather_df.rename(
+                    columns={column_name: DSET_MAP[column_name]}, inplace=True
+                )
 
-    return weather_df
+        return weather_df
 
+    elif isinstance(weather_df, xr.Dataset):
+        weather_df = weather_df.rename({key: value for key, value in DSET_MAP.items() if key in weather_df.data_vars})
+        
+        return weather_df
+    
+    else:
+        raise TypeError("input must be pd.DataFrame or xr.Dataset")
 
 def read_h5(gid, file, attributes=None, **_):
     """
@@ -633,7 +686,17 @@ def get_NSRDB(
         return weather_df, meta.to_dict()
 
     elif geospatial:
+        # new versions have multiple files per satellite-year to reduce filesizes
+        # this is great for yearly data but TMY has multiple files
+        # the year attached to the TMY file in the filesystem/name is seemingly
+        # the year it was created. this creates problems, we only want to combine the files
+        # if they are NOT TMY
+
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
+
+        if (isinstance(names, str) and names.lower() in ["tmy", "tmy3"]):
+            nsrdb_fnames = nsrdb_fnames[-1:] # maintain as list with last element
+
         weather_ds, meta_df = ini_h5_geospatial(nsrdb_fnames)
 
         if attributes is not None:
@@ -931,3 +994,434 @@ def get_anywhere(database = "PSM3", id=None, **kwargs):
                 weather_db = {'result': 'NA'}
 
     return weather_db, meta 
+
+
+def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
+    """
+    Roll/wrap the ends of a TMY UTC DataFrame to align with local times based on timezone offset.
+
+    Parameters:
+    ----------
+    weather_df : pd.DataFrame
+        The input DataFrame containing TMY data with a UTC datetime index.
+    meta : dict
+        Metadata dictionary containing at least the 'tz' key, representing timezone offset in hours
+        (e.g., -8 for UTC-8).
+
+    Returns:
+    -------
+    pd.DataFrame
+        The rolled DataFrame aligned to local times with a new datetime index spanning a typical year.
+
+    Raises:
+    ------
+    ValueError
+        If the timezone offset is not a multiple of the data frequency or if the frequency cannot be inferred.
+    """
+    # Extract timezone offset in hours
+    tz_offset = meta.get('tz', 0)  # Default to UTC if not specified
+
+    # Step 1: Localize the index to UTC
+    weather_df_local = weather_df.copy()
+    weather_df_local.index = pd.to_datetime(weather_df_local.index)
+    weather_df_local = weather_df_local.tz_localize('UTC')
+
+    # Step 2: Convert to desired local timezone
+    # 'Etc/GMT+X' corresponds to UTC-X
+    if tz_offset >= 0:
+        local_tz = f'Etc/GMT-{tz_offset}'
+    else:
+        local_tz = f'Etc/GMT+{abs(tz_offset)}'
+
+    try:
+        weather_df_local = weather_df_local.tz_convert(local_tz)
+    except Exception as e:
+        raise ValueError(f"Invalid timezone offset: {tz_offset}. Error: {e}")
+
+    # Step 3: Make timezone-naive
+    weather_df_naive = weather_df_local.tz_localize(None)
+
+    # Step 4: Determine frequency
+    freq = pd.infer_freq(weather_df_naive.index)
+    if freq is None:
+        raise ValueError("Cannot infer frequency of the DataFrame index. Ensure it is regular.")
+
+    # Step 5: Calculate the shift amount
+    # To align local time to start at 00:00, shift by -tz_offset hours
+    # For example, tz_offset = -8 (UTC-8) => shift by +8 hours
+    total_shift = pd.Timedelta(hours=-tz_offset)
+
+    if freq.isalpha():
+        freq = "1" + freq
+
+    row_timedelta = pd.to_timedelta(freq) # this probably broke because it was a string without an hourly frequency
+
+    if total_shift % row_timedelta != pd.Timedelta(0):
+        raise ValueError("Timezone offset must be a multiple of the data frequency.")
+
+    num_shift = int(total_shift / row_timedelta)
+
+    # Step 6: Perform the shift (roll the DataFrame)
+    if num_shift > 0:
+        rearranged = pd.concat([
+            weather_df_naive.iloc[num_shift:],
+            weather_df_naive.iloc[:num_shift]
+        ])
+    elif num_shift < 0:
+        rearranged = pd.concat([
+            weather_df_naive.iloc[num_shift:],
+            weather_df_naive.iloc[:num_shift]
+        ])
+    else:
+        rearranged = weather_df_naive.copy()
+
+    # Step 7: Assign a new datetime index spanning a typical non-leap year
+    # Preserve the original start time's hour, minute, second, etc.
+    # Using year 2001 as it is not a leap year
+
+    # Extract the time component from the first timestamp
+    original_start_time = rearranged.index[0].time()
+    start_time = pd.Timestamp('2001-01-01') + pd.Timedelta(
+        hours=0,
+        minutes=original_start_time.minute,
+    )
+
+    expected_num_rows = rearranged.shape[0]
+
+    # Create the new datetime index with the preserved start time
+    new_index = pd.date_range(start=start_time, periods=expected_num_rows, freq=freq)
+
+    # Handle potential leap day if present in new_index
+    # Since 2001 is not a leap year, ensure no Feb 29 exists
+    new_index = new_index[~((new_index.month == 2) & (new_index.day == 29))]
+
+    # Assign the new index to the rearranged DataFrame
+    rearranged = rearranged.iloc[:len(new_index)]  # Ensure lengths match
+    rearranged.index = new_index
+
+    return rearranged
+
+
+# RENAME, THIS SHOULD NOT REFERENCE PVGIS
+def _process_weather_result_distributed(weather_df):
+    """Create an xarray.Dataset using numpy array backend from a pvgis weather dataframe"""
+
+    import dask.array as da
+
+    weather_df.index.rename('time', inplace=True)
+    weather_ds = weather_df.to_xarray().drop_vars('time').copy() 
+
+    for var in weather_ds.data_vars:
+        dask_array = da.from_array(weather_ds[var].values, chunks='auto')
+
+        weather_ds[var] = (weather_ds[var].dims, dask_array)
+
+    return weather_ds
+
+def _weather_distributed_vec(
+    database: str, 
+    coord: tuple[float], 
+    api_key: str,   # NSRDB api key
+    email: str      # NSRDB developer email
+    ): 
+    """
+    Distributed weather calculation for use with dask futures/delayed
+
+    Parameters
+    ----------
+    database: str
+        database/source from `pvdeg.weather.get`
+    coord: tuple[float]
+        (latitude, longitude) coordinate pair. (`pvdeg.weather.get` id)
+    api_key: str
+        NSRDB developer api key (see `pvdeg.weather.get`)
+    email: str
+        NSRDB developer email (see `pvdeg.weather.get`)
+    
+    Returns
+    --------
+        Returns ds, dict, None if unsucessful  
+        Returns None, None, Exception if unsucessful
+    """
+        
+    try:
+        if (database == "PVGIS"): # does not need api key
+            weather_df, meta_dict = get(database=database, id=coord)
+        elif (database == "PSM3"):
+            weather_df, meta_dict = get(database=database, id=coord, api_key=api_key, email=email)
+        else:
+            raise NotImplementedError(f'database {database} not implemented, options: "PVGIS", "PSM3"')
+
+    except Exception as e:
+        return None, None, e
+
+    weather_ds = _process_weather_result_distributed(weather_df=weather_df)
+
+    return weather_ds, meta_dict, None 
+
+
+# THE NSRDB shapes could be moved to their own definition
+# organization style question?
+def empty_weather_ds(
+    gids_size, 
+    periodicity, 
+    database
+    )->xr.Dataset:
+    """
+    Create an empty weather dataframe for generalized input.
+    
+    Parameters
+    ---------
+    gids_size: int    
+        number of entries to create along gid axis
+    periodicity: str
+        freqency, pandas `freq` string arg from `pd.date_range`.
+
+        .. code-block:: python
+            "1h"
+            "30min"
+            "15min"
+    database: str
+        database from `pvdeg.weather.get`
+    
+    Returns
+    -------
+    weather_ds: xarray.Dataset
+        Weather dataset of the same format/shapes given by a `pvdeg.weather.get` geospatial call or `pvdeg.weather.weather_distributed` call or `GeosptialScenario.get_geospatial_data`.
+    """
+
+    import dask.array as da
+
+    pvgis_shapes = {
+        "temp_air": ("gid", "time"),
+        "relative_humidity": ("gid", "time"),
+        "ghi": ("gid", "time"),
+        "dni": ("gid", "time"),
+        "dhi": ("gid", "time"),
+        "IR(h)": ("gid", "time"),
+        "wind_speed": ("gid", "time"),
+        "wind_direction": ("gid", "time"),
+        "pressure": ("gid", "time"),
+    }
+
+    nsrdb_shapes = {
+        'Year': ("gid", "time"), 
+        'Month': ("gid", "time"), 
+        'Day': ("gid", "time"), 
+        'Hour': ("gid", "time"), 
+        'Minute': ("gid", "time"), 
+        'temp_air':("gid", "time"), 
+        'dew_point': ("gid", "time"), 
+        'dhi': ("gid", "time"), 
+        'dni': ("gid", "time"), 
+        'ghi': ("gid", "time"), 
+        'albedo': ("gid", "time"),
+        'pressure': ("gid", "time"), 
+        'wind_direction': ("gid", "time"), 
+        'wind_speed' : ("gid", "time"),    
+        'relative_humidity': ("gid", "time"), 
+    }
+
+    attrs = {}
+    global_attrs = {}
+
+    dims = {'gid', 'time'}
+    dims_size = {'time': TIME_PERIODICITY_MAP[periodicity], 'gid': gids_size}
+
+    if database == "NSRDB" or database == "PSM3":
+        # shapes = shapes | nsrdb_extra_shapes
+        shapes = nsrdb_shapes
+    elif database == "PVGIS":
+        shapes = pvgis_shapes
+    else:
+        raise ValueError(f"database must be PVGIS, NSRDB, PSM3 not {database}")
+
+
+    weather_ds = xr.Dataset(
+        data_vars={
+            var: (dim, da.empty([dims_size[d] for d in dim]), attrs.get(var))
+            for var, dim in shapes.items()
+        },
+        coords={'time': pd.date_range("2022-01-01", freq=periodicity, periods=TIME_PERIODICITY_MAP[periodicity]),
+                'gid': np.linspace(0, gids_size-1, gids_size, dtype=int)},
+        attrs=global_attrs,
+    )
+
+    return weather_ds
+
+
+# add some check to see if a dask client exists
+# can force user to pass dask client to ensure it exists
+# if called without dask client we will return a xr.Dataset 
+# with dask backend that does not appear as if it failed until we compute it
+
+# TODO: implement rate throttling so we do not make too many requests. 
+# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
+# TODO: this overwrites NSRDB GIDS when database == "PSM3"
+def weather_distributed(
+    database: str, 
+    coords: list[tuple], 
+    api_key: str = None, 
+    email: str = None
+    ):
+    """
+    Grab weather using pvgis for all of the following locations using dask for parallelization.
+    You must create a dask client with multiple processes before calling this function, otherwise results will not be properly calculated.
+
+    PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads 
+    that would put you over this limit. 
+
+    NSRDB (including `database="PSM3"`) is rate limited and your key will face restrictions after making too many requests.
+    See rates [here](https://developer.nrel.gov/docs/solar/nsrdb/guide/).
+    
+    Parameters
+    ---------- 
+    database : (str)
+        'PVGIS' or 'NSRDB' (not implemented yet)
+    coords: list[tuple]
+        list of tuples containing (latitude, longitude) coordinates
+        
+        .. code-block:: python
+
+            coords_example = [
+                (49.95, 1.5),
+                (51.95, -9.5),
+                (51.95, -8.5),
+                (51.95, -4.5),
+                (51.95, -3.5)]
+
+    api_key: str
+        Only required when making NSRDB requests using "PSM3".
+        [NSRDB developer API key](https://developer.nrel.gov/signup/)
+
+    email: str
+        Only required when making NSRDB requests using "PSM3".
+        [NSRDB developer account email associated with `api_key`](https://developer.nrel.gov/signup/)
+    
+    Returns
+    --------
+    weather_ds : xr.Dataset
+        Weather data for all locations requested in an xarray.Dataset using a dask array backend.
+    meta_df : pd.DataFrame
+        Pandas DataFrame containing metadata for all requested locations. Each row maps to a single entry in the weather_ds.
+    gids_failed: list
+        list of index failed coordinates in input `coords`
+    """
+
+    import dask.delayed
+    import dask.distributed
+
+    try:
+        client = dask.distributed.get_client()
+        print("Connected to a Dask scheduler | Dashboard:", client.dashboard_link)
+    except ValueError:
+        raise RuntimeError("No Dask scheduler found. Ensure a dask client is running.")
+
+    if (database != "PVGIS" and database != "PSM3"):
+        raise NotImplementedError(f"Only 'PVGIS' and 'PSM3' are implemented, you entered {database}")
+
+    futures = [dask.delayed(_weather_distributed_vec)(database, coord, api_key, email) for coord in coords]
+    results = dask.compute(futures)[0] # values are returned in a list with one entry
+
+    # what is the difference between these two approaches for dask distributed work, how can we schedule differently
+    # i believe futures might be better for our needs
+    # futures = [client.submit(weather_distributed, "PVGIS", coord) for coord in coords]
+    # client.gather(futures)
+
+    # results is a 2d list
+    # results[0] is the weather_ds with dask backend
+    # results[1] is meta_dict
+    weather_ds_collection = [row[0] for row in results]
+    meta_dict_collection = [row[1] for row in results]
+
+    indexes_failed = []
+
+    time_length = weather_ds_collection[0].sizes["time"]
+    periodicity = ENTRIES_PERIODICITY_MAP[time_length]
+
+    # weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather xr.dataset
+    weather_ds = empty_weather_ds(
+        gids_size=len(results),
+        periodicity=periodicity,
+        database=database,
+    )
+
+    meta_df = pd.DataFrame.from_dict(meta_dict_collection) # create populated meta pd.DataFrame 
+
+    # gids are spatially meaningless if data is from PVGIS, they will only show corresponding entries between weather_ds and meta_df
+    # only meaningfull if data is from NSRDB
+    # this loop can be refactored, it is a little weird
+    for i, row in enumerate(results):
+
+        if row[2]:
+            indexes_failed.append(i)
+            continue
+
+        weather_ds[dict(gid=i)] = weather_ds_collection[i]
+
+    return weather_ds, meta_df, indexes_failed
+
+
+
+# def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+
+#     map_weather(weather_df=weather_df)
+#     map_meta(meta)
+
+    # check if weather is localized, convert to GMT (like pvgis)
+    # check if time index is on the hour or 30 minutes
+        # weather_df.index - pd.Timedelta("30m")
+        
+    # NSRDB datavars
+    # Year  Month  Day  Hour  Minute  dew_point  dhi
+    # dni  ghi  albedo  pressure  temp_air
+    # wind_direction  wind_speed  relative_humidity
+
+    # weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
+    # meta_dropables = [...]
+
+    # NSRDB meta
+    # {'Source': 'NSRDB',
+    #  'Location ID': '145809',
+    #  'City': '-',
+    #  'State': '-',
+    #  'Country': '-',
+    #  'Dew Point Units': 'c',
+    #  'DHI Units': 'w/m2',
+    #  'DNI Units': 'w/m2',
+    #  'GHI Units': 'w/m2',
+    #  'Temperature Units': 'c',
+    #  'Pressure Units': 'mbar',
+    #  'Wind Direction Units': 'Degrees',
+    #  'Wind Speed Units': 'm/s',
+    #  'Surface Albedo Units': 'N/A',
+    #  'Version': '3.2.0',
+    #  'latitude': 39.73,
+    #  'longitude': -105.18,
+    #  'altitude': 1820,
+    #  'tz': -7,
+    #  'wind_height': 2}
+    ...
+
+# def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+
+    # map_weather(weather_df=weather_df)
+    # map_meta(meta)
+
+    # drop meaningless variables
+
+    # pvgis datavars
+    # temp_air  relative_humidity   ghi  dni   dhi
+    # IR(h)  wind_speed  wind_direction  pressure
+
+    # weather_dropables = ["IR(h)"]
+    # meta_dropables = ['irradiance_time_offset', ...]
+
+    # pvgis meta
+    # {'latitude': 24.7136,
+    #   'longitude': 46.6753,
+    #   'irradiance_time_offset': -0.1955,
+    #   'altitude': 646.0,
+    #   'wind_height': 10,
+    #   'Source': 'PVGIS'})
+    # ...

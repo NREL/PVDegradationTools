@@ -8,6 +8,8 @@ to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 import os
 import pandas as pd
 import pvdeg
+import pytest
+import xarray as xr
 
 from pvdeg import TEST_DATA_DIR
 
@@ -31,6 +33,8 @@ DSETS = [
 ]
 META_KEYS = [""]
 
+DISTRIBUTED_PVGIS_WEATHER = xr.load_dataset(os.path.join( TEST_DATA_DIR, "distributed_pvgis_weather.nc"))
+DISTRIBUTED_PVGIS_META = pd.read_csv(os.path.join( TEST_DATA_DIR, "distributed_pvgis_meta.csv"), index_col=0)
 
 def test_colum_name():
     df, meta_data = pvdeg.weather.read(
@@ -101,3 +105,49 @@ def test_get_NSRDB():
     Contained within get_weather()
     """
     pass
+
+
+def test_weather_distributed_no_client():
+
+    with pytest.raises(RuntimeError, match="No Dask scheduler found. Ensure a dask client is running."):
+        # function should fail because we do not have a running dask scheduler or client
+        pvdeg.weather.weather_distributed(
+            database="PVGIS",
+            coords=None,
+        )
+
+def test_weather_distributed_client_bad_database(capsys):
+
+    pvdeg.geospatial.start_dask()
+
+    with pytest.raises(NotImplementedError, match="Only 'PVGIS' and 'PSM3' are implemented, you entered fakeDB"):
+        pvdeg.weather.weather_distributed(
+            database="fakeDB",
+            coords=None,
+        )
+
+    captured = capsys.readouterr()
+    assert "Connected to a Dask scheduler" in captured.out
+
+def test_weather_distributed_pvgis():
+
+    weather, meta, failed_gids = pvdeg.weather.weather_distributed(
+        database="PVGIS",
+        coords=[
+            (39.7555, 105.2211),
+            (40.7555, 105.2211),
+        ]
+    )
+
+    assert DISTRIBUTED_PVGIS_WEATHER.equals(weather)
+    assert DISTRIBUTED_PVGIS_META.equals(meta)
+    assert failed_gids == []
+
+def test_empty_weather_ds_invalid_database():
+    """Test that emtpy_weather_ds raises ValueError for an invalid database."""
+    gids_size = 10
+    periodicity = "1h"
+    invalid_database = "INVALID_DB"
+    
+    with pytest.raises(ValueError, match=f"database must be PVGIS, NSRDB, PSM3 not {invalid_database}"):
+        pvdeg.weather.empty_weather_ds(gids_size, periodicity, invalid_database)

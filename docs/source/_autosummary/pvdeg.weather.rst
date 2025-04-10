@@ -20,6 +20,7 @@ pvdeg.weather
 
       
       pvdeg.weather.csv_read
+      pvdeg.weather.empty_weather_ds
       pvdeg.weather.get
       pvdeg.weather.get_NSRDB
       pvdeg.weather.get_NSRDB_fnames
@@ -32,6 +33,8 @@ pvdeg.weather
       pvdeg.weather.read
       pvdeg.weather.read_h5
       pvdeg.weather.repeat_annual_time_series
+      pvdeg.weather.roll_tmy
+      pvdeg.weather.weather_distributed
       pvdeg.weather.write
 
    
@@ -53,6 +56,13 @@ pvdeg.weather
    .. _sphx_glr_backref_pvdeg.weather.csv_read:
 
    .. minigallery:: pvdeg.weather.csv_read
+       :add-heading:
+
+   .. autofunction:: empty_weather_ds
+
+   .. _sphx_glr_backref_pvdeg.weather.empty_weather_ds:
+
+   .. minigallery:: pvdeg.weather.empty_weather_ds
        :add-heading:
 
    .. autofunction:: get
@@ -137,6 +147,20 @@ pvdeg.weather
    .. _sphx_glr_backref_pvdeg.weather.repeat_annual_time_series:
 
    .. minigallery:: pvdeg.weather.repeat_annual_time_series
+       :add-heading:
+
+   .. autofunction:: roll_tmy
+
+   .. _sphx_glr_backref_pvdeg.weather.roll_tmy:
+
+   .. minigallery:: pvdeg.weather.roll_tmy
+       :add-heading:
+
+   .. autofunction:: weather_distributed
+
+   .. _sphx_glr_backref_pvdeg.weather.weather_distributed:
+
+   .. minigallery:: pvdeg.weather.weather_distributed
        :add-heading:
 
    .. autofunction:: write

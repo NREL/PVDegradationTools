@@ -55,6 +55,7 @@ dependencies = [
     "xarray",
     "pre-commit",
     "sympy",
+    "zarr",
 ]
 dynamic = ["version"]
 
@@ -67,6 +68,7 @@ docs = [
     "nbsphinx",
     "sphinx_toggleprompt",
     "pydata_sphinx_theme",
+    "mistune==3.0.0",
 ]
 test = [
     "pytest",
@@ -76,8 +78,11 @@ test = [
 books = [
     "jupyter-book",
 ]
+sam = [
+    "NREL-PySAM==5.1.0",
+]
 all = [
-    "pvdeg[docs,test,books]",
+    "pvdeg[docs,test,books,sam]",
 ]
 
 [project.entry-points.pvdeg]
