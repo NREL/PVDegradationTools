@@ -333,6 +333,7 @@ def map_meta(meta):
         "Local Time Zone": "tz",
         "Time Zone": "tz",
         "timezone": "tz",
+        "TZ":"tz",
         "Dew Point": "dew_point",
         "Longitude": "longitude",
         "Latitude": "latitude",
