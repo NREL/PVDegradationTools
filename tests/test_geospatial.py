@@ -13,7 +13,7 @@ import pytest
 # this is fine for unchunked inputs if the number of chunks along all axes is 1
 # AND the size of the chunk will contain all elements in the entire axis,
 
-GEO_META = pd.read_csv(os.path.join(TEST_DATA_DIR, "summit-meta.csv"), index_col=0)
+GEO_META = pd.read_csv(os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0)
 
 GEO_WEATHER = xr.load_dataset(os.path.join(pvdeg.TEST_DATA_DIR, "summit-weather.nc"))
 
