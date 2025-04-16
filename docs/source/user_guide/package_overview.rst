@@ -29,11 +29,27 @@ produced via simulation (for example: results from `bifacial_radiance
   * Van 't Hoff environment characterization
   * Arrhenius degradation acceleration factor
   * Arrhenius environment characterization
-  * Solder Fatigue
   * Spectral Degradation
+  * LETID outdoor, lab
+  * Solder Fatigue
 
 3. Standards
 
   * Ideal Installation Distance
+  * Effective Operating Temperatures
+
+4. Monte Carlo
+
+  * Uncorrelated Monte Carlo simulation
+  * Multi-variate Correlated Monte Carlo simulation
+
+5. Geospatial
+
+  * Geospatial analysis framework
+  * High Performance Computing Tools
+
+6. Weather Utilities
+
+  * Parallelized downloads of NSRDB, and PVGIS
 
 For an in depth look at each class and function, please refer to API

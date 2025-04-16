@@ -2,11 +2,12 @@
 Collection of classes and functions for geospatial analysis.
 """
 
-from . import (
+from pvdeg import (
     standards,
     humidity,
     letid,
     utilities,
+    pysam,
     decorators,
 )
 
@@ -90,8 +91,42 @@ def start_dask(hpc=None):
 
     return client
 
+# rename this?
+# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt really doing anything anymore
+# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset already then we dont want to anything
+# def _ds_from_arbitrary(res, func):
+#     """
+#     Convert an arbitrary return type to xarray.Dataset. 
+#     """
+
+#     ######## STRUCTURAL #########
+#     # functions can just return xr.Dataset to take advantage of geospatial
+#     # this should not be required to implement a new geospatial function
+
+#     if isinstance(res, xr.Dataset):
+#         return res
+
+
+#     # if isinstance(res, pysam.inspirePysamReturn):
+#     #     return pysam._handle_pysam_return(res)
+#     # add more conditionals if we have special cases 
+#     # or add general case for mixed return dimensions: HARD
+    
+#     # handles collections with elements of same shapes
+#     df = _df_from_arbitrary(res=res, func=func)
+#     ds = xr.Dataset.from_dataframe(df)
+
+#     if not df.index.name:
+#         ds = ds.isel(index=0, drop=True)
+
+#     return ds
+
 
 def _df_from_arbitrary(res, func):
+    """
+    Convert an arbitrary return type to dataframe.
+    Results must be of similar shape currently. Either all numerics or all timeseries.
+    """
     numerics = (int, float, np.number)
     arrays = (np.ndarray, pd.Series)
 
@@ -104,12 +139,13 @@ def _df_from_arbitrary(res, func):
     elif isinstance(res, tuple) and all(isinstance(item, numerics) for item in res):
         return pd.DataFrame([res])
     elif isinstance(res, tuple) and all(isinstance(item, arrays) for item in res):
+        # add check for same size, raise value error otherwise
         return pd.concat(
             res, axis=1
         )  # they must all be the same length here or this will error out
     else:
         raise NotImplementedError(
-            f"function return type: {type(res)} not available for geospatial analysis yet."
+            f"function return type: {type(res)} not available for geospatial analysis yet. This could be result of mismatched coordinates of outputs. EX. tuple(dataframe, int)."
         )
 
 
@@ -139,19 +175,26 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     if type(meta_gid["latitude"]) == dict:
         meta_gid = utilities.fix_metadata(meta_gid)
 
-    df_weather = (
-        ds_gid.to_dataframe()
-    )  # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    df_weather = ds_gid.to_dataframe()  
     if isinstance(
         df_weather.index, pd.MultiIndex
     ):  # check for multiindex and convert to just time index, don't know what was causing this
         df_weather = df_weather.reset_index().set_index("time")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
-    df_res = _df_from_arbitrary(res, func)  # convert all return types to dataframe
-    ds_res = xr.Dataset.from_dataframe(df_res)
+    # res is the type returned by func
+    # can be float, tuple, list, dataframe, dataset, etc.
+    # need to convert it to a dataset
 
-    if not df_res.index.name:
+    if isinstance(res, xr.Dataset):
+        return res
+   
+    # handles collections with elements of same shapes
+    df = _df_from_arbitrary(res=res, func=func)
+    ds_res = xr.Dataset.from_dataframe(df)
+
+    if not df.index.name:
         ds_res = ds_res.isel(index=0, drop=True)
 
     return ds_res
@@ -306,6 +349,17 @@ def output_template(
     dims = set([d for dim in shapes.values() for d in dim])
     dims_size = dict(ds_gids.sizes) | add_dims
 
+    # update the coordinates with the dims which include add_dims
+    coords = {}
+    for dim in dims:
+        if dim in ds_gids:
+            coords[dim] = ds_gids[dim]
+        elif dim in add_dims:
+            coords[dim] = np.arange(dims_size[dim]) # placeholder array (edge case)
+        else:
+            raise ValueError(f"dim: {dim} not in ds_gids or add_dims")
+
+
     output_template = xr.Dataset(
         data_vars={
             var: (
@@ -315,13 +369,20 @@ def output_template(
             )  # this will produce a dask array with 1 chunk of the same size as the input
             for var, dim in shapes.items()
         },
-        coords={dim: ds_gids[dim] for dim in dims},
+        coords=coords,
         attrs=global_attrs,
-    )
+    ) 
 
-    if ds_gids.chunks:  # chunk to match input
+    # we can only chunk dimensions existing in the input
+    # added dimensions will fail if chunked under this scheme 
+    # because they do not exist in ds gids
+    if ds_gids.chunks: 
         output_template = output_template.chunk(
-            {dim: ds_gids.chunks[dim] for dim in dims}
+            {   
+                dim: ds_gids.chunks[dim] 
+                for dim in dims
+                if dim in ds_gids
+            }
         )
 
     return output_template
@@ -371,6 +432,33 @@ def template_parameters(func):
 
         add_dims = {}
 
+    elif func == standards.vertical_POA:
+        # res = {"annual_gh": x, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
+
+        shapes = {
+            "annual_gh": ("gid",),
+            "annual_energy": ("gid",),
+            "lcoe_nom": ("gid",),
+
+        }
+
+        attrs = {
+            "annual_gh": {"long_name": "SAM Annual GHI", "units": "Wh/m2/yr"},
+            "annual_energy": {
+                "long_name": "Annual AC energy",
+                "units": "kWh",
+            },
+            "lcoe_nom": {
+                "long_name": "LCOE Levelized cost of energy nominal",
+                "units": "cents/kWh",
+            },
+        }
+
+        global_attrs = {
+            "long_name": "Vertical dataset",
+        }
+        add_dims = {}
+        
     elif func == humidity.module:
         shapes = {
             "RH_surface_outside": ("gid", "time"),
@@ -509,15 +597,13 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
 
     can_auto_template(func=func)
-    # if not (hasattr(func, "numeric_or_timeseries") and hasattr(func, "shape_names")):
-    #     raise ValueError(
-    #         f"{func.__name__} cannot be autotemplated. create a template manually"
-    #     )
 
-    if func.numeric_or_timeseries == 0:
+    if func.numeric_or_timeseries == 'numeric':
         shapes = {datavar: ("gid",) for datavar in func.shape_names}
-    elif func.numeric_or_timeseries == 1:
+    elif func.numeric_or_timeseries == 'timeseries':
         shapes = {datavar: ("gid", "time") for datavar in func.shape_names}
+    else:
+        raise ValueError(f"{func.__name__} 'numeric_or_timseries' attribute invalid. is {func.numeric_or_timeseries} should be 'numeric' or 'timeseries'")
 
     template = output_template(ds_gids=ds_gids, shapes=shapes)  # zeros_template?
 
@@ -618,7 +704,7 @@ def meta_KDtree(meta_df, leaf_size=40, fp=None):
     Create a sklearn.neighbors.KDTree for fast geospatial lookup operations.
     Requires Scikit Learn library. Not included in pvdeg depency list.
 
-    Parameters:
+    Parameters
     -----------
     meta_df: pd.DataFrame
         Dataframe of metadata as generated by pvdeg.weather.get for geospatial
@@ -629,7 +715,7 @@ def meta_KDtree(meta_df, leaf_size=40, fp=None):
         If none, no file saved. must be ``.pkl`` file extension. Open saved
         pkl file with joblib (sklearn dependency).
 
-    Returns:
+    Returns
     --------
     kdtree: sklearn.neighbors.KDTree
         kdtree containing latitude-longitude pairs for quick lookups
@@ -995,7 +1081,9 @@ def elevation_stochastic_downselect(
         a=len(coords), p=normalized_weights / np.sum(normalized_weights), size=m
     )
 
-    return np.unique(selected_indicies)
+    return meta_df.index.values[np.unique(selected_indicies)]
+    #return meta_df.iloc[np.unique(selected_indicies)].index.values
+    #return np.unique(selected_indicies)
 
 
 def interpolate_analysis(
@@ -1040,45 +1128,32 @@ def interpolate_analysis(
 
 # api could be updated to match that of plot_USA
 def plot_sparse_analysis(
-    result: xr.Dataset,
-    data_var: str,
-    method="nearest",
-    resolution: complex = 100j,
-    figsize: tuple = (10, 8),
-    show_plot: bool = False,
+    result: xr.Dataset, 
+    data_var: str, 
+    method="nearest", 
+    resolution=100j, 
+    cmap='viridis',
+    ax=None
+
 ) -> None:
-    """
-    Plot the output of a sparse geospatial analysis using interpolation.
-
-    Parameters
-    -----------
-    result: xr.Dataset
-        xarray dataset in memory containing coordinates['longitude', 'latitude'] and at least one datavariable.
-    data_var: str
-        name of datavariable to plot from result
-    method: str
-        interpolation method.
-        Options: `'nearest', 'linear', 'cubic'`
-        See [`scipy.interpolate.griddata`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.griddata.html)
-    resolution: complex
-        Change the amount the input is interpolated.
-        For more interpolation set higher (200j is more than 100j)
-
-    Returns
-    -------
-    fig, ax: tuple
-        matplotlib figure and axes of plot
-    """
-
     grid_values, lat, lon = interpolate_analysis(
         result=result, data_var=data_var, method=method, resolution=resolution
     )
 
     fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes(
-        [0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False
-    )  # these should be the same ccrs
+    ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False) # these should be the same ccrs
     ax.patch.set_visible(False)
+
+    # These lines came up as a formatting error upon a merge attempt. I just commented it out. Kempe
+    #    show = True
+    #else:
+    #    fig = None
+    #    show = False
+
+    #    show = True
+    #else:
+    #    fig = None
+    #    show = False
 
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
     ax.set_extent(extent)
@@ -1086,8 +1161,8 @@ def plot_sparse_analysis(
         grid_values,
         extent=extent,
         origin="lower",
-        cmap="viridis",
-        transform=ccrs.PlateCarree(),  # why are ccrs different
+        cmap=cmap,
+        transform=ccrs.PlateCarree(),
     )
 
     shapename = "admin_1_states_provinces_lakes"
@@ -1102,76 +1177,14 @@ def plot_sparse_analysis(
         edgecolor="gray",
     )
 
-    cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
-    cbar.set_label("Value")
+    if fig is not None:
+        cbar = plt.colorbar(img, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
+        cbar.set_label("Value")
+        plt.title("Interpolated Heatmap")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
 
-    plt.title(f"Interpolated Sparse Analysis, {data_var}")
-    plt.xlabel("Longitude")
-    plt.ylabel("Latitude")
-
-    if show_plot:
-        plt.show()
-
-    return fig, ax
-
-
-def plot_sparse_analysis_land(
-    result: xr.Dataset,
-    data_var: str,
-    method="nearest",
-    resolution: complex = 100j,
-    figsize: tuple = (10, 8),
-    show_plot: bool = False,
-    proj=ccrs.PlateCarree(),
-):
-    import matplotlib.path as mpath
-    from cartopy.mpl.patch import geos_to_path
-
-    grid_values, lat, lon = interpolate_analysis(
-        result=result, data_var=data_var, method=method, resolution=resolution
-    )
-
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_axes([0, 0, 1, 1], projection=proj, frameon=False)
-    ax.patch.set_visible(False)
-
-    extent = [lon.min(), lon.max(), lat.min(), lat.max()]
-    ax.set_extent(extent, crs=proj)
-
-    mesh = ax.pcolormesh(lon, lat, grid_values, transform=proj, cmap="viridis")
-
-    land_path = geos_to_path(list(cfeature.LAND.geometries()))
-    land_path = mpath.Path.make_compound_path(*land_path)
-    plate_carre_data_transform = proj._as_mpl_transform(ax)
-    mesh.set_clip_path(land_path, plate_carre_data_transform)
-
-    shapename = "admin_1_states_provinces_lakes"
-    states_shp = shpreader.natural_earth(
-        resolution="110m", category="cultural", name=shapename
-    )
-
-    ax.add_geometries(
-        shpreader.Reader(states_shp).geometries(),
-        proj,
-        facecolor="none",
-        edgecolor="black",
-        linestyle=":",
-    )
-
-    cbar = plt.colorbar(mesh, ax=ax, orientation="vertical", fraction=0.02, pad=0.04)
-    cbar.set_label("Value")
-
-    utilities._add_cartopy_features(
-        ax=ax,
-        features=[
-            cfeature.BORDERS,
-            cfeature.COASTLINE,
-            cfeature.LAND,
-            cfeature.OCEAN,
-        ],
-    )
-
-    if show_plot:
+    if show and fig is not None:
         plt.show()
 
     return fig, ax

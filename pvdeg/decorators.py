@@ -7,20 +7,20 @@ import functools
 import inspect
 import warnings
 
-def geospatial_quick_shape(numeric_or_timeseries: bool, shape_names: list[str]) -> None:
+def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -> None:
     """
     Add an attribute to the functions that can be run with geospatial analysis.
     Strict typing is not enough for this purpose so we can view this attribute
     at runtime to create a template for the function.
 
     For single numeric results, includes tabular numeric data
-    >>> value = False (0)
+    >>> value = 'numeric'
 
     Example if a function returns a dataframe with 1 row of numerics (not timeseries)
     `pvdeg.standards.standoff` does this.
 
     For timeseries results
-    >>> value = True (1)
+    >>> value = 'timeseries'
 
     Example, `pvdeg.temperature.temperature`
 
@@ -35,7 +35,9 @@ def geospatial_quick_shape(numeric_or_timeseries: bool, shape_names: list[str]) 
     >>> func.shape_names = ["T98", "x_eff"] # function attribute names
 
     * Note: we cannot autotemplate functions with ambiguous return types that depend on runtime input,
-    the function will need strictly return a timeseries or numeric but not one or the other.
+    the function will need to strictly return a timeseries or numeric.
+
+    * Note: this is accessed through the ``decorators.geospatial_quick_shape`` namespace
 
     Parameters:
     -----------

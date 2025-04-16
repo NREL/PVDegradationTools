@@ -10,13 +10,12 @@ from rex import Outputs
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from . import (
+from pvdeg import (
     temperature,
     spectral,
-    weather
+    weather,
+    decorators
 )
-
-from pvdeg.decorators import geospatial_quick_shape
 
 
 def _ambient(weather_df):
@@ -654,7 +653,7 @@ def backsheet(
     return backsheet
 
 
-@geospatial_quick_shape(1, ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
+@decorators.geospatial_quick_shape('timeseries', ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
 def module(
     weather_df,
     meta,

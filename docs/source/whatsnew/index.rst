@@ -4,7 +4,8 @@ What's New
 ==========
 PVDegradationTools (pvdeg) change log:
 
-.. include:: releases/v0.4.4.rst
+.. include:: releases/v0.5.1.rst
+.. include:: releases/v0.5.0.rst
 .. include:: releases/v0.4.3.rst
 .. include:: releases/v0.4.2.rst
 .. include:: releases/v0.4.1.rst

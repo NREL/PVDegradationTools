@@ -28,7 +28,7 @@ keywords = [
     "PV",
 ]
 dependencies = [
-    "aiohttp==3.10.2",
+    "aiohttp==3.10.11",
     "numpy==1.26.4",
     "pvlib==0.10.3",
     "scipy<1.14.0",
@@ -55,6 +55,7 @@ dependencies = [
     "xarray",
     "pre-commit",
     "sympy",
+    "zarr",
 ]
 dynamic = ["version"]
 
@@ -72,13 +73,16 @@ docs = [
 test = [
     "pytest",
     "pytest-cov",
-    "sympy",
+    "scikit-learn",
 ]
 books = [
     "jupyter-book",
 ]
+sam = [
+    "NREL-PySAM==5.1.0",
+]
 all = [
-    "pvdeg[docs,test,books]",
+    "pvdeg[docs,test,books,sam]",
 ]
 
 [project.entry-points.pvdeg]

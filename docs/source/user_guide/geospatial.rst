@@ -1,6 +1,6 @@
 .. _geospatial:
 
-Geospatial
+Geospatial 🌍
 ==========
 
 Geospatial data is time based data that maps to a location on Earth. PVDeg supports single site and geospatial analyses using meteorological and solar radiation data,
@@ -90,7 +90,7 @@ Previously, ``pvdeg.geospatial`` provided minimal templates and forced users to 
 But many pvdeg functions do not require a template for geospatial analysis.
 
 Auto-templating: allows users to skip creating templates for most ``pvdeg`` functions. 
-It is integrated into ``geospatial.analysis``. If a function is defined with the ``@geospatial_quick_shape`` decorator in the source code, we can call ``geospatial.analysis`` without providing a template.
+It is integrated into ``geospatial.analysis``. If a function is defined with the ``@decorators.geospatial_quick_shape`` decorator in the source code, we can call ``geospatial.analysis`` without providing a template.
 The function responsible for this is called ``geospatial.auto_template`` and is exposed publicly to create templates outside of ``geospatial.analysis``.
 
 If a function cannot be auto-templated, both ``geospatial.analysis`` and ``geospatial.auto_template`` will raise the following error.

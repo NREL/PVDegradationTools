@@ -10,8 +10,13 @@ import datetime
 import pvlib
 
 
-from pvdeg import collection, utilities, standards, DATA_DIR
-from pvdeg.decorators import geospatial_quick_shape
+from pvdeg import (
+    collection, 
+    utilities, 
+    standards, 
+    decorators,
+    DATA_DIR,
+)
 
 
 def tau_now(tau_0, tau_deg, n_b):
@@ -872,8 +877,8 @@ def calc_injection_outdoors(results):
     return injection
 
 
-@geospatial_quick_shape(
-    1,
+@decorators.geospatial_quick_shape(
+    'timeseries',
     [
         "Temperature",
         "Injection",
