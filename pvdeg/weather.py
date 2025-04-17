@@ -17,6 +17,7 @@ import numpy as np
 import h5py
 import dask.dataframe as dd
 import xarray as xr
+from geopy.geocoders import Nominatim
 
 
 TIME_PERIODICITY_MAP = {
@@ -1408,7 +1409,35 @@ def weather_distributed(
 
     return weather_ds, meta_df, indexes_failed
 
-
+def find_metadata(meta):
+     """
+     Fills in missing meta data for a geographic location. 
+     The meta dictionary must have longitude and latitude information.
+     Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
+     It will only replace empty keys and those with one character of length.
+ 
+     Parameters:
+     -----------
+     meta : (dict)
+         Dictionary of metadata for the weather data
+ 
+     Returns:
+     --------
+     meta : (dict)
+         Dictionary of metadata for the weather data
+     """
+     geolocator = Nominatim(user_agent="geoapiexercises")
+     location = geolocator.reverse(str(meta['latitude']) + ',' + str(meta['longitude'])).raw['address']
+     map_meta(location)
+ 
+     for key in [*location.keys()]:
+         if key in meta.keys():
+             if len(meta[key])<2:
+                 meta[key] = location[key]
+         else:
+             meta[key] = location[key]
+ 
+     return meta
 
 # def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
@@ -1448,7 +1477,7 @@ def weather_distributed(
     #  'altitude': 1820,
     #  'tz': -7,
     #  'wind_height': 2}
-    ...
+    # ...
 
 # def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
