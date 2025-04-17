@@ -113,7 +113,7 @@ def poa_irradiance(
     return poa
 
 
-@geospatial_quick_shape(
+@decorators.geospatial_quick_shape(
     1,
     [
         "poa_global",
@@ -197,7 +197,7 @@ def poa_irradiance_fixed(
     return poa
 
 
-@geospatial_quick_shape(
+@decorators.geospatial_quick_shape(
     1,
     [
         "poa_global",
