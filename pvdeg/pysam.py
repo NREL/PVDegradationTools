@@ -681,7 +681,6 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     )
 
     ds_result = _handle_pysam_return(pysam_res_dict=outputs, weather_df=weather_df, tilt=tilt_used, pitch=pitch_used)
-        
 
     return ds_result
 

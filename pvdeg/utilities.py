@@ -966,44 +966,78 @@ def new_id(collection):
 
     return id
 
-
-def restore_gids(
-    original_meta_df: pd.DataFrame, analysis_result_ds: xr.Dataset
-) -> xr.Dataset:
+def restore_gids(meta_df: xr.Dataset, update_ds: xr.Dataset) -> xr.Dataset:
     """
-    Restore gids to results dataset. For desired behavior output data must
+    Restore gids to results dataset. 
+    
+    For desired behavior output data must
     have identical ordering to input data, otherwise will fail silently by
     misassigning gids to lat-long coordinates in returned dataset.
 
     Parameters:
     -----------
-    original_meta_df : pd.DataFrame
-        Metadata dataframe as returned by geospatial ``pvdeg.weather.get``
-    analysis_result_ds : xr.Dataset
-        geospatial result data as returned by ``pvdeg.geospatial.analysis``
+    meta_df : pd.DataFrame
+        Geospatial metadata dataframe, with gid index. Commonly returned by geospatial ``pvdeg.weather.get``.
+    update_ds : xr.Dataset
+        Dataset with coordinates including latitude and longitude. Commonly returned by ``pvdeg.geospatial.analysis``. Can include the same points or a subset of points from meta_df.
 
     Returns:
     --------
-    restored_gids_ds : xr.Dataset
-        dataset like ``analysis_result_ds`` with new datavariable, ``gid``
+    expanded_ds : xr.Dataset
+        dataset like ``update_ds`` with new datavariable, ``gid``
         holding the original gids of each result from the input metadata.
-        Warning: if meta order is different than result ordering gids will
-        be assigned incorrectly.
     """
 
-    flattened = analysis_result_ds.stack(points=("latitude", "longitude"))
+    # there is probably a better way to construct the dataset of gids
+    meta_df.loc[:,"gid"] = meta_df.index.values
+    gids_ds = meta_df.set_index(["latitude","longitude"])["gid"].sort_index().to_xarray().to_dataset().reset_coords().reindex_like(update_ds, method=None)
+    meta_df = meta_df.drop(columns=["gid"])
+    
+    if update_ds.chunks:
+        chunks = {dim_name: chunk_size[0] for dim_name, chunk_size in update_ds.chunks.items() if dim_name in gids_ds.dims}
+        gids_ds = gids_ds.chunk(chunks)
 
-    gids = original_meta_df.index.values
+    expanded_ds = xr.merge([update_ds, gids_ds], compat="no_conflicts", join="override")
 
-    # Create a DataArray with the gids and assign it to the Dataset
-    gids_da = xr.DataArray(gids, coords=[flattened["points"]], name="gid")
+    return expanded_ds
 
-    # Unstack the DataArray to match the original dimensions of the Dataset
-    gids_da = gids_da.unstack("points")
+# def restore_gids(
+#     original_meta_df: pd.DataFrame, analysis_result_ds: xr.Dataset
+# ) -> xr.Dataset:
+#     """
+#     Restore gids to results dataset. For desired behavior output data must
+#     have identical ordering to input data, otherwise will fail silently by
+#     misassigning gids to lat-long coordinates in returned dataset.
 
-    restored_gids_ds = analysis_result_ds.assign(gid=gids_da)
+#     Parameters:
+#     -----------
+#     original_meta_df : pd.DataFrame
+#         Metadata dataframe as returned by geospatial ``pvdeg.weather.get``
+#     analysis_result_ds : xr.Dataset
+#         geospatial result data as returned by ``pvdeg.geospatial.analysis``
 
-    return restored_gids_ds
+#     Returns:
+#     --------
+#     restored_gids_ds : xr.Dataset
+#         dataset like ``analysis_result_ds`` with new datavariable, ``gid``
+#         holding the original gids of each result from the input metadata.
+#         Warning: if meta order is different than result ordering gids will
+#         be assigned incorrectly.
+#     """
+
+#     flattened = analysis_result_ds.stack(points=("latitude", "longitude"))
+
+#     gids = original_meta_df.index.values
+
+#     # Create a DataArray with the gids and assign it to the Dataset
+#     gids_da = xr.DataArray(gids, coords=[flattened["points"]], name="gid")
+
+#     # Unstack the DataArray to match the original dimensions of the Dataset
+#     gids_da = gids_da.unstack("points")
+
+#     restored_gids_ds = analysis_result_ds.assign(gid=gids_da)
+
+#     return restored_gids_ds
 
 
 def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
@@ -1169,7 +1203,6 @@ def _calc_elevation_weights(
         must be: "linear", "exp", "log"
         """
     )
-
 
 def fix_metadata(meta):
     """
@@ -1346,7 +1379,7 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
 
-def merge_sparse(files: list[str])->xr.Dataset:
+def merge_sparse(files: list[str], engine:str="h5netcdf")->xr.Dataset:
     """
     Merge an arbitrary number of geospatial analysis results. 
     Creates monotonically increasing indicies.
@@ -1366,7 +1399,7 @@ def merge_sparse(files: list[str])->xr.Dataset:
         filepaths list.
     """
 
-    datasets = [xr.open_dataset(fp, engine='h5netcdf').compute() for fp in files]
+    datasets = [xr.open_dataset(fp, engine=engine).compute() for fp in files]
 
     latitudes = np.concatenate([ds.latitude.values for ds in datasets])
     longitudes = np.concatenate([ds.longitude.values for ds in datasets])

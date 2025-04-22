@@ -239,8 +239,6 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
 
     ValueError: <function-name> cannot be autotemplated. create a template manually with `geospatial.output_template`
 
-
-
     Parameters
     ----------
     weather_ds : xarray.Dataset
