@@ -232,7 +232,7 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
     return res
 
 
-def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
+def analysis(weather_ds, meta_df, func, template=None, preserve_gid_dim=False, **func_kwargs):
     """
     Applies a function to each gid of a weather dataset. `analysis` will attempt to create a template using `geospatial.auto_template`.
     If this process fails you will have to provide a geospatial template to the template argument.
@@ -249,6 +249,9 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
         Function to apply to weather data.
     template : xarray.Dataset
         Template for output data.
+    preserve_gid_dim : bool, optional
+        Expert setting. If True, preserves the 'gid' dimension and prevents expansion to latitude/longitude coordinates.
+        Other dimensions such as time and distance are unaffected. Default is False.
     func_kwargs : dict
         Keyword arguments to pass to func.
 
@@ -270,6 +273,9 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     stacked = weather_ds.map_blocks(
         calc_block, kwargs=kwargs, template=template
     ).compute()
+
+    if preserve_gid_dim is True:
+        return stacked
 
     # lats = stacked.latitude.values.flatten()
     # lons = stacked.longitude.values.flatten()
