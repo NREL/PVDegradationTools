@@ -330,7 +330,12 @@ def test_calc_letid_outdoors():
         generation_df,
     )
     print("here it is", META)
-    pd.testing.assert_frame_equal(result, LETID_OUTDOORS)
+    pd.testing.assert_frame_equal(
+        result,
+        LETID_OUTDOORS,
+        rtol=1e-5,
+        atol=1e-8
+    )
 
 
 def test_calc_letid_lab():
