@@ -25,7 +25,7 @@ from pvdeg import (
 # passing all tests after updating temperature models but this should be checked throughly before final release
 
 
-@decorators.geospatial_quick_shape('timeseries', ["T_0", "T_inf", "poa"])
+@decorators.geospatial_quick_shape("timeseries", ["T_0", "T_inf", "poa"])
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
@@ -206,7 +206,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
 
 # test conf for other temperature models
 @decorators.geospatial_quick_shape(
-    'numeric', ["x", "T98_0", "T98_inf"]
+    "numeric", ["x", "T98_0", "T98_inf"]
 )  # numeric result, with corresponding datavariable names
 def standoff(
     weather_df: pd.DataFrame = None,
@@ -470,7 +470,7 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
     return Output
 
 
-@decorators.geospatial_quick_shape('numeric', ["T98"])
+@decorators.geospatial_quick_shape("numeric", ["T98"])
 def T98_estimate(
     weather_df=None,
     meta=None,
@@ -637,4 +637,3 @@ def standoff_x(
     ).x[0]
 
     return temp_df
-

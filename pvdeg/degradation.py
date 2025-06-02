@@ -237,7 +237,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-@decorators.geospatial_quick_shape('numeric', ["Iwa"])
+@decorators.geospatial_quick_shape("numeric", ["Iwa"])
 def IwaVantHoff(
     weather_df,
     meta,

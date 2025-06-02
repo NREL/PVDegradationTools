@@ -198,9 +198,7 @@ injection = np.full(len(timesteps), suns)
 timesteps["Temperature"] = temps
 timesteps["Injection"] = injection
 
-timesteps[
-    ["NA", "NB", "NC", "tau"]
-] = (
+timesteps[["NA", "NB", "NC", "tau"]] = (
     np.nan
 )  # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
 
@@ -390,9 +388,7 @@ injection = np.full(len(timesteps), suns)
 timesteps["Temperature"] = temps
 timesteps["Injection"] = injection
 
-timesteps[
-    ["NA", "NB", "NC", "tau"]
-] = (
+timesteps[["NA", "NB", "NC", "tau"]] = (
     np.nan
 )  # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
 
@@ -501,9 +497,7 @@ injection = np.full(len(timesteps), suns)
 timesteps["Temperature"] = temps
 timesteps["Injection"] = injection
 
-timesteps[
-    ["NA", "NB", "NC", "tau"]
-] = (
+timesteps[["NA", "NB", "NC", "tau"]] = (
     np.nan
 )  # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
 

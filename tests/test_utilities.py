@@ -144,78 +144,90 @@ def test_nrel_kestrel_check_bad():
 # ===========================
 def test_read_material_special():
 
-    template_material = pvdeg.utilities.read_material(pvdeg_file="AApermeation", key="AA000")
+    template_material = pvdeg.utilities.read_material(
+        pvdeg_file="AApermeation", key="AA000"
+    )
 
     assert len(template_material) == 1
     assert "comment" in template_material
 
+
 def test_read_material_normal():
 
     res = {
-        'name': 'ST504', 
-        'alias': 'PET1', 
-        'contributor': 'Michael Kempe', 
-        'source': 'unpublished measurements', 
-        'Fickian': True,
-        'Ead': 47.603, 
-        'Do': 0.554153, 
-        'Eas': -11.5918, 
-        'So': 9.554366e-07, 
-        'Eap': 34.2011, 
-        'Po': 2128.8937
+        "name": "ST504",
+        "alias": "PET1",
+        "contributor": "Michael Kempe",
+        "source": "unpublished measurements",
+        "Fickian": True,
+        "Ead": 47.603,
+        "Do": 0.554153,
+        "Eas": -11.5918,
+        "So": 9.554366e-07,
+        "Eap": 34.2011,
+        "Po": 2128.8937,
     }
 
-    template_material = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key="OX002")
+    template_material = pvdeg.utilities.read_material(
+        pvdeg_file="O2permeation", key="OX002"
+    )
 
     assert template_material == res
+
 
 def test_read_material_fewer_params():
 
     res = {
-        'name': 'ST504', 
-        'Fickian': True,
+        "name": "ST504",
+        "Fickian": True,
     }
 
-    template_material = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key="OX002", parameters=["name", "Fickian"])
+    template_material = pvdeg.utilities.read_material(
+        pvdeg_file="O2permeation", key="OX002", parameters=["name", "Fickian"]
+    )
 
     assert template_material == res
-
 
 
 def test_read_material_extra_params():
 
     res = {
-        'namenotindict1': None,
-        'namenotindict2': None,
+        "namenotindict1": None,
+        "namenotindict2": None,
     }
 
-    template_material = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key="OX002", parameters=["namenotindict1", "namenotindict2"])
+    template_material = pvdeg.utilities.read_material(
+        pvdeg_file="O2permeation",
+        key="OX002",
+        parameters=["namenotindict1", "namenotindict2"],
+    )
 
     assert template_material == res
+
 
 # pvdeg_file should override fp if both are provided
 def test_read_material_fp_override():
 
     res = {
-        'name': 'ST504', 
-        'alias': 'PET1', 
-        'contributor': 'Michael Kempe', 
-        'source': 'unpublished measurements', 
-        'Fickian': True,
-        'Ead': 47.603, 
-        'Do': 0.554153, 
-        'Eas': -11.5918, 
-        'So': 9.554366e-07, 
-        'Eap': 34.2011, 
-        'Po': 2128.8937
+        "name": "ST504",
+        "alias": "PET1",
+        "contributor": "Michael Kempe",
+        "source": "unpublished measurements",
+        "Fickian": True,
+        "Ead": 47.603,
+        "Do": 0.554153,
+        "Eas": -11.5918,
+        "So": 9.554366e-07,
+        "Eap": 34.2011,
+        "Po": 2128.8937,
     }
 
     from pvdeg import DATA_DIR
 
     # fp gets overridden by pvdeg_file
     template_material = pvdeg.utilities.read_material(
-        pvdeg_file="O2permeation", 
-        fp=os.path.join(DATA_DIR, "AApermeation.json"), 
+        pvdeg_file="O2permeation",
+        fp=os.path.join(DATA_DIR, "AApermeation.json"),
         key="OX002",
     )
 
@@ -223,8 +235,12 @@ def test_read_material_fp_override():
 
 
 def test_search_json():
-    name_res = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation", name_or_alias="Ethylene Vinyl Acetate")
-    alias_res = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation", name_or_alias="EVA")
+    name_res = pvdeg.utilities.search_json(
+        pvdeg_file="H2Opermeation", name_or_alias="Ethylene Vinyl Acetate"
+    )
+    alias_res = pvdeg.utilities.search_json(
+        pvdeg_file="H2Opermeation", name_or_alias="EVA"
+    )
 
     assert name_res == "W001"
     assert alias_res == "W001"

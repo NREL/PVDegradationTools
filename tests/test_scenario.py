@@ -33,15 +33,13 @@ def test_Scenario_add(monkeypatch):
 
     ### monkey patch to bypass psm3 api calls in addLocation ###
     monkeypatch.setattr(
-        target=Scenario,
-        name="addLocation",
-        value=monkeypatch_addLocation
+        target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
 
     a = Scenario(name="test")
 
-    EMAIL = "placeholder@email.xxx",
-    API_KEY =  "fake_key"
+    EMAIL = ("placeholder@email.xxx",)
+    API_KEY = "fake_key"
 
     a.clean()
     a.restore_credentials(email=EMAIL, api_key=API_KEY)
@@ -59,14 +57,11 @@ def test_Scenario_add(monkeypatch):
     assert a == restored
 
 
-
 def test_Scenario_run(monkeypatch):
 
     ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
     monkeypatch.setattr(
-        target=Scenario,
-        name="addLocation",
-        value=monkeypatch_addLocation
+        target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
 
     a = Scenario.load_json(
@@ -79,7 +74,6 @@ def test_Scenario_run(monkeypatch):
     res_df = a.results["test-module"]["GLUSE"]
     known_df = pd.DataFrame(
         {
-		
             "x": {0: 2.008636},
             "T98_0": {0: 77.038644},
             "T98_inf": {0: 50.561112},
@@ -110,9 +104,7 @@ def test_addModule_badmat(capsys, monkeypatch):
 
     ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
     monkeypatch.setattr(
-        target=Scenario,
-        name="addLocation",
-        value=monkeypatch_addLocation
+        target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
 
     a = Scenario.load_json(

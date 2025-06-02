@@ -1,5 +1,4 @@
-"""Collection of functions related to calculating current collection in solar cells
-"""
+"""Collection of functions related to calculating current collection in solar cells"""
 
 import numpy as np
 from scipy.integrate import simpson
@@ -69,9 +68,9 @@ def calculate_jsc_from_tau_cp(
     """
     Returns cell Jsc given lifetime and cell parameters
 
-    Jsc is calculated via integrating collection probability and optical generation profiles
-    through the wafer depth. Includes contribution of the emitter, depletion region (assumes
-    CP = 1 in the depletion region), and base.
+    Jsc is calculated via integrating collection probability and optical generation
+    profiles through the wafer depth. Includes contribution of the emitter, depletion
+    region (assumes CP = 1 in the depletion region), and base.
 
     Parameters
     ----------
@@ -213,7 +212,8 @@ def calculate_jsc_from_tau_iqe(
     """
     Returns cell Jsc given lifetime and cell parameters
 
-    Calculates Jsc via calculating cell internal quantum efficiency (IQE) and absorption for Si
+    Calculates Jsc via calculating cell internal quantum efficiency (IQE) and absorption
+    for Si
 
     Parameters
     ----------
@@ -251,8 +251,9 @@ def calculate_jsc_from_tau_iqe(
         Front surface recombination velocity [cm/s].
 
     xp : numeric, default 0.00000024
-        width of the depletion region [m]. Treated as fixed width, as it is very small compared
-        to the bulk, so injection-dependent variations will have very small effects.
+        width of the depletion region [m]. Treated as fixed width, as it is very small
+        compared to the bulk, so injection-dependent variations will have very small
+        effects.
 
     Returns
     -------
@@ -261,9 +262,9 @@ def calculate_jsc_from_tau_iqe(
 
     Notes
     -----
-    Default emitter parameters w, l, d, and s are supplied, but users may wish to experiment to
-    find the most suitable parameters to model different cell types. Default values are adapted
-    from [2]_ and [3]_.
+    Default emitter parameters w, l, d, and s are supplied, but users may wish to
+    experiment to find the most suitable parameters to model different cell types.
+    Default values are adapted from [2]_ and [3]_.
 
     Pros of this approach:
         requires only fundamental inputs: Si absorption and spectrum

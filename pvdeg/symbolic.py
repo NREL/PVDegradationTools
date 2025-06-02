@@ -50,11 +50,13 @@ def calc_df_symbolic(
     """
     variables = set(map(str, list(expr.free_symbols)))
     if not variables.issubset(df.columns.values):
-        raise ValueError(f"""
+        raise ValueError(
+            f"""
                                  all expression variables need to be in dataframe cols
                                  expr symbols   : {expr.free_symbols}")
                                  dataframe cols : {df.columns.values}
-                                 """)
+                                 """
+        )
 
     res = df.apply(lambda row: calc_kwarg_floats(expr, row.to_dict()), axis=1)
     return res

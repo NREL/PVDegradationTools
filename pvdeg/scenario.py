@@ -28,6 +28,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from dask.distributed import Client
 
+
 class Scenario:
     """
     The scenario object contains all necessary parameters and criteria for a given scenario.
@@ -116,7 +117,9 @@ class Scenario:
             and self.path == other.path
             and np.array_equal(self.gids, other.gids)
             and self.modules == other.modules
-            and compare_ordereddict_values(self.pipeline, other.pipeline) # keys are random
+            and compare_ordereddict_values(
+                self.pipeline, other.pipeline
+            )  # keys are random
             and self.file == other.file
             and self.results == other.results
             and (
@@ -311,7 +314,17 @@ class Scenario:
 
     # add testing
     def add_material(
-        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname="O2permeation.json",
+        self,
+        name,
+        alias,
+        Ead,
+        Eas,
+        So,
+        Do=None,
+        Eap=None,
+        Po=None,
+        fickian=True,
+        fname="O2permeation.json",
     ):
         """
         add a new material type to main list
@@ -877,7 +890,7 @@ class Scenario:
         return fig, ax
 
     def _ipython_display_(self):
-        file_url = "no file provided" 
+        file_url = "no file provided"
         if self.path:
             file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
 
@@ -1121,54 +1134,56 @@ class GeospatialScenario(Scenario):
         self.func = func
         self.template = template
         self.dask_client = dask_client
-        self.kdtree = None # sklearn kdtree
+        self.kdtree = None  # sklearn kdtree
 
     def __eq__(self, other):
-        raise NotImplementedError("""
+        raise NotImplementedError(
+            """
             Cannot directly compare pvdeg.GeospatialScenario objects
             due to larger than memory/out of memory datasets stored in 
             GeospatialScenario.weather_data attribute.
-            """)
+            """
+        )
 
     def start_dask(self, hpc=None) -> None:
         """
-            Starts a dask cluster for parallel processing.
+        Starts a dask cluster for parallel processing.
 
-            Parameters
-            ----------
-            hpc : dict
-                Dictionary containing dask hpc settings (see examples below).
-                Supply `None` for a default configuration.
+        Parameters
+        ----------
+        hpc : dict
+            Dictionary containing dask hpc settings (see examples below).
+            Supply `None` for a default configuration.
 
-            Examples
-            --------
-            Local cluster:
+        Examples
+        --------
+        Local cluster:
 
-            .. code-block:: python
+        .. code-block:: python
 
-                hpc = {'manager': 'local',
-                    'n_workers': 1,
-                    'threads_per_worker': 8,
-                    'memory_limit': '10GB'}
+            hpc = {'manager': 'local',
+                'n_workers': 1,
+                'threads_per_worker': 8,
+                'memory_limit': '10GB'}
 
-            SLURM cluster:
+        SLURM cluster:
 
-            .. code-block:: python
+        .. code-block:: python
 
-                kestrel = {
-                    'manager': 'slurm',
-                    'n_jobs': 1,  # Max number of nodes used for parallel processing
-                    'cores': 104,
-                    'memory': '246GB',
-                    'account': 'pvsoiling',
-                    'walltime': '4:00:00',
-                    'processes': 52,
-                    'local_directory': '/tmp/scratch',
-                    'job_extra_directives': ['-o ./logs/slurm-%j.out'],
-                    'death_timeout': 600,}
+            kestrel = {
+                'manager': 'slurm',
+                'n_jobs': 1,  # Max number of nodes used for parallel processing
+                'cores': 104,
+                'memory': '246GB',
+                'account': 'pvsoiling',
+                'walltime': '4:00:00',
+                'processes': 52,
+                'local_directory': '/tmp/scratch',
+                'job_extra_directives': ['-o ./logs/slurm-%j.out'],
+                'death_timeout': 600,}
         """
         self.dask_client = pvdeg.geospatial.start_dask()
-                                 
+
     def addLocation(
         self,
         country: Optional[str] = None,
@@ -1224,15 +1239,15 @@ class GeospatialScenario(Scenario):
             list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).
 
                 Valid Options:
-                - 'air_temperature'  
-                - 'dew_point'  
-                - 'dhi'  
-                - 'dni'  
-                - 'ghi'  
-                - 'surface_albedo'   
-                - 'surface_pressure'   
-                - 'wind_direction'   
-                - 'wind_speed'  
+                - 'air_temperature'
+                - 'dew_point'
+                - 'dhi'
+                - 'dni'
+                - 'ghi'
+                - 'surface_albedo'
+                - 'surface_pressure'
+                - 'wind_direction'
+                - 'wind_speed'
 
         see_added : bool
             flag true if you want to see a runtime notification for added location/gids
@@ -1260,7 +1275,6 @@ class GeospatialScenario(Scenario):
             bbox_gids = pvdeg.geospatial.apply_bounding_box(geo_meta, **bbox_kwarg)
             geo_meta = geo_meta.loc[bbox_gids]
 
-
         #                Downselect by Region
         # ======================================================
 
@@ -1272,7 +1286,6 @@ class GeospatialScenario(Scenario):
             self._check_set(countries, set(geo_meta["country"]))
             geo_meta = geo_meta[geo_meta["country"].isin(countries)]
 
-
         if state:
             states = toList(state)
             states = [
@@ -1282,7 +1295,6 @@ class GeospatialScenario(Scenario):
 
             self._check_set(states, set(geo_meta["state"]))
             geo_meta = geo_meta[geo_meta["state"].isin(states)]
-
 
         if county:
             if isinstance(county, str):
@@ -1315,8 +1327,8 @@ class GeospatialScenario(Scenario):
 
         geo_weather, geo_meta = self.get_geospatial_data()
 
-        geo_meta = geo_meta[geo_meta['state'] != "Alaska"]
-        geo_meta = geo_meta[geo_meta['state'] != "Hawaii"]
+        geo_meta = geo_meta[geo_meta["state"] != "Alaska"]
+        geo_meta = geo_meta[geo_meta["state"] != "Hawaii"]
         geo_weather = geo_weather.sel(gid=geo_meta.index)
 
         self.weather_data = geo_weather
@@ -1358,13 +1370,12 @@ class GeospatialScenario(Scenario):
 
         self.meta_data = self.meta_data.loc[bbox_gids]
 
-    def set_kdtree(self, kdtree = None) -> None:
+    def set_kdtree(self, kdtree=None) -> None:
         """Initialize a kidtree and save it to the GeospatialScenario"""
         if kdtree is None:
             self.kdtree = pvdeg.geospatial.meta_KDtree(meta_df=self.meta_data)
         else:
             self.kdtree = kdtree
-
 
     def classify_mountains_radii(
         self,
@@ -1373,7 +1384,7 @@ class GeospatialScenario(Scenario):
         threshold_factor: Union[float, int] = 1.25,
         elevation_floor: Union[float, int] = 0,
         bbox_kwarg: Optional[dict] = {},
-        kdtree = None,
+        kdtree=None,
     ):
         """
         Find mountains from elevation metadata using sklearn kdtree for fast lookup.
@@ -1435,7 +1446,7 @@ class GeospatialScenario(Scenario):
         k_neighbors: int = 3,
         method: str = "mean",
         normalization: str = "linear",
-        kdtree = None,
+        kdtree=None,
     ):
         """
         Add a column to the scenario meta_data dataframe containing a boolean
@@ -1490,7 +1501,7 @@ class GeospatialScenario(Scenario):
         return
 
     def classify_feature(
-       self,
+        self,
         feature_name=None,
         resolution="10m",
         radius=None,
@@ -1543,7 +1554,7 @@ class GeospatialScenario(Scenario):
         k_neighbors=3,
         method="mean",
         normalization="linear",
-        kdtree = None,
+        kdtree=None,
     ):
         """
         Prefenetially downselect data points based on elevation and update
@@ -1674,7 +1685,9 @@ class GeospatialScenario(Scenario):
         return geo_weather_sub, self.meta_data
 
     # @dispatch(xr.Dataset, pd.DataFrame)
-    def set_geospatial_data(self, weather_ds: xr.Dataset, meta_df: pd.DataFrame ) -> None:
+    def set_geospatial_data(
+        self, weather_ds: xr.Dataset, meta_df: pd.DataFrame
+    ) -> None:
         """
         Parameters:
         -----------
@@ -1697,15 +1710,15 @@ class GeospatialScenario(Scenario):
         func: Callable,
         template: xr.Dataset = None,
         func_params: dict = {},
-        see_added: bool = False
+        see_added: bool = False,
     ) -> None:
         """
-        Add a pvdeg geospatial function to the scenario pipeline. If no template is provided, `addJob` attempts to use `geospatial.auto_template` this will raise an 
+        Add a pvdeg geospatial function to the scenario pipeline. If no template is provided, `addJob` attempts to use `geospatial.auto_template` this will raise an
 
         Parameters:
         -----------
         func : function
-            pvdeg function to use for geospatial analysis. 
+            pvdeg function to use for geospatial analysis.
         template : xarray.Dataset
             Template for output data. Only required if a function is not supported by `geospatial.auto_template`.
         func_params : dict
@@ -1719,7 +1732,9 @@ class GeospatialScenario(Scenario):
 
             # take the weather datapoints specified by metadata and create a template based on them.
             self.weather_data = self.weather_data.sel(gid=self.meta_data.index)
-            template = pvdeg.geospatial.auto_template(func=func, ds_gids=self.weather_data)
+            template = pvdeg.geospatial.auto_template(
+                func=func, ds_gids=self.weather_data
+            )
 
         self.template = template
         self.func = func
@@ -1728,8 +1743,6 @@ class GeospatialScenario(Scenario):
         if see_added:
             message = f"{func.__name__} added to scenario with arguments {func_params} using template: {template}"
             warnings.warn(message, UserWarning)
-
-
 
     def run(self, hpc_worker_conf: Optional[dict] = None) -> None:
         """
@@ -1744,7 +1757,7 @@ class GeospatialScenario(Scenario):
         -----------
         hpc_worker_conf : dict
             Dictionary containing dask hpc settings (see examples below).
-            When `None`, a default configuration is used. 
+            When `None`, a default configuration is used.
 
             Examples
             --------
@@ -1777,14 +1790,14 @@ class GeospatialScenario(Scenario):
             raise ValueError("Dask Client already exists, cannot configure new client.")
         elif not self.dask_client:
             self.dask_client = pvdeg.geospatial.start_dask(hpc=hpc_worker_conf)
-        
+
         print("Dashboard:", self.dask_client.dashboard_link)
 
         analysis_result = pvdeg.geospatial.analysis(
             weather_ds=self.weather_data,
             meta_df=self.meta_data,
             func=self.func,
-            template=self.template, # provided or generated via autotemplate in GeospatialScenario.addJob
+            template=self.template,  # provided or generated via autotemplate in GeospatialScenario.addJob
         )
 
         self.results = analysis_result
@@ -1892,7 +1905,6 @@ class GeospatialScenario(Scenario):
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
         )
 
-
     def plot_coords(
         self,
         coord_1: Optional[tuple[float]] = None,
@@ -1949,7 +1961,6 @@ class GeospatialScenario(Scenario):
         plt.show()
 
         return fig, ax
-
 
     def plot_meta_classification(
         self,
@@ -2108,14 +2119,15 @@ class GeospatialScenario(Scenario):
 
         return fig, ax
 
-
     def _check_set(self, iterable, to_check: set):
         """Check if iterable is a subset of to_check"""
         if not isinstance(iterable, set):
             iterable = set(iterable)
 
         if not iterable.issubset(to_check):
-            raise ValueError(f"All of iterable: {iterable} does not exist in {to_check}")
+            raise ValueError(
+                f"All of iterable: {iterable} does not exist in {to_check}"
+            )
 
     def format_geospatial_work(self):
         if self.func:
@@ -2265,5 +2277,3 @@ class GeospatialScenario(Scenario):
             """
 
         return weather_data_html
-
-

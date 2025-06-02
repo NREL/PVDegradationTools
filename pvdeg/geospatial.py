@@ -91,12 +91,13 @@ def start_dask(hpc=None):
 
     return client
 
+
 # rename this?
 # and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt really doing anything anymore
 # we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset already then we dont want to anything
 # def _ds_from_arbitrary(res, func):
 #     """
-#     Convert an arbitrary return type to xarray.Dataset. 
+#     Convert an arbitrary return type to xarray.Dataset.
 #     """
 
 #     ######## STRUCTURAL #########
@@ -109,9 +110,9 @@ def start_dask(hpc=None):
 
 #     # if isinstance(res, pysam.inspirePysamReturn):
 #     #     return pysam._handle_pysam_return(res)
-#     # add more conditionals if we have special cases 
+#     # add more conditionals if we have special cases
 #     # or add general case for mixed return dimensions: HARD
-    
+
 #     # handles collections with elements of same shapes
 #     df = _df_from_arbitrary(res=res, func=func)
 #     ds = xr.Dataset.from_dataframe(df)
@@ -176,7 +177,7 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
         meta_gid = utilities.fix_metadata(meta_gid)
 
     # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
-    df_weather = ds_gid.to_dataframe()  
+    df_weather = ds_gid.to_dataframe()
     if isinstance(
         df_weather.index, pd.MultiIndex
     ):  # check for multiindex and convert to just time index, don't know what was causing this
@@ -189,7 +190,7 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
 
     if isinstance(res, xr.Dataset):
         return res
-   
+
     # handles collections with elements of same shapes
     df = _df_from_arbitrary(res=res, func=func)
     ds_res = xr.Dataset.from_dataframe(df)
@@ -261,10 +262,7 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     """
 
     if template is None:
-        template = auto_template(
-            func=func,
-            ds_gids=weather_ds
-        )
+        template = auto_template(func=func, ds_gids=weather_ds)
 
     # future_meta_df = client.scatter(meta_df)
     kwargs = {"func": func, "future_meta_df": meta_df, "func_kwargs": func_kwargs}
@@ -293,10 +291,10 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
 
 def output_template(
     ds_gids: xr.Dataset,
-    shapes: dict, 
-    attrs=dict(), 
-    global_attrs=dict(), 
-    add_dims=dict()
+    shapes: dict,
+    attrs=dict(),
+    global_attrs=dict(),
+    add_dims=dict(),
 ):
     """
     Generates a xarray template for output data. Output variables and
@@ -315,7 +313,7 @@ def output_template(
             "T98_inf": ("gid",),
             "T98_0": ("gid",),
         }
-    
+
     **Note: The dimensions are stored in a tuple, this this why all of the parenthesis have commas after the single string, otherwise python will interpret the value as a string.**
 
     This is what the shapes dictinoary should look like for `pvdeg.humidity.module`. Refering to the docstring,
@@ -355,10 +353,9 @@ def output_template(
         if dim in ds_gids:
             coords[dim] = ds_gids[dim]
         elif dim in add_dims:
-            coords[dim] = np.arange(dims_size[dim]) # placeholder array (edge case)
+            coords[dim] = np.arange(dims_size[dim])  # placeholder array (edge case)
         else:
             raise ValueError(f"dim: {dim} not in ds_gids or add_dims")
-
 
     output_template = xr.Dataset(
         data_vars={
@@ -371,18 +368,14 @@ def output_template(
         },
         coords=coords,
         attrs=global_attrs,
-    ) 
+    )
 
     # we can only chunk dimensions existing in the input
-    # added dimensions will fail if chunked under this scheme 
+    # added dimensions will fail if chunked under this scheme
     # because they do not exist in ds gids
-    if ds_gids.chunks: 
+    if ds_gids.chunks:
         output_template = output_template.chunk(
-            {   
-                dim: ds_gids.chunks[dim] 
-                for dim in dims
-                if dim in ds_gids
-            }
+            {dim: ds_gids.chunks[dim] for dim in dims if dim in ds_gids}
         )
 
     return output_template
@@ -390,7 +383,9 @@ def output_template(
 
 # This has been replaced with pvdeg.geospatial.auto_templates inside of pvdeg.geospatial.analysis.
 # it is here for completeness. it can be removed.
-@decorators.deprecated(reason="use geospatial.auto_template or create a template with geospatial.output_template")
+@decorators.deprecated(
+    reason="use geospatial.auto_template or create a template with geospatial.output_template"
+)
 def template_parameters(func):
     """
     Output parameters for xarray template.
@@ -439,7 +434,6 @@ def template_parameters(func):
             "annual_gh": ("gid",),
             "annual_energy": ("gid",),
             "lcoe_nom": ("gid",),
-
         }
 
         attrs = {
@@ -458,7 +452,7 @@ def template_parameters(func):
             "long_name": "Vertical dataset",
         }
         add_dims = {}
-        
+
     elif func == humidity.module:
         shapes = {
             "RH_surface_outside": ("gid", "time"),
@@ -535,17 +529,18 @@ def zero_template(
 
     return res
 
+
 def can_auto_template(func) -> None:
     """
     Check if we can use `geospatial.auto_template on a given function.
 
     Raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
     No error raised if we can run `geospatial.auto_template` on provided function, `func`.
-    
+
     Parameters
     ----------
     func: callable
-        function to create template from. 
+        function to create template from.
 
     Returns
     -------
@@ -555,7 +550,6 @@ def can_auto_template(func) -> None:
         raise ValueError(
             f"{func.__name__} cannot be autotemplated. create a template manually"
         )
-
 
 
 def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
@@ -598,12 +592,14 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
 
     can_auto_template(func=func)
 
-    if func.numeric_or_timeseries == 'numeric':
+    if func.numeric_or_timeseries == "numeric":
         shapes = {datavar: ("gid",) for datavar in func.shape_names}
-    elif func.numeric_or_timeseries == 'timeseries':
+    elif func.numeric_or_timeseries == "timeseries":
         shapes = {datavar: ("gid", "time") for datavar in func.shape_names}
     else:
-        raise ValueError(f"{func.__name__} 'numeric_or_timseries' attribute invalid. is {func.numeric_or_timeseries} should be 'numeric' or 'timeseries'")
+        raise ValueError(
+            f"{func.__name__} 'numeric_or_timseries' attribute invalid. is {func.numeric_or_timeseries} should be 'numeric' or 'timeseries'"
+        )
 
     template = output_template(ds_gids=ds_gids, shapes=shapes)  # zeros_template?
 
@@ -1082,12 +1078,15 @@ def elevation_stochastic_downselect(
     )
 
     return meta_df.index.values[np.unique(selected_indicies)]
-    #return meta_df.iloc[np.unique(selected_indicies)].index.values
-    #return np.unique(selected_indicies)
+    # return meta_df.iloc[np.unique(selected_indicies)].index.values
+    # return np.unique(selected_indicies)
 
 
 def interpolate_analysis(
-    result: xr.Dataset, data_var: str, method="nearest", resolution=100j,
+    result: xr.Dataset,
+    data_var: str,
+    method="nearest",
+    resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Interpolate sparse spatial result data against DataArray coordinates.
@@ -1125,13 +1124,12 @@ def interpolate_analysis(
 
 # api could be updated to match that of plot_USA
 def plot_sparse_analysis(
-    result: xr.Dataset, 
-    data_var: str, 
-    method="nearest", 
-    resolution=100j, 
-    cmap='viridis',
-    ax=None
-
+    result: xr.Dataset,
+    data_var: str,
+    method="nearest",
+    resolution=100j,
+    cmap="viridis",
+    ax=None,
 ) -> None:
     grid_values, lat, lon = interpolate_analysis(
         result=result, data_var=data_var, method=method, resolution=resolution
@@ -1139,7 +1137,9 @@ def plot_sparse_analysis(
 
     if ax is None:
         fig = plt.figure()
-        ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
+        ax = fig.add_axes(
+            [0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False
+        )
         ax.patch.set_visible(False)
 
         show = True

@@ -15,7 +15,7 @@ import cartopy.feature as cfeature
 
 
 # A mapping to simplify access to files stored in `pvdeg/data`
-pvdeg_datafiles = { 
+pvdeg_datafiles = {
     "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
@@ -530,7 +530,7 @@ def _read_material(name, fname="O2permeation.json"):
 
         # Mike Added
         # broke test
-        # =========== 
+        # ===========
         # material_list = ''
         # print('working')
         # for key in data:
@@ -1063,20 +1063,19 @@ def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
 
 
 def _add_cartopy_features(
-        ax, 
-        features = [
-            cfeature.BORDERS,
-            cfeature.COASTLINE,
-            cfeature.LAND,
-            cfeature.OCEAN,
-            cfeature.LAKES,
-            cfeature.RIVERS,
-        ],
-    ):
+    ax,
+    features=[
+        cfeature.BORDERS,
+        cfeature.COASTLINE,
+        cfeature.LAND,
+        cfeature.OCEAN,
+        cfeature.LAKES,
+        cfeature.RIVERS,
+    ],
+):
     """
     Add cartopy features to an existing matplotlib.pyplot axis.
     """
-   
 
     for i in features:
         if i == cfeature.BORDERS:
@@ -1084,7 +1083,8 @@ def _add_cartopy_features(
         else:
             ax.add_feature(i)
 
-def linear_normalize(array: np.ndarray)->np.ndarray:
+
+def linear_normalize(array: np.ndarray) -> np.ndarray:
     """
     Normalize a non-negative input array.
     """
@@ -1162,9 +1162,10 @@ def _calc_elevation_weights(
     elif normalization == "log":
         # add 1 to shift the domain right so results of log will be positive
         # there may be a better way to do this, the value wont be properly normalized between 0 and 1
-        return linear_normalize(np.log(linear_weights + 1)) 
+        return linear_normalize(np.log(linear_weights + 1))
 
-    raise ValueError(f"""
+    raise ValueError(
+        f"""
         normalization method: {normalization} does not exist.
         must be: "linear", "exp", "log"
         """
@@ -1301,6 +1302,7 @@ def compare_templates(
 
     return True
 
+
 def add_time_columns_tmy(weather_df, coerce_year=1979):
     """
     Add time columns to a tmy weather dataframe.
@@ -1315,40 +1317,43 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
     Returns:
     --------
     weather_df: pd.DataFrame
-        dataframe with columns added new columns will be 
+        dataframe with columns added new columns will be
 
         ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
     """
 
-    weather_df = weather_df.reset_index(drop=True)    
+    weather_df = weather_df.reset_index(drop=True)
 
     if len(weather_df) == 8760:
-        freq = 'h'
+        freq = "h"
     elif len(weather_df) == 17520:
-        freq = '30min'
+        freq = "30min"
     else:
         raise ValueError("weather df must be in 1 hour or 30 minute intervals")
 
     date_range = pd.date_range(
-        start=f'{coerce_year}-01-01 00:00:00', 
-        end=f'{coerce_year}-12-31 23:45:00', # 15 minute internval is highest granularity
-        freq=freq
+        start=f"{coerce_year}-01-01 00:00:00",
+        end=f"{coerce_year}-12-31 23:45:00",  # 15 minute internval is highest granularity
+        freq=freq,
     )
 
-    df = pd.DataFrame({
-        'Year': date_range.year,
-        'Month': date_range.month,
-        'Day': date_range.day,
-        'Hour': date_range.hour,
-        'Minute': date_range.minute
-    })
+    df = pd.DataFrame(
+        {
+            "Year": date_range.year,
+            "Month": date_range.month,
+            "Day": date_range.day,
+            "Hour": date_range.hour,
+            "Minute": date_range.minute,
+        }
+    )
 
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
 
-def merge_sparse(files: list[str])->xr.Dataset:
+
+def merge_sparse(files: list[str]) -> xr.Dataset:
     """
-    Merge an arbitrary number of geospatial analysis results. 
+    Merge an arbitrary number of geospatial analysis results.
     Creates monotonically increasing indicies.
 
     Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.
@@ -1362,11 +1367,11 @@ def merge_sparse(files: list[str])->xr.Dataset:
     Returns
     -------
     merged_ds: xr.Dataset
-        Dataset (in memory) with `coordinates = ['latitude','longitude']` and datavariables matching files in 
+        Dataset (in memory) with `coordinates = ['latitude','longitude']` and datavariables matching files in
         filepaths list.
     """
 
-    datasets = [xr.open_dataset(fp, engine='h5netcdf').compute() for fp in files]
+    datasets = [xr.open_dataset(fp, engine="h5netcdf").compute() for fp in files]
 
     latitudes = np.concatenate([ds.latitude.values for ds in datasets])
     longitudes = np.concatenate([ds.longitude.values for ds in datasets])
@@ -1376,11 +1381,14 @@ def merge_sparse(files: list[str])->xr.Dataset:
     data_vars = datasets[0].data_vars
 
     merged_ds = xr.Dataset(
-        {var: (['latitude', 'longitude'], np.full((len(unique_latitudes), len(unique_longitudes)), np.nan)) for var in data_vars},
-        coords={
-            'latitude': unique_latitudes,
-            'longitude': unique_longitudes
-        }
+        {
+            var: (
+                ["latitude", "longitude"],
+                np.full((len(unique_latitudes), len(unique_longitudes)), np.nan),
+            )
+            for var in data_vars
+        },
+        coords={"latitude": unique_latitudes, "longitude": unique_longitudes},
     )
 
     for ds in datasets:
@@ -1392,10 +1400,11 @@ def merge_sparse(files: list[str])->xr.Dataset:
 
     return merged_ds
 
+
 def display_json(
-    pvdeg_file: str = None, 
-    fp: str = None, 
-    ) -> None:
+    pvdeg_file: str = None,
+    fp: str = None,
+) -> None:
     """
     Interactively view a 2 level JSON file in a JupyterNotebook
 
@@ -1413,39 +1422,43 @@ def display_json(
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
-            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}"
+            )
 
-    with open(fp, 'r') as file:
+    with open(fp, "r") as file:
         data = json.load(file)
 
     def json_to_html(data):
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
-            json_str = json_str.replace(f'"{key}":', f'<span style="color: plum;">"{key}":</span>')
-        
-        indented_html = '<br>'.join([' ' * 4 + line for line in json_str.splitlines()])
+            json_str = json_str.replace(
+                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'
+            )
+
+        indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
         return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
 
     html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
     for key, value in data.items():
         html += (
-            f'<div>'
+            f"<div>"
             f'<strong style="color: white;">{key}:</strong> '
-            f'<span onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === \'none\' ? \'block\' : \'none\'" style="cursor: pointer; color: white;">&#9660;</span>'
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"
             f'<div style="display: none;">{json_to_html(value)}</div>'
-            f'</div>'
+            f"</div>"
         )
-    html += '</div>'
+    html += "</div>"
 
     # Display the HTML
     display(HTML(html))
 
 
 def search_json(
-    pvdeg_file: str = None, 
-    fp: str = None, 
+    pvdeg_file: str = None,
+    fp: str = None,
     name_or_alias: str = None,
-    )-> str:
+) -> str:
     """
     Search through a 2 level JSON with arbitrary key names for subkeys with matching attributes of name or alias.
 
@@ -1469,24 +1482,27 @@ def search_json(
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
-            raise KeyError(rf"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(
+                rf"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}"
+            )
 
     with open(fp, "r") as file:
         data = json.load(file)
 
     for key, subdict in data.items():
         if "name" in subdict and "alias" in subdict:
-            if (subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias):
+            if subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias:
                 return key
 
     raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}")
 
+
 def read_material(
-    pvdeg_file: str = None, 
-    fp: str = None, 
+    pvdeg_file: str = None,
+    fp: str = None,
     key: str = None,
     parameters: list[str] = None,
-)-> dict:
+) -> dict:
     """
     Read material parameters from a `pvdeg/data` file or JSON file path.
 
@@ -1513,18 +1529,21 @@ def read_material(
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
-            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}"
+            )
 
     with open(fp, "r") as file:
         data = json.load(file)
 
     # take subdict from file
-    material_dict = data[key] 
-    
+    material_dict = data[key]
+
     if parameters:
-        material_dict = {k: material_dict.get(k, None) for k in parameters} 
+        material_dict = {k: material_dict.get(k, None) for k in parameters}
 
     return material_dict
+
 
 def add_time_columns_tmy(weather_df, coerce_year=1979):
     """
@@ -1540,34 +1559,35 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
     Returns:
     --------
     weather_df: pd.DataFrame
-        dataframe with columns added new columns will be 
+        dataframe with columns added new columns will be
 
         ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
     """
 
-    weather_df = weather_df.reset_index(drop=True)    
+    weather_df = weather_df.reset_index(drop=True)
 
     if len(weather_df) == 8760:
-        freq = 'h'
+        freq = "h"
     elif len(weather_df) == 17520:
-        freq = '30min'
+        freq = "30min"
     else:
         raise ValueError("weather df must be in 1 hour or 30 minute intervals")
 
     date_range = pd.date_range(
-        start=f'{coerce_year}-01-01 00:00:00', 
-        end=f'{coerce_year}-12-31 23:45:00', # 15 minute internval is highest granularity
-        freq=freq
+        start=f"{coerce_year}-01-01 00:00:00",
+        end=f"{coerce_year}-12-31 23:45:00",  # 15 minute internval is highest granularity
+        freq=freq,
     )
 
-    df = pd.DataFrame({
-        'Year': date_range.year,
-        'Month': date_range.month,
-        'Day': date_range.day,
-        'Hour': date_range.hour,
-        'Minute': date_range.minute
-    })
+    df = pd.DataFrame(
+        {
+            "Year": date_range.year,
+            "Month": date_range.month,
+            "Day": date_range.day,
+            "Hour": date_range.hour,
+            "Minute": date_range.minute,
+        }
+    )
 
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
-

@@ -7,6 +7,7 @@ import functools
 import inspect
 import warnings
 
+
 def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -> None:
     """
     Add an attribute to the functions that can be run with geospatial analysis.
@@ -63,8 +64,9 @@ def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -
 
     return decorator
 
+
 # Taken from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
-# A future Python version (after 3.13) will include the warnings.deprecated decorator 
+# A future Python version (after 3.13) will include the warnings.deprecated decorator
 def deprecated(reason):
     """
     This is a decorator which can be used to mark functions
@@ -72,7 +74,7 @@ def deprecated(reason):
     when the function is used.
     """
 
-    string_types = (type(b''), type(u''))
+    string_types = (type(b""), type(""))
 
     if isinstance(reason, string_types):
 
@@ -93,13 +95,13 @@ def deprecated(reason):
 
             @functools.wraps(func1)
             def new_func1(*args, **kwargs):
-                warnings.simplefilter('always', DeprecationWarning)
+                warnings.simplefilter("always", DeprecationWarning)
                 warnings.warn(
                     fmt1.format(name=func1.__name__, reason=reason),
                     category=DeprecationWarning,
-                    stacklevel=2
+                    stacklevel=2,
                 )
-                warnings.simplefilter('default', DeprecationWarning)
+                warnings.simplefilter("default", DeprecationWarning)
                 return func1(*args, **kwargs)
 
             return new_func1
@@ -125,13 +127,13 @@ def deprecated(reason):
 
         @functools.wraps(func2)
         def new_func2(*args, **kwargs):
-            warnings.simplefilter('always', DeprecationWarning)
+            warnings.simplefilter("always", DeprecationWarning)
             warnings.warn(
                 fmt2.format(name=func2.__name__),
                 category=DeprecationWarning,
-                stacklevel=2
+                stacklevel=2,
             )
-            warnings.simplefilter('default', DeprecationWarning)
+            warnings.simplefilter("default", DeprecationWarning)
             return func2(*args, **kwargs)
 
         return new_func2

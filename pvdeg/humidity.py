@@ -1,5 +1,4 @@
-"""Collection of classes and functions for humidity calculations.
-"""
+"""Collection of classes and functions for humidity calculations."""
 
 import numpy as np
 import pandas as pd
@@ -10,12 +9,7 @@ from rex import Outputs
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from pvdeg import (
-    temperature,
-    spectral,
-    weather,
-    decorators
-)
+from pvdeg import temperature, spectral, weather, decorators
 
 
 def _ambient(weather_df):
@@ -653,7 +647,10 @@ def backsheet(
     return backsheet
 
 
-@decorators.geospatial_quick_shape('timeseries', ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
+@decorators.geospatial_quick_shape(
+    "timeseries",
+    ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"],
+)
 def module(
     weather_df,
     meta,

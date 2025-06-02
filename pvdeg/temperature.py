@@ -3,6 +3,7 @@ Collection of classes and functions to calculate different temperatures.
 """
 
 import pvlib
+
 # import pvdeg
 
 from pvdeg import (
@@ -28,23 +29,23 @@ def map_model(temp_model: str, cell_or_mod: str) -> callable:
 
     # double check that models are in correct maps
     module = {  # only module
-        "sapm"          : pvlib.temperature.sapm_module,
-        "sapm_mod"      : pvlib.temperature.sapm_module,
+        "sapm": pvlib.temperature.sapm_module,
+        "sapm_mod": pvlib.temperature.sapm_module,
     }
 
     cell = {  # only cell
-        "sapm"          : pvlib.temperature.sapm_cell,
-        "sapm_cell"     : pvlib.temperature.sapm_cell,
-        "pvsyst"        : pvlib.temperature.pvsyst_cell,
-        "ross"          : pvlib.temperature.ross,
-        "noct_sam"      : pvlib.temperature.noct_sam,
+        "sapm": pvlib.temperature.sapm_cell,
+        "sapm_cell": pvlib.temperature.sapm_cell,
+        "pvsyst": pvlib.temperature.pvsyst_cell,
+        "ross": pvlib.temperature.ross,
+        "noct_sam": pvlib.temperature.noct_sam,
         "generic_linear": pvlib.temperature.generic_linear,
     }
 
     agnostic = {  # module or cell
-        "faiman"        : pvlib.temperature.faiman,
-        "faiman_rad"    : pvlib.temperature.faiman_rad,
-        "fuentes"       : pvlib.temperature.fuentes,
+        "faiman": pvlib.temperature.faiman,
+        "faiman_rad": pvlib.temperature.faiman_rad,
+        "fuentes": pvlib.temperature.fuentes,
     }
 
     super_map = {"module": module, "cell": cell}
@@ -96,7 +97,7 @@ def _wind_speed_factor(temp_model: str, meta: dict, wind_factor: float):
     return wind_speed_factor
 
 
-@decorators.geospatial_quick_shape('timeseries', ["module_temperature"])
+@decorators.geospatial_quick_shape("timeseries", ["module_temperature"])
 def module(
     weather_df,
     meta,
@@ -187,7 +188,7 @@ def module(
     return module_temperature
 
 
-@decorators.geospatial_quick_shape('timeseries', ["cell_temperature"])
+@decorators.geospatial_quick_shape("timeseries", ["cell_temperature"])
 def cell(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -195,7 +196,7 @@ def cell(
     temp_model: str = "sapm",
     conf: str = "open_rack_glass_polymer",
     wind_factor: float = 0.33,
-    ) -> pd.DataFrame:
+) -> pd.DataFrame:
     """
     Calculate the PV cell temperature using PVLIB
     Currently this only supports the SAPM temperature model.
@@ -302,7 +303,7 @@ def temperature(
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
     irradiance_kwarg={},
-    model_kwarg={}
+    model_kwarg={},
 ):
     """
     Calculate the PV cell or module temperature using PVLIB
@@ -414,4 +415,3 @@ def temperature(
     temperature = func(**model_args)
 
     return temperature
-

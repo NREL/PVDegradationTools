@@ -340,9 +340,7 @@ nC_0 = 0
 
 mechanism_params = utilities.get_kinetics("repins")
 
-timesteps[
-    ["NA", "NB", "NC", "tau"]
-] = (
+timesteps[["NA", "NB", "NC", "tau"]] = (
     np.nan
 )  # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
 

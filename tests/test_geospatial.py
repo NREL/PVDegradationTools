@@ -103,10 +103,12 @@ def test_output_template_unchunked():
     assert pvdeg.utilities.compare_templates(manual_template, HUMIDITY_TEMPLATE)
     for k, v in manual_template.chunks.items():
         if len(v) != 1:
-            raise ValueError(f"""
+            raise ValueError(
+                f"""
                             Need one chunk per axis for an unchunked input
                             dimension {k} has {len(v)} chunks.
-                            """)
+                            """
+            )
 
 
 def test_output_template_chunked():
@@ -127,6 +129,7 @@ def test_output_template_chunked():
         chunked_template, HUMIDITY_TEMPLATE.chunk({"gid": 3})
     )
 
+
 def mixed_res_dict(weather_df, meta):
     """
     geospatial test function. returns have mixed dimensions. they are returned in dictionary form
@@ -136,7 +139,8 @@ def mixed_res_dict(weather_df, meta):
     timeseries_df = pd.DataFrame(pvdeg.temperature.module(weather_df, meta))
     avg_temp = timeseries_df[0].mean()
 
-    return {'temperatures' : timeseries_df, 'avg_temp' : avg_temp}
+    return {"temperatures": timeseries_df, "avg_temp": avg_temp}
+
 
 def mixed_res_dataset(weather_df, meta):
     """
@@ -145,12 +149,10 @@ def mixed_res_dataset(weather_df, meta):
 
     return xr.Dataset(
         data_vars={
-            "temperatures" : (('time'), np.full((8760,), fill_value=80)),
-            "avg_temp": 80
+            "temperatures": (("time"), np.full((8760,), fill_value=80)),
+            "avg_temp": 80,
         },
-        coords={
-            'time' : pd.date_range(start="2001-01-01", periods=8760, freq='1h')
-        }
+        coords={"time": pd.date_range(start="2001-01-01", periods=8760, freq="1h")},
     )
 
 
@@ -163,34 +165,38 @@ def test_mixed_res_dict():
     mixed_res_dict_template = pvdeg.geospatial.output_template(
         ds_gids=GEO_WEATHER,
         shapes={
-            'temperatures': ('gid', 'time'),
-            'avg_temp' : ('gid',),
-        }
+            "temperatures": ("gid", "time"),
+            "avg_temp": ("gid",),
+        },
     )
 
-    with pytest.raises(NotImplementedError, match=r"function return type: <class 'dict'> not available for geospatial analysis yet"):
+    with pytest.raises(
+        NotImplementedError,
+        match=r"function return type: <class 'dict'> not available for geospatial analysis yet",
+    ):
         pvdeg.geospatial.analysis(
             weather_ds=GEO_WEATHER,
             meta_df=GEO_META,
             func=mixed_res_dict,
-            template=mixed_res_dict_template 
+            template=mixed_res_dict_template,
         )
-    
+
+
 # this should not raise any errors
 def test_mixed_res_dataset():
     template = pvdeg.geospatial.output_template(
         ds_gids=GEO_WEATHER,
         shapes={
-            'temperatures': ('gid', 'time'),
-            'avg_temp' : ('gid',),
-        }
+            "temperatures": ("gid", "time"),
+            "avg_temp": ("gid",),
+        },
     )
 
     res = pvdeg.geospatial.analysis(
         weather_ds=GEO_WEATHER,
         meta_df=GEO_META,
         func=mixed_res_dataset,
-        template=template
+        template=template,
     )
 
     assert isinstance(res, xr.Dataset)

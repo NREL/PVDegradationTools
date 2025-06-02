@@ -6,8 +6,9 @@ import pvlib
 import pandas as pd
 from pvdeg import decorators
 
+
 @decorators.geospatial_quick_shape(
-    'timeseries',
+    "timeseries",
     [
         "apparent_zenith",
         "zenith",
@@ -54,7 +55,7 @@ def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 
 
 @decorators.geospatial_quick_shape(
-    'timeseries',
+    "timeseries",
     [
         "poa_global",
         "poa_direct",

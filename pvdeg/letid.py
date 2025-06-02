@@ -1,6 +1,7 @@
 """Collection of functions to calculate LETID or B-O LID defect states, defect state transitions,
 and device degradation given device details
 """
+
 import numpy as np
 import pandas as pd
 import os
@@ -11,9 +12,9 @@ import pvlib
 
 
 from pvdeg import (
-    collection, 
-    utilities, 
-    standards, 
+    collection,
+    utilities,
+    standards,
     decorators,
     DATA_DIR,
 )
@@ -878,7 +879,7 @@ def calc_injection_outdoors(results):
 
 
 @decorators.geospatial_quick_shape(
-    'timeseries',
+    "timeseries",
     [
         "Temperature",
         "Injection",
