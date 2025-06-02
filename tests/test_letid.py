@@ -288,7 +288,7 @@ def test_calc_injection_outdoors():
         temperature_model_parameters=temperature_model_parameters,
     )
 
-    mc = ModelChain(system, location)
+    mc = ModelChain(system, location, spectral_model='sapm')
 
     mc.run_model(WEATHER)
     mc.complete_irradiance(WEATHER)
