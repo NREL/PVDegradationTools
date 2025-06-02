@@ -30,7 +30,7 @@ keywords = [
 dependencies = [
     "aiohttp==3.10.11",
     "numpy>=1.19.3",
-    "pvlib==0.12.0",
+    "pvlib>=0.12.0",
     "scipy>1.6.0",
     "NREL-rex",
     "cartopy",
