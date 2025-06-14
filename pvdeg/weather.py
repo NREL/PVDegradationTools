@@ -66,7 +66,7 @@ def get(database, id=None, geospatial=False, **kwargs):
         Dictionary of metadata for the weather data
 
 
-    Examples
+    Example
     --------
     Collecting a single site of PSM3 NSRDB data. *Api key and email must be replaced with your personal api key and email*. [Request a key!](https://developer.nrel.gov/signup/)
 
@@ -88,33 +88,6 @@ def get(database, id=None, geospatial=False, **kwargs):
     .. code-block:: python
 
         weather_df, meta_dict = pvdeg.weather.get(database="PVGIS", id=(49.95, 1.5))
-
-    Collecting geospatial data from NSRDB on Kestrel (NREL INTERNAL USERS ONLY)
-
-    satellite options:
-        ``"GOES", "METEOSAT", "Himawari", "SUNY", "CONUS", "Americas"``
-
-
-    .. code-block:: python
-
-        weather_db = "NSRDB"
-        weather_arg = {
-            "satellite": "Americas",
-            "names": "TMY",
-            "NREL_HPC": True,
-            "attributes": [
-                    "air_temperature",
-                    "wind_speed",
-                    "dhi",
-                    "ghi",
-                    "dni",
-                    "relative_humidity",
-                ],
-        }
-
-        geo_weather, geo_meta = pvdeg.weather.get(
-            weather_db, geospatial=True, **weather_arg
-        )
     """
 
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
@@ -340,7 +313,6 @@ def map_meta(meta):
         "Local Time Zone": "tz",
         "Time Zone": "tz",
         "timezone": "tz",
-        "TZ":"tz",
         "Dew Point": "dew_point",
         "Longitude": "longitude",
         "Latitude": "latitude",
