@@ -90,9 +90,7 @@ srv_rear = 100  # [cm/s] a reasonable value for rear surface recombination veloc
 # Other device structures will have different SRV values. E.g., aluminum back surface field (Al-BSF) cells could be ~500 cm/s. TopCON or other high efficiency cell structures will be lower, e.g. 10 cm/s.
 # Note that all of these values are intepreted as "lumped" values for the entire rear surface.
 
-isc_0 = df.query(
-    "Week == 0"
-)[
+isc_0 = df.query("Week == 0")[
     "Isc"
 ].item()  # [A] we'll use the short circuit current from the Week 0 test data, instead of trying to calculate it
 cell_area = 240.8  # [cm^2] typical cell size for 6-inch pseudosquare monocrystalline silicon  wafers
@@ -136,9 +134,7 @@ pmp_0, df.query("Week == 0")["Pmp"].item()
 
 tau_deg = 80  # [us] degraded bulk lifetime
 
-isc_deg = df.query(
-    "Week == 4"
-)[
+isc_deg = df.query("Week == 4")[
     "Isc"
 ].item()  # [A] we'll use the short circuit current from the Week 4 test data, instead of trying to calculate it
 jsc_deg = isc_deg / cell_area * 1000  # [mA/cm^2] short circuit current density
