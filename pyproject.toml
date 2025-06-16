@@ -73,7 +73,7 @@ docs = [
 test = [
     "pytest",
     "pytest-cov",
-    "scikit-learn",
+    "sympy",
 ]
 books = [
     "jupyter-book",
