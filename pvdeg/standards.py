@@ -1,6 +1,4 @@
-"""
-Collection of classes and functions for standard development.
-"""
+"""Collection of classes and functions for standard development."""
 
 import numpy as np
 import pandas as pd
@@ -39,10 +37,10 @@ def eff_gap_parameters(
     wind_factor=0.33,
     model_kwarg={},
 ):
-    """
-    Calculate and set up data necessary to calculate the effective standoff distance for rooftop mounded PV system
-    according to IEC TS 63126. The the temperature is modeled for T_0 and T_inf and the corresponding test
-    module temperature must be provided in the weather data.
+    """Calculate and set up data necessary to calculate the effective standoff distance
+    for rooftop mounded PV system according to IEC TS 63126. The the temperature is
+    modeled for T_0 and T_inf and the corresponding test module temperature must be
+    provided in the weather data.
 
     Parameters
     ----------
@@ -93,7 +91,6 @@ def eff_gap_parameters(
         An array of temperature values for a module that is rack mounted, [°C].
     poa : float
         An array of values for the plane of array irradiance, [W/m²]
-
     """
 
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
@@ -142,10 +139,9 @@ def eff_gap_parameters(
 
 
 def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_min=0):
-    """
-    Calculate the effective standoff distance for rooftop mounded PV system
-    according to IEC TS 63126. The 98ᵗʰ percentile calculations for T_0 and T_inf are
-    also calculated.
+    """Calculate the effective standoff distance for rooftop mounded PV system according
+    to IEC TS 63126. The 98ᵗʰ percentile calculations for T_0 and T_inf are also
+    calculated.
 
     Parameters
     ----------
@@ -226,13 +222,10 @@ def standoff(
     irradiance_kwarg={},
     model_kwarg={},
 ) -> pd.DataFrame:
-    """
-    Calculate a minimum standoff distance for roof mounded PV systems.
-    Will default to horizontal tilt. If the azimuth is not provided, it
-    will use equator facing.
-    You can use customized temperature models for the building integrated
-    and the rack mounted configuration, but it will still assume an
-    exponential decay.
+    """Calculate a minimum standoff distance for roof mounded PV systems. Will default
+    to horizontal tilt. If the azimuth is not provided, it will use equator facing. You
+    can use customized temperature models for the building integrated and the rack
+    mounted configuration, but it will still assume an exponential decay.
 
     Parameters
     ----------
@@ -371,9 +364,9 @@ def standoff(
 
 
 def interpret_standoff(standoff_1=None, standoff_2=None):
-    """
-    This is a set of statments designed to provide a printable output to interpret the results of standoff calculations.
-    At a minimum, data for Standoff_1 must be included.
+    """This is a set of statments designed to provide a printable output to interpret
+    the results of standoff calculations. At a minimum, data for Standoff_1 must be
+    included.
 
     Parameters
     ----------
@@ -486,10 +479,9 @@ def T98_estimate(
     x_0=6.5,
     model_kwarg={},
 ):
-    """
-    Estimate the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
-    If any of these factors are supplied, it default to latitide tilt, equatorial facing, and
-    open rack mounted, respectively.
+    """Estimate the 98ᵗʰ percential temperature for the module at the given tilt,
+    azimuth, and x_eff. If any of these factors are supplied, it default to latitide
+    tilt, equatorial facing, and open rack mounted, respectively.
 
     Parameters
     ----------
@@ -537,7 +529,6 @@ def T98_estimate(
     -------
     T98: float
         This is the 98ᵗʰ percential temperature for the module at the given tilt, azimuth, and x_eff.
-
     """
 
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
@@ -605,10 +596,9 @@ def standoff_x(
     wind_factor=None,
     model_kwarg={},
 ):
-    """
-    Calculate a minimum standoff distance for roof mounded PV systems.
-    Will default to horizontal tilt and return only that value. It just passes
-    through the calling function and returns a single value.
+    """Calculate a minimum standoff distance for roof mounded PV systems. Will default
+    to horizontal tilt and return only that value. It just passes through the calling
+    function and returns a single value.
 
     Parameters
     ----------

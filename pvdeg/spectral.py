@@ -1,6 +1,4 @@
-"""
-Collection of classes and functions to obtain spectral parameters.
-"""
+"""Collection of classes and functions to obtain spectral parameters."""
 
 import pvlib
 import pandas as pd
@@ -19,9 +17,8 @@ from pvdeg import decorators
     ],
 )
 def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
-    """
-    Calculate solar position using pvlib based on weather data from the
-    National Solar Radiation Database (NSRDB) for a given location (gid).
+    """Calculate solar position using pvlib based on weather data from the National
+    Solar Radiation Database (NSRDB) for a given location (gid).
 
     Parameters
     ----------
@@ -72,9 +69,8 @@ def poa_irradiance(
     azimuth=None,
     sky_model="isotropic",
 ) -> pd.DataFrame:
-    """
-    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
-    National Solar Radiation Database (NSRDB) for a given location (gid).
+    """Calculate plane-of-array (POA) irradiance using pvlib based on weather data from
+    the National Solar Radiation Database (NSRDB) for a given location (gid).
 
     Parameters
     ----------

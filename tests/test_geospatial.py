@@ -131,9 +131,10 @@ def test_output_template_chunked():
 
 
 def mixed_res_dict(weather_df, meta):
-    """
-    geospatial test function. returns have mixed dimensions. they are returned in dictionary form
-    the first key value is a timeseries, the second key value is a float.
+    """Geospatial test function.
+
+    returns have mixed dimensions. they are returned in dictionary form the first key
+    value is a timeseries, the second key value is a float.
     """
 
     timeseries_df = pd.DataFrame(pvdeg.temperature.module(weather_df, meta))
@@ -143,8 +144,9 @@ def mixed_res_dict(weather_df, meta):
 
 
 def mixed_res_dataset(weather_df, meta):
-    """
-    geospatial test function. returns have mixed dimensions. which are correctly stored in a xr.Dataset
+    """Geospatial test function.
+
+    returns have mixed dimensions. which are correctly stored in a xr.Dataset
     """
 
     return xr.Dataset(

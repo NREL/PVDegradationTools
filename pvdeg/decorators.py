@@ -1,5 +1,5 @@
-"""
-Utility Decorators for PVDeg.
+"""Utility Decorators for PVDeg.
+
 Private API, should only be used in PVDeg implemenation files.
 """
 
@@ -9,10 +9,9 @@ import warnings
 
 
 def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -> None:
-    """
-    Add an attribute to the functions that can be run with geospatial analysis.
-    Strict typing is not enough for this purpose so we can view this attribute
-    at runtime to create a template for the function.
+    """Add an attribute to the functions that can be run with geospatial analysis.
+    Strict typing is not enough for this purpose so we can view this attribute at
+    runtime to create a template for the function.
 
     For single numeric results, includes tabular numeric data
     >>> value = 'numeric'
@@ -68,10 +67,9 @@ def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -
 # Taken from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically
 # A future Python version (after 3.13) will include the warnings.deprecated decorator
 def deprecated(reason):
-    """
-    This is a decorator which can be used to mark functions
-    as deprecated. It will result in a warning being emitted
-    when the function is used.
+    """This is a decorator which can be used to mark functions as deprecated.
+
+    It will result in a warning being emitted when the function is used.
     """
 
     string_types = (type(b""), type(""))

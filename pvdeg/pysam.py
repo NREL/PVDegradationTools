@@ -1,5 +1,5 @@
-"""
-Pysam Integration for pvdeg, supports single site and geospatial calculations.
+"""Pysam Integration for pvdeg, supports single site and geospatial calculations.
+
 Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
 """
 
@@ -25,8 +25,7 @@ def vertical_POA(
     samjsonname="vertical",
     weather_kwarg=None,
 ):
-    """
-    Run a SAM
+    """Run a SAM.
 
     Parameters
     ----------
@@ -161,8 +160,7 @@ def pysam(
     config_files: dict[str:str] = None,
     results: list[str] = None,
 ) -> dict:
-    """
-    Run pySam simulation. Only works with pysam weather.
+    """Run pySam simulation. Only works with pysam weather.
 
     Parameters
     -----------
@@ -369,7 +367,7 @@ def pysam(
 
 # def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
 def _handle_pysam_return(pysam_res_dict: dict, weather_df: pd.DataFrame) -> xr.Dataset:
-    """Handle a pysam return object and transform it to an xarray"""
+    """Handle a pysam return object and transform it to an xarray."""
 
     ground_irradiance = pysam_res_dict["subarray1_ground_rear_spatial"]
 
@@ -430,8 +428,8 @@ INSPIRE_NSRDB_ATTRIBUTES = [
 
 
 def inspire_ground_irradiance(weather_df, meta, config_files):
-    """
-    Get ground irradiance array and annual poa irradiance for a given point using pvsamv1
+    """Get ground irradiance array and annual poa irradiance for a given point using
+    pvsamv1.
 
     Parameters
     ----------
@@ -474,8 +472,7 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
 
 
 def solar_resource_dict(weather_df, meta):
-    """
-    Create a solar resource dict mapping from weather and metadata.
+    """Create a solar resource dict mapping from weather and metadata.
 
     Works on PVGIS and appears to work on NSRDB (NOT PSM3).
     """
@@ -518,9 +515,9 @@ def solar_resource_dict(weather_df, meta):
 
 
 def sample_inspire_result(weather_df, meta):  # throw weather, meta away
-    """
-    returns a sample inspire_ground_irradiance xarray. Dataset for geospatial testing.
-    Weather_df and meta exist to provide a homogenous arugment structure for geospatial calculations but are not used.
+    """Returns a sample inspire_ground_irradiance xarray. Dataset for geospatial
+    testing. Weather_df and meta exist to provide a homogenous arugment structure for
+    geospatial calculations but are not used.
 
     Parameters
     ----------
@@ -553,8 +550,9 @@ def sample_inspire_result(weather_df, meta):  # throw weather, meta away
 
 
 def ground_irradiance_monthly(inspire_res_ds: xr.Dataset) -> xr.Dataset:
-    """
-    Many rows are not populated because the model only calculates ground irradiance when certain measurements are met.
+    """Many rows are not populated because the model only calculates ground irradiance
+    when certain measurements are met.
+
     Drop the rows and calculate the monthly average irradiance at each distance.
     """
 

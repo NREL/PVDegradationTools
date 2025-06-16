@@ -1,6 +1,5 @@
-"""Collection of functions to calculate LETID or B-O LID defect states, defect state transitions,
-and device degradation given device details
-"""
+"""Collection of functions to calculate LETID or B-O LID defect states, defect state
+transitions, and device degradation given device details."""
 
 import numpy as np
 import pandas as pd
@@ -21,9 +20,8 @@ from pvdeg import (
 
 
 def tau_now(tau_0, tau_deg, n_b):
-    """
-    Return carrier lifetime of a LID or LETID-degraded wafer given initial lifetime, fully
-    degraded lifetime, and fraction of defects in recombination-active state B
+    """Return carrier lifetime of a LID or LETID-degraded wafer given initial lifetime,
+    fully degraded lifetime, and fraction of defects in recombination-active state B.
 
     Parameters
     ----------
@@ -44,9 +42,8 @@ def tau_now(tau_0, tau_deg, n_b):
 
 
 def k_ij(attempt_frequency, activation_energy, temperature):
-    """
-    Calculates an Arrhenius rate constant given attempt frequency, activation energy, and
-    temperature
+    """Calculates an Arrhenius rate constant given attempt frequency, activation energy,
+    and temperature.
 
     Parameters
     ----------
@@ -85,9 +82,9 @@ def carrier_factor(
     mechanism_params,
     dn_lit=None,
 ):
-    """
-    Return the delta_n^x_ij term to modify attempt frequency by excess carrier density. See
-    McPherson 2022 [1]_. Requires mechanism_params, a dict of required mechanism parameters.
+    """Return the delta_n^x_ij term to modify attempt frequency by excess carrier
+    density. See McPherson 2022 [1]_. Requires mechanism_params, a dict of required
+    mechanism parameters.
 
     Parameters
     ----------
@@ -135,7 +132,6 @@ def carrier_factor(
     “Excess carrier concentration in silicon devices and wafers: How bulk properties are
     expected to accelerate light and elevated temperature degradation,”
     MRS Advances, vol. 7, pp. 438–443, 2022, doi: 10.1557/s43580-022-00222-5.
-
     """
     q = elementary_charge
 
@@ -221,9 +217,8 @@ def carrier_factor(
 def carrier_factor_wafer(
     tau, transition, suns, jsc, wafer_thickness, mechanism_params, dn_lit=None
 ):
-    r"""
-    Return the delta_n^x_ij term to modify attempt frequency by excess carrier density for a
-    passivated wafer, rather than a solar cell.
+    r"""Return the delta_n^x_ij term to modify attempt frequency by excess carrier
+    density for a passivated wafer, rather than a solar cell.
 
     For a passivated wafer, delta_n increases linearly with lifetime:
 
@@ -273,7 +268,6 @@ def carrier_factor_wafer(
     “Excess carrier concentration in silicon devices and wafers: How bulk properties are
     expected to accelerate light and elevated temperature degradation,”
     MRS Advances, vol. 7, pp. 438–443, 2022, doi: 10.1557/s43580-022-00222-5.
-
     """
     q = elementary_charge
 
@@ -369,9 +363,8 @@ def calc_dn(
     nv=1.6e25,
     e_g=1.79444e-19,
 ):
-    """
-    Return excess carrier concentration, i.e. "injection", given lifetime, temperature,
-    suns-equivalent applied injection, and cell parameters
+    """Return excess carrier concentration, i.e. "injection", given lifetime,
+    temperature, suns-equivalent applied injection, and cell parameters.
 
     Parameters
     ----------
@@ -417,7 +410,6 @@ def calc_dn(
     -------
     dn : numeric
         excess carrier concentration [m^-3]
-
     """
     k = Boltzmann
     q = elementary_charge
@@ -470,8 +462,7 @@ def convert_i_to_v(
     nv=1.6e25,
     e_g=1.79444e-19,
 ):
-    """
-    Return voltage given lifetime and applied current, and cell parameters
+    """Return voltage given lifetime and applied current, and cell parameters.
 
     Parameters
     ----------
@@ -532,8 +523,7 @@ def convert_i_to_v(
 
 
 def j0_gray(ni2, diffusivity, na, diffusion_length, arg, srv):
-    """
-    Returns j0 (saturation current density in quasi-neutral regions of a solar cell)
+    """Returns j0 (saturation current density in quasi-neutral regions of a solar cell)
     as shown in eq. 3.128 in [1]_.
 
     Parameters
@@ -577,8 +567,8 @@ def j0_gray(ni2, diffusivity, na, diffusion_length, arg, srv):
 
 
 def calc_voc_from_tau(tau, wafer_thickness, srv_rear, jsc, temperature, na=7.2e21):
-    """
-    Return solar cell open-circuit voltage (Voc), given lifetime and other device parameters
+    """Return solar cell open-circuit voltage (Voc), given lifetime and other device
+    parameters.
 
     Parameters
     ----------
@@ -619,8 +609,7 @@ def calc_voc_from_tau(tau, wafer_thickness, srv_rear, jsc, temperature, na=7.2e2
 
 
 def calc_device_params(timesteps, cell_area=239):
-    """
-    Returns device parameters given a Dataframe of Jsc and Voc
+    """Returns device parameters given a Dataframe of Jsc and Voc.
 
     Parameters
     ----------
@@ -637,7 +626,6 @@ def calc_device_params(timesteps, cell_area=239):
     -------
     timesteps : DataFrame
         Dataframe with new columns for Isc, FF, Pmp, and normalized Pmp
-
     """
     timesteps.loc[:, "Isc"] = timesteps.loc[:, "Jsc"] * (cell_area / 1000)
     timesteps.loc[:, "FF"] = ff_green(timesteps.loc[:, "Voc"])
@@ -653,8 +641,8 @@ def calc_device_params(timesteps, cell_area=239):
 
 
 def calc_energy_loss(timesteps):
-    """
-    Returns energy loss given a timeseries containing normalized changes in maximum power
+    """Returns energy loss given a timeseries containing normalized changes in maximum
+    power.
 
     Parameters
     ----------
@@ -689,8 +677,8 @@ def calc_energy_loss(timesteps):
 
 
 def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
-    """
-    Returns time to x% regeneration, determined by the percentage of defects in State C.
+    """Returns time to x% regeneration, determined by the percentage of defects in State
+    C.
 
     Parameters
     ----------
@@ -733,8 +721,7 @@ def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
 def calc_pmp_loss_from_tau_loss(
     tau_0, tau_deg, cell_area, wafer_thickness, s_rear, generation=None, depth=None
 ):
-    """
-    Function to estimate power loss from bulk lifetime loss
+    """Function to estimate power loss from bulk lifetime loss.
 
     Parameters
     ----------
@@ -802,8 +789,7 @@ def calc_pmp_loss_from_tau_loss(
 
 
 def calc_ndd(tau_0, tau_deg):
-    """
-    Calculates normalized defect density given starting and ending lifetimes
+    """Calculates normalized defect density given starting and ending lifetimes.
 
     Parameters
     ----------
@@ -823,8 +809,8 @@ def calc_ndd(tau_0, tau_deg):
 
 
 def ff_green(voltage, temperature=298.15):
-    """
-    Calculates the empirical expression for fill factor of Si cells from open-circuit voltage.
+    """Calculates the empirical expression for fill factor of Si cells from open-circuit
+    voltage.
 
     See [1]_, equation 4.
 
@@ -854,9 +840,8 @@ def ff_green(voltage, temperature=298.15):
 
 
 def calc_injection_outdoors(results):
-    """
-    Return "injection" of a pvlib modelchain cell/module/array operated at maximum power point.
-    Injection is normalized to "suns", the fraction of 1-sun irradiance.
+    """Return "injection" of a pvlib modelchain cell/module/array operated at maximum
+    power point. Injection is normalized to "suns", the fraction of 1-sun irradiance.
 
     Parameters
     ----------
@@ -916,8 +901,7 @@ def calc_letid_outdoors(
     temp_model="sapm",
     temperature_model_parameters="open_rack_glass_polymer",
 ):
-    """
-    Models outdoor LETID progression of a device.
+    """Models outdoor LETID progression of a device.
 
     Parameters
     ----------
@@ -1210,9 +1194,8 @@ def calc_letid_lab(
     d_base=27,
     cell_area=239,
 ):
-    """
-    Models LETID progression in a constant temperature and injection (i.e. lab-based accelerated
-    test) environment.
+    """Models LETID progression in a constant temperature and injection (i.e. lab-based
+    accelerated test) environment.
 
     Parameters
     ----------
@@ -1279,7 +1262,6 @@ def calc_letid_lab(
     -------
     timesteps : pandas DataFrame
         Datafame containing defect state percentages, lifetime, and device electrical parameters
-
     """
     if start is None:
         start = datetime.datetime.now()

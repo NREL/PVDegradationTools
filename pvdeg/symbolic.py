@@ -1,6 +1,5 @@
-"""
-Collections of functions to enable arbitrary symbolic expression evaluation for simple models
-"""
+"""Collections of functions to enable arbitrary symbolic expression evaluation for
+simple models."""
 
 import sympy as sp
 import pandas as pd
@@ -14,8 +13,7 @@ def calc_kwarg_floats(
     expr: sp.core.mul.Mul,
     kwarg: dict,
 ) -> float:
-    """
-    Calculate a symbolic sympy expression using a dictionary of values
+    """Calculate a symbolic sympy expression using a dictionary of values.
 
     Parameters:
     ----------
@@ -38,8 +36,7 @@ def calc_df_symbolic(
     expr: sp.core.mul.Mul,
     df: pd.DataFrame,
 ) -> pd.Series:
-    """
-    Calculate the expression over the entire dataframe.
+    """Calculate the expression over the entire dataframe.
 
     Parameters:
     ----------

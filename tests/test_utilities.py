@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -41,8 +40,7 @@ DSETS = [
 
 
 def test_convert_tmy():
-    """
-    Test pvdeg.utilites.convert_tmy
+    """Test pvdeg.utilites.convert_tmy.
 
     Requires:
     ---------

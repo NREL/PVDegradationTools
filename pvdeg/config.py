@@ -1,4 +1,4 @@
-"""Configuration file for pvdeg package"""
+"""Configuration file for pvdeg package."""
 
 from pathlib import Path
 import sys

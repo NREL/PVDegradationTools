@@ -1,6 +1,4 @@
-"""
-Collection of functions for monte carlo simulations.
-"""
+"""Collection of functions for monte carlo simulations."""
 
 import numpy as np
 import pandas as pd
@@ -24,14 +22,13 @@ class Corr:
     correlation = 0
 
     def __init__(self, mc_1_string, mc_2_string, corr):
-        """parameterized constructor"""
+        """Parameterized constructor."""
         self.mc_1 = mc_1_string
         self.mc_2 = mc_2_string
         self.correlation = corr
 
     def getModelingConstants(self) -> list[str, str]:
-        """
-        Helper method. Returns modeling constants in string form.
+        """Helper method. Returns modeling constants in string form.
 
         Parameters
         ----------
@@ -49,8 +46,7 @@ class Corr:
 
 
 def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
-    """
-    Helper function. Generate a symmetric correlation coefficient matrix.
+    """Helper function. Generate a symmetric correlation coefficient matrix.
 
     Parameters
     ----------
@@ -107,8 +103,8 @@ def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
 
 
 def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.DataFrame:
-    """
-    helper function. Unpacks mean and standard deviation for modeling constants into a DataFrame
+    """Helper function. Unpacks mean and standard deviation for modeling constants into
+    a DataFrame.
 
     Parameters
     ----------
@@ -158,10 +154,9 @@ def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.Dat
 def _correlateData(
     samples_to_correlate: pd.DataFrame, stats_for_correlation: pd.DataFrame
 ) -> pd.DataFrame:
-    """
-    helper function. Uses meaningless correlated samples and makes meaningful by
+    """Helper function. Uses meaningless correlated samples and makes meaningful by
     multiplying random samples by their parent modeling constant's standard deviation
-    and adding the mean
+    and adding the mean.
 
     Parameters
     ----------
@@ -198,11 +193,11 @@ def generateCorrelatedSamples(
     # columns are now named, may run into issues if more mean and stdev entries than correlation coefficients
     # havent tested yet but this could cause major issues (see lines 163 and 164 for info)
 
-    """
-    Generates a tall correlated samples numpy array based on correlation coefficients and mean and stdev
-    for modeling constants. Values are correlated from cholesky decomposition of correlation coefficients,
-    and n random samples for each modeling constant generated from a standard distribution with mean = 0
-    and standard deviation = 1.
+    """Generates a tall correlated samples numpy array based on correlation coefficients
+    and mean and stdev for modeling constants. Values are correlated from cholesky
+    decomposition of correlation coefficients, and n random samples for each modeling
+    constant generated from a standard distribution with mean = 0 and standard deviation
+    = 1.
 
     Parameters
     ----------
@@ -277,9 +272,10 @@ def generateCorrelatedSamples(
 def simulate(
     func: Callable, correlated_samples: pd.DataFrame, **function_kwargs
 ) -> pd.Series:
-    """
-    Applies a target function to data to preform a monte carlo simulation. If you get a key error and the target function has default parameters,
-    try adding them to your ``func_kwargs`` dictionary instead of using the default value from the target function.
+    """Applies a target function to data to preform a monte carlo simulation. If you get
+    a key error and the target function has default parameters, try adding them to your
+    ``func_kwargs`` dictionary instead of using the default value from the target
+    function.
 
     Parameters
     ----------

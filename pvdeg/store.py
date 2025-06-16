@@ -9,7 +9,7 @@ from pvdeg import METOROLOGICAL_DOWNLOAD_PATH
 
 
 def my_path():
-    """Finds path to your zarr store of data if it exists"""
+    """Finds path to your zarr store of data if it exists."""
     if os.path.exists(os.path.join(METOROLOGICAL_DOWNLOAD_PATH, ".zattrs")):
         print(METOROLOGICAL_DOWNLOAD_PATH)
 
@@ -18,7 +18,7 @@ def my_path():
 
 
 def _combine_geo_weather_meta(weather_ds: xr.Dataset, meta_df: pd.DataFrame):
-    """Combine weather dataset and meta dataframe into a single dataset"""
+    """Combine weather dataset and meta dataframe into a single dataset."""
 
     meta_ds = xr.Dataset.from_dataframe(meta_df).rename({"index": "gid"})
 
@@ -32,10 +32,8 @@ def _combine_geo_weather_meta(weather_ds: xr.Dataset, meta_df: pd.DataFrame):
 def _seperate_geo_weather_meta(
     ds_from_zarr: xr.Dataset,
 ):
-    """
-    Take loaded dataset in the zarr store schema (weather and meta combined)
-    and seperate it into `weather_ds` and `meta_df`.
-    """
+    """Take loaded dataset in the zarr store schema (weather and meta combined) and
+    seperate it into `weather_ds` and `meta_df`."""
 
     ds_from_zarr["Source"] = ds_from_zarr["Source"].astype(
         object
@@ -66,7 +64,8 @@ def _seperate_geo_weather_meta(
 
 
 def _make_coords_to_gid_da(ds_from_zarr: xr.Dataset):
-    """Create a 2D indexable array that maps coordinates (lat and lon) to gid stored in zarr store"""
+    """Create a 2D indexable array that maps coordinates (lat and lon) to gid stored in
+    zarr store."""
 
     # only want to do this if the arrays are dask arrays
     lats = ds_from_zarr.latitude.to_numpy()
@@ -93,8 +92,9 @@ def _create_sample_sheet(
     wind_height: int = -1,
     Source: str = "SampleSheet",
 ):
-    """
-    Create a dummy sample dataset containing weather for one gid. This will be called a sheet, a single location of weather_data from the dataset with the gid coordinate still present.
+    """Create a dummy sample dataset containing weather for one gid. This will be called
+    a sheet, a single location of weather_data from the dataset with the gid coordinate
+    still present.
 
     The sizes of the dimensions of the sheet will be {"gid": 1, "time": 8760}
 

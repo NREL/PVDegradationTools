@@ -13,8 +13,7 @@ from pvdeg import temperature, spectral, weather, decorators
 
 
 def _ambient(weather_df):
-    """
-    Calculate ambient relative humidity from dry bulb air temperature and dew point
+    """Calculate ambient relative humidity from dry bulb air temperature and dew point.
 
     references:
     Alduchov, O. A., and R. E. Eskridge, 1996: Improved Magnus' form approximation of saturation
@@ -51,10 +50,9 @@ def _ambient(weather_df):
 # TODO: When is dew_yield used?
 @njit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
-    """
-    Estimates the dew yield in [mm/day].  Calculation taken from:
-    Beysens, "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167
-    (2016) 146-155
+    """Estimates the dew yield in [mm/day].  Calculation taken from: Beysens,
+    "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167
+    (2016) 146-155.
 
     Parameters
     -----------
@@ -76,7 +74,6 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     -------
     dew_yield : float
         Amount of dew yield in [mm/day]
-
     """
     wind_speed_cut_off = 4.4
     dew_yield = (1 / 12) * (
@@ -97,11 +94,10 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
 
 
 def psat(temp, average=True):
-    """
-    Function calculated the water saturation temperature or dew point for a given water vapor
-    pressure. Water vapor pressure model created from an emperical fit of ln(Psat) vs
-    temperature using a 6th order polynomial fit. The fit produced R^2=0.999813.
-    Calculation created by Michael Kempe, unpublished data.
+    """Function calculated the water saturation temperature or dew point for a given
+    water vapor pressure. Water vapor pressure model created from an emperical fit of
+    ln(Psat) vs temperature using a 6th order polynomial fit. The fit produced
+    R^2=0.999813. Calculation created by Michael Kempe, unpublished data.
 
     Parameters:
     -----------
@@ -133,8 +129,8 @@ def psat(temp, average=True):
 
 
 def surface_outside(rh_ambient, temp_ambient, temp_module):
-    """
-    Function calculates the Relative Humidity of a Solar Panel Surface at module temperature
+    """Function calculates the Relative Humidity of a Solar Panel Surface at module
+    temperature.
 
     Parameters
     ----------
@@ -149,7 +145,6 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
     --------
     rh_Surface : float
         The relative humidity of the surface of a solar module as a fraction or percent depending on input.
-
     """
     rh_Surface = rh_ambient * (psat(temp_ambient)[0] / psat(temp_module)[0])
 
@@ -163,9 +158,9 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
 def _diffusivity_numerator(
     rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
 ):
-    """
-    Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
-    This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
+    """Calculation is used in determining a weighted average Relative Humidity of the
+    outside surface of a module. This funciton is used exclusively in the function
+    _diffusivity_weighted_water and could be combined.
 
     The function returns values needed for the numerator of the Diffusivity weighted water
     content equation. This function will return a pandas series prior to summation of the
@@ -194,7 +189,6 @@ def _diffusivity_numerator(
     -------
     diff_numerator : pandas series (float)
         Nnumerator of the Sdw equation prior to summation
-
     """
 
     # Get the relative humidity of the surface
@@ -212,9 +206,9 @@ def _diffusivity_numerator(
 
 
 def _diffusivity_denominator(temp_module, Ead=38.14):
-    """
-    Calculation is used in determining a weighted average Relative Humidity of the outside surface of a module.
-    This funciton is used exclusively in the function _diffusivity_weighted_water and could be combined.
+    """Calculation is used in determining a weighted average Relative Humidity of the
+    outside surface of a module. This funciton is used exclusively in the function
+    _diffusivity_weighted_water and could be combined.
 
     The function returns values needed for the denominator of the Diffusivity
     weighted water content equation(diffuse_water). This function will return a pandas
@@ -232,7 +226,6 @@ def _diffusivity_denominator(temp_module, Ead=38.14):
     -------
     diff_denominator : pandas series (float)
         Denominator of the diffuse_water equation prior to summation
-
     """
 
     diff_denominator = np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
@@ -242,9 +235,9 @@ def _diffusivity_denominator(temp_module, Ead=38.14):
 def _diffusivity_weighted_water(
     rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
 ):
-    """
-    Calculation is used in determining a weighted average water content at the surface of a module.
-    It is used as a constant water content that is equivalent to the time varying one with respect to moisture ingress.
+    """Calculation is used in determining a weighted average water content at the
+    surface of a module. It is used as a constant water content that is equivalent to
+    the time varying one with respect to moisture ingress.
 
     The function calculates the Diffusivity weighted water content.
 
@@ -271,7 +264,6 @@ def _diffusivity_weighted_water(
     ------
     diffuse_water : float
         Diffusivity weighted water content
-
     """
 
     numerator = _diffusivity_numerator(
@@ -290,8 +282,8 @@ def _diffusivity_weighted_water(
 
 
 def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
-    """
-    Function returns a diffusivity weighted average Relative Humidity of the module surface.
+    """Function returns a diffusivity weighted average Relative Humidity of the module
+    surface.
 
     Parameters
     ----------
@@ -314,7 +306,6 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729
     ------
     RHfront_series : pandas series (float)
         Relative Humidity of Frontside Solar module Encapsulant [%]
-
     """
     diffuse_water = _diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
@@ -333,9 +324,8 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729
 
 
 def _csat(temp_module, So=1.81390702, Eas=16.729):
-    """
-    Calculation is used in determining Relative Humidity of Backside Solar
-    Module Encapsulant, and returns saturation of Water Concentration [g/cm³]
+    """Calculation is used in determining Relative Humidity of Backside Solar Module
+    Encapsulant, and returns saturation of Water Concentration [g/cm³]
 
     Parameters
     -----------
@@ -353,7 +343,6 @@ def _csat(temp_module, So=1.81390702, Eas=16.729):
     -------
     Csat : pandas series (float)
         Saturation of Water Concentration [g/cm³]
-
     """
 
     # Saturation of water concentration
@@ -363,9 +352,8 @@ def _csat(temp_module, So=1.81390702, Eas=16.729):
 
 
 def _ceq(Csat, rh_SurfaceOutside):
-    """
-    Calculation is used in determining Relative Humidity of Backside Solar
-    Module Encapsulant, and returns Equilibration water concentration (g/cm³)
+    """Calculation is used in determining Relative Humidity of Backside Solar Module
+    Encapsulant, and returns Equilibration water concentration (g/cm³)
 
     Parameters
     ------------
@@ -378,7 +366,6 @@ def _ceq(Csat, rh_SurfaceOutside):
     --------
     Ceq : pandas series (float)
         Equilibration water concentration (g/cm³)
-
     """
 
     Ceq = Csat * (rh_SurfaceOutside / 100)
@@ -397,10 +384,9 @@ def Ce_numba(
     l=0.5,
     Eas=16.729,
 ):
-    """
-    Calculation is used in determining Relative Humidity of Backside Solar
-    Module Encapsulant. This function returns a numpy array of the Concentration of water in the
-    encapsulant at every time step
+    """Calculation is used in determining Relative Humidity of Backside Solar Module
+    Encapsulant. This function returns a numpy array of the Concentration of water in
+    the encapsulant at every time step.
 
     Numba was used to isolate recursion requiring a for loop
     Numba Functions compile and run in machine code but can not use pandas (Very fast).
@@ -439,7 +425,6 @@ def Ce_numba(
     --------
     Ce_list : numpy array
         Concentration of water in the encapsulant at every time step
-
     """
 
     dataPoints = len(temp_module)
@@ -492,8 +477,7 @@ def back_encap(
     l=0.5,
     Eas=16.729,
 ):
-    """
-    rh_back_encap()
+    """rh_back_encap()
 
     Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
     and return a pandas series for each time step
@@ -529,7 +513,6 @@ def back_encap(
     --------
     RHback_series : pandas series (float)
         Relative Humidity of Backside Solar Module Encapsulant [%]
-
     """
 
     rh_surface = surface_outside(
@@ -563,9 +546,9 @@ def back_encap(
 
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
-    """
-    Function to calculate the Relative Humidity of solar module backsheet as timeseries.
-    Requires the RH of the backside encapsulant and the outside surface of the module.
+    """Function to calculate the Relative Humidity of solar module backsheet as
+    timeseries. Requires the RH of the backside encapsulant and the outside surface of
+    the module.
 
     Parameters
     ----------
@@ -595,7 +578,8 @@ def backsheet(
     l=0.5,
     Eas=16.729,
 ):
-    """Function to calculate the Relative Humidity of solar module backsheet as timeseries.
+    """Function to calculate the Relative Humidity of solar module backsheet as
+    timeseries.
 
     Parameters
     ----------

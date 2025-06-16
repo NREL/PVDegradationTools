@@ -20,11 +20,10 @@ from . import (
 
 
 def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
-    """
-    Helper function. Find the rate of degradation kenetics using the Fischer model.
-    Degradation kentics model interpolated 50 coatings with respect to
-    color shift, cracking, gloss loss, fluorescense loss,
-    retroreflectance loss, adhesive transfer, and shrinkage.
+    """Helper function. Find the rate of degradation kenetics using the Fischer model.
+    Degradation kentics model interpolated 50 coatings with respect to color shift,
+    cracking, gloss loss, fluorescense loss, retroreflectance loss, adhesive transfer,
+    and shrinkage.
 
     (ADD IEEE reference)
 
@@ -46,7 +45,6 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
     -------/
     degradationrate : float
         rate of Degradation (NEED TO ADD METRIC)
-
     """
 
     # poa_global ** (p) * Tf ** ((temp - temp_chamber) / 10)
@@ -57,9 +55,9 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
 
 
 def _deg_rate_chamber(I_chamber, p):
-    """
-    Helper function. Find the rate of degradation kenetics of a simulated chamber. Mike Kempe's
-    calculation of the rate of degradation inside a accelerated degradation chamber.
+    """Helper function. Find the rate of degradation kenetics of a simulated chamber.
+    Mike Kempe's calculation of the rate of degradation inside a accelerated degradation
+    chamber.
 
     (ADD IEEE reference)
 
@@ -82,8 +80,7 @@ def _deg_rate_chamber(I_chamber, p):
 
 
 def _acceleration_factor(numerator, denominator):
-    """
-    Helper Function. Find the acceleration factor
+    """Helper Function. Find the acceleration factor.
 
     (ADD IEEE reference)
 
@@ -121,8 +118,7 @@ def vantHoff_deg(
     irradiance_kwarg={},
     model_kwarg={},
 ):
-    """
-    Van't Hoff Irradiance Degradation
+    """Van't Hoff Irradiance Degradation.
 
     Parameters
     -----------
@@ -175,7 +171,6 @@ def vantHoff_deg(
     -------
     accelerationFactor : float or series
         Degradation acceleration factor
-
     """
 
     if poa is None:
@@ -211,8 +206,7 @@ def vantHoff_deg(
 
 
 def _to_eq_vantHoff(temp, Tf=1.41):
-    """
-    Function to obtain the Vant Hoff temperature equivalent [°C]
+    """Function to obtain the Vant Hoff temperature equivalent [°C]
 
     Parameters
     ----------
@@ -225,7 +219,6 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     -------
     Toeq : float
         Vant Hoff temperature equivalent [°C]
-
     """
 
     # toSum = Tf ** (temp / 10)
@@ -345,8 +338,7 @@ def IwaVantHoff(
 
 
 def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
-    """
-    Helper function. Calculates the rate of degredation of the Environmnet
+    """Helper function. Calculates the rate of degredation of the Environmnet.
 
     Parameters
     ----------
@@ -390,8 +382,7 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
 
 
 def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
-    """
-    Helper function. Find the rate of degradation of a simulated chamber.
+    """Helper function. Find the rate of degradation of a simulated chamber.
 
     Parameters
     ----------
@@ -453,10 +444,9 @@ def arrhenius_deg(
     model_kwarg={},
     irradiance_kwarg={},
 ):
-    """
-    Calculate the Acceleration Factor between the rate of degredation of a
-    modeled environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1 year
-    of Controlled Environment exposure is equal to 25 years in the field"
+    """Calculate the Acceleration Factor between the rate of degredation of a modeled
+    environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1
+    year of Controlled Environment exposure is equal to 25 years in the field".
 
     Parameters
     ----------
@@ -521,7 +511,6 @@ def arrhenius_deg(
     --------
     accelerationFactor : pandas series
         Degradation acceleration factor
-
     """
 
     if poa is None:
@@ -566,9 +555,9 @@ def arrhenius_deg(
 
 
 def _T_eq_arrhenius(temp, Ea):
-    """
-    Get the Temperature equivalent required for the settings of the controlled environment
-    Calculation is used in determining Arrhenius Environmental Characterization
+    """Get the Temperature equivalent required for the settings of the controlled
+    environment Calculation is used in determining Arrhenius Environmental
+    Characterization.
 
     Parameters
     -----------
@@ -582,7 +571,6 @@ def _T_eq_arrhenius(temp, Ea):
     Teq : float
         Temperature equivalent (Celsius) required
         for the settings of the controlled environment
-
     """
 
     summationFrame = np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
@@ -595,8 +583,7 @@ def _T_eq_arrhenius(temp, Ea):
 
 
 def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
-    """
-    NOTE
+    """NOTE.
 
     Get the Relative Humidity Weighted Average.
     Calculation is used in determining Arrhenius Environmental Characterization
@@ -620,7 +607,6 @@ def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
     --------
     RHwa : float
         Relative Humidity Weighted Average [%]
-
     """
 
     if Teq is None:
@@ -657,10 +643,8 @@ def IwaArrhenius(
     model_kwarg={},
     irradiance_kwarg={},
 ) -> float:
-    """
-    Function to calculate IWa, the Environment Characterization [W/m²].
-    For one year of degredation the controlled environmnet lamp settings will
-    need to be set at IWa.
+    """Function to calculate IWa, the Environment Characterization [W/m²]. For one year
+    of degredation the controlled environmnet lamp settings will need to be set at IWa.
 
     Parameters
     ----------
@@ -772,8 +756,7 @@ def IwaArrhenius(
 
 
 def _rh_Above85(rh):
-    """
-    Helper function. Determines if the relative humidity is above 85%.
+    """Helper function. Determines if the relative humidity is above 85%.
 
     Parameters
     ----------
@@ -785,7 +768,6 @@ def _rh_Above85(rh):
     rhabove85 : boolean
         True if the relative humidity is above 85% or False if the relative
         humidity is below 85%
-
     """
 
     if rh > 85:
@@ -798,8 +780,7 @@ def _rh_Above85(rh):
 
 
 def _hoursRH_Above85(df):
-    """
-    Helper Function. Count the number of hours relative humidity is above 85%.
+    """Helper Function. Count the number of hours relative humidity is above 85%.
 
     Parameters
     ----------
@@ -810,7 +791,6 @@ def _hoursRH_Above85(df):
     -------
     numhoursabove85 : int
         Number of hours relative humidity is above 85%
-
     """
     booleanDf = df.apply(lambda x: _rh_Above85(x))
     numhoursabove85 = booleanDf.sum()
@@ -874,10 +854,9 @@ def degradation(
     C2: float = 0.07,
     C: float = 1.0,
 ) -> float:
-    """
-    Compute degredation as double integral of Arrhenius (Activation
-    Energy, RH, Temperature) and spectral (wavelength, irradiance)
-    functions over wavelength and time.
+    """Compute degredation as double integral of Arrhenius (Activation Energy, RH,
+    Temperature) and spectral (wavelength, irradiance) functions over wavelength and
+    time.
 
     Parameters
     ----------
@@ -908,7 +887,6 @@ def degradation(
     -------
     degradation : float
         Total degredation factor over time and wavelength.
-
     """
     # --- TO DO ---
     # unpack input-dataframe
@@ -958,8 +936,7 @@ def degradation(
 def vecArrhenius(
     poa_global: np.ndarray, module_temp: np.ndarray, ea: float, x: float, lnr0: float
 ) -> float:
-    """
-    Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
+    """Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
 
     Parameters
     ----------
@@ -982,7 +959,6 @@ def vecArrhenius(
     ----------
     degredation : float
         Degradation Rate [%/h]
-
     """
 
     mask = poa_global >= 25

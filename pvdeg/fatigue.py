@@ -6,8 +6,8 @@ from pvdeg import temperature, decorators
 
 
 def _avg_daily_temp_change(time_range, temp_cell):
-    """
-    Helper function. Get the average of a year for the daily maximum temperature change.
+    """Helper function. Get the average of a year for the daily maximum temperature
+    change.
 
     For every 24hrs this function will find the delta between the maximum
     temperature and minimun temperature.  It will then take the deltas for
@@ -27,7 +27,6 @@ def _avg_daily_temp_change(time_range, temp_cell):
         Average Daily Temerature Change for 1-year (Celsius)
     avg_max_temp_cell : float
         Average of Daily Maximum Temperature for 1-year (Celsius)
-
     """
 
     if time_range.dtype == "object":
@@ -61,9 +60,8 @@ def _avg_daily_temp_change(time_range, temp_cell):
 
 
 def _times_over_reversal_number(temp_cell, reversal_temp):
-    """
-    Helper function. Get the number of times a temperature increases or decreases over a
-    specific temperature gradient.
+    """Helper function. Get the number of times a temperature increases or decreases
+    over a specific temperature gradient.
 
     Parameters
     ------------
@@ -76,7 +74,6 @@ def _times_over_reversal_number(temp_cell, reversal_temp):
     --------
     num_changes_temp_hist : int
         Number of times the temperature threshold is crossed
-
     """
     # Find the number of times the temperature crosses over 54.8(°C)
 
@@ -115,8 +112,7 @@ def solder_fatigue(
     model_kwarg={},
     irradiance_kwarg={},
 ) -> float:
-    """
-    Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
+    """Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
     Damage will be returned as the rate of solder fatigue for one year. Based on:
 
         Bosco, N., Silverman, T. and Kurtz, S. (2020). Climate specific thermomechanical
@@ -189,7 +185,6 @@ def solder_fatigue(
     --------
     damage : float series
         Solder fatigue damage for a time interval depending on time_range [kPa]
-
     """
 
     # TODO this, and many other functions with temp_cell or temp_module would benefit from an

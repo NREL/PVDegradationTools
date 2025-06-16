@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -52,9 +51,7 @@ def test_colum_name():
 
 
 def test_get():
-    """
-    Test with (lat,lon) and gid options
-    """
+    """Test with (lat,lon) and gid options."""
     # TODO: Test with AWS
 
     # #Test with lat, lon on NREL HPC
@@ -106,9 +103,7 @@ def test_get_NSRDB_fnames():
 
 
 def test_get_NSRDB():
-    """
-    Contained within get_weather()
-    """
+    """Contained within get_weather()"""
     pass
 
 

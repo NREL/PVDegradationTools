@@ -14,9 +14,8 @@ API_KEY = "DEMO_KEY"
 
 
 def monkeypatch_addLocation(self, *args, **kwargs) -> None:
-    """
-    mocker function to be monkey patched at runtime for Scenario.addLocation to avoid psm3 api calls and use local weather files instead.
-    """
+    """Mocker function to be monkey patched at runtime for Scenario.addLocation to avoid
+    psm3 api calls and use local weather files instead."""
 
     PSM_FILE = os.path.join(TEST_DATA_DIR, r"psm3_pytest.csv")
     weather_df, meta = weather.read(PSM_FILE, "psm")

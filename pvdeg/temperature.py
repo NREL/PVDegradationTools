@@ -1,6 +1,4 @@
-"""
-Collection of classes and functions to calculate different temperatures.
-"""
+"""Collection of classes and functions to calculate different temperatures."""
 
 import pvlib
 
@@ -17,8 +15,7 @@ import inspect
 
 
 def map_model(temp_model: str, cell_or_mod: str) -> callable:
-    """
-    Utility function to map string to pvlib function.
+    """Utility function to map string to pvlib function.
 
     References
     ----------
@@ -106,8 +103,7 @@ def module(
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
 ):
-    """
-    Calculate module surface temperature using pvlib.
+    """Calculate module surface temperature using pvlib.
 
     Parameters
     ----------
@@ -151,8 +147,8 @@ def module(
             wind_speed_factor = (5 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "ross":
             wind_speed_factor = (
-                10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess the temperature model height on this one, Kempe
+                (10 / float(meta["wind_height"])) ** wind_factor
+            )  # I had to guess the temperature model height on this one, Kempe
         elif temp_model == "noct_sam":
             if meta["wind_height"] > 3:
                 wind_speed_factor = 2
@@ -197,9 +193,8 @@ def cell(
     conf: str = "open_rack_glass_polymer",
     wind_factor: float = 0.33,
 ) -> pd.DataFrame:
-    """
-    Calculate the PV cell temperature using PVLIB
-    Currently this only supports the SAPM temperature model.
+    """Calculate the PV cell temperature using PVLIB Currently this only supports the
+    SAPM temperature model.
 
     Parameters
     -----------
@@ -250,8 +245,8 @@ def cell(
             wind_speed_factor = (5 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "ross":
             wind_speed_factor = (
-                10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess what the wind height for this temperature model was on this one, Kempe.
+                (10 / float(meta["wind_height"])) ** wind_factor
+            )  # I had to guess what the wind height for this temperature model was on this one, Kempe.
         elif temp_model == "notc_sam":
             if float(meta["wind_height"]) > 3:
                 wind_speed_factor = 2

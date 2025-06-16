@@ -1,6 +1,4 @@
-"""
-Collection of classes and functions for geospatial analysis.
-"""
+"""Collection of classes and functions for geospatial analysis."""
 
 from pvdeg import (
     standards,
@@ -31,8 +29,7 @@ from shapely import LineString, MultiLineString
 
 
 def start_dask(hpc=None):
-    """
-    Starts a dask cluster for parallel processing.
+    """Starts a dask cluster for parallel processing.
 
     Parameters
     ----------
@@ -124,8 +121,8 @@ def start_dask(hpc=None):
 
 
 def _df_from_arbitrary(res, func):
-    """
-    Convert an arbitrary return type to dataframe.
+    """Convert an arbitrary return type to dataframe.
+
     Results must be of similar shape currently. Either all numerics or all timeseries.
     """
     numerics = (int, float, np.number)
@@ -151,8 +148,7 @@ def _df_from_arbitrary(res, func):
 
 
 def calc_gid(ds_gid, meta_gid, func, **kwargs):
-    """
-    Calculates a single gid for a given function.
+    """Calculates a single gid for a given function.
 
     Parameters
     ----------
@@ -202,8 +198,7 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
 
 
 def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
-    """
-    Calculates a block of gids for a given function.
+    """Calculates a block of gids for a given function.
 
     Parameters
     ----------
@@ -234,9 +229,9 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
 
 
 def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
-    """
-    Applies a function to each gid of a weather dataset. `analysis` will attempt to create a template using `geospatial.auto_template`.
-    If this process fails you will have to provide a geospatial template to the template argument.
+    """Applies a function to each gid of a weather dataset. `analysis` will attempt to
+    create a template using `geospatial.auto_template`. If this process fails you will
+    have to provide a geospatial template to the template argument.
 
     ValueError: <function-name> cannot be autotemplated. create a template manually with `geospatial.output_template`
 
@@ -296,11 +291,10 @@ def output_template(
     global_attrs=dict(),
     add_dims=dict(),
 ):
-    """
-    Generates a xarray template for output data. Output variables and
-    associated dimensions need to be specified via the shapes dictionary.
-    The dimension length are derived from the input data. Additonal output
-    dimensions can be defined with the add_dims argument.
+    """Generates a xarray template for output data. Output variables and associated
+    dimensions need to be specified via the shapes dictionary. The dimension length are
+    derived from the input data. Additonal output dimensions can be defined with the
+    add_dims argument.
 
     Examples
     --------
@@ -387,8 +381,7 @@ def output_template(
     reason="use geospatial.auto_template or create a template with geospatial.output_template"
 )
 def template_parameters(func):
-    """
-    Output parameters for xarray template.
+    """Output parameters for xarray template.
 
     Returns
     -------
@@ -531,8 +524,7 @@ def zero_template(
 
 
 def can_auto_template(func) -> None:
-    """
-    Check if we can use `geospatial.auto_template on a given function.
+    """Check if we can use `geospatial.auto_template on a given function.
 
     Raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
     No error raised if we can run `geospatial.auto_template` on provided function, `func`.
@@ -696,9 +688,8 @@ def plot_Europe(
 
 
 def meta_KDtree(meta_df, leaf_size=40, fp=None):
-    """
-    Create a sklearn.neighbors.KDTree for fast geospatial lookup operations.
-    Requires Scikit Learn library. Not included in pvdeg depency list.
+    """Create a sklearn.neighbors.KDTree for fast geospatial lookup operations. Requires
+    Scikit Learn library. Not included in pvdeg depency list.
 
     Parameters
     -----------
@@ -775,13 +766,11 @@ def identify_mountains_radii(
     elevation_floor=0,
     bbox_kwarg={},
 ) -> np.array:
-    """
-    Find mountains from elevation metadata using sklearn kdtree for fast lookup.
-    Compares a large area of points to a small area of points to find
-    significant changes in elevation representing mountains. Tweak the radii
-    to determine the sensitivity and noise. Bad radii cause the result to
-    become unstable quickly. kdtree can be generated using
-    ``pvdeg.geospatial.meta_KDTree``
+    """Find mountains from elevation metadata using sklearn kdtree for fast lookup.
+    Compares a large area of points to a small area of points to find significant
+    changes in elevation representing mountains. Tweak the radii to determine the
+    sensitivity and noise. Bad radii cause the result to become unstable quickly. kdtree
+    can be generated using ``pvdeg.geospatial.meta_KDTree``
 
     Parameters:
     -----------
@@ -837,8 +826,7 @@ def identify_mountains_weights(
     method="mean",
     normalization="linear",
 ) -> np.array:
-    """
-    Find mountains using weights calculated via changes in nearest neighbors
+    """Find mountains using weights calculated via changes in nearest neighbors
     elevations.
 
     Parameters:
@@ -980,8 +968,8 @@ def feature_downselect(
 def apply_bounding_box(
     meta_df: pd.DataFrame, coord_1=None, coord_2=None, coords=None
 ) -> np.array:
-    """
-    Apply a latitude-longitude rectangular bounding box to existing geospatial metadata.
+    """Apply a latitude-longitude rectangular bounding box to existing geospatial
+    metadata.
 
     Parameters:
     -----------
@@ -1028,12 +1016,10 @@ def elevation_stochastic_downselect(
     method: str = "mean",
     normalization: str = "linear",
 ):
-    """
-    Downsample assigning each point a weight associated with its neighbors
-    changes in height. Randomly choose points based on weights to
-    preferentially select points next to or in mountains while drastically
-    lowering the density of points in flat areas to find a non-uniformly dense
-    sub-sample of original data points.
+    """Downsample assigning each point a weight associated with its neighbors changes in
+    height. Randomly choose points based on weights to preferentially select points next
+    to or in mountains while drastically lowering the density of points in flat areas to
+    find a non-uniformly dense sub-sample of original data points.
 
     Parameters:
     -----------
@@ -1088,9 +1074,8 @@ def interpolate_analysis(
     method="nearest",
     resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Interpolate sparse spatial result data against DataArray coordinates.
-    Takes DataArray instead of Dataset, index one variable of a dataset to get a dataarray.
+    """Interpolate sparse spatial result data against DataArray coordinates. Takes
+    DataArray instead of Dataset, index one variable of a dataset to get a dataarray.
 
     Parameters:
     -----------

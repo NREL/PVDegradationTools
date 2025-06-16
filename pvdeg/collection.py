@@ -1,4 +1,4 @@
-"""Collection of functions related to calculating current collection in solar cells"""
+"""Collection of functions related to calculating current collection in solar cells."""
 
 import numpy as np
 from scipy.integrate import simpson
@@ -8,9 +8,8 @@ import photovoltaic as pv
 
 
 def collection_probability(x, thickness, s, l, d):
-    """
-    Returns the collection probability (unit 0 to 1) at a distance x (cm) from the junction.
-    See [1]_.
+    """Returns the collection probability (unit 0 to 1) at a distance x (cm) from the
+    junction. See [1]_.
 
     Parameters
     ----------
@@ -65,8 +64,7 @@ def calculate_jsc_from_tau_cp(
     s_emitter=1e4,
     xp=0.00000024,
 ):
-    """
-    Returns cell Jsc given lifetime and cell parameters
+    """Returns cell Jsc given lifetime and cell parameters.
 
     Jsc is calculated via integrating collection probability and optical generation
     profiles through the wafer depth. Includes contribution of the emitter, depletion
@@ -141,7 +139,6 @@ def calculate_jsc_from_tau_cp(
     .. [3] W. J. Yang, Z. Q. Ma, X. Tang, C. B. Feng, W. G. Zhao, and P. P. Shi, “Internal quantum
     efficiency for solar cells,” Solar Energy, vol. 82, no. 2, pp. 106–110, Feb. 2008, doi:
     10.1016/j.solener.2007.07.010.
-
     """
     q = elementary_charge
 
@@ -209,8 +206,7 @@ def calculate_jsc_from_tau_iqe(
     s_emitter=1e4,
     xp=0.00000024,
 ):
-    """
-    Returns cell Jsc given lifetime and cell parameters
+    """Returns cell Jsc given lifetime and cell parameters.
 
     Calculates Jsc via calculating cell internal quantum efficiency (IQE) and absorption
     for Si
@@ -320,8 +316,7 @@ def calculate_jsc_from_tau_iqe(
 
 
 def generation_current(generation, depth):
-    """
-    Returns cell generation current given generation profile
+    """Returns cell generation current given generation profile.
 
     Parameters
     ----------

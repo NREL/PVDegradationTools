@@ -36,8 +36,7 @@ ARRHENIUS_RESULT = pd.read_csv(
 
 
 def test_generateCorrelatedSamples():
-    """
-    test pvdeg.montecarlo.generateCorrelatedSamples
+    """Test pvdeg.montecarlo.generateCorrelatedSamples.
 
     Requires:
     ---------
@@ -93,8 +92,7 @@ def test_generateCorrelatedSamples():
 
 
 def test_simulate():
-    """
-    test pvdeg.montecarlo.simulate
+    """Test pvdeg.montecarlo.simulate.
 
     Requires:
     ---------

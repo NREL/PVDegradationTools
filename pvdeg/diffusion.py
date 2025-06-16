@@ -1,6 +1,5 @@
-"""
-Collection of classes and functions to calculate diffusion of permeants into a PV module.
-"""
+"""Collection of classes and functions to calculate diffusion of permeants into a PV
+module."""
 
 import os
 import json
@@ -36,10 +35,10 @@ def esdiffusion(
     printout=True,
     **kwarg,
 ):
-    """
-    Calculate 1-D diffusion into the edge of a PV module. This assumes an edge seal and a limited length of encapsulant.
-    In the future it will be able to run calculations for degradation and for water ingress, but initially I'm just
-    writing it to run calculations for oxygen ingress.
+    """Calculate 1-D diffusion into the edge of a PV module. This assumes an edge seal
+    and a limited length of encapsulant. In the future it will be able to run
+    calculations for degradation and for water ingress, but initially I'm just writing
+    it to run calculations for oxygen ingress.
 
     Parameters
     ----------
@@ -161,11 +160,11 @@ def esdiffusion(
     dod = Dos / Doe
     ead = Eads - Eade
 
-    edge_seal_width = edge_seal_width / (
-        seal_nodes - 0.5
+    edge_seal_width = (
+        edge_seal_width / (seal_nodes - 0.5)
     )  # The 0.5 is put in there because the model exterior is defined as the center of the edge node.
-    encapsulant_width = encapsulant_width / (
-        encapsulant_nodes - 0.5
+    encapsulant_width = (
+        encapsulant_width / (encapsulant_nodes - 0.5)
     )  # The 0.5 is put in because the model interior encapsulant node is a point of symmetry and defines the condition at the center line.
 
     perm_mid = np.array(

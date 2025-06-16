@@ -1,6 +1,4 @@
-"""
-Collection of classes and functions to obtain spectral parameters.
-"""
+"""Collection of classes and functions to obtain spectral parameters."""
 
 import dask.distributed
 from pvdeg import humidity
@@ -38,9 +36,8 @@ ENTRIES_PERIODICITY_MAP = {
 
 
 def get(database, id=None, geospatial=False, **kwargs):
-    """
-    Load weather data directly from  NSRDB or through any other PVLIB i/o
-    tools function.
+    """Load weather data directly from  NSRDB or through any other PVLIB i/o tools
+    function.
 
     Parameters
     -----------
@@ -173,8 +170,7 @@ def get(database, id=None, geospatial=False, **kwargs):
 
 
 def read(file_in, file_type, map_variables=True, **kwargs):
-    """
-    Read a locally stored weather file of any PVLIB compatible type
+    """Read a locally stored weather file of any PVLIB compatible type.
 
     #TODO: add error handling
 
@@ -223,11 +219,9 @@ def read(file_in, file_type, map_variables=True, **kwargs):
 
 
 def csv_read(filename):
-    """
-    Read a locally stored csv weather file. The first line contains the meta data
+    """Read a locally stored csv weather file. The first line contains the meta data
     variable names, and the second line contains the meta data values. This is followed
     by the meterological data.
-
 
     Parameters:
     -----------
@@ -390,9 +384,7 @@ def map_weather(weather_df):
 
 
 def read_h5(gid, file, attributes=None, **_):
-    """
-    Read a locally stored h5 weather file that follows NSRDB conventions.
-
+    """Read a locally stored h5 weather file that follows NSRDB conventions.
 
     Parameters:
     -----------
@@ -439,9 +431,8 @@ def read_h5(gid, file, attributes=None, **_):
 
 
 def ini_h5_geospatial(fps):
-    """
-    initialize an h5 weather file that follows NSRDB conventions for
-    geospatial analyses.
+    """Initialize an h5 weather file that follows NSRDB conventions for geospatial
+    analyses.
 
     Parameters:
     -----------
@@ -544,8 +535,7 @@ def ini_h5_geospatial(fps):
 
 
 def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
-    """
-    Get a list of NSRDB files for a given satellite and year
+    """Get a list of NSRDB files for a given satellite and year.
 
     Parameters:
     -----------
@@ -613,8 +603,7 @@ def get_NSRDB(
     attributes=None,
     **_,
 ):
-    """
-    Get NSRDB weather data from different satellites and years.
+    """Get NSRDB weather data from different satellites and years.
 
     Provide either gid or location tuple.
 
@@ -728,12 +717,10 @@ def get_NSRDB(
 
 
 def repeat_annual_time_series(time_series, start_year, n_years):
-    """
-    Repeat a pandas time series dataframe containing annual data.
-    For example, repeat TMY data by n_years, adding in leap days as necessary.
-    For now, this function requires 1 or more full years of uniform
-    interval (non-leap year) data, i.e. length must be a multiple of 8760.
-    On leap days, all data is set to 0.
+    """Repeat a pandas time series dataframe containing annual data. For example, repeat
+    TMY data by n_years, adding in leap days as necessary. For now, this function
+    requires 1 or more full years of uniform interval (non-leap year) data, i.e. length
+    must be a multiple of 8760. On leap days, all data is set to 0.
 
     TODO: make it possible to have weirder time series, e.g. non uniform intervals.
     Include option for synthetic leap day data
@@ -840,7 +827,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
 
 
 def is_leap_year(year):
-    """Returns True if year is a leap year"""
+    """Returns True if year is a leap year."""
     if year % 4 != 0:
         return False
     elif year % 100 != 0:
@@ -852,9 +839,9 @@ def is_leap_year(year):
 
 
 def get_satellite(location):
-    """
-    identify a satellite to use for a given lattitude and longitude. This is to provide default values worldwide, but a more
-    experienced user may want to specify a specific satellite to get better data.
+    """Identify a satellite to use for a given lattitude and longitude. This is to
+    provide default values worldwide, but a more experienced user may want to specify a
+    specific satellite to get better data.
 
     Provide a location tuple.
 
@@ -880,12 +867,11 @@ def get_satellite(location):
 
 
 def write(data_df, metadata, savefile="WeatherFile.csv"):
-    """
-    Saves dataframe with weather data and any associated meta data in an *.csv format.
-    The metadata will be formatted on the first two lines with the first being the descriptor
-    and the second line being the value. Then the meterological, time and other data series
-    headers on on the third line with all the subsequent data on the remaining lines. This
-    format can be read by the PVDeg software.
+    """Saves dataframe with weather data and any associated meta data in an *.csv
+    format. The metadata will be formatted on the first two lines with the first being
+    the descriptor and the second line being the value. Then the meterological, time and
+    other data series headers on on the third line with all the subsequent data on the
+    remaining lines. This format can be read by the PVDeg software.
 
     Parameters
     -----------
@@ -926,7 +912,6 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
     Returns
     -------
     Nothing, it just writes the file.
-
     """
 
     meta_string = (
@@ -955,9 +940,8 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
 
 
 def get_anywhere(database="PSM3", id=None, **kwargs):
-    """
-    Load weather data directly from  NSRDB or through any other PVLIB i/o
-    tools function. Only works for a single location look-up, not for geospatial analysis.
+    """Load weather data directly from  NSRDB or through any other PVLIB i/o tools
+    function. Only works for a single location look-up, not for geospatial analysis.
 
     Parameters:
     -----------
@@ -1020,8 +1004,8 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
 
 
 def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
-    """
-    Roll/wrap the ends of a TMY UTC DataFrame to align with local times based on timezone offset.
+    """Roll/wrap the ends of a TMY UTC DataFrame to align with local times based on
+    timezone offset.
 
     Parameters:
     ----------
@@ -1129,7 +1113,8 @@ def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 
 # RENAME, THIS SHOULD NOT REFERENCE PVGIS
 def _process_weather_result_distributed(weather_df):
-    """Create an xarray.Dataset using numpy array backend from a pvgis weather dataframe"""
+    """Create an xarray.Dataset using numpy array backend from a pvgis weather
+    dataframe."""
 
     import dask.array as da
 
@@ -1150,8 +1135,7 @@ def _weather_distributed_vec(
     api_key: str,  # NSRDB api key
     email: str,  # NSRDB developer email
 ):
-    """
-    Distributed weather calculation for use with dask futures/delayed
+    """Distributed weather calculation for use with dask futures/delayed.
 
     Parameters
     ----------
@@ -1193,8 +1177,7 @@ def _weather_distributed_vec(
 # THE NSRDB shapes could be moved to their own definition
 # organization style question?
 def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
-    """
-    Create an empty weather dataframe for generalized input.
+    """Create an empty weather dataframe for generalized input.
 
     Parameters
     ---------
@@ -1293,9 +1276,9 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
 def weather_distributed(
     database: str, coords: list[tuple], api_key: str = None, email: str = None
 ):
-    """
-    Grab weather using pvgis for all of the following locations using dask for parallelization.
-    You must create a dask client with multiple processes before calling this function, otherwise results will not be properly calculated.
+    """Grab weather using pvgis for all of the following locations using dask for
+    parallelization. You must create a dask client with multiple processes before
+    calling this function, otherwise results will not be properly calculated.
 
     PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads
     that would put you over this limit.

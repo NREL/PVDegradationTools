@@ -23,8 +23,7 @@ pvdeg_datafiles = {
 
 
 def gid_downsampling(meta, n):
-    """
-    Downsample the NSRDB GID grid by a factor of n
+    """Downsample the NSRDB GID grid by a factor of n.
 
     Parameters:
     -----------
@@ -58,8 +57,7 @@ def gid_downsampling(meta, n):
 
 
 def meta_as_dict(rec):
-    """
-    Turn a numpy recarray record into a dict.
+    """Turn a numpy recarray record into a dict.
 
     Parameters:
     -----------
@@ -76,8 +74,7 @@ def meta_as_dict(rec):
 
 
 def get_kinetics(name=None, fname="kinetic_parameters.json"):
-    """
-    Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
+    """Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json.
 
     Parameters:
     -----------
@@ -111,9 +108,8 @@ def write_gids(
     gids=None,
     out_fn="gids",
 ):
-    """
-    Generate a .CSV file containing the GIDs for the spatial test range.
-    The .CSV file will be saved to the working directory
+    """Generate a .CSV file containing the GIDs for the spatial test range. The .CSV
+    file will be saved to the working directory.
 
     TODO: specify output file name and directory?
 
@@ -153,8 +149,7 @@ def write_gids(
 
 
 def _get_state(id):
-    """
-    Returns the full name of a state based on two-letter state code
+    """Returns the full name of a state based on two-letter state code.
 
     Parameters:
     -----------
@@ -232,9 +227,8 @@ def _get_state(id):
 def get_state_bbox(
     abbr: str = None,
 ) -> np.ndarray:
-    """
-    Retrieve the top left and bottom right coordinate pairs for state bounding boxes.
-    """
+    """Retrieve the top left and bottom right coordinate pairs for state bounding
+    boxes."""
 
     # can move to its own file in pvdeg.DATA_DIR
     bbox_dict = {
@@ -445,8 +439,7 @@ def get_state_bbox(
 
 
 def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
-    """
-    Read a older TMY-like weather file and convert to h5 for use in pvdeg
+    """Read a older TMY-like weather file and convert to h5 for use in pvdeg.
 
     TODO: figure out scale_facator and np.int32 for smaller file
           expand for international locations?
@@ -503,8 +496,7 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 
 ### DEPRECATE ###
 def _read_material(name, fname="O2permeation.json"):
-    """
-    read a material from materials.json and return the parameter dictionary
+    """Read a material from materials.json and return the parameter dictionary.
 
     Parameters:
     -----------
@@ -557,9 +549,8 @@ def _add_material(
     fickian=True,
     fname="O2permeation.json",
 ):
-    """
-    Add a new material to the materials.json database. Check the parameters for specific units.
-    If material already exists, parameters will be updated.
+    """Add a new material to the materials.json database. Check the parameters for
+    specific units. If material already exists, parameters will be updated.
 
     TODO: check if material is already existing
 
@@ -611,8 +602,7 @@ def _add_material(
 
 
 def quantile_df(file, q):
-    """
-    Calculate the quantile of each parameter at each location.
+    """Calculate the quantile of each parameter at each location.
 
     Parameters:
     -----------
@@ -639,8 +629,7 @@ def quantile_df(file, q):
 
 
 def ts_gid_df(file, gid):
-    """
-    Extract the time series of each parameter for given location.
+    """Extract the time series of each parameter for given location.
 
     Parameters:
     -----------
@@ -670,8 +659,8 @@ def ts_gid_df(file, gid):
 def tilt_azimuth_scan(
     weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
 ):
-    """
-    Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
+    """Calculate a minimum standoff distance for roof mounded PV systems as a function
+    of tilt and azimuth.
 
     Parameters
     ----------
@@ -865,8 +854,7 @@ def geospatial_from_csv(
     file_path: list[str],
     year: int,  # should be able to take a range of years
 ):
-    """
-    Create an xarray dataset contaning aeospatial weather data and a pandas dataframe
+    """Create an xarray dataset contaning aeospatial weather data and a pandas dataframe
     containing geospatial metadata from a list of local csv files.
 
     Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
@@ -902,8 +890,7 @@ def geospatial_from_csv(
 
 
 def strip_normalize_tmy(df, start_time, end_time):
-    """
-    Normalize the DataFrame to start at 00:00 and extract the data between the
+    """Normalize the DataFrame to start at 00:00 and extract the data between the
     specified start and end times. Then shift back to the original indexes.
 
     Parameters:
@@ -946,8 +933,7 @@ def strip_normalize_tmy(df, start_time, end_time):
 
 
 def new_id(collection):
-    """
-    Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
+    """Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
 
     Parameters:
     -----------
@@ -972,10 +958,9 @@ def new_id(collection):
 def restore_gids(
     original_meta_df: pd.DataFrame, analysis_result_ds: xr.Dataset
 ) -> xr.Dataset:
-    """
-    Restore gids to results dataset. For desired behavior output data must
-    have identical ordering to input data, otherwise will fail silently by
-    misassigning gids to lat-long coordinates in returned dataset.
+    """Restore gids to results dataset. For desired behavior output data must have
+    identical ordering to input data, otherwise will fail silently by misassigning gids
+    to lat-long coordinates in returned dataset.
 
     Parameters:
     -----------
@@ -1009,9 +994,8 @@ def restore_gids(
 
 
 def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
-    """
-    find the min and max latitude and longitude values from 2 lists
-    or a tall numpy array of the shape [[lat, long], ...]
+    """Find the min and max latitude and longitude values from 2 lists or a tall numpy
+    array of the shape [[lat, long], ...]
 
     Parameters:
     -----------
@@ -1050,8 +1034,8 @@ def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
 
 
 def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
-    """
-    Set matplotlib axis limits to the values from a bounding box.
+    """Set matplotlib axis limits to the values from a bounding box.
+
     See Also:
     --------
     pvdeg.utilities._find_bbox_corners for more information
@@ -1075,9 +1059,7 @@ def _add_cartopy_features(
         cfeature.RIVERS,
     ],
 ):
-    """
-    Add cartopy features to an existing matplotlib.pyplot axis.
-    """
+    """Add cartopy features to an existing matplotlib.pyplot axis."""
 
     for i in features:
         if i == cfeature.BORDERS:
@@ -1087,9 +1069,7 @@ def _add_cartopy_features(
 
 
 def linear_normalize(array: np.ndarray) -> np.ndarray:
-    """
-    Normalize a non-negative input array.
-    """
+    """Normalize a non-negative input array."""
 
     return np.divide(
         np.subtract(array, np.min(array)),
@@ -1105,9 +1085,8 @@ def _calc_elevation_weights(
     normalization: str,
     kdtree,
 ) -> np.array:
-    """
-    utility function. caluclate a weight for each point in a dataset
-    to use for probabalistic downselection.
+    """Utility function. caluclate a weight for each point in a dataset to use for
+    probabalistic downselection.
 
     Parameters:
     -----------
@@ -1175,9 +1154,8 @@ def _calc_elevation_weights(
 
 
 def fix_metadata(meta):
-    """
-    meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
-    remove each subdict and replace with value for each key
+    """Meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
+    remove each subdict and replace with value for each key.
 
     Parameters:
     -----------
@@ -1195,10 +1173,8 @@ def fix_metadata(meta):
 # we want this to only exist for things that can be run on kestrel
 # moving away from hpc tools so this may not be useful in the future
 def nrel_kestrel_check():
-    """
-    Check if the user is on Kestrel HPC environment.
-    Passes silently or raises a ConnectionError if not running on Kestrel.
-    This will fail on AWS
+    """Check if the user is on Kestrel HPC environment. Passes silently or raises a
+    ConnectionError if not running on Kestrel. This will fail on AWS.
 
     Returns:
     --------
@@ -1225,8 +1201,7 @@ def nrel_kestrel_check():
 
 
 def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
-    """
-    Move `cwd` to fp and remove all scenario file trees from fp directory.
+    """Move `cwd` to fp and remove all scenario file trees from fp directory.
     Permanently deletes all scenario file trees. USE WITH CAUTION.
 
     Parameters:
@@ -1253,9 +1228,10 @@ def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
 
 
 def _update_pipeline_task(task):
-    """
-    Convert qualified name to callable function reference
-    and matain odict items ordering. Use to restore scenario from json.
+    """Convert qualified name to callable function reference and matain odict items
+    ordering.
+
+    Use to restore scenario from json.
     """
     from importlib import import_module
 
@@ -1272,7 +1248,7 @@ def _update_pipeline_task(task):
 def compare_templates(
     ds1: xr.Dataset, ds2: xr.Dataset, atol=1e-10, consider_nan_equal=True
 ) -> bool:
-    """Compare loaded datasets with "empty-like" values"""
+    """Compare loaded datasets with "empty-like" values."""
 
     if ds1.dims != ds2.dims:
         return False
@@ -1306,8 +1282,7 @@ def compare_templates(
 
 
 def add_time_columns_tmy(weather_df, coerce_year=1979):
-    """
-    Add time columns to a tmy weather dataframe.
+    """Add time columns to a tmy weather dataframe.
 
     Parameters:
     -----------
@@ -1354,9 +1329,8 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
 
 
 def merge_sparse(files: list[str]) -> xr.Dataset:
-    """
-    Merge an arbitrary number of geospatial analysis results.
-    Creates monotonically increasing indicies.
+    """Merge an arbitrary number of geospatial analysis results. Creates monotonically
+    increasing indicies.
 
     Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.
 
@@ -1407,8 +1381,7 @@ def display_json(
     pvdeg_file: str = None,
     fp: str = None,
 ) -> None:
-    """
-    Interactively view a 2 level JSON file in a JupyterNotebook
+    """Interactively view a 2 level JSON file in a JupyterNotebook.
 
     Parameters:
     ------------
@@ -1461,8 +1434,8 @@ def search_json(
     fp: str = None,
     name_or_alias: str = None,
 ) -> str:
-    """
-    Search through a 2 level JSON with arbitrary key names for subkeys with matching attributes of name or alias.
+    """Search through a 2 level JSON with arbitrary key names for subkeys with matching
+    attributes of name or alias.
 
     Parameters
     ------------
@@ -1505,8 +1478,7 @@ def read_material(
     key: str = None,
     parameters: list[str] = None,
 ) -> dict:
-    """
-    Read material parameters from a `pvdeg/data` file or JSON file path.
+    """Read material parameters from a `pvdeg/data` file or JSON file path.
 
     Parameters
     -----------
@@ -1548,8 +1520,7 @@ def read_material(
 
 
 def add_time_columns_tmy(weather_df, coerce_year=1979):
-    """
-    Add time columns to a tmy weather dataframe.
+    """Add time columns to a tmy weather dataframe.
 
     Parameters:
     -----------

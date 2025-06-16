@@ -1,6 +1,4 @@
-"""
-Scenario objects and methods for accelerated analysis
-"""
+"""Scenario objects and methods for accelerated analysis."""
 
 import pvdeg
 from pvdeg import utilities
@@ -30,10 +28,11 @@ from dask.distributed import Client
 
 
 class Scenario:
-    """
-    The scenario object contains all necessary parameters and criteria for a given scenario.
-    Generally speaking, this will be information such as:
-    Scenario Name, Path, Geographic Location, Module Type, Racking Type
+    """The scenario object contains all necessary parameters and criteria for a given
+    scenario.
+
+    Generally speaking, this will be information such as: Scenario Name, Path,
+    Geographic Location, Module Type, Racking Type
     """
 
     def __init__(
@@ -50,8 +49,7 @@ class Scenario:
         email: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
-        """
-        Initialize the degradation scenario object.
+        """Initialize the degradation scenario object.
 
         Parameters:
         -----------
@@ -101,8 +99,8 @@ class Scenario:
             self.load_json(file_path=file, email=email, api_key=api_key)
 
     def __eq__(self, other):
-        """
-        Define the behavior of the `==` operator between two Scenario instances.
+        """Define the behavior of the `==` operator between two Scenario instances.
+
         Does not check credentials.
         """
         if not isinstance(other, Scenario):
@@ -133,13 +131,11 @@ class Scenario:
         )
 
     def clean(self):
-        """
-        Wipe the Scenario object filetree. This is useful because the Scenario
-        object stores its data in local files outside of the python script.
-        This causes issues when two unique scenario instances are created in
-        the same directory, they appear to be seperate instances to python but
-        share the same data (if no path is provided).
-        Changes made to one are reflected in both.
+        """Wipe the Scenario object filetree. This is useful because the Scenario object
+        stores its data in local files outside of the python script. This causes issues
+        when two unique scenario instances are created in the same directory, they
+        appear to be seperate instances to python but share the same data (if no path is
+        provided). Changes made to one are reflected in both.
 
         Parameters:
         -----------
@@ -162,8 +158,7 @@ class Scenario:
         weather_db: str = "PSM3",
         see_added: bool = False,
     ):
-        """
-        Add a location to the scenario using a latitude-longitude pair.
+        """Add a location to the scenario using a latitude-longitude pair.
 
         The scenario object instance must already be populated with
         credentials when making a call to the NSRBD. Provide credentials
@@ -247,9 +242,8 @@ class Scenario:
         irradiance_kwarg: dict = {},
         see_added: bool = False,
     ):
-        """
-        Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
-        the given scenario.
+        """Add a module to the Scenario. Multiple modules can be added. Each module will
+        be tested in the given scenario.
 
         Parameters
         -----------
@@ -326,9 +320,7 @@ class Scenario:
         fickian=True,
         fname="O2permeation.json",
     ):
-        """
-        add a new material type to main list
-        """
+        """Add a new material type to main list."""
         utilities._add_material(
             name=name,
             alias=alias,
@@ -345,8 +337,8 @@ class Scenario:
         print("To add the material as a module in your current scene, run .addModule()")
 
     def viewScenario(self):
-        """
-        Print all scenario information currently stored in the scenario instance.
+        """Print all scenario information currently stored in the scenario instance.
+
         Does not implement ipython.display. If available, use this.
         """
         pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
@@ -389,8 +381,7 @@ class Scenario:
         func_kwarg={},
         see_added=False,
     ):
-        """
-        Add a pvdeg function to the scenario pipeline
+        """Add a pvdeg function to the scenario pipeline.
 
         Parameters:
         -----------
@@ -531,9 +522,7 @@ class Scenario:
         email: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
-        """
-        Import scenario dictionaries from an existing 'scenario.json' file
-        """
+        """Import scenario dictionaries from an existing 'scenario.json' file."""
         with open(file_path, "r") as f:
             data = json.load(f)
         name = data["name"]
@@ -567,8 +556,7 @@ class Scenario:
 
     @classmethod
     def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
-        """
-        Move `cwd` to fp and remove all scenario file trees from fp directory.
+        """Move `cwd` to fp and remove all scenario file trees from fp directory.
         Permanently deletes all scenario file trees. USE WITH CAUTION.
 
         Parameters:
@@ -593,9 +581,8 @@ class Scenario:
         return
 
     def _verify_function(func_name: str) -> Tuple[Callable, List]:
-        """
-        Check all classes in pvdeg for a function of the name "func_name". Returns a callable function
-        and list of all function parameters with no default values.
+        """Check all classes in pvdeg for a function of the name "func_name". Returns a
+        callable function and list of all function parameters with no default values.
 
         Parameters:
         -----------
@@ -656,10 +643,9 @@ class Scenario:
         return attributes
 
     def dump(self, api_key: bool = False, path: Optional[str] = None) -> None:
-        """
-        Serialize the scenario instance as a json. No dataframes will be saved
-        but some attributes like weather_df and results will be stored in
-        nested file trees as csvs.
+        """Serialize the scenario instance as a json. No dataframes will be saved but
+        some attributes like weather_df and results will be stored in nested file trees
+        as csvs.
 
         Parameters:
         -----------
@@ -687,9 +673,8 @@ class Scenario:
         email: str,
         api_key: str,
     ) -> None:
-        """
-        Restore email and api key to scenario. Use after importing
-        scenario if json does not contain email and api key.
+        """Restore email and api key to scenario. Use after importing scenario if json
+        does not contain email and api key.
 
         Parameters:
         -----------
@@ -710,8 +695,7 @@ class Scenario:
         start_time: Optional[dt] = None,
         end_time: Optional[dt] = None,
     ) -> pd.DataFrame:
-        """
-        Extract scenario results along an axis.
+        """Extract scenario results along an axis.
 
         Note:
         --------
@@ -813,8 +797,7 @@ class Scenario:
         end_time: Optional[dt] = None,
         title: str = "",
     ) -> tuple:
-        """
-        Plot scenario results along an axis using `Scenario.extract`
+        """Plot scenario results along an axis using `Scenario.extract`
 
         Note:
         --------
@@ -1146,8 +1129,7 @@ class GeospatialScenario(Scenario):
         )
 
     def start_dask(self, hpc=None) -> None:
-        """
-        Starts a dask cluster for parallel processing.
+        """Starts a dask cluster for parallel processing.
 
         Parameters
         ----------
@@ -1204,8 +1186,8 @@ class GeospatialScenario(Scenario):
         bbox_kwarg: Optional[dict] = {},
         see_added: bool = False,
     ) -> None:
-        """
-        Add locations to the GeospatialScenario. Existing weather and meta data will be overwritten with weather and meta data gathered by this method.
+        """Add locations to the GeospatialScenario. Existing weather and meta data will
+        be overwritten with weather and meta data gathered by this method.
 
         Parameters
         -----------
@@ -1323,7 +1305,7 @@ class GeospatialScenario(Scenario):
     def downselect_CONUS(
         self,
     ) -> None:
-        """Downselect US to contiguous US geospatial data"""
+        """Downselect US to contiguous US geospatial data."""
 
         geo_weather, geo_meta = self.get_geospatial_data()
 
@@ -1340,10 +1322,8 @@ class GeospatialScenario(Scenario):
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
     ) -> None:
-        """
-
-        Apply a latitude-longitude rectangular bounding box to
-        geospatial scenario metadata.
+        """Apply a latitude-longitude rectangular bounding box to geospatial scenario
+        metadata.
 
         Parameters:
         -----------
@@ -1371,7 +1351,7 @@ class GeospatialScenario(Scenario):
         self.meta_data = self.meta_data.loc[bbox_gids]
 
     def set_kdtree(self, kdtree=None) -> None:
-        """Initialize a kidtree and save it to the GeospatialScenario"""
+        """Initialize a kidtree and save it to the GeospatialScenario."""
         if kdtree is None:
             self.kdtree = pvdeg.geospatial.meta_KDtree(meta_df=self.meta_data)
         else:
@@ -1386,13 +1366,11 @@ class GeospatialScenario(Scenario):
         bbox_kwarg: Optional[dict] = {},
         kdtree=None,
     ):
-        """
-        Find mountains from elevation metadata using sklearn kdtree for fast lookup.
-        Compares a large area of points to a small area of points to find
-        significant changes in elevation representing mountains. Tweak the radii
-        to determine the sensitivity and noise. Bad radii cause the result to
-        become unstable quickly. kdtree can be generated using
-        ``pvdeg.geospatial.meta_KDTree``
+        """Find mountains from elevation metadata using sklearn kdtree for fast lookup.
+        Compares a large area of points to a small area of points to find significant
+        changes in elevation representing mountains. Tweak the radii to determine the
+        sensitivity and noise. Bad radii cause the result to become unstable quickly.
+        kdtree can be generated using ``pvdeg.geospatial.meta_KDTree``
 
         Parameters:
         -----------
@@ -1448,10 +1426,9 @@ class GeospatialScenario(Scenario):
         normalization: str = "linear",
         kdtree=None,
     ):
-        """
-        Add a column to the scenario meta_data dataframe containing a boolean
-        True or False value representing if the entry is a near a mountain.
-        Calculated from weights assigned during stochastic downselection.
+        """Add a column to the scenario meta_data dataframe containing a boolean True or
+        False value representing if the entry is a near a mountain. Calculated from
+        weights assigned during stochastic downselection.
 
         Parameters:
         -----------
@@ -1556,9 +1533,8 @@ class GeospatialScenario(Scenario):
         normalization="linear",
         kdtree=None,
     ):
-        """
-        Prefenetially downselect data points based on elevation and update
-        scenario metadata.
+        """Prefenetially downselect data points based on elevation and update scenario
+        metadata.
 
         Parameters:
         -----------
@@ -1602,8 +1578,7 @@ class GeospatialScenario(Scenario):
         return
 
     def gid_downsample(self, downsample_factor: int) -> None:
-        """
-        Downsample the NSRDB GID grid by a factor of n
+        """Downsample the NSRDB GID grid by a factor of n.
 
         Returns:
         --------
@@ -1618,8 +1593,7 @@ class GeospatialScenario(Scenario):
         )
 
     def gids_tonumpy(self) -> np.array:
-        """
-        Convert the scenario's gids to a numpy array
+        """Convert the scenario's gids to a numpy array.
 
         Returns:
         --------
@@ -1629,8 +1603,7 @@ class GeospatialScenario(Scenario):
         return self.meta_data.index
 
     def gids_tolist(self) -> np.array:
-        """
-        Convert the scenario's gids to a python list
+        """Convert the scenario's gids to a python list.
 
         Returns:
         --------
@@ -1640,15 +1613,9 @@ class GeospatialScenario(Scenario):
         return list(self.meta_data.index)
 
     def coords_tonumpy(self) -> np.array:
-        """
-        Create a tall 2d numpy array of gids of the shape
-        ```
-        [
-            [lat, long],
-                ...
-            [lat, long]
-        ]
-        ```
+        """Create a tall 2d numpy array of gids of the shape ``` [ [lat, long], ...
+        [lat, long] ] ```
+
         Returns:
         --------
         coords : np.array
@@ -1661,8 +1628,8 @@ class GeospatialScenario(Scenario):
         return coords
 
     def get_geospatial_data(self) -> tuple[xr.Dataset, pd.DataFrame]:
-        """
-        Extract the geospatial weather dataset and metadata dataframe from the scenario object
+        """Extract the geospatial weather dataset and metadata dataframe from the
+        scenario object.
 
         Example Use:
         >>> geo_weather, geo_meta = GeospatialScenario.geospatial_data()
@@ -1712,8 +1679,9 @@ class GeospatialScenario(Scenario):
         func_params: dict = {},
         see_added: bool = False,
     ) -> None:
-        """
-        Add a pvdeg geospatial function to the scenario pipeline. If no template is provided, `addJob` attempts to use `geospatial.auto_template` this will raise an
+        """Add a pvdeg geospatial function to the scenario pipeline. If no template is
+        provided, `addJob` attempts to use `geospatial.auto_template` this will raise
+        an.
 
         Parameters:
         -----------
@@ -1744,8 +1712,7 @@ class GeospatialScenario(Scenario):
             warnings.warn(message, UserWarning)
 
     def run(self, hpc_worker_conf: Optional[dict] = None) -> None:
-        """
-        Run the geospatial scenario stored in the geospatial scenario object.
+        """Run the geospatial scenario stored in the geospatial scenario object.
 
         Only supports one function at a time. Unlike `Scenario` which supports unlimited conventional pipeline jobs.
         Results are stored in the `GeospatialScenario.results` attribute.
@@ -1804,10 +1771,10 @@ class GeospatialScenario(Scenario):
         self.dask_client.shutdown()
 
     def restore_result_gids(self):
-        """
-        Restore gids to result Dataset as datavariable from original metadata.
-        Assumes results will be in the same order as input metadata rows.
-        Otherwise will fail silently and restore incorrect gids
+        """Restore gids to result Dataset as datavariable from original metadata.
+
+        Assumes results will be in the same order as input metadata rows. Otherwise will
+        fail silently and restore incorrect gids
         """
 
         flattened = self.results.stack(points=("latitude", "longitude"))
@@ -1823,8 +1790,7 @@ class GeospatialScenario(Scenario):
         self.results = self.results.assign(gids=gids_da)
 
     def _get_geospatial_data(year: int):
-        """
-        Helper function. gets geospatial weather dataset and metadata dictionary.
+        """Helper function. gets geospatial weather dataset and metadata dictionary.
 
         Parameters
         ----------
@@ -1861,8 +1827,7 @@ class GeospatialScenario(Scenario):
         county: Optional[str] = None,
         target_region: Optional[str] = None,
     ):
-        """
-        Gets all valid region names in the NSRDB. Only works on hpc
+        """Gets all valid region names in the NSRDB. Only works on hpc.
 
         Arguments
         ---------
@@ -1896,9 +1861,8 @@ class GeospatialScenario(Scenario):
         return meta_df[target_region].unique()
 
     def plot(self):
-        """
-        Not Usable in GeospatialScenario class instance, only in Scenario instance.
-        """
+        """Not Usable in GeospatialScenario class instance, only in Scenario
+        instance."""
         # python has no way to hide a parent class method in the child, so this only exists to prevent access
         raise AttributeError(
             "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
@@ -1911,9 +1875,8 @@ class GeospatialScenario(Scenario):
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
     ) -> tuple[matplotlib.figure, matplotlib.axes]:
-        """
-        Plot lat-long coordinate pairs on blank map. Quickly view
-        geospatial datapoints before your analysis.
+        """Plot lat-long coordinate pairs on blank map. Quickly view geospatial
+        datapoints before your analysis.
 
         Parameters:
         -----------
@@ -1969,10 +1932,9 @@ class GeospatialScenario(Scenario):
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
     ) -> tuple[matplotlib.figure, matplotlib.axes]:
-        """
-        Plot classified lat-long coordinate pairs on map. Quicly view
-        geospatial datapoints with binary classification in a meta_data
-        dataframe column before your analysis.
+        """Plot classified lat-long coordinate pairs on map. Quicly view geospatial
+        datapoints with binary classification in a meta_data dataframe column before
+        your analysis.
 
         Parameters:
         -----------
@@ -2083,9 +2045,8 @@ class GeospatialScenario(Scenario):
         vmin: Union[int, float] = 0,
         vmax: Optional[Union[int, float]] = None,
     ) -> tuple[matplotlib.figure, matplotlib.axes]:
-        """
-        Plot a vizualization of the geospatial scenario result.
-        Only works on geospatial scenarios.
+        """Plot a vizualization of the geospatial scenario result. Only works on
+        geospatial scenarios.
 
         Parameters
         ----------
@@ -2119,7 +2080,7 @@ class GeospatialScenario(Scenario):
         return fig, ax
 
     def _check_set(self, iterable, to_check: set):
-        """Check if iterable is a subset of to_check"""
+        """Check if iterable is a subset of to_check."""
         if not isinstance(iterable, set):
             iterable = set(iterable)
 

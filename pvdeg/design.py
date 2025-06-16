@@ -6,16 +6,16 @@ import pandas as pd
 
 
 def edge_seal_ingress_rate(avg_psat):
-    """
-    This function generates a constant k, relating the average moisture ingress rate through a
-    specific edge seal, Helioseal 101. Is an emperical estimation the rate of water ingress of
-    water through edge seal material. This function was determined from numerical calculations
-    from several locations and thus produces typical responses. This simplification works
-    because the environmental temperature is not as important as local water vapor pressure.
-    For the same environmental water concentration, a higher temperature results in lower
-    absorption in the edge seal but lower diffusivity through the edge seal. In practice, these
-    effects nearly cancel out makeing absolute humidity the primary parameter determining
-    moisture ingress through edge seals.
+    """This function generates a constant k, relating the average moisture ingress rate
+    through a specific edge seal, Helioseal 101. Is an emperical estimation the rate of
+    water ingress of water through edge seal material. This function was determined from
+    numerical calculations from several locations and thus produces typical responses.
+    This simplification works because the environmental temperature is not as important
+    as local water vapor pressure. For the same environmental water concentration, a
+    higher temperature results in lower absorption in the edge seal but lower
+    diffusivity through the edge seal. In practice, these effects nearly cancel out
+    makeing absolute humidity the primary parameter determining moisture ingress through
+    edge seals.
 
     See: Kempe, Nobles, Postak Calderon,"Moisture ingress prediction in polyisobutylene‐based
     edge seal with molecular sieve desiccant", Progress in Photovoltaics, DOI: 10.1002/pip.2947
@@ -34,7 +34,6 @@ def edge_seal_ingress_rate(avg_psat):
         With this constant, one can determine an approximate estimate of the ingress distance
         for a particular climate without more complicated numerical methods and detailed
         environmental analysis.
-
     """
 
     k = 0.0013 * (avg_psat) ** 0.4933
@@ -50,8 +49,8 @@ def edge_seal_width(
     years: int = 25,
     from_dew_point: bool = False,
 ):
-    """
-    Determine the width of edge seal required for given number of years water ingress.
+    """Determine the width of edge seal required for given number of years water
+    ingress.
 
     Parameters
     ----------
