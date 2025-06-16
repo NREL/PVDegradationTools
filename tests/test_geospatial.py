@@ -160,7 +160,6 @@ def mixed_res_dataset(weather_df, meta):
 # see decorators.geospatial_quick_shape for documentation
 # however it is possible to work around this
 def test_mixed_res_dict():
-
     # dict template with varing dimensions
     mixed_res_dict_template = pvdeg.geospatial.output_template(
         ds_gids=GEO_WEATHER,

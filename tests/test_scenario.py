@@ -30,7 +30,6 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
 
 
 def test_Scenario_add(monkeypatch):
-
     ### monkey patch to bypass psm3 api calls in addLocation ###
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation
@@ -58,7 +57,6 @@ def test_Scenario_add(monkeypatch):
 
 
 def test_Scenario_run(monkeypatch):
-
     ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation
@@ -101,7 +99,6 @@ def test_addLocation_pvgis():
 
 
 def test_addModule_badmat(capsys, monkeypatch):
-
     ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation

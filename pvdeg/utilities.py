@@ -862,7 +862,8 @@ def _weather_ds_from_csv(
 
 # not functional
 def geospatial_from_csv(
-    file_path: list[str], year: int  # should be able to take a range of years
+    file_path: list[str],
+    year: int,  # should be able to take a range of years
 ):
     """
     Create an xarray dataset contaning aeospatial weather data and a pandas dataframe
@@ -879,8 +880,9 @@ def geospatial_from_csv(
         Single year of data to use from local csv files.
     """
 
-    weather_ds, meta_df = _weather_ds_from_csv(file_path, year), _meta_df_from_csv(
-        file_path
+    weather_ds, meta_df = (
+        _weather_ds_from_csv(file_path, year),
+        _meta_df_from_csv(file_path),
     )
 
     # only want to keep meta from given file using GIDs from DS

@@ -113,7 +113,6 @@ def test_get_NSRDB():
 
 
 def test_weather_distributed_no_client():
-
     with pytest.raises(
         RuntimeError, match="No Dask scheduler found. Ensure a dask client is running."
     ):
@@ -125,7 +124,6 @@ def test_weather_distributed_no_client():
 
 
 def test_weather_distributed_client_bad_database(capsys):
-
     pvdeg.geospatial.start_dask()
 
     with pytest.raises(
@@ -142,7 +140,6 @@ def test_weather_distributed_client_bad_database(capsys):
 
 
 def test_weather_distributed_pvgis():
-
     weather, meta, failed_gids = pvdeg.weather.weather_distributed(
         database="PVGIS",
         coords=[

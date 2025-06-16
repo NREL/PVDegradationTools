@@ -134,7 +134,6 @@ def _create_sample_sheet(
     dummy_da = da.full(shape=(1, sheet_ds.sizes["time"]), fill_value=fill_value)
 
     for var in sheet_ds.data_vars:
-
         dim = sheet_ds[var].dims
         sheet_ds[var] = (dim, dummy_da)
 

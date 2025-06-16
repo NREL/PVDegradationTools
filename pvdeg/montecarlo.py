@@ -195,7 +195,6 @@ def _correlateData(
 def generateCorrelatedSamples(
     corr: list[Corr], stats: dict[str, dict[str, float]], n: int, seed=None
 ) -> pd.DataFrame:
-
     # columns are now named, may run into issues if more mean and stdev entries than correlation coefficients
     # havent tested yet but this could cause major issues (see lines 163 and 164 for info)
 

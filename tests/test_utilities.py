@@ -134,7 +134,6 @@ def test_add_material():
 
 # this only works because we are not running on kestrel
 def test_nrel_kestrel_check_bad():
-
     with pytest.raises(ConnectionError):
         pvdeg.utilities.nrel_kestrel_check()
 
@@ -143,7 +142,6 @@ def test_nrel_kestrel_check_bad():
 # These tests will likely fail if the associated materials are changed
 # ===========================
 def test_read_material_special():
-
     template_material = pvdeg.utilities.read_material(
         pvdeg_file="AApermeation", key="AA000"
     )
@@ -153,7 +151,6 @@ def test_read_material_special():
 
 
 def test_read_material_normal():
-
     res = {
         "name": "ST504",
         "alias": "PET1",
@@ -176,7 +173,6 @@ def test_read_material_normal():
 
 
 def test_read_material_fewer_params():
-
     res = {
         "name": "ST504",
         "Fickian": True,
@@ -190,7 +186,6 @@ def test_read_material_fewer_params():
 
 
 def test_read_material_extra_params():
-
     res = {
         "namenotindict1": None,
         "namenotindict2": None,
@@ -207,7 +202,6 @@ def test_read_material_extra_params():
 
 # pvdeg_file should override fp if both are provided
 def test_read_material_fp_override():
-
     res = {
         "name": "ST504",
         "alias": "PET1",

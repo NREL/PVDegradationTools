@@ -98,6 +98,6 @@ for i in range(0, geo_meta.shape[0], step):
     )
 
     inspire_partial_res.to_netcdf(
-        f"{target_dir}-quarter-res-{i}-{i+i-1}.nc", engine="h5netcdf"
+        f"{target_dir}-quarter-res-{i}-{i + i - 1}.nc", engine="h5netcdf"
     )
     print("ended", i)

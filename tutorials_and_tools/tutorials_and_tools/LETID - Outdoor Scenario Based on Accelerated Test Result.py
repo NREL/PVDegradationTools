@@ -90,7 +90,9 @@ srv_rear = 100  # [cm/s] a reasonable value for rear surface recombination veloc
 # Other device structures will have different SRV values. E.g., aluminum back surface field (Al-BSF) cells could be ~500 cm/s. TopCON or other high efficiency cell structures will be lower, e.g. 10 cm/s.
 # Note that all of these values are intepreted as "lumped" values for the entire rear surface.
 
-isc_0 = df.query("Week == 0")[
+isc_0 = df.query(
+    "Week == 0"
+)[
     "Isc"
 ].item()  # [A] we'll use the short circuit current from the Week 0 test data, instead of trying to calculate it
 cell_area = 240.8  # [cm^2] typical cell size for 6-inch pseudosquare monocrystalline silicon  wafers
@@ -134,7 +136,9 @@ pmp_0, df.query("Week == 0")["Pmp"].item()
 
 tau_deg = 80  # [us] degraded bulk lifetime
 
-isc_deg = df.query("Week == 4")[
+isc_deg = df.query(
+    "Week == 4"
+)[
     "Isc"
 ].item()  # [A] we'll use the short circuit current from the Week 4 test data, instead of trying to calculate it
 jsc_deg = isc_deg / cell_area * 1000  # [mA/cm^2] short circuit current density
@@ -559,7 +563,7 @@ ax.set_title("Energy Loss")
 
 loss = letid.calc_energy_loss(timesteps)
 
-ax.text(mdates.datestr2num("1999-08-02"), 0.994, s=f"Energy loss = {loss*100:.2f}%")
+ax.text(mdates.datestr2num("1999-08-02"), 0.994, s=f"Energy loss = {loss * 100:.2f}%")
 
 plt.show()
 
@@ -677,7 +681,7 @@ energy = simpson(timesteps["p_mp"] / 1000, timesteps["Timedelta"])
 ax3.text(
     mdates.datestr2num("1999-03-02"),
     2,
-    s=f"Energy loss = {loss*energy:.1f} kWh ({loss*100:.2f}%)",
+    s=f"Energy loss = {loss * energy:.1f} kWh ({loss * 100:.2f}%)",
 )
 
 ax1.set_ylabel("Module $P_{MP}$ [W]")

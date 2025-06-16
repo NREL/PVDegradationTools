@@ -206,7 +206,6 @@ for n in range(1, 13):
         if m == n:
             if d == 15:
                 if t == datetime.time(12):
-
                     dates.append(np_t.values)
 
                     # subartic: near Crested Butte CO

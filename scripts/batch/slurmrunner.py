@@ -12,7 +12,7 @@ n_nodes = int(os.environ["SLURM_NNODES"])
 mem_per_node = int(os.environ["SLURM_MEM_PER_NODE"])
 mem_worker = mem_per_node / (n_workers * cpus_per_task) * 1e6
 
-logger.info(f"Memory per worker: {mem_worker/1e9} GB")
+logger.info(f"Memory per worker: {mem_worker / 1e9} GB")
 
 with SLURMRunner(
     scheduler_file=f"/scratch/{user_name}/scheduler-{job_id}.json",

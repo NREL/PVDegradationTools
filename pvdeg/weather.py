@@ -1388,7 +1388,6 @@ def weather_distributed(
     # only meaningfull if data is from NSRDB
     # this loop can be refactored, it is a little weird
     for i, row in enumerate(results):
-
         if row[2]:
             indexes_failed.append(i)
             continue

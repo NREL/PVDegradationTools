@@ -435,7 +435,7 @@ ax2.plot(
 ax2.legend(loc="upper right")
 ax2.set_ylabel("Normalized STC $P_{MP}$")
 
-ax.set_title("Outdoor LETID \n" f"{location.name}")
+ax.set_title(f"Outdoor LETID \n{location.name}")
 
 plt.show()
 
