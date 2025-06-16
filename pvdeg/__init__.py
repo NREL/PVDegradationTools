@@ -11,12 +11,10 @@ from . import design
 from . import fatigue
 from . import geospatial
 
-# from .geospatialscenario import GeospatialScenario
 from . import humidity
 from . import letid
 from . import montecarlo
 from . import pysam
-from .scenario import Scenario, GeospatialScenario
 from . import spectral
 from . import store
 from . import symbolic
@@ -25,6 +23,9 @@ from . import temperature
 from . import utilities
 from . import weather
 from . import diffusion
+
+from .scenario import Scenario
+from .geospatialscenario import GeospatialScenario
 
 __version__ = version("pvdeg")
 

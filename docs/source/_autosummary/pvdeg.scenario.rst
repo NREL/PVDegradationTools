@@ -25,13 +25,6 @@ pvdeg.scenario
    -------
 
    
-   .. autoclass:: GeospatialScenario
-      :members:
-
-   .. _sphx_glr_backref_pvdeg.scenario.GeospatialScenario:
-
-   .. minigallery:: pvdeg.scenario.GeospatialScenario
-       :add-heading:
    .. autoclass:: Scenario
       :members:
 
