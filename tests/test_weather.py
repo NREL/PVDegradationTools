@@ -79,8 +79,9 @@ def test_read():
     """
     Test pvdeg.utilities.read_weather.
 
-    TODO: enable the final assertion which checks column names. This may require troubleshooting
-    with PVLIB devs. varaible mapping apears inconsistent
+    TODO: enable the final assertion which checks column names.
+    This may require troubleshooting with PVLIB devs. varaible mapping apears
+    inconsistent.
 
     Requires:
     ---------
