@@ -114,7 +114,6 @@ print(samples)
 # In[28]:
 
 
-
 # defining arguments to pass to the target function, standoff() in this case
 function_kwargs = {
     "weather_df": WEATHER,
