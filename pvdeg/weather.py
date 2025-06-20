@@ -1115,8 +1115,10 @@ def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 
 # RENAME, THIS SHOULD NOT REFERENCE PVGIS
 def _process_weather_result_distributed(weather_df):
-    """Create an xarray.Dataset using numpy array backend from a pvgis weather
-    dataframe."""
+    """
+    Create an xarray.Dataset using numpy array backend from a pvgis weather
+    dataframe.
+    """
     import dask.array as da
 
     weather_df.index.rename("time", inplace=True)
