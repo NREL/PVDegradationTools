@@ -1117,7 +1117,6 @@ def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 def _process_weather_result_distributed(weather_df):
     """Create an xarray.Dataset using numpy array backend from a pvgis weather
     dataframe."""
-
     import dask.array as da
 
     weather_df.index.rename("time", inplace=True)
@@ -1181,7 +1180,7 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
     """Create an empty weather dataframe for generalized input.
 
     Parameters
-    ---------
+    ----------
     gids_size: int
         number of entries to create along gid axis
     periodicity: str
@@ -1236,7 +1235,7 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
     attrs = {}
     global_attrs = {}
 
-    dims = {"gid", "time"}
+    # dims = {"gid", "time"}
     dims_size = {"time": TIME_PERIODICITY_MAP[periodicity], "gid": gids_size}
 
     if database == "NSRDB" or database == "PSM3":
