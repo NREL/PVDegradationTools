@@ -160,11 +160,11 @@ def esdiffusion(
     dod = Dos / Doe
     ead = Eads - Eade
 
-    edge_seal_width = edge_seal_width / (
-        seal_nodes - 0.5
+    edge_seal_width = (
+        edge_seal_width / (seal_nodes - 0.5)
     )  # The 0.5 is put in there because the model exterior is defined as the center of the edge node.
-    encapsulant_width = encapsulant_width / (
-        encapsulant_nodes - 0.5
+    encapsulant_width = (
+        encapsulant_width / (encapsulant_nodes - 0.5)
     )  # The 0.5 is put in because the model interior encapsulant node is a point of symmetry and defines the condition at the center line.
 
     perm_mid = np.array(
