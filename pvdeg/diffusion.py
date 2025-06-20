@@ -35,7 +35,9 @@ def esdiffusion(
     printout=True,
     **kwarg,
 ):
-    """Calculate 1-D diffusion into the edge of a PV module. This assumes an edge seal
+    """Calculate 1-D diffusion into the edge of a PV module.
+
+    This assumes an edge seal
     and a limited length of encapsulant. In the future it will be able to run
     calculations for degradation and for water ingress, but initially I'm just writing
     it to run calculations for oxygen ingress.

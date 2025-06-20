@@ -28,7 +28,9 @@ class Corr:
         self.correlation = corr
 
     def getModelingConstants(self) -> list[str, str]:
-        """Helper method. Returns modeling constants in string form.
+        """Helper method.
+
+        Returns modeling constants in string form.
 
         Parameters
         ----------
@@ -46,7 +48,9 @@ class Corr:
 
 
 def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
-    """Helper function. Generate a symmetric correlation coefficient matrix.
+    """Helper function.
+
+    Generate a symmetric correlation coefficient matrix.
 
     Parameters
     ----------
@@ -103,7 +107,9 @@ def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
 
 
 def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.DataFrame:
-    """Helper function. Unpacks mean and standard deviation for modeling constants into
+    """Helper function.
+
+    Unpacks mean and standard deviation for modeling constants into
     a DataFrame.
 
     Parameters
@@ -154,7 +160,9 @@ def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.Dat
 def _correlateData(
     samples_to_correlate: pd.DataFrame, stats_for_correlation: pd.DataFrame
 ) -> pd.DataFrame:
-    """Helper function. Uses meaningless correlated samples and makes meaningful by
+    """Helper function.
+
+    Uses meaningless correlated samples and makes meaningful by
     multiplying random samples by their parent modeling constant's standard deviation
     and adding the mean.
 
@@ -272,7 +280,9 @@ def generateCorrelatedSamples(
 def simulate(
     func: Callable, correlated_samples: pd.DataFrame, **function_kwargs
 ) -> pd.Series:
-    """Applies a target function to data to preform a monte carlo simulation. If you get
+    """Applies a target function to data to preform a monte carlo simulation.
+
+    If you get
     a key error and the target function has default parameters, try adding them to your
     ``func_kwargs`` dictionary instead of using the default value from the target
     function.

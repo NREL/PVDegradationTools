@@ -301,7 +301,8 @@ def temperature(
     model_kwarg={},
 ):
     """
-    Calculate the PV cell or module temperature using PVLIB
+    Calculate the PV cell or module temperature using PVLIB.
+
     Current supports the following temperature models:
 
     Parameters
@@ -357,7 +358,6 @@ def temperature(
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
         estimation, analysis of wind characteristics and energy potential assessment for selected
         sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
-
     """
     cell_or_mod = "module" if cell_or_mod == "mod" else cell_or_mod  # mod->module
 

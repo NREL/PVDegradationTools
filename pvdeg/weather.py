@@ -62,7 +62,6 @@ def get(database, id=None, geospatial=False, **kwargs):
     meta : (dict)
         Dictionary of metadata for the weather data
 
-
     Example
     --------
     Collecting a single site of PSM3 NSRDB data. *Api key and email must be replaced with your personal api key and email*. [Request a key!](https://developer.nrel.gov/signup/)
@@ -78,7 +77,6 @@ def get(database, id=None, geospatial=False, **kwargs):
         }
 
         weather_df, meta_dict = pvdeg.weather.get(database="PSM3", id=(25.783388, -80.189029), **weather_arg)
-
 
     Collecting a single site of PVGIS TMY data
 
@@ -291,7 +289,8 @@ def csv_read(filename):
 
 
 def map_meta(meta):
-    """ "
+    """"
+
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.
 
@@ -321,7 +320,8 @@ def map_meta(meta):
 
 
 def map_weather(weather_df):
-    """ "
+    """"
+
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.
 
@@ -717,7 +717,9 @@ def get_NSRDB(
 
 
 def repeat_annual_time_series(time_series, start_year, n_years):
-    """Repeat a pandas time series dataframe containing annual data. For example, repeat
+    """Repeat a pandas time series dataframe containing annual data.
+
+    For example, repeat
     TMY data by n_years, adding in leap days as necessary. For now, this function
     requires 1 or more full years of uniform interval (non-leap year) data, i.e. length
     must be a multiple of 8760. On leap days, all data is set to 0.
@@ -839,7 +841,9 @@ def is_leap_year(year):
 
 
 def get_satellite(location):
-    """Identify a satellite to use for a given lattitude and longitude. This is to
+    """Identify a satellite to use for a given lattitude and longitude.
+
+    This is to
     provide default values worldwide, but a more experienced user may want to specify a
     specific satellite to get better data.
 
@@ -940,7 +944,8 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
 
 
 def get_anywhere(database="PSM3", id=None, **kwargs):
-    """Load weather data directly from  NSRDB or through any other PVLIB i/o tools
+    """Load weather data directly from  NSRDB or through any other PVLIB i/o tools.
+
     function. Only works for a single location look-up, not for geospatial analysis.
 
     Parameters:

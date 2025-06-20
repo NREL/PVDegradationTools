@@ -6,7 +6,9 @@ from pvdeg import temperature, decorators
 
 
 def _avg_daily_temp_change(time_range, temp_cell):
-    """Helper function. Get the average of a year for the daily maximum temperature
+    """Helper function.
+
+    Get the average of a year for the daily maximum temperature
     change.
 
     For every 24hrs this function will find the delta between the maximum
@@ -60,7 +62,9 @@ def _avg_daily_temp_change(time_range, temp_cell):
 
 
 def _times_over_reversal_number(temp_cell, reversal_temp):
-    """Helper function. Get the number of times a temperature increases or decreases
+    """Helper function.
+
+    Get the number of times a temperature increases or decreases
     over a specific temperature gradient.
 
     Parameters
@@ -113,6 +117,7 @@ def solder_fatigue(
     irradiance_kwarg={},
 ) -> float:
     """Get the Thermomechanical Fatigue of flat plate photovoltaic module solder joints.
+
     Damage will be returned as the rate of solder fatigue for one year. Based on:
 
         Bosco, N., Silverman, T. and Kurtz, S. (2020). Climate specific thermomechanical

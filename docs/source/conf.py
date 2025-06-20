@@ -228,7 +228,9 @@ warnings.filterwarnings(
 
 
 def get_obj_module(qualname):
-    """Get a module/class/attribute and its original module by qualname. Useful for
+    """Get a module/class/attribute and its original module by qualname.
+
+    Useful for
     looking up the original location when a function is imported into an __init__.py.
 
     Examples

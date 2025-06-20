@@ -131,7 +131,9 @@ class Scenario:
         )
 
     def clean(self):
-        """Wipe the Scenario object filetree. This is useful because the Scenario object
+        """Wipe the Scenario object filetree.
+
+        This is useful because the Scenario object
         stores its data in local files outside of the python script. This causes issues
         when two unique scenario instances are created in the same directory, they
         appear to be seperate instances to python but share the same data (if no path is
@@ -242,7 +244,9 @@ class Scenario:
         irradiance_kwarg: dict = {},
         see_added: bool = False,
     ):
-        """Add a module to the Scenario. Multiple modules can be added. Each module will
+        """Add a module to the Scenario.
+
+        Multiple modules can be added. Each module will
         be tested in the given scenario.
 
         Parameters
@@ -412,6 +416,7 @@ class Scenario:
     def run(self):
         """
         Run all jobs in pipeline on scenario object for each module in the scenario.
+
         Note: if a pipeline job contains a function not adhering to package
         wide pv parameter naming scheme, the job will raise a fatal error.
 
@@ -557,6 +562,7 @@ class Scenario:
     @classmethod
     def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
         """Move `cwd` to fp and remove all scenario file trees from fp directory.
+
         Permanently deletes all scenario file trees. USE WITH CAUTION.
 
         Parameters:
@@ -581,7 +587,9 @@ class Scenario:
         return
 
     def _verify_function(func_name: str) -> Tuple[Callable, List]:
-        """Check all classes in pvdeg for a function of the name "func_name". Returns a
+        """Check all classes in pvdeg for a function of the name "func_name".
+
+        Returns a
         callable function and list of all function parameters with no default values.
 
         Parameters:
@@ -643,7 +651,9 @@ class Scenario:
         return attributes
 
     def dump(self, api_key: bool = False, path: Optional[str] = None) -> None:
-        """Serialize the scenario instance as a json. No dataframes will be saved but
+        """Serialize the scenario instance as a json.
+
+        No dataframes will be saved but
         some attributes like weather_df and results will be stored in nested file trees
         as csvs.
 
@@ -673,7 +683,9 @@ class Scenario:
         email: str,
         api_key: str,
     ) -> None:
-        """Restore email and api key to scenario. Use after importing scenario if json
+        """Restore email and api key to scenario.
+
+        Use after importing scenario if json
         does not contain email and api key.
 
         Parameters:
@@ -797,7 +809,7 @@ class Scenario:
         end_time: Optional[dt] = None,
         title: str = "",
     ) -> tuple:
-        """Plot scenario results along an axis using `Scenario.extract`
+        """Plot scenario results along an axis using `Scenario.extract`.
 
         Note:
         --------
@@ -1186,7 +1198,9 @@ class GeospatialScenario(Scenario):
         bbox_kwarg: Optional[dict] = {},
         see_added: bool = False,
     ) -> None:
-        """Add locations to the GeospatialScenario. Existing weather and meta data will
+        """Add locations to the GeospatialScenario.
+
+        Existing weather and meta data will
         be overwritten with weather and meta data gathered by this method.
 
         Parameters
@@ -1322,7 +1336,8 @@ class GeospatialScenario(Scenario):
         coord_2: Optional[tuple[float]] = None,
         coords: Optional[np.ndarray[float]] = None,
     ) -> None:
-        """Apply a latitude-longitude rectangular bounding box to geospatial scenario
+        """Apply a latitude-longitude rectangular bounding box to geospatial scenario.
+
         metadata.
 
         Parameters:
@@ -1367,6 +1382,7 @@ class GeospatialScenario(Scenario):
         kdtree=None,
     ):
         """Find mountains from elevation metadata using sklearn kdtree for fast lookup.
+
         Compares a large area of points to a small area of points to find significant
         changes in elevation representing mountains. Tweak the radii to determine the
         sensitivity and noise. Bad radii cause the result to become unstable quickly.
@@ -1657,6 +1673,7 @@ class GeospatialScenario(Scenario):
     ) -> None:
         """
         Parameters:
+
         -----------
         weather_ds : xarray.Dataset
             Dataset containing weather data for a block of gids.
@@ -1790,7 +1807,9 @@ class GeospatialScenario(Scenario):
         self.results = self.results.assign(gids=gids_da)
 
     def _get_geospatial_data(year: int):
-        """Helper function. gets geospatial weather dataset and metadata dictionary.
+        """Helper function.
+
+        gets geospatial weather dataset and metadata dictionary.
 
         Parameters
         ----------
@@ -1827,7 +1846,9 @@ class GeospatialScenario(Scenario):
         county: Optional[str] = None,
         target_region: Optional[str] = None,
     ):
-        """Gets all valid region names in the NSRDB. Only works on hpc.
+        """Gets all valid region names in the NSRDB.
+
+        Only works on hpc.
 
         Arguments
         ---------
@@ -1875,7 +1896,9 @@ class GeospatialScenario(Scenario):
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
     ) -> tuple[matplotlib.figure, matplotlib.axes]:
-        """Plot lat-long coordinate pairs on blank map. Quickly view geospatial
+        """Plot lat-long coordinate pairs on blank map.
+
+        Quickly view geospatial
         datapoints before your analysis.
 
         Parameters:
@@ -1932,7 +1955,9 @@ class GeospatialScenario(Scenario):
         coords: Optional[np.ndarray[float]] = None,
         size: Union[int, float] = 1,
     ) -> tuple[matplotlib.figure, matplotlib.axes]:
-        """Plot classified lat-long coordinate pairs on map. Quicly view geospatial
+        """Plot classified lat-long coordinate pairs on map.
+
+        Quicly view geospatial
         datapoints with binary classification in a meta_data dataframe column before
         your analysis.
 
@@ -2045,7 +2070,9 @@ class GeospatialScenario(Scenario):
         vmin: Union[int, float] = 0,
         vmax: Optional[Union[int, float]] = None,
     ) -> tuple[matplotlib.figure, matplotlib.axes]:
-        """Plot a vizualization of the geospatial scenario result. Only works on
+        """Plot a vizualization of the geospatial scenario result.
+
+        Only works on
         geospatial scenarios.
 
         Parameters

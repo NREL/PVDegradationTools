@@ -73,13 +73,11 @@ def eff_gap_parameters(
         be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
         this can vary significantly.
 
-
     References
     ----------
     R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
     estimation, analysis of wind characteristics and energy potential assessment for selected
     sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
-
 
     Returns
     -------
@@ -222,7 +220,9 @@ def standoff(
     irradiance_kwarg={},
     model_kwarg={},
 ) -> pd.DataFrame:
-    """Calculate a minimum standoff distance for roof mounded PV systems. Will default
+    """Calculate a minimum standoff distance for roof mounded PV systems.
+
+    Will default
     to horizontal tilt. If the azimuth is not provided, it will use equator facing. You
     can use customized temperature models for the building integrated and the rack
     mounted configuration, but it will still assume an exponential decay.
@@ -596,7 +596,9 @@ def standoff_x(
     wind_factor=None,
     model_kwarg={},
 ):
-    """Calculate a minimum standoff distance for roof mounded PV systems. Will default
+    """Calculate a minimum standoff distance for roof mounded PV systems.
+
+    Will default
     to horizontal tilt and return only that value. It just passes through the calling
     function and returns a single value.
 

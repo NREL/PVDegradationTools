@@ -20,7 +20,9 @@ from . import (
 
 
 def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
-    """Helper function. Find the rate of degradation kenetics using the Fischer model.
+    """Helper function.
+
+    Find the rate of degradation kenetics using the Fischer model.
     Degradation kentics model interpolated 50 coatings with respect to color shift,
     cracking, gloss loss, fluorescense loss, retroreflectance loss, adhesive transfer,
     and shrinkage.
@@ -55,7 +57,9 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
 
 
 def _deg_rate_chamber(I_chamber, p):
-    """Helper function. Find the rate of degradation kenetics of a simulated chamber.
+    """Helper function.
+
+    Find the rate of degradation kenetics of a simulated chamber.
     Mike Kempe's calculation of the rate of degradation inside a accelerated degradation
     chamber.
 
@@ -80,7 +84,9 @@ def _deg_rate_chamber(I_chamber, p):
 
 
 def _acceleration_factor(numerator, denominator):
-    """Helper Function. Find the acceleration factor.
+    """Helper Function.
+
+    Find the acceleration factor.
 
     (ADD IEEE reference)
 
@@ -166,7 +172,6 @@ def vantHoff_deg(
         keyword argument dictionary used for the pvlib temperature model calculation.
         See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
-
     Returns
     -------
     accelerationFactor : float or series
@@ -206,7 +211,7 @@ def vantHoff_deg(
 
 
 def _to_eq_vantHoff(temp, Tf=1.41):
-    """Function to obtain the Vant Hoff temperature equivalent [°C]
+    """Function to obtain the Vant Hoff temperature equivalent [°C].
 
     Parameters
     ----------
@@ -246,7 +251,8 @@ def IwaVantHoff(
     irradiance_kwarg={},
 ):
     """
-    IWa : Environment Characterization [W/m²]
+    IWa : Environment Characterization [W/m²].
+
     For one year of degredation the controlled environmnet lamp settings will
     need to be set to IWa.
 
@@ -293,12 +299,10 @@ def IwaVantHoff(
         keyword argument dictionary used for the pvlib temperature model calculation.
         See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
-
     Returns
     --------
     Iwa : float
         Environment Characterization [W/m²[]
-
     """
     if poa is None:
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
@@ -338,7 +342,9 @@ def IwaVantHoff(
 
 
 def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
-    """Helper function. Calculates the rate of degredation of the Environmnet.
+    """Helper function.
+
+    Calculates the rate of degredation of the Environmnet.
 
     Parameters
     ----------
@@ -382,7 +388,9 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
 
 
 def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
-    """Helper function. Find the rate of degradation of a simulated chamber.
+    """Helper function.
+
+    Find the rate of degradation of a simulated chamber.
 
     Parameters
     ----------
@@ -444,7 +452,8 @@ def arrhenius_deg(
     model_kwarg={},
     irradiance_kwarg={},
 ):
-    """Calculate the Acceleration Factor between the rate of degredation of a modeled
+    """Calculate the Acceleration Factor between the rate of degredation of a modeled.
+
     environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1
     year of Controlled Environment exposure is equal to 25 years in the field".
 
@@ -643,7 +652,9 @@ def IwaArrhenius(
     model_kwarg={},
     irradiance_kwarg={},
 ) -> float:
-    """Function to calculate IWa, the Environment Characterization [W/m²]. For one year
+    """Function to calculate IWa, the Environment Characterization [W/m²].
+
+    For one year
     of degredation the controlled environmnet lamp settings will need to be set at IWa.
 
     Parameters
@@ -697,8 +708,6 @@ def IwaArrhenius(
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
         See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
-
-
 
     Returns
     --------
@@ -756,7 +765,9 @@ def IwaArrhenius(
 
 
 def _rh_Above85(rh):
-    """Helper function. Determines if the relative humidity is above 85%.
+    """Helper function.
+
+    Determines if the relative humidity is above 85%.
 
     Parameters
     ----------
@@ -780,7 +791,9 @@ def _rh_Above85(rh):
 
 
 def _hoursRH_Above85(df):
-    """Helper Function. Count the number of hours relative humidity is above 85%.
+    """Helper Function.
+
+    Count the number of hours relative humidity is above 85%.
 
     Parameters
     ----------
@@ -813,7 +826,6 @@ def _whToGJ(wh):
     -------
     gj : float
         Value in GJ/m²
-
     """
 
     gj = 0.0000036 * wh
@@ -836,7 +848,6 @@ def _gJtoMJ(gJ):
     -------
     MJ : float
         Value in MJ/m^-2
-
     """
     MJ = gJ * 1000
 
@@ -854,7 +865,8 @@ def degradation(
     C2: float = 0.07,
     C: float = 1.0,
 ) -> float:
-    """Compute degredation as double integral of Arrhenius (Activation Energy, RH,
+    """Compute degredation as double integral of Arrhenius (Activation Energy, RH,.
+
     Temperature) and spectral (wavelength, irradiance) functions over wavelength and
     time.
 
@@ -936,7 +948,7 @@ def degradation(
 def vecArrhenius(
     poa_global: np.ndarray, module_temp: np.ndarray, ea: float, x: float, lnr0: float
 ) -> float:
-    """Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
+    """Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`.
 
     Parameters
     ----------

@@ -92,7 +92,9 @@ def _create_sample_sheet(
     wind_height: int = -1,
     Source: str = "SampleSheet",
 ):
-    """Create a dummy sample dataset containing weather for one gid. This will be called
+    """Create a dummy sample dataset containing weather for one gid.
+
+    This will be called
     a sheet, a single location of weather_data from the dataset with the gid coordinate
     still present.
 

@@ -229,13 +229,13 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
 
 
 def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
-    """Applies a function to each gid of a weather dataset. `analysis` will attempt to
+    """Applies a function to each gid of a weather dataset.
+
+    `analysis` will attempt to
     create a template using `geospatial.auto_template`. If this process fails you will
     have to provide a geospatial template to the template argument.
 
     ValueError: <function-name> cannot be autotemplated. create a template manually with `geospatial.output_template`
-
-
 
     Parameters
     ----------
@@ -291,7 +291,9 @@ def output_template(
     global_attrs=dict(),
     add_dims=dict(),
 ):
-    """Generates a xarray template for output data. Output variables and associated
+    """Generates a xarray template for output data.
+
+    Output variables and associated
     dimensions need to be specified via the shapes dictionary. The dimension length are
     derived from the input data. Additonal output dimensions can be defined with the
     add_dims argument.
@@ -547,6 +549,7 @@ def can_auto_template(func) -> None:
 def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
     Automatically create a template for a target function: `func`.
+
     Only works on functions that have the `numeric_or_timeseries` and `shape_names` attributes.
     These attributes are assigned at function definition with the `@geospatial_quick_shape` decorator.
 
@@ -688,7 +691,9 @@ def plot_Europe(
 
 
 def meta_KDtree(meta_df, leaf_size=40, fp=None):
-    """Create a sklearn.neighbors.KDTree for fast geospatial lookup operations. Requires
+    """Create a sklearn.neighbors.KDTree for fast geospatial lookup operations.
+
+    Requires
     Scikit Learn library. Not included in pvdeg depency list.
 
     Parameters
@@ -767,6 +772,7 @@ def identify_mountains_radii(
     bbox_kwarg={},
 ) -> np.array:
     """Find mountains from elevation metadata using sklearn kdtree for fast lookup.
+
     Compares a large area of points to a small area of points to find significant
     changes in elevation representing mountains. Tweak the radii to determine the
     sensitivity and noise. Bad radii cause the result to become unstable quickly. kdtree
@@ -826,7 +832,8 @@ def identify_mountains_weights(
     method="mean",
     normalization="linear",
 ) -> np.array:
-    """Find mountains using weights calculated via changes in nearest neighbors
+    """Find mountains using weights calculated via changes in nearest neighbors.
+
     elevations.
 
     Parameters:
@@ -1074,7 +1081,9 @@ def interpolate_analysis(
     method="nearest",
     resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Interpolate sparse spatial result data against DataArray coordinates. Takes
+    """Interpolate sparse spatial result data against DataArray coordinates.
+
+    Takes
     DataArray instead of Dataset, index one variable of a dataset to get a dataarray.
 
     Parameters:

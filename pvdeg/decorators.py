@@ -10,6 +10,7 @@ import warnings
 
 def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -> None:
     """Add an attribute to the functions that can be run with geospatial analysis.
+
     Strict typing is not enough for this purpose so we can view this attribute at
     runtime to create a template for the function.
 

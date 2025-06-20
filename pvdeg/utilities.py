@@ -108,7 +108,9 @@ def write_gids(
     gids=None,
     out_fn="gids",
 ):
-    """Generate a .CSV file containing the GIDs for the spatial test range. The .CSV
+    """Generate a .CSV file containing the GIDs for the spatial test range.
+
+    The .CSV
     file will be saved to the working directory.
 
     TODO: specify output file name and directory?
@@ -547,7 +549,9 @@ def _add_material(
     fickian=True,
     fname="O2permeation.json",
 ):
-    """Add a new material to the materials.json database. Check the parameters for
+    """Add a new material to the materials.json database.
+
+    Check the parameters for
     specific units. If material already exists, parameters will be updated.
 
     TODO: check if material is already existing
@@ -708,7 +712,7 @@ def tilt_azimuth_scan(
 
 def _meta_df_from_csv(file_paths: list[str]):
     """
-    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
+    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)].
 
     Parameters
     ----------
@@ -956,7 +960,9 @@ def new_id(collection):
 def restore_gids(
     original_meta_df: pd.DataFrame, analysis_result_ds: xr.Dataset
 ) -> xr.Dataset:
-    """Restore gids to results dataset. For desired behavior output data must have
+    """Restore gids to results dataset.
+
+    For desired behavior output data must have
     identical ordering to input data, otherwise will fail silently by misassigning gids
     to lat-long coordinates in returned dataset.
 
@@ -1083,7 +1089,9 @@ def _calc_elevation_weights(
     normalization: str,
     kdtree,
 ) -> np.array:
-    """Utility function. caluclate a weight for each point in a dataset to use for
+    """Utility function.
+
+    caluclate a weight for each point in a dataset to use for
     probabalistic downselection.
 
     Parameters:
@@ -1153,6 +1161,7 @@ def _calc_elevation_weights(
 
 def fix_metadata(meta):
     """Meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
+
     remove each subdict and replace with value for each key.
 
     Parameters:
@@ -1171,7 +1180,9 @@ def fix_metadata(meta):
 # we want this to only exist for things that can be run on kestrel
 # moving away from hpc tools so this may not be useful in the future
 def nrel_kestrel_check():
-    """Check if the user is on Kestrel HPC environment. Passes silently or raises a
+    """Check if the user is on Kestrel HPC environment.
+
+    Passes silently or raises a
     ConnectionError if not running on Kestrel. This will fail on AWS.
 
     Returns:
@@ -1200,6 +1211,7 @@ def nrel_kestrel_check():
 
 def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
     """Move `cwd` to fp and remove all scenario file trees from fp directory.
+
     Permanently deletes all scenario file trees. USE WITH CAUTION.
 
     Parameters:
@@ -1327,7 +1339,9 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
 
 
 def merge_sparse(files: list[str]) -> xr.Dataset:
-    """Merge an arbitrary number of geospatial analysis results. Creates monotonically
+    """Merge an arbitrary number of geospatial analysis results.
+
+    Creates monotonically
     increasing indicies.
 
     Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.

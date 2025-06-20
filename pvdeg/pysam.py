@@ -160,7 +160,9 @@ def pysam(
     config_files: dict[str:str] = None,
     results: list[str] = None,
 ) -> dict:
-    """Run pySam simulation. Only works with pysam weather.
+    """Run pySam simulation.
+
+    Only works with pysam weather.
 
     Parameters
     -----------
@@ -515,7 +517,9 @@ def solar_resource_dict(weather_df, meta):
 
 
 def sample_inspire_result(weather_df, meta):  # throw weather, meta away
-    """Returns a sample inspire_ground_irradiance xarray. Dataset for geospatial
+    """Returns a sample inspire_ground_irradiance xarray.
+
+    Dataset for geospatial
     testing. Weather_df and meta exist to provide a homogenous arugment structure for
     geospatial calculations but are not used.
 
