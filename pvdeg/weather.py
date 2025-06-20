@@ -397,7 +397,6 @@ def read_h5(gid, file, attributes=None, **_):
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-
     if os.path.dirname(file):
         fp = file
     else:
@@ -409,7 +408,7 @@ def read_h5(gid, file, attributes=None, **_):
         dattr = f.attrs
 
     # TODO: put into utilities
-    if attributes == None:
+    if attributes is None:
         attributes = list(dattr.keys())
         try:
             attributes.remove("meta")
@@ -426,11 +425,11 @@ def read_h5(gid, file, attributes=None, **_):
 
 
 def ini_h5_geospatial(fps):
-    """Initialize an h5 weather file that follows NSRDB conventions for geospatial
-    analyses.
+    """
+    Initialize h5 weather file that follows NSRDB conventions for geospatial analyses.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : (str)
         file path and name of h5 file to be read
     gid : (int)
@@ -438,8 +437,8 @@ def ini_h5_geospatial(fps):
     attributes : (list)
         List of weather attributes to extract from NSRDB
 
-    Returns:
-    --------
+    Returns
+    -------
     weather_df : (pd.DataFrame)
         DataFrame of weather data
     meta : (dict)
@@ -532,8 +531,8 @@ def ini_h5_geospatial(fps):
 def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
     """Get a list of NSRDB files for a given satellite and year.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     satellite : (str)
         'GOES', 'METEOSAT', 'Himawari', 'SUNY', 'CONUS', 'Americas'
     names : (int or str)
@@ -544,15 +543,14 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
         If True, use NREL HPC path
         If False, use AWS path
 
-    Returns:
-    --------
+    Returns
+    -------
     nsrdb_fnames : (list)
         List of NSRDB files for a given satellite and year
     hsds : (bool)
         If True, use h5pyd to access NSRDB files
         If False, use h5py to access NSRDB files
     """
-
     sat_map = {
         "GOES": "full_disc",
         "METEOSAT": "meteosat",
@@ -561,7 +559,6 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
         "CONUS": "conus",
         "Americas": "current",
     }
-
     if NREL_HPC:
         hpc_fp = "/datasets/NSRDB/"
         hsds = False
@@ -602,8 +599,8 @@ def get_NSRDB(
 
     Provide either gid or location tuple.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     satellite : (str)
         'GOES', 'METEOSAT', 'Himawari', 'SUNY', 'CONUS', 'Americas'
     names : (int or str)
@@ -619,19 +616,18 @@ def get_NSRDB(
     attributes : (list)
         List of weather attributes to extract from NSRDB
 
-    Returns:
-    --------
+    Returns
+    -------
     weather_df : (pd.DataFrame)
         DataFrame of weather data
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz", "timezone": "tz"}
 
     if (
-        satellite == None
+        satellite is None
     ):  # TODO: This function is not fully written as of January 3, 2024
         satellite, gid = get_satellite(location)
     if not geospatial:
@@ -643,7 +639,7 @@ def get_NSRDB(
         for i, file in enumerate(nsrdb_fnames):
             with NSRDBX(file, hsds=hsds) as f:
                 if i == 0:
-                    if gid == None:  # TODO: add exception handling
+                    if gid is None:  # TODO: add exception handling
                         gid = f.lat_lon_gid(location)
                     meta = f["meta", gid].iloc[0]
                     index = f.time_index
@@ -652,7 +648,7 @@ def get_NSRDB(
                 for attr in lattr:
                     dattr[attr] = file
 
-        if attributes == None:
+        if attributes is None:
             attributes = list(dattr.keys())
             try:
                 attributes.remove("meta")
@@ -687,8 +683,8 @@ def get_NSRDB(
         # new versions have multiple files per satellite-year to reduce filesizes
         # this is great for yearly data but TMY has multiple files
         # the year attached to the TMY file in the filesystem/name is seemingly
-        # the year it was created. this creates problems, we only want to combine the files
-        # if they are NOT TMY
+        # the year it was created. this creates problems, we only want to combine the
+        # files if they are NOT TMY
 
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
 
@@ -722,8 +718,8 @@ def repeat_annual_time_series(time_series, start_year, n_years):
     TODO: make it possible to have weirder time series, e.g. non uniform intervals.
     Include option for synthetic leap day data
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     time_series : (pd.DataFrame)
         pandas dataframe with DatetimeIndex
 
@@ -733,12 +729,11 @@ def repeat_annual_time_series(time_series, start_year, n_years):
     n_years : (int)
         number of years to repeat time_series
 
-    Returns:
-    --------
+    Returns
+    -------
     new_time_series : (pd.DataFrame)
         pandas dataframe repeated n_years
     """
-
     if len(time_series) % 8760 != 0:
         raise ValueError("Length of time_series must be a multiple of 8760")
 
@@ -1282,9 +1277,11 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
 def weather_distributed(
     database: str, coords: list[tuple], api_key: str = None, email: str = None
 ):
-    """Grab weather using pvgis for all of the following locations using dask for
-    parallelization. You must create a dask client with multiple processes before
-    calling this function, otherwise results will not be properly calculated.
+    """Grab weather using pvgis for all following locations using dask.
+
+    Dask is used for parallelization. You must create a dask client with multiple
+    processes before calling this function, otherwise results will not be properly
+    calculated.
 
     PVGIS supports up to 30 requests per second so your dask client should not have more
     than $x$ workers/threads
