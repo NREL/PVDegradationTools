@@ -455,19 +455,17 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 
     src_data, src_meta = iotools.tmy.read_tmy3(file_in, coerce_year=2023)
 
-    save_cols = {
-        "DNI": "dni",
-        "DHI": "dhi",
-        "GHI": "ghi",
-        "DryBulb": "temp_air",
-        "DewPoint": "dew_point",
-        "RHum": "relative_humidity",
-        "Wspd": "wind_speed",
-        "Alb": "albedo",
-    }
-
-    df_new = src_data[save_cols.keys()].copy()
-    df_new.columns = save_cols.values()
+    save_cols = [
+        "dni",
+        "dhi",
+        "ghi",
+        "temp_air",
+        "relative_humidity",
+        "wind_speed",
+        "albedo",
+    ]
+    
+    df_new = src_data[save_cols].copy()
     time_index = df_new.index
 
     meta = {
