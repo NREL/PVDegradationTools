@@ -1,7 +1,5 @@
 import os
 import pandas as pd
-import numpy as np
-import pytest
 import pvdeg
 from pvdeg import TEST_DATA_DIR
 import json

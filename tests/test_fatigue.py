@@ -6,7 +6,6 @@ coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 
 import os
 import pytest
-import pandas as pd
 from pvdeg import fatigue, weather, TEST_DATA_DIR
 
 PSM_FILE = os.path.join(TEST_DATA_DIR, "psm3_pytest.csv")

@@ -13,7 +13,6 @@ import pvlib
 from pvdeg import (
     collection,
     utilities,
-    standards,
     decorators,
     DATA_DIR,
 )

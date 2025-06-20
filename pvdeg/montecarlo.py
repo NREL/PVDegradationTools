@@ -2,9 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from numba import njit
 from scipy.linalg import cholesky
-from scipy import stats
 from typing import Callable
 import inspect
 
@@ -132,7 +130,7 @@ def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.Dat
     # incomplete dataset
     for mc in stats:
         if "mean" not in stats[mc] or "stdev" not in stats[mc]:
-            raise ValueError(f"Missing 'mean' or 'stdev' for modeling constant")
+            raise ValueError("Missing 'mean' or 'stdev' for modeling constant")
 
     # unpack data
     modeling_constants = list(stats.keys())
@@ -149,7 +147,7 @@ def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.Dat
 
     # what happens if columns do not match?
     if len(uniques) != len(corr):
-        raise ValueError(f"correlation data is insufficient")
+        raise ValueError("correlation data is insufficient")
 
     # should match columns from correlation matrix
     stats_df = stats_df[uniques]

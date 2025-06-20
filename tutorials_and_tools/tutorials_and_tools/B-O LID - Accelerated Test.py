@@ -42,7 +42,8 @@ import matplotlib.pyplot as plt
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 import pvdeg
 
 print("Working on a ", platform.system(), platform.release())

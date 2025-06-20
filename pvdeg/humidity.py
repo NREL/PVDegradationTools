@@ -2,14 +2,9 @@
 
 import numpy as np
 import pandas as pd
-import pvlib
 from numba import njit
-from rex import NSRDBX
-from rex import Outputs
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from pvdeg import temperature, spectral, weather, decorators
+from pvdeg import temperature, spectral, decorators
 
 
 def _ambient(weather_df):

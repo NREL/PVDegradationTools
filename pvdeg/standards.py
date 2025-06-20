@@ -3,19 +3,12 @@
 import numpy as np
 import pandas as pd
 import dask.dataframe as dd
-import pvlib
-from rex import NSRDBX
-from rex import Outputs
-from pathlib import Path
-from random import random
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import Union, Tuple
+from typing import Union
 
 # from gaps import ProjectPoints
 from pvdeg import (
     temperature,
     spectral,
-    utilities,
     weather,
     decorators,
 )
@@ -188,7 +181,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
     try:
         x_eff = -x_0 * np.log(1 - summ / n)
         # x_eff = np.multiply(np.negative(x_0), np.log(np.subtract(1, np.divide(summ, n))))
-    except RuntimeWarning as e:
+    except RuntimeWarning:
         x_eff = (
             np.nan
         )  # results if the specified T₉₈ is cooler than an open_rack temperature
@@ -351,7 +344,7 @@ def standoff(
 
     try:
         x = -x_0 * np.log(1 - (T98_0 - T98) / (T98_0 - T98_inf))
-    except RuntimeWarning as e:
+    except RuntimeWarning:
         x = np.nan
         # results if the specified T₉₈ is cooler than an open_rack temperature
     if x < 0:
@@ -397,7 +390,7 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
                 x80 = -(-x70 / (np.log(1 - (T98_0 - 70) / (T98_0 - T98_inf)))) * np.log(
                     1 - (T98_0 - 80) / (T98_0 - T98_inf)
                 )
-            except RuntimeWarning as e:
+            except RuntimeWarning:
                 x80 = None
     else:
         x70 = None

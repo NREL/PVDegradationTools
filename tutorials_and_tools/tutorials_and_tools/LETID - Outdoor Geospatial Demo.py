@@ -10,13 +10,9 @@
 
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import pvdeg
 from pvdeg import DATA_DIR
-import dask.array as da
-import dask.dataframe as dd
-import xarray as xr
 import os
 
 
@@ -24,7 +20,8 @@ import os
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -155,9 +152,6 @@ letid_res
 # In[18]:
 
 
-from matplotlib.animation import FuncAnimation
-from matplotlib.animation import PillowWriter
-import matplotlib.animation as animation
 import datetime
 
 ims = []
@@ -187,9 +181,6 @@ for n in range(1, 13):
 # In[34]:
 
 
-from matplotlib.animation import FuncAnimation
-from matplotlib.animation import PillowWriter
-import matplotlib.animation as animation
 import datetime
 
 ims = []

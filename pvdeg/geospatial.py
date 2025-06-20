@@ -5,7 +5,6 @@ from pvdeg import (
     humidity,
     letid,
     utilities,
-    pysam,
     decorators,
 )
 

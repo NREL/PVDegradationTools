@@ -50,7 +50,8 @@ import matplotlib.pyplot as plt
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -195,7 +196,7 @@ weather
 
 
 # if our weather file doesn't have precipitable water, calculate it with pvlib
-if not "precipitable_water" in weather.columns:
+if "precipitable_water" not in weather.columns:
     weather["precipitable_water"] = pvlib.atmosphere.gueymard94_pw(
         weather["temp_air"], weather["relative_humidity"]
     )

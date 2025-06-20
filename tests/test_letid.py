@@ -3,13 +3,11 @@ from pvdeg import weather, letid, utilities, collection, DATA_DIR, TEST_DATA_DIR
 
 import os
 import pandas as pd
-import numpy as np
 import json
-from pvlib.pvsystem import retrieve_sam
 from scipy.constants import convert_temperature
 
 import pvlib
-from pvlib.pvsystem import PVSystem, FixedMount
+from pvlib.pvsystem import PVSystem
 from pvlib.location import Location
 from pvlib.modelchain import ModelChain
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS

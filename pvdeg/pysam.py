@@ -8,13 +8,11 @@ import dask.array as da
 import pandas as pd
 import xarray as xr
 import numpy as np
-import pickle
 import json
-import sys
 import os
 
 
-from pvdeg import weather, utilities, decorators, DATA_DIR
+from pvdeg import weather, utilities, decorators
 
 
 @decorators.deprecated("unverified")

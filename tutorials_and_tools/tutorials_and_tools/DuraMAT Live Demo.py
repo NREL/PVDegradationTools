@@ -18,20 +18,16 @@
 # In[2]:
 
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import pvdeg
-import dask.array as da
-import dask.dataframe as dd
-import xarray as xr
 
 
 # In[ ]:
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)

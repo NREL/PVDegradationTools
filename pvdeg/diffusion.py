@@ -5,9 +5,7 @@ import os
 import json
 import pandas as pd
 from pvdeg import DATA_DIR
-from numba import jit
 import numpy as np
-from typing import Callable
 
 
 def esdiffusion(

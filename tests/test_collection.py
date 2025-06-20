@@ -8,7 +8,7 @@ import pytest
 import os
 import pandas as pd
 import numpy as np
-from pvdeg import collection, TEST_DIR, DATA_DIR
+from pvdeg import collection, DATA_DIR
 
 fgen = os.path.join(DATA_DIR, "PVL_GenProfile.xlsx")
 generation_df = pd.read_excel(fgen, header=0, engine="openpyxl")

@@ -1,8 +1,6 @@
 """Configuration file for pvdeg package."""
 
 from pathlib import Path
-import sys
-import os
 
 # Specify module directories
 PVDEG_DIR = Path(__file__).parent

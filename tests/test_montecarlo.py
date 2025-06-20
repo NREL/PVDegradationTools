@@ -1,7 +1,6 @@
 # TODO:
 # correlation list is empty AND correlation list is populated with r = 0's
 
-import pytest
 import os
 import json
 import pandas as pd

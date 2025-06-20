@@ -5,7 +5,6 @@ import numpy as np
 from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
-import inspect
 from random import choices
 from string import ascii_uppercase
 from collections import OrderedDict

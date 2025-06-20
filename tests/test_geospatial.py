@@ -1,6 +1,5 @@
 import pvdeg
 from pvdeg import TEST_DATA_DIR
-import pickle
 import pandas as pd
 import numpy as np
 import xarray as xr

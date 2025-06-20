@@ -10,7 +10,6 @@ from pvdeg import (
 )
 import pandas as pd
 from typing import Union
-from functools import partial
 import inspect
 
 

@@ -9,7 +9,7 @@ import json
 import pytest
 import pandas as pd
 import pvdeg
-from pvdeg import TEST_DATA_DIR, DATA_DIR, TEST_DIR
+from pvdeg import TEST_DATA_DIR
 
 """
 TODO: during conversion from pkl to csv, a few fields dropped from float64 to float32.

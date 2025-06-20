@@ -2,7 +2,6 @@ from pvdeg.scenario import Scenario
 from pvdeg.standards import standoff
 from pvdeg import TEST_DATA_DIR
 from pvdeg import weather
-import json
 import pandas as pd
 import pytest
 import os

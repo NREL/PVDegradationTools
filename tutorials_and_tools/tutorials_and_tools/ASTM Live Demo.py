@@ -36,7 +36,6 @@ import os
 import pvlib
 import pvdeg
 import pandas as pd
-from pvdeg import DATA_DIR
 import matplotlib.pyplot as plt
 
 
@@ -44,7 +43,8 @@ import matplotlib.pyplot as plt
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
