@@ -1012,18 +1012,20 @@ def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
     weather_df : pd.DataFrame
         The input DataFrame containing TMY data with a UTC datetime index.
     meta : dict
-        Metadata dictionary containing at least the 'tz' key, representing timezone offset in hours
-        (e.g., -8 for UTC-8).
+        Metadata dictionary containing at least the 'tz' key, representing timezone
+        offset in hours (e.g., -8 for UTC-8).
 
     Returns:
     -------
     pd.DataFrame
-        The rolled DataFrame aligned to local times with a new datetime index spanning a typical year.
+        The rolled DataFrame aligned to local times with a new datetime index spanning a
+        typical year.
 
     Raises:
     ------
     ValueError
-        If the timezone offset is not a multiple of the data frequency or if the frequency cannot be inferred.
+        If the timezone offset is not a multiple of the data frequency or if the
+        frequency cannot be inferred.
     """
     # Extract timezone offset in hours
     tz_offset = meta.get("tz", 0)  # Default to UTC if not specified
@@ -1149,11 +1151,10 @@ def _weather_distributed_vec(
         NSRDB developer email (see `pvdeg.weather.get`)
 
     Returns
-    --------
+    -------
         Returns ds, dict, None if unsucessful
         Returns None, None, Exception if unsucessful
     """
-
     try:
         if database == "PVGIS":  # does not need api key
             weather_df, meta_dict = get(database=database, id=coord)
@@ -1196,9 +1197,10 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
     Returns
     -------
     weather_ds: xarray.Dataset
-        Weather dataset of the same format/shapes given by a `pvdeg.weather.get` geospatial call or `pvdeg.weather.weather_distributed` call or `GeosptialScenario.get_geospatial_data`.
+        Weather dataset of the same format/shapes given by a `pvdeg.weather.get`
+        geospatial call or `pvdeg.weather.weather_distributed` call or
+        GeosptialScenario.get_geospatial_data`.
     """
-
     import dask.array as da
 
     pvgis_shapes = {
@@ -1271,8 +1273,11 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
 
 
 # TODO: implement rate throttling so we do not make too many requests.
-# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
+# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means
+# twice the speed ;)
 # TODO: this overwrites NSRDB GIDS when database == "PSM3"
+
+
 def weather_distributed(
     database: str, coords: list[tuple], api_key: str = None, email: str = None
 ):
@@ -1280,10 +1285,12 @@ def weather_distributed(
     parallelization. You must create a dask client with multiple processes before
     calling this function, otherwise results will not be properly calculated.
 
-    PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads
+    PVGIS supports up to 30 requests per second so your dask client should not have more
+    than $x$ workers/threads
     that would put you over this limit.
 
-    NSRDB (including `database="PSM3"`) is rate limited and your key will face restrictions after making too many requests.
+    NSRDB (including `database="PSM3"`) is rate limited and your key will face
+    restrictions after making too many requests.
     See rates [here](https://developer.nrel.gov/docs/solar/nsrdb/guide/).
 
     Parameters
@@ -1308,18 +1315,20 @@ def weather_distributed(
 
     email: str
         Only required when making NSRDB requests using "PSM3".
-        [NSRDB developer account email associated with `api_key`](https://developer.nrel.gov/signup/)
+        [NSRDB developer account email associated with `api_key`]
+        https://developer.nrel.gov/signup/)
 
     Returns
-    --------
+    -------
     weather_ds : xr.Dataset
-        Weather data for all locations requested in an xarray.Dataset using a dask array backend.
+        Weather data for all locations requested in an xarray.Dataset using a dask array
+        backend.
     meta_df : pd.DataFrame
-        Pandas DataFrame containing metadata for all requested locations. Each row maps to a single entry in the weather_ds.
+        Pandas DataFrame containing metadata for all requested locations. Each row maps
+        to a single entry in the weather_ds.
     gids_failed: list
         list of index failed coordinates in input `coords`
     """
-
     import dask.delayed
     import dask.distributed
 
@@ -1340,7 +1349,8 @@ def weather_distributed(
     ]
     results = dask.compute(futures)[0]  # values are returned in a list with one entry
 
-    # what is the difference between these two approaches for dask distributed work, how can we schedule differently
+    # what is the difference between these two approaches for dask distributed work,
+    # how can we schedule differently
     # i believe futures might be better for our needs
     # futures = [client.submit(weather_distributed, "PVGIS", coord) for coord in coords]
     # client.gather(futures)
@@ -1356,7 +1366,8 @@ def weather_distributed(
     time_length = weather_ds_collection[0].sizes["time"]
     periodicity = ENTRIES_PERIODICITY_MAP[time_length]
 
-    # weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather xr.dataset
+    # weather_ds = pvgis_hourly_empty_weather_ds(len(results)) # create empty weather
+    # xr.dataset
     weather_ds = empty_weather_ds(
         gids_size=len(results),
         periodicity=periodicity,
@@ -1367,7 +1378,8 @@ def weather_distributed(
         meta_dict_collection
     )  # create populated meta pd.DataFrame
 
-    # gids are spatially meaningless if data is from PVGIS, they will only show corresponding entries between weather_ds and meta_df
+    # gids are spatially meaningless if data is from PVGIS, they will only show
+    # corresponding entries between weather_ds and meta_df
     # only meaningfull if data is from NSRDB
     # this loop can be refactored, it is a little weird
     for i, row in enumerate(results):
@@ -1379,7 +1391,8 @@ def weather_distributed(
 
     return weather_ds, meta_df, indexes_failed
 
-    # def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+    # def _nsrdb_to_uniform(
+    # weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
     #     map_weather(weather_df=weather_df)
     #     map_meta(meta)
@@ -1420,7 +1433,8 @@ def weather_distributed(
     ...
 
 
-# def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _pvgis_to_uniform(
+# weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
 # map_weather(weather_df=weather_df)
 # map_meta(meta)
