@@ -334,7 +334,7 @@ c_norm = 1.35  # Normalization constants "C_norm". See Repins 2023 for details
 ax2.plot(
     timesteps["time (s)"], timesteps["NDD"] * c_norm, c="black", label="NDD modeled"
 )
-ax.set_ylabel("NDD [$\mu s^{-1}$]")
+ax.set_ylabel(r"NDD [$\mu s^{-1}$]")
 
 literature_data_file = os.path.join(DATA_DIR, "wyller data.csv")
 data = pd.read_csv(literature_data_file, header=0)
@@ -645,7 +645,7 @@ for name, group in grouped_model:
     ax.plot(
         group["time (s)"] + 0.1,
         group["NDD-normalized"],
-        label=f"Modeled NDD {name}$\degree$C",
+        label=rf"Modeled NDD {name}$\degree$C",
     )
     ax.legend()
 
@@ -656,7 +656,7 @@ for name, group in grouped_data:
     ax.scatter(
         group["X"],
         group["Y"],
-        label=f"Wyller NDD {name}$\degree$C",
+        label=rf"Wyller NDD {name}$\degree$C",
         marker=next(marker),
     )
     ax.legend()
@@ -664,7 +664,7 @@ for name, group in grouped_data:
 ax.set_xscale("log")
 
 ax.set_xlabel("Time [s]")
-ax.set_ylabel("NDD [$\mu s^{-1}$]")
+ax.set_ylabel(r"NDD [$\mu s^{-1}$]")
 
 plt.show()
 
@@ -683,7 +683,7 @@ for name, group in grouped_model:
         group["time (s)"] + 0.1,
         group["NDD-normalized"],
         color=next(colors),
-        label=f"Modeled {name}$\degree$C",
+        label=rf"Modeled {name}$\degree$C",
         linewidth=3,
     )
     ax.legend(prop={"size": 12})
@@ -695,7 +695,7 @@ for name, group in grouped_data:
     ax.scatter(
         group["X"],
         group["Y"],
-        label=f"Literature data  {name}$\degree$C",
+        label=rf"Literature data  {name}$\degree$C",
         color=next(colors),
         marker=next(marker),
         s=70,
@@ -708,7 +708,7 @@ ax.tick_params(axis="both", which="major", labelsize=16)
 
 
 ax.set_xlabel("Time [s]", fontsize=16)
-ax.set_ylabel("Normalized defect \n density [$\mu s^{-1}$]", fontsize=16)
+ax.set_ylabel("Normalized defect \n density [$\\mu s^{-1}$]", fontsize=16)
 
 ax.set_title("Modeled vs. Literature LETID data", fontsize=16)
 

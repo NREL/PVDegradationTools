@@ -201,7 +201,7 @@ ax2.plot(
 ax1.set_ylim([0, 1000])
 ax2.set_ylim([0, 50])
 ax1.set_ylabel("DNI")
-ax2.set_ylabel("Temperature $\degree$C")
+ax2.set_ylabel(r"Temperature $\degree$C")
 
 
 # ## 2. Calculate Installation Standoff - Level 1
