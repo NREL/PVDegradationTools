@@ -1,6 +1,5 @@
 """Collection of classes and functions to obtain spectral parameters."""
 
-import dask.distributed
 from pvdeg import humidity
 from pvdeg.utilities import nrel_kestrel_check
 
@@ -9,11 +8,9 @@ import os
 import glob
 import pandas as pd
 from rex import NSRDBX, Outputs
-from pvdeg import humidity
 import datetime
 import numpy as np
 import h5py
-import dask.dataframe as dd
 import xarray as xr
 
 
@@ -36,11 +33,10 @@ ENTRIES_PERIODICITY_MAP = {
 
 
 def get(database, id=None, geospatial=False, **kwargs):
-    """Load weather data directly from  NSRDB or through any other PVLIB i/o tools
-    function.
+    """Load weather data from  NSRDB or any other PVLIB io tools function.
 
     Parameters
-    -----------
+    ----------
     database : (str)
         'NSRDB' or 'PVGIS'. Use "PSM3" for tmy NSRDB data.
     id : (int or tuple)
@@ -56,15 +52,17 @@ def get(database, id=None, geospatial=False, **kwargs):
         (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
 
     Returns
-    --------
+    -------
     weather_df : (pd.DataFrame)
         DataFrame of weather data
     meta : (dict)
         Dictionary of metadata for the weather data
 
     Example
-    --------
-    Collecting a single site of PSM3 NSRDB data. *Api key and email must be replaced with your personal api key and email*. [Request a key!](https://developer.nrel.gov/signup/)
+    -------
+    Collecting a single site of PSM3 NSRDB data. *Api key and email must be replaced
+    with your personal api key and email*.
+    [Request a key!](https://developer.nrel.gov/signup/)
 
     .. code-block:: python
 
@@ -76,7 +74,8 @@ def get(database, id=None, geospatial=False, **kwargs):
             'map_variables': True
         }
 
-        weather_df, meta_dict = pvdeg.weather.get(database="PSM3", id=(25.783388, -80.189029), **weather_arg)
+        weather_df, meta_dict =
+        pvdeg.weather.get(database="PSM3",id=(25.783388, -80.189029), **weather_arg)
 
     Collecting a single site of PVGIS TMY data
 
@@ -84,7 +83,6 @@ def get(database, id=None, geospatial=False, **kwargs):
 
         weather_df, meta_dict = pvdeg.weather.get(database="PVGIS", id=(49.95, 1.5))
     """
-
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     if type(id) is tuple:
@@ -172,15 +170,14 @@ def read(file_in, file_type, map_variables=True, **kwargs):
 
     #TODO: add error handling
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_in : (path)
         full file path to the desired weather file
     file_type : (str)
         type of weather file from list below (verified)
         [psm3, tmy3, epw, h5, csv]
     """
-
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
@@ -205,7 +202,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         meta = meta.to_dict()
 
     # map meta-names as needed
-    if map_variables == True:
+    if map_variables is True:
         map_weather(weather_df)
         map_meta(meta)
 
@@ -217,23 +214,22 @@ def read(file_in, file_type, map_variables=True, **kwargs):
 
 
 def csv_read(filename):
-    """Read a locally stored csv weather file. The first line contains the meta data
-    variable names, and the second line contains the meta data values. This is followed
-    by the meterological data.
+    """Read a locally stored csv weather file.
+    The first line contains the meta data variable names, and the second line contains
+    the meta data values. This is followed by the meterological data.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file_path : (str)
         file path and name of h5 file to be read
 
-    Returns:
-    --------
+    Returns
+    -------
     weather_df : (pd.DataFrame)
         DataFrame of weather data
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-
     file1 = open(filename, "r")
     # get the meta data from the first two lines
     metadata_fields = file1.readline().split(",")
@@ -289,17 +285,16 @@ def csv_read(filename):
 
 
 def map_meta(meta):
-    """"
+    """
+    Update the headings for meterological data to standard forms.
 
-    This will update the headings for meterological data to standard forms
-    as outlined in https://github.com/DuraMAT/pv-terms.
+    Updated forms outlined in https://github.com/DuraMAT/pv-terms.
 
-    Returns:
-    --------
+    Returns
+    -------
     meta : dictionary
         DataFrame of weather data with modified column headers.
     """
-
     META_MAP = {
         "elevation": "altitude",
         "Elevation": "altitude",
@@ -320,17 +315,17 @@ def map_meta(meta):
 
 
 def map_weather(weather_df):
-    """"
+    """
 
-    This will update the headings for meterological data to standard forms
-    as outlined in https://github.com/DuraMAT/pv-terms.
+    Update the headings for meterological data to standard forms.
 
-    Returns:
-    --------
+    Standard outlined in https://github.com/DuraMAT/pv-terms.
+
+    Returns
+    -------
     weather_df : (pd.DataFrame)
         DataFrame of weather data with modified column headers.
     """
-
     DSET_MAP = {
         "year": "Year",
         "month": "Month",
