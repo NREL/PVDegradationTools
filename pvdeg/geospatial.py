@@ -89,8 +89,10 @@ def start_dask(hpc=None):
 
 
 # rename this?
-# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt really doing anything anymore
-# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset already then we dont want to anything
+# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt
+# really doing anything anymore
+# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset
+# already then we dont want to anything
 # def _ds_from_arbitrary(res, func):
 #     """
 #     Convert an arbitrary return type to xarray.Dataset.
@@ -142,12 +144,14 @@ def _df_from_arbitrary(res, func):
         )  # they must all be the same length here or this will error out
     else:
         raise NotImplementedError(
-            f"function return type: {type(res)} not available for geospatial analysis yet. This could be result of mismatched coordinates of outputs. EX. tuple(dataframe, int)."
+            f"function return type: {type(res)} not available for geospatial analysis \
+                yet. This could be result of mismatched coordinates of outputs. \
+                    EX. tuple(dataframe, int)."
         )
 
 
 def calc_gid(ds_gid, meta_gid, func, **kwargs):
-    """Calculates a single gid for a given function.
+    """Calculate a single grid for a given function.
 
     Parameters
     ----------
@@ -165,17 +169,20 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     ds_res : xarray.Dataset
         Dataset with results for a single gid.
     """
-
-    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), not a perminant fix
-    # hopefully this isn't too slow, what is causing this? how meta is being read from dataset? @ martin?
-    if type(meta_gid["latitude"]) == dict:
+    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), not
+    # a permanent fix
+    # hopefully this isn't too slow, what is causing this? how meta is being read
+    # from dataset? @ martin?
+    if type(meta_gid["latitude"]) is dict:
         meta_gid = utilities.fix_metadata(meta_gid)
 
-    # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    # set time index here? is there any reason the weather shouldn't always have only
+    # pd.datetime index? @ martin?
     df_weather = ds_gid.to_dataframe()
     if isinstance(
         df_weather.index, pd.MultiIndex
-    ):  # check for multiindex and convert to just time index, don't know what was causing this
+    ):  # check for multiindex and convert to just time index, don't know what was
+        # causing this
         df_weather = df_weather.reset_index().set_index("time")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
@@ -197,7 +204,7 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
 
 
 def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
-    """Calculates a block of gids for a given function.
+    """Calculate a block of gids for a given function.
 
     Parameters
     ----------
@@ -215,7 +222,6 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
     ds_res : xarray.Dataset
         Dataset with results for a block of gids.
     """
-
     res = weather_ds_block.groupby("gid", squeeze=False).map(
         lambda ds_gid: calc_gid(
             ds_gid=ds_gid.squeeze(),
@@ -228,13 +234,14 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
 
 
 def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
-    """Applies a function to each gid of a weather dataset.
+    """Apply a function to each gid of a weather dataset.
 
     `analysis` will attempt to
     create a template using `geospatial.auto_template`. If this process fails you will
     have to provide a geospatial template to the template argument.
 
-    ValueError: <function-name> cannot be autotemplated. create a template manually with `geospatial.output_template`
+    ValueError: <function-name> cannot be autotemplated. create a template manually
+    with `geospatial.output_template`
 
     Parameters
     ----------
@@ -254,7 +261,6 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
     ds_res : xarray.Dataset
         Dataset with results for a block of gids.
     """
-
     if template is None:
         template = auto_template(func=func, ds_gids=weather_ds)
 
@@ -290,7 +296,7 @@ def output_template(
     global_attrs=dict(),
     add_dims=dict(),
 ):
-    """Generates a xarray template for output data.
+    """Generate xarray template for output data.
 
     Output variables and associated
     dimensions need to be specified via the shapes dictionary. The dimension length are
@@ -299,8 +305,10 @@ def output_template(
 
     Examples
     --------
-    Providing the shapes dictionary can be confusing. Here is what the `shapes` dictionary should look like for `pvdeg.standards.standoff`.
-    Refer to the docstring, the function will have one result per location so the only dimension for each return value is "gid", a geospatial ID number.
+    Providing the shapes dictionary can be confusing. Here is what the `shapes`
+    dictionary should look like for `pvdeg.standards.standoff`. Refer to the docstring,
+    the function will have one result per location so the only dimension for each return
+    value is "gid", a geospatial ID number.
 
     .. code-block:: python
         shapes = {
@@ -309,10 +317,13 @@ def output_template(
             "T98_0": ("gid",),
         }
 
-    **Note: The dimensions are stored in a tuple, this this why all of the parenthesis have commas after the single string, otherwise python will interpret the value as a string.**
+    **Note: The dimensions are stored in a tuple, this this why all of the parenthesis
+    have commas after the single string, otherwise python will interpret the value as a
+    string.**
 
-    This is what the shapes dictinoary should look like for `pvdeg.humidity.module`. Refering to the docstring,
-    we can see that the function will return a timeseries result for each location. This means we need dimensions of "gid" and "time".
+    This is what the shapes dictinoary should look like for `pvdeg.humidity.module`.
+    Refering to the docstring, we can see that the function will return a timeseries
+    result for each location. This means we need dimensions of "gid" and "time".
 
     .. code-block:: python
         shapes = {
@@ -358,7 +369,7 @@ def output_template(
                 dim,
                 da.empty([dims_size[d] for d in dim]),
                 attrs.get(var),
-            )  # this will produce a dask array with 1 chunk of the same size as the input
+            )  # produces dask array with 1 chunk of the same size as the input
             for var, dim in shapes.items()
         },
         coords=coords,
@@ -376,10 +387,11 @@ def output_template(
     return output_template
 
 
-# This has been replaced with pvdeg.geospatial.auto_templates inside of pvdeg.geospatial.analysis.
+# Replaced with pvdeg.geospatial.auto_templates inside of pvdeg.geospatial.analysis.
 # it is here for completeness. it can be removed.
 @decorators.deprecated(
-    reason="use geospatial.auto_template or create a template with geospatial.output_template"
+    reason="use geospatial.auto_template or create a template with \
+    geospatial.output_template"
 )
 def template_parameters(func):
     """Output parameters for xarray template.
@@ -395,7 +407,6 @@ def template_parameters(func):
     add_dims : dict
         Dictionary of dimensions to add to the output template.
     """
-
     if func == standards.standoff:
         shapes = {
             "x": ("gid",),
@@ -406,11 +417,13 @@ def template_parameters(func):
         attrs = {
             "x": {"long_name": "Standoff distance", "units": "cm"},
             "T98_0": {
-                "long_name": "98th percential temperature of a theoretical module with no standoff",
+                "long_name": "98th percential temperature of a theoretical module \
+                with no standoff",
                 "units": "Celsius",
             },
             "T98_inf": {
-                "long_name": "98th percential temperature of a theoretical rack mounted module",
+                "long_name": "98th percential temperature of a theoretical rack \
+                    mounted module",
                 "units": "Celsius",
             },
         }
@@ -527,8 +540,9 @@ def zero_template(
 def can_auto_template(func) -> None:
     """Check if we can use `geospatial.auto_template on a given function.
 
-    Raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
-    No error raised if we can run `geospatial.auto_template` on provided function, `func`.
+    Raise an error if the function was not declared with the `@geospatial_quick_shape`
+    decorator. No error raised if we can run `geospatial.auto_template` on
+    provided function, `func`.
 
     Parameters
     ----------
@@ -549,23 +563,24 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     """
     Automatically create a template for a target function: `func`.
 
-    Only works on functions that have the `numeric_or_timeseries` and `shape_names` attributes.
-    These attributes are assigned at function definition with the `@geospatial_quick_shape` decorator.
+    Only works on functions that have the `numeric_or_timeseries` and `shape_names`
+    attributes. These attributes are assigned at function definition with the
+    `@geospatial_quick_shape` decorator.
 
-    Otherwise you will have to create your own template using `geospatial.output_template`.
-    See the Geospatial Templates Notebook for more information.
+    Otherwise you will have to create your own template using
+    `geospatial.output_template`. See the Geospatial Templates Notebook for more
+    information.
 
     Examples
-    ---------
-
-    the function returns a numeric value
+    --------
+    The function returns a numeric value
     >>> pvdeg.design.edge_seal_width
 
     the function returns a timeseries result
     >>> pvdeg.module.humidity
 
-    Counter example:
-    ----------------
+    Counter example
+    ---------------
     the function could either return a single numeric or a series based on changed in
     the input. Because it does not have a known result shape we cannot determine the
     attributes required for autotemplating ahead of time.
@@ -573,9 +588,11 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     Parameters
     ----------
     func: callable
-        function to create template from. This will raise an error if the function was not declared with the `@geospatial_quick_shape` decorator.
+        function to create template from. This will raise an error if the function was
+        not declared with the `@geospatial_quick_shape` decorator.
     ds_gids : xarray.Dataset
-        Dataset containing the gids and their associated dimensions. (geospatial weather dataset)
+        Dataset containing the gids and their associated dimensions. (geospatial weather
+                                                                      dataset)
         Dataset should already be chunked.
 
     Returns
@@ -583,7 +600,6 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
     output_template : xarray.Dataset
         Template for output data.
     """
-
     can_auto_template(func=func)
 
     if func.numeric_or_timeseries == "numeric":
@@ -592,7 +608,8 @@ def auto_template(func: Callable, ds_gids: xr.Dataset) -> xr.Dataset:
         shapes = {datavar: ("gid", "time") for datavar in func.shape_names}
     else:
         raise ValueError(
-            f"{func.__name__} 'numeric_or_timseries' attribute invalid. is {func.numeric_or_timeseries} should be 'numeric' or 'timeseries'"
+            f"{func.__name__} 'numeric_or_timseries' attribute invalid. is\
+            {func.numeric_or_timeseries} should be 'numeric' or 'timeseries'"
         )
 
     template = output_template(ds_gids=ds_gids, shapes=shapes)  # zeros_template?
@@ -690,7 +707,7 @@ def plot_Europe(
 
 
 def meta_KDtree(meta_df, leaf_size=40, fp=None):
-    """Create a sklearn.neighbors.KDTree for fast geospatial lookup operations.
+    """Create an sklearn.neighbors.KDTree for fast geospatial lookup operations.
 
     Requires
     Scikit Learn library. Not included in pvdeg depency list.
@@ -707,19 +724,18 @@ def meta_KDtree(meta_df, leaf_size=40, fp=None):
         pkl file with joblib (sklearn dependency).
 
     Returns
-    --------
+    -------
     kdtree: sklearn.neighbors.KDTree
         kdtree containing latitude-longitude pairs for quick lookups
 
     See Also:
     https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KDTree.html
     """
-
     from sklearn.neighbors import KDTree
     from joblib import dump
 
     coordinates = meta_df[["latitude", "longitude"]].values
-    elevations = meta_df["altitude"].values
+    # elevations = meta_df["altitude"].values
 
     tree = KDTree(coordinates, leaf_size)
 
@@ -897,6 +913,8 @@ def feature_downselect(
     bbox_kwarg={},
 ) -> np.array:
     """
+    Parameters
+    ----------
     meta_df : pd.DataFrame
         Dataframe of metadata as generated by pvdeg.weather.get for geospatial
     kdtree : sklearn.neighbors.KDTree or str
@@ -917,7 +935,6 @@ def feature_downselect(
     --------
     gids : np.ndarray
     """
-
     if isinstance(kdtree, str):
         from joblib import load
 
@@ -974,8 +991,7 @@ def feature_downselect(
 def apply_bounding_box(
     meta_df: pd.DataFrame, coord_1=None, coord_2=None, coords=None
 ) -> np.array:
-    """Apply a latitude-longitude rectangular bounding box to existing geospatial
-    metadata.
+    """Apply latitude-longitude rectangular bounding box to geospatial metadata.
 
     Parameters:
     -----------
@@ -998,7 +1014,6 @@ def apply_bounding_box(
     gids : np.array
         Array of gids associated with NSRDB entries inside the bounding box.
     """
-
     lats, longs = utilities._find_bbox_corners(
         coord_1=coord_1, coord_2=coord_2, coords=coords
     )
@@ -1022,7 +1037,10 @@ def elevation_stochastic_downselect(
     method: str = "mean",
     normalization: str = "linear",
 ):
-    """Downsample assigning each point a weight associated with its neighbors changes in
+    """
+    Downsample function.
+
+    Downsample, assigning each point a weight associated with its neighbors changes in
     height. Randomly choose points based on weights to preferentially select points next
     to or in mountains while drastically lowering the density of points in flat areas to
     find a non-uniformly dense sub-sample of original data points.
@@ -1082,8 +1100,8 @@ def interpolate_analysis(
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Interpolate sparse spatial result data against DataArray coordinates.
 
-    Takes
-    DataArray instead of Dataset, index one variable of a dataset to get a dataarray.
+    Takes DataArray instead of Dataset, index one variable of a dataset to get a
+    dataarray.
 
     Parameters:
     -----------
@@ -1094,7 +1112,6 @@ def interpolate_analysis(
     Result:
     -------
     """
-
     da_copy = deepcopy(result[data_var])
 
     df = da_copy.to_dataframe().reset_index()
