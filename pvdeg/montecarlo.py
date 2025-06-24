@@ -10,7 +10,8 @@ import inspect
 class Corr:
     """
     corrlation class :
-    stores modeling constants and corresponding correlation coefficient to access at runtime
+    stores modeling constants and corresponding correlation coefficient to access at
+    runtime
     """
 
     # modeling constants : str
@@ -26,9 +27,7 @@ class Corr:
         self.correlation = corr
 
     def getModelingConstants(self) -> list[str, str]:
-        """Helper method.
-
-        Returns modeling constants in string form.
+        """Return modeling constants in string form, helper method.
 
         Parameters
         ----------
@@ -38,17 +37,15 @@ class Corr:
         Returns
         ----------
         modeling_constants : list[str, str]
-            Both modeling constants in string from from their corresponding correlation coefficient object
+            Both modeling constants in string from from their corresponding correlation
+            coefficient object
         """
-
         modeling_constants = [self.mc_1, self.mc_2]
         return modeling_constants
 
 
 def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
-    """Helper function.
-
-    Generate a symmetric correlation coefficient matrix.
+    """Generate a symmetric correlation coefficient matrix, helper function.
 
     Parameters
     ----------
@@ -58,10 +55,10 @@ def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
     Returns
     ----------
     identity_df : pd.DataFrame
-        Matrix style DataFrame containing relationships between all input modeling constants
-        Index and Column names represent modeling constants for comprehensibility
+        Matrix style DataFrame containing relationships between all input modeling
+        constants. Index and Column names represent modeling constants for
+        comprehensibility.
     """
-
     if not corr:
         return None
 
@@ -75,7 +72,7 @@ def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
     identity_df = pd.DataFrame(identity_matrix, columns=uniques, index=uniques)
 
     # walks matrix to fill in correlation coefficients
-    # make this a modular standalone function if bigger function preformance is not improved with @njit
+    # make this modular standalone function if performance is not improved with @njit
     for i in range(len(uniques)):
         for j in range(i):  # only iterate over lower triangle
             x, y = identity_df.index[i], identity_df.columns[j]
@@ -89,13 +86,15 @@ def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
                     found = True
                     break
 
-            # if no matches in all correlation coefficients, they will be uncorrelated (= 0)
+            # if no matches in all correlation coefficients, they will be uncorrelated
+            # (= 0)
             if not found:
                 identity_df.iat[i, j] = 0
 
     # mirror the matrix
     # this may be computationally expensive for large matricies
-    # could be better to fill the original matrix in all in one go rather than doing lower triangular and mirroring it across I
+    # could be better to fill the original matrix in all in one go rather than doing
+    # lower triangular and mirroring it across I
     identity_df = (
         identity_df + identity_df.T - np.diag(identity_df.to_numpy().diagonal())
     )
@@ -105,10 +104,7 @@ def _symettric_correlation_matrix(corr: list[Corr]) -> pd.DataFrame:
 
 
 def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.DataFrame:
-    """Helper function.
-
-    Unpacks mean and standard deviation for modeling constants into
-    a DataFrame.
+    """Unpack mean and standard deviation for modeling constants into a DataFrame.
 
     Parameters
     ----------
@@ -121,7 +117,6 @@ def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.Dat
     stats_df : pd.DataFrame
         contains unpacked means and standard deviations from dictionary
     """
-
     # empty correlation list case
     if not corr:
         stats_df = pd.DataFrame(stats)
@@ -174,10 +169,11 @@ def _correlateData(
         column names must be consistent with all modeling constant inputs
 
     Returns
-    ----------
+    -------
     correlated_samples : pd.DataFrame
-        correlated samples in a tall dataframe. column names match modeling constant inputs,
-        integer indexes. See generateCorrelatedSamples() references section for process info
+        correlated samples in a tall dataframe. column names match modeling constant
+        inputs, integer indexes. See generateCorrelatedSamples() references section for
+        process info.
     """
 
     # accounts for out of order column names, AS LONG AS ALL MATCH
@@ -196,38 +192,39 @@ def _correlateData(
 def generateCorrelatedSamples(
     corr: list[Corr], stats: dict[str, dict[str, float]], n: int, seed=None
 ) -> pd.DataFrame:
-    # columns are now named, may run into issues if more mean and stdev entries than correlation coefficients
-    # havent tested yet but this could cause major issues (see lines 163 and 164 for info)
+    # columns are now named, may run into issues if more mean and stdev entries than
+    # correlation coefficients
+    # havent tested, could cause major issues (see lines 163 and 164 for info)
+    """Generate tall correlated samples np.array.
 
-    """Generates a tall correlated samples numpy array based on correlation coefficients
-    and mean and stdev for modeling constants. Values are correlated from cholesky
-    decomposition of correlation coefficients, and n random samples for each modeling
-    constant generated from a standard distribution with mean = 0 and standard deviation
-    = 1.
+    Calculated based on correlation coefficients and mean and stdev for modeling
+    constants. Values are correlated from cholesky decomposition of correlation
+    coefficients, and n random samples for each modeling constant generated from a
+    standard distribution with mean = 0 and standard deviation = 1.
 
     Parameters
     ----------
     corr : List[Corr]
         list containing correlations between variable
     stats : dict[str, dict[str, float]]
-        dictionary storing variable mean and standard deviation. Syntax : `<variable_name> : {'mean' : <float>, 'stdev' : <float>}`
+        dictionary storing variable mean and standard deviation.
+        Syntax : `<variable_name> : {'mean' : <float>, 'stdev' : <float>}`
     n : int
         number of samples to create
     seed : Any, optional
         reseed the numpy BitGenerator, numpy legacy function (use cautiously)
 
     Returns
-    ----------
+    -------
     correlated_samples : pd.Dataframe
         tall dataframe of dimensions (n by # of modeling constants).
         Columns named as modeling constants from Corr object inputs
 
     References
     ----------
-    Burgess, Nicholas, Correlated Monte Carlo Simulation using Cholesky Decomposition (March 25, 2022).
-    Available at SSRN: https://ssrn.com/abstract=4066115
+    Burgess, Nicholas, Correlated Monte Carlo Simulation using Cholesky Decomposition
+    (March 25, 2022). Available at SSRN: https://ssrn.com/abstract=4066115
     """
-
     if seed:
         np.random.seed(seed=seed)
 
@@ -278,7 +275,7 @@ def generateCorrelatedSamples(
 def simulate(
     func: Callable, correlated_samples: pd.DataFrame, **function_kwargs
 ) -> pd.Series:
-    """Applies a target function to data to preform a monte carlo simulation.
+    """Apply a target function to data to preform a monte carlo simulation.
 
     If you get
     a key error and the target function has default parameters, try adding them to your
@@ -290,21 +287,21 @@ def simulate(
     func : function
         Function to apply for monte carlo simulation
     correlated_samples : pd.DataFrame
-        Dataframe of correlated samples with named columns for each appropriate modeling constant, can be generated using generateCorrelatedSamples()
+        Dataframe of correlated samples with named columns for each appropriate modeling
+        constant, can be generated using generateCorrelatedSamples()
     function_kwargs : dict
-        Keyword arguments to pass to func, only include arguments not named in your correlated_samples columns
+        Keyword arguments to pass to func, only include arguments not named in your
+        correlated_samples columns
 
     Returns
     -------
     res : pandas.Series
         Series with monte carlo results from target function
     """
-
-    ### NOTES ###
+    # NOTES
     # func modeling constant parameters must be lowercase in function definition
     # dynamically construct argument list for func
     # call func with .apply(lambda)
-
     args = {k.lower(): v for k, v in function_kwargs.items()}  # make lowercase
 
     func_signature = inspect.signature(func)
