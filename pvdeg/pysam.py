@@ -45,7 +45,6 @@ def vertical_POA(
     lcoa_nom : float [cents/kWh]
         LCOE Levelized cost of energy nominal
     """
-
     try:
         import PySAM
         import PySAM.Pvsamv1 as pv1
@@ -55,7 +54,8 @@ def vertical_POA(
         import PySAM.Cashloan as Cashloan
     except ModuleNotFoundError:
         print(
-            "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM dependency"
+            "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM \
+            dependency"
         )
         return
 
@@ -86,15 +86,15 @@ def vertical_POA(
                 try:
                     # if sys.version.split(' ')[0] == '3.11.7':
                     # Bypassing this as it's not working with my pandas. the printouts
-                    # like "<Pvsamv1 object at 0x7f0f01339cf0> dc_adjust_periods [[0, 0, 0]]"
-                    # means it is going to the except. !!!!
+                    # like "<Pvsamv1 object at 0x7f0f01339cf0> dc_adjust_periods
+                    # [[0, 0, 0]]" means it is going to the except. !!!!
 
-                    # Check needed for python 3.10.7 and perhaps other releases above 3.10.4.
-                    # This prevents the failure "UnicodeDecodeError: 'utf-8' codec can't decode byte...
-                    # This bug will be fixed on a newer version of pysam (currently not working on 5.1.0)
-                    if (
-                        "adjust_" in k
-                    ):  # This check is needed for Python 3.10.7 and some others. Not needed for 3.7.4
+                    # Check needed for python 3.10.7 and perhaps other releases above
+                    # 3.10.4. This prevents the failure "UnicodeDecodeError:
+                    # 'utf-8' codec can't decode byte... This bug will be fixed on a
+                    # newer version of pysam (currently not working on 5.1.0)
+                    if "adjust_" in k:
+                        # Check needed for Python 3.10.7 and some others, not for 3.7.4
                         k = k.split("adjust_")[1]
                     module.value(k, v)
                 except AttributeError:
@@ -149,7 +149,8 @@ def vertical_POA(
     return df_res
 
 
-# TODO: add grid_default, cashloan_default, utilityrate_defaults for expanded pysam simulation capabilities
+# TODO: add grid_default, cashloan_default, utilityrate_defaults for expanded pysam
+# simulation capabilities
 def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -167,16 +168,19 @@ def pysam(
     weather_df: pd.DataFrame
         DataFrame of weather data. As returned by ``pvdeg.weather.get``
     meta: dict
-        Dictionary of metadata for the weather data. As returned by ``pvdeg.weather.get``
+        Dictionary of metadata for the weather data. As returned by
+        ``pvdeg.weather.get``
     pv_model: str
         choose pySam photovoltaic system model.
         Some models are less thorough and run faster.
-        pvwatts8 is ~50x faster than pysamv1 but only calculates 46 parameters while pysamv1 calculates 195.
+        pvwatts8 is ~50x faster than pysamv1 but only calculates 46 parameters while
+        pysamv1 calculates 195.
 
             options: ``pvwatts8``, ``pysamv1``, etc.
 
     pv_model_default: str
-        pysam config for pv model. [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
+        pysam config for pv model.
+        [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
 
         On the docs some modules have availabile defaults listed.
 
@@ -233,11 +237,13 @@ def pysam(
 
     grid_default: str
 
-        pysam default config for grid model. [Grid Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Grid.html)
+        pysam default config for grid model.
+        [Grid Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Grid.html)
 
     cashloan_default: str
 
-        pysam default config for cashloan model. [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)
+        pysam default config for cashloan model.
+        [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)
         - "FlatPlatePVCommercial"
         - "FlatPlatePVResidential"
         - "PVBatteryCommercial"
@@ -249,12 +255,15 @@ def pysam(
 
     utiltityrate_default: str
 
-        pysam default config for utilityrate5 model. [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())
+        pysam default config for utilityrate5 model.
+        [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())
 
     config_files: dict
         SAM configuration files. A dictionary containing a mapping to filepaths.
 
-        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`. Each key should contain a value as a string representing the file path to a SAM config file. Cannot deal with the entire SAM config json.
+        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`.
+        Each key should contain a value as a string representing the file path to a SAM
+        config file. Cannot deal with the entire SAM config json.
 
         ```
         files = {
@@ -268,21 +277,24 @@ def pysam(
     results: list[str]
         list of strings corresponding to pysam outputs to return.
         Pysam models such as `Pvwatts8` and `Pvsamv1` return hundreds of results.
-        So we can chose to take only the specified results while throwing away the others.
+        So we can chose to take only the specified results while throwing away the
+        others.
 
         To grab only 'annual_energy' and 'ac' from the model results.
 
         >>> results = ['annual_energy', 'ac']
 
-        This may cause some undesired behavior with geospatial calculations if the lengths of the results within the list are different.
+        This may cause some undesired behavior with geospatial calculations if the
+        lengths of the results within the list are different.
 
     Returns
     -------
     pysam_res: dict
-        dictionary of outputs. Keys are result name and value is the corresponding result.
-        If `results` is not specified, the dictionary will contain every calculation from the model.
+        dictionary of outputs. Keys are result name and value is the corresponding
+        result.
+        If `results` is not specified, the dictionary will contain every calculation
+        from the model.
     """
-
     try:
         import PySAM
         import PySAM.Pvsamv1 as pv1
@@ -292,7 +304,8 @@ def pysam(
         import PySAM.Cashloan as Cashloan
     except ModuleNotFoundError:
         print(
-            "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM dependency"
+            "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM \
+            dependency"
         )
         return
 
@@ -349,12 +362,14 @@ def pysam(
 
 
 # class inspirePysamReturn():
-#     """simple struct to facilitate handling weirdly shaped pysam simulation return values"""
+#     """simple struct to facilitate handling weirdly shaped pysam simulation
+#        return values"""
 
 #     # removes __dict__ atribute and breaks pickle
 #     # __slots__ = ("annual_poa", "ground_irradiance", "timeseries_index")
 
-#     def __init__(self, annual_poa, ground_irradiance, timeseries_index, annual_energy, poa_front, poa_rear, subarray1_poa_front, subarray1_poa_rear):
+#     def __init__(self, annual_poa, ground_irradiance, timeseries_index, annual_energy,
+#                   poa_front, poa_rear, subarray1_poa_front, subarray1_poa_rear):
 #         self.annual_energy = annual_energy
 #         self.annual_poa = annual_poa
 #         self.ground_irradiance = ground_irradiance
@@ -368,7 +383,6 @@ def pysam(
 # def _handle_pysam_return(pysam_res : inspirePysamReturn) -> xr.Dataset:
 def _handle_pysam_return(pysam_res_dict: dict, weather_df: pd.DataFrame) -> xr.Dataset:
     """Handle a pysam return object and transform it to an xarray."""
-
     ground_irradiance = pysam_res_dict["subarray1_ground_rear_spatial"]
 
     annual_poa = pysam_res_dict["annual_poa_front"]
@@ -384,7 +398,7 @@ def _handle_pysam_return(pysam_res_dict: dict, weather_df: pd.DataFrame) -> xr.D
     timeseries_index = weather_df.index
 
     # redo this using numba?
-    distances = ground_irradiance[0][1:]
+    # distances = ground_irradiance[0][1:]
     ground_irradiance_values = da.from_array([row[1:] for row in ground_irradiance[1:]])
 
     single_location_ds = xr.Dataset(
@@ -393,7 +407,7 @@ def _handle_pysam_return(pysam_res_dict: dict, weather_df: pd.DataFrame) -> xr.D
             "annual_poa": annual_poa,
             "annual_energy": annual_energy,
             # simple timeseries
-            # which poa do we want to use, we can elimiate one of the pairs to save a lot of memory
+            # which poa do we want to use, can elimiate one pair to save memory
             "poa_front": (("time",), da.array(poa_front)),
             "poa_rear": (("time",), da.array(poa_rear)),
             "subarray1_poa_front": (("time",), da.array(subarray1_poa_front)),
@@ -515,7 +529,7 @@ def solar_resource_dict(weather_df, meta):
 
 
 def sample_inspire_result(weather_df, meta):  # throw weather, meta away
-    """Returns a sample inspire_ground_irradiance xarray.
+    """Return a sample inspire_ground_irradiance xarray.
 
     Dataset for geospatial
     testing. Weather_df and meta exist to provide a homogenous arugment structure for
@@ -531,9 +545,9 @@ def sample_inspire_result(weather_df, meta):  # throw weather, meta away
     Returns
     -------
     inspire_ground_irradiance: xr.Dataset
-        returns an xarray dataset of the same shape generated by inpspire_ground_irradiance()
+        returns an xarray dataset of the same shape generated by
+        inpspire_ground_irradiance()
     """
-
     return xr.Dataset(
         data_vars={
             "poa_rear": (("time",), np.zeros((8760,))),
@@ -552,10 +566,10 @@ def sample_inspire_result(weather_df, meta):  # throw weather, meta away
 
 
 def ground_irradiance_monthly(inspire_res_ds: xr.Dataset) -> xr.Dataset:
-    """Many rows are not populated because the model only calculates ground irradiance
-    when certain measurements are met.
+    """Drop the rows and calculate the monthly average irradiance at each distance.
 
-    Drop the rows and calculate the monthly average irradiance at each distance.
+    Many rows are not populated because the model only calculates ground irradiance
+    when certain measurements are met.
     """
 
     nonzero_mask = (inspire_res_ds["ground_irradiance"] != 0).any(dim="distance")
