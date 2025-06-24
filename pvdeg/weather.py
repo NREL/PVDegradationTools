@@ -178,7 +178,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         type of weather file from list below (verified)
         [psm3, tmy3, epw, h5, csv]
     """
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
+    # META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
@@ -215,6 +215,7 @@ def read(file_in, file_type, map_variables=True, **kwargs):
 
 def csv_read(filename):
     """Read a locally stored csv weather file.
+
     The first line contains the meta data variable names, and the second line contains
     the meta data values. This is followed by the meterological data.
 
@@ -819,7 +820,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
 
 
 def is_leap_year(year):
-    """Returns True if year is a leap year."""
+    """Return True if year is a leap year."""
     if year % 4 != 0:
         return False
     elif year % 100 != 0:
@@ -851,7 +852,6 @@ def get_satellite(location):
     gid : (int)
         gid for the desired location
     """
-
     # this is just a placeholder till the actual code gets programmed.
     satellite = "PSM3"
 
@@ -861,14 +861,15 @@ def get_satellite(location):
 
 
 def write(data_df, metadata, savefile="WeatherFile.csv"):
-    """Saves dataframe with weather data and any associated meta data in an *.csv
-    format. The metadata will be formatted on the first two lines with the first being
+    """Save dataframe with weather data and any associated meta data in an *.csv format.
+
+    The metadata will be formatted on the first two lines with the first being
     the descriptor and the second line being the value. Then the meterological, time and
     other data series headers on on the third line with all the subsequent data on the
     remaining lines. This format can be read by the PVDeg software.
 
     Parameters
-    -----------
+    ----------
     data_df : pandas.DataFrame
         timeseries data.
     metdata : dictionary
@@ -907,7 +908,6 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
     -------
     Nothing, it just writes the file.
     """
-
     meta_string = (
         ", ".join(str(key) for key, value in metadata.items())
         + "\n"
@@ -922,7 +922,7 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
     savedata = "\n".join(savedata)
     columns = list(
         data_df.columns
-    )  # This had to be pulled out separately because spaces can get turned into commas in the header names.
+    )  # pulled out separately as spaces can get turned into commas in the header names.
     str1 = ""
     for ele in columns:
         str1 = str1 + ele + ","
@@ -999,8 +999,7 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
 
 
 def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
-    """Roll/wrap the ends of a TMY UTC DataFrame to align with local times based on
-    timezone offset.
+    """Wrap ends of TMY UTC DataFrame to align with local time based on timezone offset.
 
     Parameters:
     ----------
@@ -1110,9 +1109,7 @@ def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 
 # RENAME, THIS SHOULD NOT REFERENCE PVGIS
 def _process_weather_result_distributed(weather_df):
-    """
-    Create an xarray.Dataset using numpy array backend from a pvgis weather dataframe.
-    """
+    """Create xarray.Dataset using np.array backend from pvgis weather dataframe."""
     import dask.array as da
 
     weather_df.index.rename("time", inplace=True)
