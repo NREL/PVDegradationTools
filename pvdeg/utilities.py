@@ -1,3 +1,5 @@
+"""utilities.py"""
+
 import os
 import json
 import pandas as pd
@@ -38,7 +40,6 @@ def gid_downsampling(meta, n):
     gids_sub : (list)
         List of GIDs for the downsampled NSRDB meta data
     """
-
     if n == 0:
         gids_sub = meta.index.values
         return meta, gids_sub
@@ -58,30 +59,30 @@ def gid_downsampling(meta, n):
 def meta_as_dict(rec):
     """Turn a numpy recarray record into a dict.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rec : (np.recarray)
         numpy structured array with labels as dtypes
 
-    Returns:
-    --------
+    Returns
+    -------
      : (dict)
         dictionary of numpy structured array
     """
-
     return {name: rec[name].item() for name in rec.dtype.names}
 
 
 def get_kinetics(name=None, fname="kinetic_parameters.json"):
-    """Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json.
+    """Return a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     name : str
-        unique name of kinetic parameter set. If None, returns a list of the possible options.
+        unique name of kinetic parameter set. If None, returns a list of the possible
+        options.
 
-    Returns:
-    --------
+    Returns
+    -------
     parameter_dict : (dict)
         dictionary of kinetic parameters
     """
@@ -109,8 +110,7 @@ def write_gids(
 ):
     """Generate a .CSV file containing the GIDs for the spatial test range.
 
-    The .CSV
-    file will be saved to the working directory.
+    The .CSV  file will be saved to the working directory.
 
     TODO: specify output file name and directory?
 
@@ -127,12 +127,11 @@ def write_gids(
     out_fd : (str, default = "gids")
         Name of data column you want to retrieve. Generally, this should be "gids"
 
-    Returns:
-    -----------
+    Return
+    ------
     project_points_path : (str)
         File path to the newly created "gids.csv"
     """
-
     if not gids:
         with NSRDBX(nsrdb_fp, hsds=False) as f:
             if lat_long:
@@ -150,15 +149,15 @@ def write_gids(
 
 
 def _get_state(id):
-    """Returns the full name of a state based on two-letter state code.
+    """Return the full name of a state based on two-letter state code.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     id : (str)
         two letter state code (example: CO, AZ, MD)
 
-    Returns:
-    -----------
+    Returns
+    -------
     state_name : (str)
         full name of US state (example: Colorado, Arizona, Maryland)
     """
@@ -228,9 +227,7 @@ def _get_state(id):
 def get_state_bbox(
     abbr: str = None,
 ) -> np.ndarray:
-    """Retrieve the top left and bottom right coordinate pairs for state bounding
-    boxes."""
-
+    """Retrieve top left and bottom right coordinate pairs for state bounding boxes."""
     # can move to its own file in pvdeg.DATA_DIR
     bbox_dict = {
         "Alabama": [
@@ -493,12 +490,12 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-### DEPRECATE ###
+# DEPRECATE
 def _read_material(name, fname="O2permeation.json"):
     """Read a material from materials.json and return the parameter dictionary.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     name : (str)
         unique name of material
 
@@ -576,7 +573,6 @@ def _add_material(
     fickian : (boolean)
         I have no idea what this means (unused)
     """
-
     # TODO: test then delete commented code
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
@@ -605,8 +601,8 @@ def _add_material(
 def quantile_df(file, q):
     """Calculate the quantile of each parameter at each location.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file : (str)
         Filepath to h5 results file containing timeseries and location data.
     q : (float)
@@ -618,7 +614,6 @@ def quantile_df(file, q):
         dataframe containing location coordinates and quantile values of
         each parameter.
     """
-
     with Outputs(file, mode="r") as out:
         res = out["meta"][["latitude", "longitude"]]
         for key in out.attrs.keys():
@@ -632,19 +627,18 @@ def quantile_df(file, q):
 def ts_gid_df(file, gid):
     """Extract the time series of each parameter for given location.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file : (str)
         Filepath to h5 results file containing timeseries and location data.
     gid : (int)
         geographical id of location
 
-    Returns:
-    --------
+    Returns
+    -------
     res : (pd.DataFrame)
         dataframe containing time series data for given location.
     """
-
     with Outputs(file, mode="r") as out:
         res = pd.DataFrame(index=out["time_index"])
         meta = out["meta"][["latitude", "longitude"]]
@@ -660,8 +654,9 @@ def ts_gid_df(file, gid):
 def tilt_azimuth_scan(
     weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
 ):
-    """Calculate a minimum standoff distance for roof mounded PV systems as a function
-    of tilt and azimuth.
+    """Calculate minimum standoff distance for roof-mounted PV systems.
+
+    Standoff calculated as a function of tilt and azimuth.
 
     Parameters
     ----------
@@ -670,17 +665,19 @@ def tilt_azimuth_scan(
     meta : pd.DataFrame
         Meta data for a single location.
     tilt_step : integer
-        Step in degrees of change in tilt angle of PV system between calculations. Will scan from 0 to 90 degrees.
+        Step in degrees of change in tilt angle of PV system between calculations.
+        Will scan from 0 to 90 degrees.
     azimuth_step : integer
-        Step in degrees of change in Azimuth angle of PV system relative to north. Will scan from 0 to 180 degrees.
+        Step in degrees of change in Azimuth angle of PV system relative to north.
+        Will scan from 0 to 180 degrees.
     kwarg : dict
         All the keywords in a dictionary form that are needed to run the function.
     calc_function : string
         The name of the function that will be calculated.
     Returns
-        standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
+        standoff_series : 2-D array with each row consiting of tilt, azimuth, then
+        standoff
     """
-
     total_count = (np.ceil(360 / azimuth_step) + 1) * (np.ceil(90 / tilt_step) + 1)
     tilt_azimuth_series = np.zeros((int(total_count), 3))
     count = 0
@@ -711,17 +708,21 @@ def tilt_azimuth_scan(
 
 def _meta_df_from_csv(file_paths: list[str]):
     """
-    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)].
+    Create csv dataframe from list of files in string form, helper function.
+
+    Also warns if d.irectory not functional yet.
 
     Parameters
     ----------
     file_paths : list[str]
-        List of local weather csv files to strip metadata from. For example: download a collection of weather files from the NSRDB web viewer.
+        List of local weather csv files to strip metadata from.
+        For example: download a collection of weather files from the NSRDB web viewer.
 
     Returns
     -------
     metadata_df : pandas.DataFrame
-        Dataframe of stripped metadata from csv. Columns represent attribute names while rows represent a unique file.
+        Dataframe of stripped metadata from csv.
+        Columns represent attribute names while rows represent a unique file.
     """
     # TODO: functionality
     # list[path] instead of just string
@@ -760,15 +761,7 @@ def _weather_ds_from_csv(
     year: int,
     # select year, should be able to provide single year, or list of years
 ):
-    """
-    Helper Function: Create a geospatial xarray dataset from local csv files.
-
-    Parameters
-    ----------
-
-    Returns
-    ----------
-    """
+    """Create a geospatial xarray dataset from local csv files, helper function."""
     #  ds = xr.open_dataset(
     #             fp,
     #             engine="h5netcdf",
@@ -780,8 +773,9 @@ def _weather_ds_from_csv(
     #         )
 
     # PROBLEM: all csv do not contain all years but these all appear to have 2004
-    # when missing years, xarray will see mismatched coordinates and populate all these values with nan
-    # this is wrong we are using tmy so we ignore the year as it represents a typical meteorological year
+    # when missing years, xarray will see mismatched coordinates and populate all these
+    # values with nan this is wrong we are using tmy so we ignore the year as it
+    # represents a typical meteorological year
 
     # Prepare a list to hold the DataFrames
     dataframes = []
@@ -803,10 +797,12 @@ def _weather_ds_from_csv(
         # make allow this to take list of years
         df = df[df["time"].dt.year == year]
 
-        # add generic approach, dont manually do this, could change based on user selections
+        # add generic approach, dont manually do this, could change based on user
+        # selections
 
         # Select relevant columns and append to the list
-        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Direction', 'Wind Speed']]
+        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo',
+        # 'Wind Direction', 'Wind Speed']]
         df = df[
             [
                 "gid",
@@ -855,7 +851,9 @@ def geospatial_from_csv(
     file_path: list[str],
     year: int,  # should be able to take a range of years
 ):
-    """Create an xarray dataset contaning aeospatial weather data and a pandas dataframe
+    """Create an xarray dataset contaning aeospatial and geospatial weather/meta data.
+
+    Creates an xarray dataset contaning aeospatial weather data and a pandas dataframe
     containing geospatial metadata from a list of local csv files.
 
     Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
@@ -868,7 +866,6 @@ def geospatial_from_csv(
     year : int
         Single year of data to use from local csv files.
     """
-
     weather_ds, meta_df = (
         _weather_ds_from_csv(file_path, year),
         _meta_df_from_csv(file_path),
@@ -891,11 +888,14 @@ def geospatial_from_csv(
 
 
 def strip_normalize_tmy(df, start_time, end_time):
-    """Normalize the DataFrame to start at 00:00 and extract the data between the
-    specified start and end times. Then shift back to the original indexes.
+    """Normalize the DataFrame, extract data between start and end times.
 
-    Parameters:
-    -----------
+    Dataframe is noramlized to start at 00:00 and the data between the
+    specified start and end times is extracted. Data are then shifted back to the
+    original indexes.
+
+    Parameters
+    ----------
     df : pd.Dataframe
         dataframe with a datetime index and tmy data
     start_time : datetime.datetime
@@ -903,12 +903,11 @@ def strip_normalize_tmy(df, start_time, end_time):
     end_time : datetime.datetime
         end time
 
-    Returns:
-    --------
+    Returns
+    -------
     sub_results : pd.DataFrame
         extracted subset of tmy data
     """
-
     tz = df.index.tz
     start_time = start_time.replace(tzinfo=tz)
     end_time = end_time.replace(tzinfo=tz)
@@ -936,8 +935,8 @@ def strip_normalize_tmy(df, start_time, end_time):
 def new_id(collection):
     """Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     Collection : dict, ordereddict
         dictionary with keys as strings
 
@@ -965,22 +964,21 @@ def restore_gids(
     identical ordering to input data, otherwise will fail silently by misassigning gids
     to lat-long coordinates in returned dataset.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     original_meta_df : pd.DataFrame
         Metadata dataframe as returned by geospatial ``pvdeg.weather.get``
     analysis_result_ds : xr.Dataset
         geospatial result data as returned by ``pvdeg.geospatial.analysis``
 
-    Returns:
-    --------
+    Returns
+    -------
     restored_gids_ds : xr.Dataset
         dataset like ``analysis_result_ds`` with new datavariable, ``gid``
         holding the original gids of each result from the input metadata.
         Warning: if meta order is different than result ordering gids will
         be assigned incorrectly.
     """
-
     flattened = analysis_result_ds.stack(points=("latitude", "longitude"))
 
     gids = original_meta_df.index.values
@@ -1043,7 +1041,6 @@ def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
     --------
     pvdeg.utilities._find_bbox_corners for more information
     """
-
     lats, longs = _find_bbox_corners(coord_1, coord_2, coords)
 
     ax.set_xlim([longs[0], longs[1]])
@@ -1063,7 +1060,6 @@ def _add_cartopy_features(
     ],
 ):
     """Add cartopy features to an existing matplotlib.pyplot axis."""
-
     for i in features:
         if i == cfeature.BORDERS:
             ax.add_feature(i, linestyle=":")
@@ -1073,7 +1069,6 @@ def _add_cartopy_features(
 
 def linear_normalize(array: np.ndarray) -> np.ndarray:
     """Normalize a non-negative input array."""
-
     return np.divide(
         np.subtract(array, np.min(array)),
         np.subtract(np.max(array), np.min(array)),
@@ -1093,8 +1088,8 @@ def _calc_elevation_weights(
     caluclate a weight for each point in a dataset to use for
     probabalistic downselection.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     elevations : np.ndarray
         one dimensional numpy array of elevations at each gid in the metadata
     coords : np.ndarray
@@ -1112,8 +1107,8 @@ def _calc_elevation_weights(
         Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
         kdtree as a path to the .pkl file.
 
-    Returns:
-    --------
+    Returns
+    -------
     gids : np.array
         1d numpy array of weights corresponding to each lat-long pair
         in coordinates and respectively in metadata.
@@ -1147,7 +1142,7 @@ def _calc_elevation_weights(
 
     elif normalization == "log":
         # add 1 to shift the domain right so results of log will be positive
-        # there may be a better way to do this, the value wont be properly normalized between 0 and 1
+        # may be a better way, value wont be properly normalized between 0 and 1
         return linear_normalize(np.log(linear_weights + 1))
 
     raise ValueError(
@@ -1184,16 +1179,15 @@ def nrel_kestrel_check():
     Passes silently or raises a
     ConnectionError if not running on Kestrel. This will fail on AWS.
 
-    Returns:
-    --------
+    Returns
+    -------
     None
 
-    See Also:
-    ---------
+    See Also
+    --------
     NREL HPC : https://www.nrel.gov/hpc/
     Kestrel Documentation : https://nrel.github.io/HPC/Documentation/
     """
-
     kestrel_hostname = "kestrel.hpc.nrel.gov"
 
     host = run(args=["hostname", "-f"], shell=False, capture_output=True, text=True)
@@ -1258,7 +1252,6 @@ def compare_templates(
     ds1: xr.Dataset, ds2: xr.Dataset, atol=1e-10, consider_nan_equal=True
 ) -> bool:
     """Compare loaded datasets with "empty-like" values."""
-
     if ds1.dims != ds2.dims:
         return False
 
@@ -1293,21 +1286,20 @@ def compare_templates(
 def add_time_columns_tmy(weather_df, coerce_year=1979):
     """Add time columns to a tmy weather dataframe.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     weather_df: pd.DataFrame
         tmy weather dataframe containing 8760 rows.
     coerce_year: int
         year to set the dataframe to.
 
-    Returns:
-    --------
+    Returns
+    -------
     weather_df: pd.DataFrame
         dataframe with columns added new columns will be
 
         ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
     """
-
     weather_df = weather_df.reset_index(drop=True)
 
     if len(weather_df) == 8760:
@@ -1319,7 +1311,7 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
 
     date_range = pd.date_range(
         start=f"{coerce_year}-01-01 00:00:00",
-        end=f"{coerce_year}-12-31 23:45:00",  # 15 minute internval is highest granularity
+        end=f"{coerce_year}-12-31 23:45:00",  # 15 min internval is highest resolution
         freq=freq,
     )
 
@@ -1343,21 +1335,22 @@ def merge_sparse(files: list[str]) -> xr.Dataset:
     Creates monotonically
     increasing indicies.
 
-    Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.
+    Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to
+    netcdf files.
 
     Parameters
     -----------
     files: list[str]
         A list of strings representing filepaths to netcdf (.nc) files.
-        Each file must have the same coordinates, `['latitude','longitude']` and identical datavariables.
+        Each file must have the same coordinates, `['latitude','longitude']` and
+        identical datavariables.
 
     Returns
     -------
     merged_ds: xr.Dataset
-        Dataset (in memory) with `coordinates = ['latitude','longitude']` and datavariables matching files in
-        filepaths list.
+        Dataset (in memory) with `coordinates = ['latitude','longitude']` and
+        datavariables matching files in filepaths list.
     """
-
     datasets = [xr.open_dataset(fp, engine="h5netcdf").compute() for fp in files]
 
     latitudes = np.concatenate([ds.latitude.values for ds in datasets])
@@ -1400,7 +1393,9 @@ def display_json(
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are provided.
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are
+        provided.
     """
     from IPython.display import display, HTML
 
@@ -1454,9 +1449,12 @@ def search_json(
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are
+        provided.
     name_or_alias: str
-        searches for matching subkey value in either `name` or `alias` attributes. exits on the first matching instance.
+        searches for matching subkey value in either `name` or `alias` attributes.
+        Exits on the first matching instance.
 
     Returns
     ---------
@@ -1469,7 +1467,8 @@ def search_json(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                rf"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}"
+                rf"{pvdeg_file} does not exist in pvdeg/data. Options are \
+                    {pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r") as file:
@@ -1497,25 +1496,32 @@ def read_material(
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are
+        provided.
     key: str
-        key corresponding to specific material in the file. In the pvdeg files these have arbitrary names. Inspect the files or use `display_json` or `search_json` to identify the key for desired material.
+        key corresponding to specific material in the file. In the pvdeg files these
+        have arbitrary names. Inspect the files or use `display_json` or `search_json`
+        to identify the key for desired material.
     parameters: list[str]
-        parameters to grab from the file at index key. If none, will grab all items at index key. the elements in parameters must match the keys in the json exactly or the output value for the specific key/parameter in the retunred dict will be `None`.
+        parameters to grab from the file at index key. If none, will grab all items
+        at index key. the elements in parameters must match the keys in the json exactly
+        or the output value for the specific key/parameter in the retunred dict will be
+        `None`.
 
     Returns
     --------
     material: dict
         dictionary of material parameters from the seleted file at the index key.
     """
-
     # these live in the `pvdeg/data` folder
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}"
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are\
+                {pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r") as file:
@@ -1533,21 +1539,20 @@ def read_material(
 def add_time_columns_tmy(weather_df, coerce_year=1979):
     """Add time columns to a tmy weather dataframe.
 
-    Parameters:
-    -----------
-    weather_df: pd.DataFrame
+    Parameters
+    ----------
+    weather_df: pd.Dataframe
         tmy weather dataframe containing 8760 rows.
     coerce_year: int
         year to set the dataframe to.
 
-    Returns:
-    --------
+    Returns
+    -------
     weather_df: pd.DataFrame
         dataframe with columns added new columns will be
 
         ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
     """
-
     weather_df = weather_df.reset_index(drop=True)
 
     if len(weather_df) == 8760:
@@ -1559,7 +1564,7 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
 
     date_range = pd.date_range(
         start=f"{coerce_year}-01-01 00:00:00",
-        end=f"{coerce_year}-12-31 23:45:00",  # 15 minute internval is highest granularity
+        end=f"{coerce_year}-12-31 23:45:00",  # 15 min internval is highest resolution
         freq=freq,
     )
 
