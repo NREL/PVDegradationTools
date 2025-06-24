@@ -1,5 +1,4 @@
-"""Collection of functions to calculate LETID or B-O LID defect states, defect state
-transitions, and device degradation given device details."""
+"""LETID or B-O LID defect states, defect state transitions, device degradation."""
 
 import numpy as np
 import pandas as pd
@@ -19,7 +18,9 @@ from pvdeg import (
 
 
 def tau_now(tau_0, tau_deg, n_b):
-    """Return carrier lifetime of a LID or LETID-degraded wafer given initial lifetime,
+    """Return tau_now.
+
+    Returns carrier lifetime of a LID or LETID-degraded wafer given initial lifetime,
     fully degraded lifetime, and fraction of defects in recombination-active state B.
 
     Parameters
@@ -27,21 +28,24 @@ def tau_now(tau_0, tau_deg, n_b):
     tau_0 : numeric
         Initial lifetime. Typcially in seconds, milliseconds, or microseconds.
     tau_deg : numeric
-        Lifetime when wafer is fully-degraded, i.e. 100% of defects are in state B. Same units
-        as tau_0.
+        Lifetime when wafer is fully-degraded, i.e. 100% of defects are in state B.
+        Same units as tau_0.
     n_B : numeric
         Percentage of defects in state B [%].
 
     Returns
     -------
     numeric
-        lifetime of wafer with n_B% of defects in state B. Same units as tau_0 and tau_deg.
+        lifetime of wafer with n_B% of defects in state B. Same units as tau_0 and
+        tau_deg.
     """
     return tau_0 / ((tau_0 / tau_deg - 1) * n_b / 100 + 1)
 
 
 def k_ij(attempt_frequency, activation_energy, temperature):
-    """Calculates an Arrhenius rate constant given attempt frequency, activation energy,
+    """Calculate Arrhenius rate constant.
+
+    Returns Arrhenius rate constant given attempt frequency, activation energy,
     and temperature.
 
     Parameters
@@ -81,8 +85,9 @@ def carrier_factor(
     mechanism_params,
     dn_lit=None,
 ):
-    """Return the delta_n^x_ij term to modify attempt frequency by excess carrier
-    density. See McPherson 2022 [1]_. Requires mechanism_params, a dict of required
+    """Return delta_n^x_ij term to modify attempt frequency by excess carrier density.
+
+    See McPherson 2022 [1]_. Requires mechanism_params, a dict of required
     mechanism parameters.
 
     Parameters
@@ -91,14 +96,16 @@ def carrier_factor(
         Carrier lifetime [us].
 
     transition : str
-        Transition in the 3-state defect model (A <-> B <-> C). Must be 'ab', 'bc', or 'ba'.
+        Transition in the 3-state defect model (A <-> B <-> C). Must be 'ab', 'bc', or
+        ba'.
 
     temperature : numeric
         Temperature [C].
 
     suns : numeric
-        Applied injection level of device in terms of "suns", e.g. 1 for a device held at 1-sun
-        Jsc current injection in the dark, or at open-circuit with 1-sun illumination.
+        Applied injection level of device in terms of "suns", e.g. 1 for a device held
+        at 1-sun Jsc current injection in the dark, or at open-circuit with 1-sun
+        illumination.
 
     jsc : numeric
         Short-circuit current density [mA/cm^2].
@@ -111,13 +118,13 @@ def carrier_factor(
 
     mechanism_params : dict
         Dictionary of mechanism parameters.
-        These are typically taken from literature studies of transtions in the 3-state model.
-        They allow for calculation the excess carrier density of literature experiments (dn_lit)
-        Parameters are coded in 'kinetic_parameters.json'.
+        These are typically taken from literature studies of transtions in the 3-state
+        model. They allow for calculation the excess carrier density of literature
+        experiments (dn_lit). Parameters are coded in 'kinetic_parameters.json'.
 
     dn_lit : numeric, default None
-        Optional, supply in lieu of a complete set of mechanism_params if experimental dn_lit
-        is known.
+        Optional, supply in lieu of a complete set of mechanism_params if experimental
+        dn_lit is known.
 
     Returns
     -------
@@ -216,15 +223,16 @@ def carrier_factor(
 def carrier_factor_wafer(
     tau, transition, suns, jsc, wafer_thickness, mechanism_params, dn_lit=None
 ):
-    r"""Return the delta_n^x_ij term to modify attempt frequency by excess carrier
-    density for a passivated wafer, rather than a solar cell.
+    r"""Return delta_n^x_ij term to modify attempt frequency by excess carrier density.
 
-    For a passivated wafer, delta_n increases linearly with lifetime:
+    Function for a passivated wafer, rather than a solar cell. For a passivated wafer,
+    delta_n increases linearly with lifetime:
 
     .. math::
         \Delta n = \tau*J/W
 
-    See McPherson 2022 [1]_. Requires mechanism_params, a dict of required mechanism parameters.
+    See McPherson 2022 [1]_. Requires mechanism_params, a dict of required mechanism
+    parameters.
     See 'MECHANISM_PARAMS' dict
 
     Parameters
@@ -233,11 +241,13 @@ def carrier_factor_wafer(
         Carrier lifetime [us].
 
     transition : str
-        Transition in the 3-state defect model (A <-> B <-> C). Must be 'ab', 'bc', or 'ba'.
+        Transition in the 3-state defect model (A <-> B <-> C). Must be 'ab', 'bc', or
+        'ba'.
 
     suns : numeric
-        Applied injection level of device in terms of "suns", e.g. 1 for a device held at 1-sun
-        Jsc current injection in the dark, or at open-circuit with 1-sun illumination.
+        Applied injection level of device in terms of "suns", e.g. 1 for a device held
+        at 1-sun Jsc current injection in the dark, or at open-circuit with 1-sun
+        illumination.
 
     jsc : numeric
         Short-circuit current density [mA/cm^2].
@@ -247,13 +257,13 @@ def carrier_factor_wafer(
 
     mechanism_params : dict
         Dictionary of mechanism parameters.
-        These are typically taken from literature studies of transtions in the 3-state model.
-        They allow for calculation the excess carrier density of literature experiments (dn_lit)
-        Parameters are coded in 'MECHANISM_PARAMS' dict.
+        These are typically taken from literature studies of transtions in the 3-state
+        model. They allow for calculation the excess carrier density of literature
+        experiments (dn_lit). Parameters are coded in 'MECHANISM_PARAMS' dict.
 
     dn_lit : numeric, default None
-        Optional, supply in lieu of a complete set of mechanism_params if experimental dn_lit
-        is known.
+        Optional, supply in lieu of a complete set of mechanism_params if experimental
+        dn_lit is known.
 
     Returns
     -------
@@ -340,7 +350,8 @@ def carrier_factor_wafer(
             dn_lit = 1e21  # this is hardcoded
 
     else:
-        exponent = 0  # or we could raise a ValueError and say transition has to be 'ab'|'bc'|'ba'
+        exponent = 0  # or we could raise a ValueError and say transition has to be
+        # 'ab'|'bc'|'ba'
         dn_lit = 1e21
 
     dn = ((jsc * 0.001 * 10000 * suns) * (tau * 1e-6)) / (wafer_thickness * 1e-6) / q
@@ -362,7 +373,9 @@ def calc_dn(
     nv=1.6e25,
     e_g=1.79444e-19,
 ):
-    """Return excess carrier concentration, i.e. "injection", given lifetime,
+    """Return excess carrier concentration, i.e. "injection".
+
+    Return excess carrier concentration given lifetime,
     temperature, suns-equivalent applied injection, and cell parameters.
 
     Parameters
@@ -390,8 +403,9 @@ def calc_dn(
         Doping density [m^-3].
 
     xp : numeric, default 0.00000024
-        width of the depletion region [m]. Treated as fixed width, as it is very small compared
-        to the bulk, so injection-dependent variations will have very small effects.
+        width of the depletion region [m]. Treated as fixed width, as it is very small
+        compared to the bulk, so injection-dependent variations will have very small
+        effects.
 
     e_mobility : numeric, default 0.15
         electron mobility [m^2/V-s].
@@ -487,8 +501,9 @@ def convert_i_to_v(
         electron mobility [m^2/V-s].
 
     xp : numeric, default 0.00000024
-        width of the depletion region [m]. Treated as fixed width, as it is very small compared
-        to the bulk, so injection-dependent variations will have very small effects.
+        width of the depletion region [m]. Treated as fixed width, as it is very small
+        compared to the bulk, so injection-dependent variations will have very small
+        effects.
 
     nc : numeric, default 2.8e25
         density of states of the conduction band [m^-3]
@@ -522,8 +537,9 @@ def convert_i_to_v(
 
 
 def j0_gray(ni2, diffusivity, na, diffusion_length, arg, srv):
-    """Returns j0 (saturation current density in quasi-neutral regions of a solar cell)
-    as shown in eq. 3.128 in [1]_.
+    """Return j0 (saturation current density in quasi-neutral regions of a solar cell).
+
+    See eq. 3.128 in [1]_.
 
     Parameters
     ----------
@@ -540,7 +556,8 @@ def j0_gray(ni2, diffusivity, na, diffusion_length, arg, srv):
         carrier diffusion length [m].
 
     arg : numeric
-        (W-xn)/Lp term, (wafer_thickness-depletion region thickness)/diffusion_length [unitless].
+        (W-xn)/Lp term, (wafer_thickness-depletion region thickness)/diffusion_length
+        [unitless].
 
     srv : numeric
         surface recombination velocity [m/s].
@@ -566,12 +583,10 @@ def j0_gray(ni2, diffusivity, na, diffusion_length, arg, srv):
 
 
 def calc_voc_from_tau(tau, wafer_thickness, srv_rear, jsc, temperature, na=7.2e21):
-    """Return solar cell open-circuit voltage (Voc), given lifetime and other device
-    parameters.
+    """Return solar cell open-circuit voltage (Voc).
 
     Parameters
     ----------
-
     tau : numeric
         Carrier lifetime [us].
 
@@ -608,18 +623,18 @@ def calc_voc_from_tau(tau, wafer_thickness, srv_rear, jsc, temperature, na=7.2e2
 
 
 def calc_device_params(timesteps, cell_area=239):
-    """Returns device parameters given a Dataframe of Jsc and Voc.
+    """Return device parameters given a Dataframe of Jsc and Voc.
 
     Parameters
     ----------
-
     timesteps : DataFrame
         Column names must include:
             - ``'Jsc'``
             - ``'Voc'``
 
     cell_area : numeric, default 239
-        Cell area [cm^2]. 239 cm^2 is roughly the area of a 156x156mm pseudosquare "M0" wafer
+        Cell area [cm^2]. 239 cm^2 is roughly the area of a 156x156mm pseudosquare "M0"
+        wafer
 
     Returns
     -------
@@ -640,19 +655,17 @@ def calc_device_params(timesteps, cell_area=239):
 
 
 def calc_energy_loss(timesteps):
-    """Returns energy loss given a timeseries containing normalized changes in maximum
-    power.
+    """Return energy loss given timeseries of normalized changes in maximum power.
 
     Parameters
     ----------
-
     timesteps : Dataframe
         timesteps.index must be DatetimeIndex OR timesteps must include ``'Datetime'``
         column with dtype datetime
 
         Column names must include:
-            - ``'Pmp_norm'``, a column of normalized (0-1) maximum power such as returned by
-            letid.calc_device_params
+            - ``'Pmp_norm'``, a column of normalized (0-1) maximum power such as
+            returned by letid.calc_device_params
 
     Returns
     -------
@@ -676,20 +689,19 @@ def calc_energy_loss(timesteps):
 
 
 def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
-    """Returns time to x% regeneration, determined by the percentage of defects in State
-    C.
+    """Return time to x% regeneration from percentage of defects in State C.
 
     Parameters
     ----------
     timesteps : Dataframe
-        timesteps.index must be DatetimeIndex OR timesteps must include ``'Datetime'`` column
-        with dtype datetime
+        timesteps.index must be DatetimeIndex OR timesteps must include ``'Datetime'``
+        column with dtype datetime
         Column names must include:
             - ``'NC'``, the percentage of defects in state C
 
     x : numeric, default 80
-        percentage regeneration to look for. Note that 100% State C will take a very long time,
-        whereas in most cases >99% of power is regenerated after NC = ~80%
+        percentage regeneration to look for. Note that 100% State C will take a very
+        long time, whereas in most cases >99% of power is regenerated after NC = ~80%
 
     rel_tol : float, default = 1e-05
         The relative tolerance parameter
@@ -699,7 +711,6 @@ def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
     regen_time : timedelta
         The time taken to reach x% regeneration
     """
-
     if isinstance(timesteps.index, pd.DatetimeIndex):
         start = timesteps.index[0]
         stop_row = timesteps[np.isclose(timesteps["NC"], x, rtol)].iloc[0]
@@ -720,7 +731,7 @@ def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
 def calc_pmp_loss_from_tau_loss(
     tau_0, tau_deg, cell_area, wafer_thickness, s_rear, generation=None, depth=None
 ):
-    """Function to estimate power loss from bulk lifetime loss.
+    """Estimate power loss from bulk lifetime loss.
 
     Parameters
     ----------
@@ -744,7 +755,6 @@ def calc_pmp_loss_from_tau_loss(
     pmp_loss, pmp_0, pmp_deg : tuple of numeric
         Power loss [%], Initial power [W], and Degraded power [W]
     """
-
     if generation is None or depth is None:
         path = os.path.join(DATA_DIR, "PVL_GenProfile.xlsx")
 
@@ -788,7 +798,7 @@ def calc_pmp_loss_from_tau_loss(
 
 
 def calc_ndd(tau_0, tau_deg):
-    """Calculates normalized defect density given starting and ending lifetimes.
+    """Calculate normalized defect density given starting and ending lifetimes.
 
     Parameters
     ----------
@@ -808,8 +818,7 @@ def calc_ndd(tau_0, tau_deg):
 
 
 def ff_green(voltage, temperature=298.15):
-    """Calculates the empirical expression for fill factor of Si cells from open-circuit
-    voltage.
+    """Calculate empirical expression for Si cell fill factor from open-circuit voltage.
 
     See [1]_, equation 4.
 
@@ -827,8 +836,8 @@ def ff_green(voltage, temperature=298.15):
 
     References
     ----------
-    .. [1] M. A. Green, “Solar cell fill factors: General graph and empirical expressions”,
-    Solid-State Electronics, vol. 24, pp. 788 - 789, 1981.
+    .. [1] M. A. Green, “Solar cell fill factors: General graph and empirical
+    expressions”, Solid-State Electronics, vol. 24, pp. 788 - 789, 1981.
     https://doi.org/10.1016/0038-1101(81)90062-9
     """
     k = Boltzmann
@@ -839,8 +848,9 @@ def ff_green(voltage, temperature=298.15):
 
 
 def calc_injection_outdoors(results):
-    """Return "injection" of a pvlib modelchain cell/module/array operated at maximum
-    power point. Injection is normalized to "suns", the fraction of 1-sun irradiance.
+    """Return "injection" of a pvlib modelchain cell/module/array operated at MPP.
+
+    Injection is normalized to "suns", the fraction of 1-sun irradiance.
 
     Parameters
     ----------
@@ -926,7 +936,8 @@ def calc_letid_outdoors(
         Initial percentage of defects in state C [%]
 
     weather_df : pandas DataFrame
-        Makes use of pvlib ModelChain.run_model. Similar to pvlib, column names MUST include:
+        Makes use of pvlib ModelChain.run_model. Similar to pvlib, column names MUST
+        include:
         - ``'dni'``
         - ``'ghi'``
         - ``'dhi'``
@@ -940,17 +951,19 @@ def calc_letid_outdoors(
         - ``'albedo'``
 
     meta : dict
-        dict of location information for builidng a pvlib.Location object, e.g. from psm3 data
-        accessed via pvlib.iotools.read_psm3
+        dict of location information for builidng a pvlib.Location object, e.g. from
+        psm3 data accessed via pvlib.iotools.read_psm3
 
     mechanism_params : str
-        Name for mechanism parameters set. Parameters are coded in 'kinetic_parameters.json'.
-        These are typically taken from literature studies of transtions in the 3-state model.
-        They allow for calculation the excess carrier density of literature experiments (dn_lit)
+        Dictionary of mechanism parameters.
+        These are typically taken from literature studies of transtions in the 3-state
+        model. They allow for calculation the excess carrier density of literature
+        experiments (dn_lit). Parameters are coded in 'MECHANISM_PARAMS' dict.
 
     generation_df : pandas DataFrame or None
-        Dataframe of an optical generation profile for a solar cell used to calculate current
-        collection. If None, loads default generation profile from 'PVL_GenProfile.xlsx'.
+        Dataframe of an optical generation profile for a solar cell used to calculate
+        current collection. If None, loads default generation profile from
+    'PVL_GenProfile.xlsx'.
         If not None, column names must include:
         - ``'Generation (cm-3s-1)'``
         - ``'Depth (um)'``
@@ -960,7 +973,8 @@ def calc_letid_outdoors(
         Minority carrier diffusivity of the base of the solar cell [cm^2/Vs].
 
     cell_area : numeric, default 239
-        Cell area [cm^2]. 239 cm^2 is roughly the area of a 156x156mm pseudosquare "M0" wafer
+        Cell area [cm^2]. 239 cm^2 is roughly the area of a 156x156mm pseudosquare "M0"
+        wafer
 
     tilt : numeric or None, default None
         Tilt angle of system. If None, defaults to location latitude
@@ -969,9 +983,10 @@ def calc_letid_outdoors(
         Azimuth angle of the syste. Default is 180, i.e., south-facing.
 
     module_parameters : dict or None, default None
-        pvlib module parameters. see pvlib documentation for details. Note that this model requires
-        full DC power results, so requires either the CEC or SAPM model, (i.e., not PVWatts).
-        If None, defaults to "Jinko_Solar_Co___Ltd_JKM260P_60" from the CEC module database.
+        pvlib module parameters. see pvlib documentation for details. Note that this
+        model requires full DC power results, so requires either the CEC or SAPM model,
+        (i.e., not PVWatts). If None, defaults to "Jinko_Solar_Co___Ltd_JKM260P_60" from
+        the CEC module database.
 
     inverter_parameters : dict or None, default None
         pvlib inverter parameters. see pvlib documentation for details. .
@@ -980,12 +995,14 @@ def calc_letid_outdoors(
         pvlib temperature model, either "sapm" or "pvsyst". See pvlib.temperature.
 
     temperature_model_parameters : str, default "open_rack_glass_polymer"
-        Temperature model parameters as required by the selected model in pvlib.temperature
+        Temperature model parameters as required by the selected model in
+        pvlib.temperature
 
     Returns
     -------
     timesteps : pandas DataFrame
-        Datafame containing defect state percentages, lifetime, and device electrical parameters
+        Datafame containing defect state percentages, lifetime, and device electrical
+        parameters
 
     See also
     --------
@@ -994,8 +1011,8 @@ def calc_letid_outdoors(
     pvlib.pvsystem.PVSystem
     pvlib.temperature
     """
-
-    # Set up system, run pvlib.modelchain, and get the results we need: cell temp and injection
+    # Set up system, run pvlib.modelchain, and get the results we need: cell temp and
+    # injection
     lat = float(meta["latitude"])
     lon = float(meta["longitude"])
     tz = meta["tz"]
@@ -1047,7 +1064,8 @@ def calc_letid_outdoors(
     timesteps.rename(columns={"index": "time"}, inplace=True)
     timesteps.reset_index(inplace=True, drop=True)
 
-    # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
+    # create columns for defect state percentages and lifetime, fill with NaNs for now,
+    # to fill iteratively below
     timesteps[["NA", "NB", "NC", "tau"]] = np.nan
 
     # assign first timestep defect state percentages
@@ -1059,7 +1077,9 @@ def calc_letid_outdoors(
     if generation_df is None:
         generation_df = pd.read_excel(
             os.path.join(DATA_DIR, "PVL_GenProfile.xlsx"), header=0
-        )  # this is an optical generation profile generated by PVLighthouse's OPAL2 default model for 1-sun, normal incident AM1.5 sunlight on a 180-um thick SiNx-coated, pyramid-textured wafer.
+        )  # this is an optical generation profile generated by PVLighthouse's OPAL2
+        # default model for 1-sun, normal incident AM1.5 sunlight on a 180-um thick
+        # SiNx-coated, pyramid-textured wafer.
         generation = generation_df["Generation (cm-3s-1)"]
         depth = generation_df["Depth (um)"]
     else:
@@ -1083,10 +1103,12 @@ def calc_letid_outdoors(
             timesteps.at[index, "Voc"] = voc
 
         elif timestep["Injection"] == 0:
-            pass  # TODO, skip rows where injeciton is 0, because these won't induce letid.
-        # TODO this is where dark letid will need to be fixed.
+            pass  # TODO, skip rows where injeciton is 0, because these won't induce
+            # letid.
+            # TODO this is where dark letid will need to be fixed.
 
-        # loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.
+        # loop through rows, new tau calculated based on previous NB. Reaction proceeds
+        # based on new tau.
         else:
             n_A = timesteps.at[index - 1, "NA"]
             n_B = timesteps.at[index - 1, "NB"]
@@ -1100,7 +1122,8 @@ def calc_letid_outdoors(
             temperature = timesteps.at[index, "Temperature"]
             injection = timesteps.at[index, "Injection"]
 
-            # calculate defect reaction kinetics: reaction constant and carrier concentration factor.
+            # calculate defect reaction kinetics: reaction constant and carrier
+            # concentration factor.
             k_AB = k_ij(
                 mechanism_params["v_ab"], mechanism_params["ea_ab"], temperature
             )
@@ -1193,7 +1216,9 @@ def calc_letid_lab(
     d_base=27,
     cell_area=239,
 ):
-    """Models LETID progression in a constant temperature and injection (i.e. lab-based
+    """Model LETID progression in a constant temperature and injection.
+
+    Model LETID progression in a constant temperature and injection. (i.e. lab-based
     accelerated test) environment.
 
     Parameters
@@ -1221,31 +1246,34 @@ def calc_letid_lab(
 
     injection : float
         Injection of device. Normalized to 1-sun illumnation or short circuit current.
-        Typical injection in standard accelerated testing is 2x(Isc-Imp), i.e., roughly 0.1.
+        Typical injection in standard accelerated testing is 2x(Isc-Imp), i.e., roughly
+        0.1.
         TODO: accept timeseries of injection for modeling variable-condition testing.
 
     temperature : numeric
         Test temperature of device [C]. IEC TS 63342 specifies 75C.
 
      mechanism_params : str
-        Name for mechanism parameters set. Parameters are coded in 'kinetic_parameters.json'.
-        These are typically taken from literature studies of transtions in the 3-state model.
-        They allow for calculation the excess carrier density of literature experiments (dn_lit)
+        Dictionary of mechanism parameters.
+        These are typically taken from literature studies of transtions in the 3-state
+        model. They allow for calculation the excess carrier density of literature
+        experiments (dn_lit). Parameters are coded in 'MECHANISM_PARAMS' dict.
 
     duration : str, default "3W"
-        Duration of modeled test. Generates a timeseries using pandas.to_timedelta. Default is 3
-        weeks, i.e. the length of IEC TS 63342.
+        Duration of modeled test. Generates a timeseries using pandas.to_timedelta.
+        Default is 3 weeks, i.e. the length of IEC TS 63342.
 
     freq : str, default "min"
-        See pandas.date_range for details.  In general, choose short time intervals unless you're
-        sure defect reactions are proceeding very slowly.
+        See pandas.date_range for details.  In general, choose short time intervals
+        unless you're sure defect reactions are proceeding very slowly.
 
     start : str or datetime-like or None, default None
         If provided, defines the start time of the test. If none, defaults to now.
 
     generation_df : pandas DataFrame or None
-        Dataframe of an optical generation profile for a solar cell used to calculate current
-        collection. If None, loads default generation profile from 'PVL_GenProfile.xlsx'.
+        Dataframe of an optical generation profile for a solar cell used to calculate
+        current collection. If None, loads default generation profile from
+    'PVL_GenProfile.xlsx'.
         If not None, column names must include:
         - ``'Generation (cm-3s-1)'``
         - ``'Depth (um)'``
@@ -1255,12 +1283,14 @@ def calc_letid_lab(
         Minority carrier diffusivity of the base of the solar cell [cm^2/Vs].
 
     cell_area : numeric, default 239
-        Cell area [cm^2]. 239 cm^2 is roughly the area of a 156x156mm pseudosquare "M0" wafer
+        Cell area [cm^2]. 239 cm^2 is roughly the area of a 156x156mm pseudosquare
+        "M0" wafer
 
     Returns
     -------
     timesteps : pandas DataFrame
-        Datafame containing defect state percentages, lifetime, and device electrical parameters
+        Datafame containing defect state percentages, lifetime, and device electrical
+        parameters
     """
     if start is None:
         start = datetime.datetime.now()
@@ -1272,7 +1302,9 @@ def calc_letid_lab(
         and isinstance(temperature, int)
         or isinstance(temperature, float)
     ):
-        # default is 3 weeks of 1-minute interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly
+        # default is 3 weeks of 1-minute interval timesteps. In general, we should
+        # select small timesteps unless we are sure defect reactions are proceeding
+        # very slowly
         timesteps = pd.date_range(
             start, end=pd.to_datetime(start) + pd.to_timedelta(duration), freq=freq
         )
@@ -1284,7 +1316,8 @@ def calc_letid_lab(
         timesteps["Temperature"] = temperature
         timesteps["Injection"] = injection
 
-        # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
+        # create columns for defect state percentages and lifetime, fill with NaNs for
+        # now, to fill iteratively below
         timesteps[["NA", "NB", "NC", "tau"]] = np.nan
 
         # assign first timestep defect state percentages
@@ -1303,7 +1336,9 @@ def calc_letid_lab(
     if generation_df is None:
         generation_df = pd.read_excel(
             os.path.join(DATA_DIR, "PVL_GenProfile.xlsx"), header=0
-        )  # this is an optical generation profile generated by PVLighthouse's OPAL2 default model for 1-sun, normal incident AM1.5 sunlight on a 180-um thick SiNx-coated, pyramid-textured wafer.
+        )  # this is an optical generation profile generated by PVLighthouse's OPAL2
+        # default model for 1-sun, normal incident AM1.5 sunlight on a 180-um thick
+        # SiNx-coated, pyramid-textured wafer.
         generation = generation_df["Generation (cm-3s-1)"]
         depth = generation_df["Depth (um)"]
     else:
@@ -1327,10 +1362,12 @@ def calc_letid_lab(
             timesteps.at[index, "Voc"] = voc
 
         elif timestep["Injection"] == 0:
-            pass  # TODO, skip rows where injeciton is 0, because these won't induce letid.
+            pass  # TODO, skip rows where injeciton is 0, because these won't induce
+            # letid.
         # TODO this is where dark letid will need to be fixed.
 
-        # loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.
+        # loop through rows, new tau calculated based on previous NB. Reaction proceeds
+        # based on new tau.
         else:
             n_A = timesteps.at[index - 1, "NA"]
             n_B = timesteps.at[index - 1, "NB"]
@@ -1344,7 +1381,8 @@ def calc_letid_lab(
             temperature = timesteps.at[index, "Temperature"]
             injection = timesteps.at[index, "Injection"]
 
-            # calculate defect reaction kinetics: reaction constant and carrier concentration factor.
+            # calculate defect reaction kinetics: reaction constant and carrier
+            # concentration factor.
             k_AB = k_ij(
                 mechanism_params["v_ab"], mechanism_params["ea_ab"], temperature
             )
