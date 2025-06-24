@@ -571,7 +571,6 @@ def ground_irradiance_monthly(inspire_res_ds: xr.Dataset) -> xr.Dataset:
     Many rows are not populated because the model only calculates ground irradiance
     when certain measurements are met.
     """
-
     nonzero_mask = (inspire_res_ds["ground_irradiance"] != 0).any(dim="distance")
     filtered_data = inspire_res_ds["ground_irradiance"].where(nonzero_mask, drop=True)
 
