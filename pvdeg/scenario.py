@@ -54,23 +54,27 @@ class Scenario:
         Parameters:
         -----------
         name : (str)
-            custom name for deg. scenario. If none given, will use date of initialization (DDMMYY)
+            custom name for deg. scenario. If none given, will use date of
+            initialization (DDMMYY)
         path : (str, pathObj)
-            File path to operate within and store results. If none given, new folder "name" will be
+            File path to operate within and store results. If none given, new folder
+            "name" will be
             created in the working directory.
         gids : (str, pathObj)
-            Spatial area to perform calculation for. This can be Country or Country and State.
+            Spatial area to perform calculation for. This can be Country or Country and
+            State.
         modules : (list, str)
             List of module names to include in calculations.
         pipeline : (list, str)
             List of function names to run in job pipeline
         file : (path)
-            Full file path to a pre-generated Scenario object. If specified, all other parameters
+            Full file path to a pre-generated Scenario object. If specified, all other
+            parameters
             will be ignored and taken from the .json file.
         results : (pd.Series)
-            Full collection of outputs from pipeline execution. Populated by ``scenario.runPipeline()``
+            Full collection of outputs from pipeline execution. Populated by
+            ``scenario.runPipeline()``
         """
-
         self.name = name
         self.path = path
         self.modules = modules
@@ -252,14 +256,17 @@ class Scenario:
         Parameters
         -----------
         module_name : str
-            unique name for the module. adding multiple modules of the same name will replace the
+            unique name for the module. adding multiple modules of the same name will
+            replace the
             existing entry.
         racking : str
-            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
+            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed
+            entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
         material : str
-            Key of the material desired. For a complete list, see pvdeg/data/O2permeation.json
+            Key of the material desired. For a complete list,
+            see pvdeg/data/O2permeation.json
             or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         material_file : str
@@ -267,7 +274,8 @@ class Scenario:
             Use material json file in `pvdeg/data`. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
         temp_model : str
-            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
+            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
+            more.
             Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
         model_kwarg : dict, (optional)
             provide a dictionary of temperature model coefficents to be used
@@ -391,14 +399,14 @@ class Scenario:
         -----------
         func : function
             pvdeg function to use for single point calculation.
-            All regular pvdeg functions will work at a single point when ``Scenario.geospatial == False``
+            All regular pvdeg functions will work at a single point when
+            ``Scenario.geospatial == False``
         func_params : dict
             job specific keyword argument dictionary to provide to the function
         see_added : bool
             set flag to get a userWarning notifying the user of the job added
            to the pipeline in method call. ``default = False``
         """
-
         if func is None or not callable(func):
             print(f'FAILED: Requested function "{func}" not found')
             print("Function has not been added to pipeline.")
@@ -573,15 +581,14 @@ class Scenario:
             pattern to search for using glob. Default value of `pvd_job_` is
             equvilent to `pvd_job_*` in bash.
 
-        Returns:
-        --------
+        Returns
+        -------
         None
 
-        See Also:
-        ---------
+        See Also
+        --------
         `pvdeg.utilities.remove_scenario_filetrees`
         """
-
         utilities.remove_scenario_filetrees(fp=fp, pattern=pattern)
 
         return
@@ -608,12 +615,11 @@ class Scenario:
 
         # find the function in pvdeg
         class_list = [c for c in dir(pvdeg) if not c.startswith("_")]
-        func_list = []
         for c in class_list:
             _class = getattr(pvdeg, c)
             if func_name in dir(_class):
                 _func = getattr(_class, func_name)
-        if _func == None:
+        if _func is None:
             return (None, None)
 
         # check if necessary parameters given
@@ -626,7 +632,7 @@ class Scenario:
         return (_func, reqs)
 
     def _to_dict(self, api_key=False):
-        # pipeline is a special case, we need to remove the 'job' function reference at every entry
+        # pipeline is special case, must remove 'job' function reference at every entry
         modified_pipeline = deepcopy(self.pipeline)
         for task in modified_pipeline.values():
             function_ref = task["job"]
@@ -665,7 +671,6 @@ class Scenario:
         path : str
             location to save. If no path provided save to scenario directory.
         """
-
         if path is None:
             path = self.path
         target = os.path.join(path, f"{self.name}.json")
@@ -688,8 +693,8 @@ class Scenario:
         Use after importing scenario if json
         does not contain email and api key.
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         email : str
             email associated with nsrdb developer account
         api_key : str
@@ -709,16 +714,16 @@ class Scenario:
     ) -> pd.DataFrame:
         """Extract scenario results along an axis.
 
-        Note:
-        --------
-        only works if results are of the same shape.
+        Note
+        ----
+        Only works if results are of the same shape.
         Ex) running 5 different temperature calculations on the same module.
         Counter Ex) running a standoff and tempeature calc on the same module.
 
         Ex: ('function' : 'AKWMC)
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         dim_target : tuple of str
             Define a tuple of `(dimension, name)` to select results.
             The dimension is either 'function' or 'module', and the name
@@ -729,7 +734,6 @@ class Scenario:
             Dimension options: `'function'`, `'module'`
 
             Examples:
-
             To grab 'standoff' result from all modules in the scenario:
             Determine the name of the standoff job using `display(Scenario)`.
             If the job is called `AJCWL`, the result would be:
@@ -831,7 +835,6 @@ class Scenario:
             Dimension options: `'function'`, `'module'`
 
             Examples:
-
             To grab 'standoff' result from all modules in the scenario:
             Determine the name of the standoff job using `display(Scenario)`.
             If the job is called `AJCWL`, the result would be:
@@ -868,7 +871,6 @@ class Scenario:
         To have more control over a plot simply extract the data and then use
         more specific plotting logic
         """
-
         df = self.extract(
             dim_target=dim_target,
             col_name=col_name,
@@ -1135,13 +1137,13 @@ class GeospatialScenario(Scenario):
         raise NotImplementedError(
             """
             Cannot directly compare pvdeg.GeospatialScenario objects
-            due to larger than memory/out of memory datasets stored in 
+            due to larger than memory/out of memory datasets stored in
             GeospatialScenario.weather_data attribute.
             """
         )
 
     def start_dask(self, hpc=None) -> None:
-        """Starts a dask cluster for parallel processing.
+        """Start a dask cluster for parallel processing.
 
         Parameters
         ----------
@@ -1204,7 +1206,7 @@ class GeospatialScenario(Scenario):
         be overwritten with weather and meta data gathered by this method.
 
         Parameters
-        -----------
+        ----------
         country : str
             country to include from NSRDB. Currently supports full string names only.
             Either single string form or list of strings form.
@@ -1216,7 +1218,8 @@ class GeospatialScenario(Scenario):
         state : str
             combination of states or provinces to include from NSRDB.
             Supports two-letter codes for American states. Can mix two-letter
-            codes with full length strings. Can take single string, or list of strings (len >= 1)
+            codes with full length strings. Can take single string, or list of strings
+            (len >= 1)
 
             Examples:
             - ``state='Washington'``
@@ -1228,11 +1231,14 @@ class GeospatialScenario(Scenario):
             states present in the ``state`` argument, both will be included.
             If no state is provided
         downsample_factor : int
-            downsample the weather and metadata attached to the region you have selected. default(0), means no downsampling
+            downsample the weather and metadata attached to the region you have
+            selected. default(0), means no downsampling
         year : int
-            year of data to use from NSRDB, default = ``TMY`` otherwise provide integer like ``2022`` for psm3 yearly data.
+            year of data to use from NSRDB, default = ``TMY`` otherwise provide integer
+            like ``2022`` for psm3 yearly data.
         nsrdb_attributes : list(str)
-            list of strings of weather attributes to grab from the NSRDB, must be valid NSRDB attributes (insert list of valid options here).
+            list of strings of weather attributes to grab from the NSRDB, must be valid
+            NSRDB attributes (insert list of valid options here).
 
                 Valid Options:
                 - 'air_temperature'
@@ -1248,7 +1254,6 @@ class GeospatialScenario(Scenario):
         see_added : bool
             flag true if you want to see a runtime notification for added location/gids
         """
-
         # overwrite old location information
         self.gids, self.weather_data, self.meta_data = None, None, None
 
@@ -1355,8 +1360,8 @@ class GeospatialScenario(Scenario):
             data points. ex) Given all points for the planet, downselect based on
             the most extreme coordinates for the United States coastline information.
 
-        Returns:
-        --------
+        Returns
+        -------
         None
         """
         bbox_gids = pvdeg.geospatial.apply_bounding_box(
@@ -1417,7 +1422,6 @@ class GeospatialScenario(Scenario):
         --------
         None, strictly updates meta_data attribute of GeospatialScenario instance.
         """
-
         self.set_kdtree(kdtree=kdtree)
 
         gids = pvdeg.geospatial.identify_mountains_radii(
@@ -1442,7 +1446,9 @@ class GeospatialScenario(Scenario):
         normalization: str = "linear",
         kdtree=None,
     ):
-        """Add a column to the scenario meta_data dataframe containing a boolean True or
+        """Detect whether entry is near a mountain.
+
+        Add a column to the scenario meta_data dataframe containing a boolean True or
         False value representing if the entry is a near a mountain. Calculated from
         weights assigned during stochastic downselection.
 
@@ -1477,7 +1483,6 @@ class GeospatialScenario(Scenario):
         ---------
         `pvdeg.geospatial.identify_mountains_weights`
         """
-
         self.set_kdtree(kdtree=kdtree)
 
         gids = pvdeg.geospatial.identify_mountains_weights(
@@ -1526,7 +1531,6 @@ class GeospatialScenario(Scenario):
         ---------
         `pvdeg.geospatial.feature_downselect`
         """
-
         self.set_kdtree(kdtree=kdtree)
 
         feature_gids = pvdeg.geospatial.feature_downselect(
@@ -1578,7 +1582,6 @@ class GeospatialScenario(Scenario):
         ---------
         `pvdeg.geospatial.elevation_stochastic_downselect` for more info/docs
         """
-
         self.set_kdtree(kdtree=kdtree)
 
         gids = pvdeg.geospatial.elevation_stochastic_downselect(
@@ -1650,7 +1653,8 @@ class GeospatialScenario(Scenario):
         Example Use:
         >>> geo_weather, geo_meta = GeospatialScenario.geospatial_data()
 
-        This gets us the result we would use in the traditional pvdeg geospatial approach.
+        This gets us the result we would use in the traditional pvdeg geospatial
+        approach.
 
         Parameters:
         -----------
@@ -1659,7 +1663,8 @@ class GeospatialScenario(Scenario):
         Returns:
         --------
         (weather_data, meta_data): tuple[xr.Dataset, pd.DataFrame]
-            A tuple of weather data as an `xarray.Dataset` and the corresponding meta data as a dataframe.
+            A tuple of weather data as an `xarray.Dataset` and the corresponding meta
+            data as a dataframe.
         """
         # downsample here, not done already happens at pipeline runtime
         geo_weather_sub = self.weather_data.sel(gid=self.meta_data.index).chunk(
@@ -1696,25 +1701,27 @@ class GeospatialScenario(Scenario):
         func_params: dict = {},
         see_added: bool = False,
     ) -> None:
-        """Add a pvdeg geospatial function to the scenario pipeline. If no template is
-        provided, `addJob` attempts to use `geospatial.auto_template` this will raise
-        an.
+        """Add a pvdeg geospatial function to the scenario pipeline.
+
+        If no template is provided, `addJob` attempts to use `geospatial.auto_template`
+        this will raise an.
 
         Parameters:
         -----------
         func : function
             pvdeg function to use for geospatial analysis.
         template : xarray.Dataset
-            Template for output data. Only required if a function is not supported by `geospatial.auto_template`.
+            Template for output data. Only required if a function is not supported by
+            `geospatial.auto_template`.
         func_params : dict
             job specific keyword argument dictionary to provide to the function
         see_added : bool
             set flag to get a userWarning notifying the user of the job added
             to the pipeline in method call. ``default = False``
         """
-
         if template is None:
-            # take the weather datapoints specified by metadata and create a template based on them.
+            # take the weather datapoints specified by metadata and create a template
+            # based on them.
             self.weather_data = self.weather_data.sel(gid=self.meta_data.index)
             template = pvdeg.geospatial.auto_template(
                 func=func, ds_gids=self.weather_data
@@ -1725,16 +1732,19 @@ class GeospatialScenario(Scenario):
         self.func_params = func_params
 
         if see_added:
-            message = f"{func.__name__} added to scenario with arguments {func_params} using template: {template}"
+            message = f"{func.__name__} added to scenario with arguments {func_params} \
+            using template: {template}"
             warnings.warn(message, UserWarning)
 
     def run(self, hpc_worker_conf: Optional[dict] = None) -> None:
         """Run the geospatial scenario stored in the geospatial scenario object.
 
-        Only supports one function at a time. Unlike `Scenario` which supports unlimited conventional pipeline jobs.
-        Results are stored in the `GeospatialScenario.results` attribute.
+        Only supports one function at a time. Unlike `Scenario` which supports unlimited
+        conventional pipeline jobs. Results are stored in the
+        `GeospatialScenario.results` attribute.
 
-        Creates a dask client if it has not been initialized previously with `GeospatialScenario.start_dask`.
+        Creates a dask client if it has not been initialized previously with
+        GeospatialScenario.start_dask`.
 
         Parameters:
         -----------
@@ -1780,7 +1790,7 @@ class GeospatialScenario(Scenario):
             weather_ds=self.weather_data,
             meta_df=self.meta_data,
             func=self.func,
-            template=self.template,  # provided or generated via autotemplate in GeospatialScenario.addJob
+            template=self.template,  # provided or generated via autotemplate in# GeospatialScenario.addJob
         )
 
         self.results = analysis_result
@@ -1829,8 +1839,10 @@ class GeospatialScenario(Scenario):
             "satellite": "Americas",
             "names": year,
             "NREL_HPC": True,
-            # 'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
-            "attributes": [],  # does having do atributes break anything, should we just pick one
+            # 'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni',
+            # 'relative_humidity']}
+            "attributes": [],  # does having do atributes break anything, should we
+            # just pick one
         }
 
         weather_ds, meta_df = pvdeg.weather.get(
@@ -1846,7 +1858,7 @@ class GeospatialScenario(Scenario):
         county: Optional[str] = None,
         target_region: Optional[str] = None,
     ):
-        """Gets all valid region names in the NSRDB.
+        """Obtain all valid region names in the NSRDB.
 
         Only works on hpc.
 
@@ -1863,7 +1875,6 @@ class GeospatialScenario(Scenario):
         valid_regions : numpy.ndarray
             list of strings representing all unique region entries in the nsrdb.
         """
-
         if not self.geospatial:  # add hpc check
             return AttributeError(
                 f"self.geospatial should be True. Current value = {self.geospatial}"
@@ -1884,9 +1895,11 @@ class GeospatialScenario(Scenario):
     def plot(self):
         """Not Usable in GeospatialScenario class instance, only in Scenario
         instance."""
-        # python has no way to hide a parent class method in the child, so this only exists to prevent access
+        # python has no way to hide a parent class method in the child, so this only
+        # exists to prevent access
         raise AttributeError(
-            "The 'plot' method is not accessible in GeospatialScenario, only in Scenario"
+            "The 'plot' method is not accessible in GeospatialScenario, only in \
+                Scenario"
         )
 
     def plot_coords(
@@ -1992,7 +2005,8 @@ class GeospatialScenario(Scenario):
 
         if col_name not in self.meta_data.columns:
             raise ValueError(
-                f"{col_name} not in self.meta_data columns as follows {self.meta_data.columns}"
+                f"{col_name} not in self.meta_data columns as follows \
+                {self.meta_data.columns}"
             )
 
         col_dtype = self.meta_data[col_name].dtype
@@ -2001,13 +2015,13 @@ class GeospatialScenario(Scenario):
                 f"meta_data column {col_name} expected dtype bool not {col_dtype}"
             )
 
-        near = self.meta_data[self.meta_data[col_name] == True]
-        not_near = self.meta_data[self.meta_data[col_name] == False]
+        near = self.meta_data[self.meta_data[col_name] is True]
+        not_near = self.meta_data[self.meta_data[col_name] is False]
 
         fig = plt.figure(figsize=(15, 10))
         ax = plt.axes(projection=ccrs.PlateCarree())
 
-        if (coord_1 and coord_2) or (coords != None):
+        if (coord_1 and coord_2) or (coords is not None):
             utilities._plot_bbox_corners(
                 ax=ax, coord_1=coord_1, coord_2=coord_2, coords=coords
             )
@@ -2088,7 +2102,6 @@ class GeospatialScenario(Scenario):
         vmax : int
             upper bound on values in linear color map
         """
-
         if not self.geospatial:
             return False
 
