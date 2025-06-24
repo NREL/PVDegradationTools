@@ -1,3 +1,5 @@
+"""store.py"""
+
 import xarray as xr
 import pandas as pd
 import numpy as np
@@ -8,7 +10,7 @@ from pvdeg import METOROLOGICAL_DOWNLOAD_PATH
 
 
 def my_path():
-    """Finds path to your zarr store of data if it exists."""
+    """Find path to your zarr store of data if it exists."""
     if os.path.exists(os.path.join(METOROLOGICAL_DOWNLOAD_PATH, ".zattrs")):
         print(METOROLOGICAL_DOWNLOAD_PATH)
 
@@ -18,7 +20,6 @@ def my_path():
 
 def _combine_geo_weather_meta(weather_ds: xr.Dataset, meta_df: pd.DataFrame):
     """Combine weather dataset and meta dataframe into a single dataset."""
-
     meta_ds = xr.Dataset.from_dataframe(meta_df).rename({"index": "gid"})
 
     combined = xr.merge([weather_ds, meta_ds])
@@ -31,9 +32,12 @@ def _combine_geo_weather_meta(weather_ds: xr.Dataset, meta_df: pd.DataFrame):
 def _seperate_geo_weather_meta(
     ds_from_zarr: xr.Dataset,
 ):
-    """Take loaded dataset in the zarr store schema (weather and meta combined) and
-    seperate it into `weather_ds` and `meta_df`."""
+    """
+    Separate datasets.
 
+    Take loaded dataset in the zarr store schema (weather and meta combined) and
+    seperate it into `weather_ds` and `meta_df`.
+    """
     ds_from_zarr["Source"] = ds_from_zarr["Source"].astype(
         object
     )  # geospatial.mapblocks needs this to be an object
@@ -63,9 +67,7 @@ def _seperate_geo_weather_meta(
 
 
 def _make_coords_to_gid_da(ds_from_zarr: xr.Dataset):
-    """Create a 2D indexable array that maps coordinates (lat and lon) to gid stored in
-    zarr store."""
-
+    """Create a 2D indexable array that maps lat/lon to gid stored in zarr store."""
     # only want to do this if the arrays are dask arrays
     lats = ds_from_zarr.latitude.to_numpy()
     lons = ds_from_zarr.longitude.to_numpy()
@@ -100,7 +102,7 @@ def _create_sample_sheet(
     The sizes of the dimensions of the sheet will be {"gid": 1, "time": 8760}
 
     Parameters
-    -----------
+    ----------
     fill_value: numeric
         value to populate weather_ds single sheet with
     latitude: float
@@ -113,13 +115,13 @@ def _create_sample_sheet(
         dummy height of measure sample dataset's wind measurement
 
     Returns
-    --------
+    -------
     sheet_ds : xr.Dataset
-        Dummy weather data sheet for a single location using a dask array backend. As mentioned above this will look maintain the gid coordinate.
+        Dummy weather data sheet for a single location using a dask array backend.
+        As mentioned above this will look maintain the gid coordinate.
     meta_df : pd.DataFrame
         Dummy metadata for test location in pandas.DataFrame.
     """
-
     meta_dict = {
         "latitude": latitude,
         "longitude": longitude,
