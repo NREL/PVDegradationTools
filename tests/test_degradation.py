@@ -131,7 +131,7 @@ def test_degradation():
 
     data = pd.read_csv(INPUT_SPECTRA)
     wavelengths = np.array(range(280, 420, 20))
-    degradation = pvdeg.degradation.degradation(
+    degradation = pvdeg.degradation.degradation_spectral(
         spectra=data["Spectra"],
         rh_module=data["RH"],
         temp_module=data["Temperature"],
