@@ -1,11 +1,11 @@
-"""Collections of functions to enable arbitrary symbolic expression evaluation for
-simple models."""
+"""Functions to enable arbitrary symbolic expression evaluation for simple models."""
 
 import sympy as sp
 import pandas as pd
 import numpy as np
 
-# from latex2sympy2 import latex2sympy # this potentially useful but if someone has to use this then they proboably wont be able to figure out the rest
+# from latex2sympy2 import latex2sympy # this potentially useful but if someone has
+# to use this then they proboably wont be able to figure out the rest
 # parse: latex -> sympy using latex2sympy2 if nessesscary
 
 
@@ -86,7 +86,8 @@ def calc_kwarg_timeseries(
     expr,
     kwarg,
 ):
-    # check for equal length among timeseries. no nesting loops allowed, no functions can be dependent on their previous results values
+    # check for equal length among timeseries. no nesting loops allowed, no functions
+    # can be dependent on their previous results values
     numerics, timeseries, series_length = {}, {}, 0
     for key, val in kwarg.items():
         if isinstance(val, (pd.Series, np.ndarray)):
@@ -99,10 +100,13 @@ def calc_kwarg_timeseries(
 
     if not _have_same_length(list(timeseries.values())):
         raise NotImplementedError(
-            "arrays/series are different lengths. fix mismatched length. otherwise arbitrary symbolic solution is too complex for solver. nested loops or loops dependent on previous results not supported."
+            "arrays/series are different lengths. fix mismatched length. otherwise \
+            arbitrary symbolic solution is too complex for solver. nested loops or \
+                loops dependent on previous results not supported."
         )
 
-    # calculate the expression. we will seperately calculate all values and store then in a timeseries of the same shape. if a user wants to sum the values then they can
+    # calculate the expression. we will seperately calculate all values and store then
+    # in a timeseries of the same shape. if a user wants to sum the values then they can
     if _have_same_indices(list(timeseries.values())):
         index = list(timeseries.values())[0].index
     else:
