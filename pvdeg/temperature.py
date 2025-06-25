@@ -3,7 +3,6 @@ Collection of classes and functions to calculate different temperatures.
 """
 
 import pvlib
-# import pvdeg
 
 from pvdeg import (
     spectral,
