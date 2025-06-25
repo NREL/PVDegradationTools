@@ -139,6 +139,8 @@ def get(database, id=None, geospatial=False, find_meta: bool=None , **kwargs):
             )
 
     if not geospatial:
+        if find_meta is None:
+            find_meta = True
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
