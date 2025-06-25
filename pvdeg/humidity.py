@@ -14,6 +14,7 @@ from pvdeg import (
     temperature,
     spectral,
     weather,
+    utilities,
     decorators
 )
 
@@ -295,7 +296,7 @@ def _diffusivity_weighted_water(
     return diffuse_water
 
 
-def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
+def front_encap(rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant='W001'):
     """
     Function returns a diffusivity weighted average Relative Humidity of the module surface.
 
@@ -310,10 +311,13 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729
         "module temperature [°C]"
     So : float
         Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
+        Will default to 1.81390702(g/cm3) which is the suggested value for EVA 001 if not specified.
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        Will default to Eas = 16.729(kJ/mol) is the suggested value for EVA 001 if not specified.
+    encapsulant : str
+        This is the code number for the encapsulant. 
+        The default is EVA 001.
 
 
     Return
@@ -322,6 +326,11 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729
         Relative Humidity of Frontside Solar module Encapsulant [%]
 
     """
+
+    if So is None or Eas is None:
+        So = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['So']
+        Eas = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['Eas']
+
     diffuse_water = _diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
@@ -392,180 +401,130 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-@njit
-def Ce_numba(
-    start,
+@jit
+def Ce(
     temp_module,
     rh_surface,
-    WVTRo=7970633554,
-    EaWVTR=55.0255,
-    So=1.81390702,
-    l=0.5,
-    Eas=16.729,
+    start=None,
+    Po_b=None,
+    Ea_p_b=None,
+    t=None,
+    So_e=None,
+    Ea_s_e=None,
+    l=None,
+    backsheet = 'W017',
+    encapsulant = 'W001',
+    output="rh",
 ):
     """
-    Calculation is used in determining Relative Humidity of Backside Solar
-    Module Encapsulant. This function returns a numpy array of the Concentration of water in the
-    encapsulant at every time step
+    This calculation is used in determining the concentration or relative humidity of water in the backside 
+    encapsulant at every time step. 
+
+    This calculation uses a quasi-steady state approximation of the diffusion equation to calculate the 
+    concentration of water in the encapsulant. For this, it is assumed that the diffusion in the encapsulant is
+    much larger than the diffusion in the backsheet, and it ignores the transients in the backsheet.
 
     Numba was used to isolate recursion requiring a for loop
-    Numba Functions compile and run in machine code but can not use pandas (Very fast).
+    Numba Functions are very fast because they compile and run in machine code but can not use pandas dataframes.
 
     Parameters
     -----------
-    start : float
-        Initial value of the Concentration of water in the encapsulant
-        currently takes the first value produced from
-        the _ceq(Saturation of Water Concentration) as a point
-        of acceptable equilibrium
     temp_module : pandas series (float)
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
-    rh_Surface : list (float)
+    rh_surface : list (float)
         The relative humidity of the surface of a solar module [%]
         EXAMPLE: "50 = 50% NOT .5 = 50%"
-    WVTRo : float
-        Water Vapor Transfer Rate prefactor [g/m2/day].
-        The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
-    EaWVTR : float
-        Water Vapor Transfer Rate activation energy [kJ/mol] .
-        It is suggested to use 0.15[mm] thick PET as a default
-        for the backsheet and set EaWVTR=55.0255[kJ/mol]
-    So : float
-        Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
+    start : float
+        Initial value of the Concentration of water in the encapsulant.
+        by default, the function will use an equilibrium value as the first value
+    Po_b : float
+        Water permeation rate prefactor [g·mm/m²/day].
+        The suggested value for PET W17 is Po = 1319534666.90318 [g·mm/m²/day].
+    Ea_p_b : float
+        Backsheet permeation  activation energy [kJ/mol] .
+        For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
+    t : float
+        Thickness of the backsheet [mm].
+        The suggested default for a PET backsheet is t=0.3 [mm]
+    So_e : float
+        Encapsulant solubility prefactor in [g/cm³]
+        So = 1.81390702(g/cm³) is the suggested value for EVA W001.
+    Ea_s_e : float
+        Encapsulant solubility activation energy in [kJ/mol]
+        Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
     l : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.5(mm)
-    Eas : float
-        Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729[kJ/mol] is the suggested value for EVA.
+        The suggested value for encapsulat is EVA l=0.46 [mm]
+    backsheet : str
+        This is the code number for the backsheet. 
+        The default is PET 'W017'.
+    encapsulant : str
+        This is the code number for the encapsulant. 
+        The default is EVA 'W001'.
+    output : str
+        The default is "rh" which is the relative humidity in the encapsulant in [%],
+        any other value, e.g. "Ce" will return the concentration in [g/cm³].
+
 
     Returns
     --------
-    Ce_list : numpy array
-        Concentration of water in the encapsulant at every time step
+    Ce_list : Pandas series (float)
+        Concentration of water in the encapsulant at every time step in [g/cm³],
+        or the relative humidity in [%] depending on the output parameter.
 
     """
 
-    dataPoints = len(temp_module)
-    Ce_list = np.zeros(dataPoints)
+    Ce_list = np.zeros(len(temp_module))
+    Ce_out = temp_module
+    if not isinstance(temp_module, np.ndarray):
+        temp_module = temp_module.to_numpy()
+    if not isinstance(rh_surface, np.ndarray):
+        rh_surface = rh_surface.to_numpy()
 
+    if Po_b is None or Ea_p_b is None:
+        Po_b = utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None)['Po']
+        Ea_p_b = utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None)['Eap']
+        if t is None:
+            if 't' in utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None):
+                t = utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None)['t']
+            else:
+                t = 0.3
+    if So_e is None or Ea_s_e is None:
+        So_e = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['So']
+        Ea_s_e = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['Eas']
+        if l is None:
+            if 't' in utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None):
+                l = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['t']
+            else:
+                l = 0.46
+    # Convert the parameters to the correct and convenient units
+    WVTRo = Po_b / 100 / 100 / 24 / t
+    EaWVTR = Ea_p_b / 0.00831446261815324
+    So = So_e * l / 10
+    Eas = Ea_s_e / 0.00831446261815324
     for i in range(0, len(rh_surface)):
         if i == 0:
             # Ce = Initial start of concentration of water
-            Ce = start
+            if start is None:
+                Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100
+            else:
+                Ce = start
         else:
-            Ce = Ce_list[i - 1]
-
-        Ce = Ce + (
-            (
-                WVTRo
-                / 100
-                / 100
-                / 24
-                * np.exp(
-                    -((EaWVTR) / (0.00831446261815324 * (temp_module[i] + 273.15)))
-                )
-            )
-            / (
-                So
-                * l
-                / 10
-                * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
-            )
-            * (
-                rh_surface[i]
-                / 100
-                * So
-                * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
-                - Ce
-            )
-        )
+            Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
+                    ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
+                            ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
 
         Ce_list[i] = Ce
-
+    if output == "rh":
+        # Convert the concentration to relative humidity
+        Ce_list = 100 * (Ce_list / (So * np.exp(-(Eas / (temp_module + 273.15)))))
+        Ce_list = pd.DataFrame(Ce_list, columns=["rh"])     
+    else:
+        Ce_list = pd.DataFrame(Ce_list, columns=["Ce"])
+    
+    Ce_list.index = Ce_out.index
     return Ce_list
-
-
-def back_encap(
-    rh_ambient,
-    temp_ambient,
-    temp_module,
-    WVTRo=7970633554,
-    EaWVTR=55.0255,
-    So=1.81390702,
-    l=0.5,
-    Eas=16.729,
-):
-    """
-    rh_back_encap()
-
-    Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
-    and return a pandas series for each time step
-
-    Parameters
-    -----------
-    rh_ambient : pandas series (float)
-        The ambient outdoor environmnet relative humidity in [%]
-        EXAMPLE: "50 = 50% NOT .5 = 50%"
-    temp_ambient : pandas series (float)
-        The ambient outdoor environmnet temperature in Celsius
-    temp_module : list (float)
-        The surface temperature in Celsius of the solar panel module
-        "module temperature [°C]"
-    WVTRo : float
-        Water Vapor Transfer Rate prefactor [g/m2/day].
-        The suggested value for EVA is WVTRo = 7970633554[g/m2/day].
-    EaWVTR : float
-        Water Vapor Transfer Rate activation energy [kJ/mol] .
-        It is suggested to use 0.15[mm] thick PET as a default
-        for the backsheet and set EaWVTR=55.0255[kJ/mol]
-    So : float
-        Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702[g/cm3] is the suggested value for EVA.
-    l : float
-        Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.5[mm]
-    Eas : float
-        Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729[kJ/mol] is the suggested value for EVA.
-
-    Returns
-    --------
-    RHback_series : pandas series (float)
-        Relative Humidity of Backside Solar Module Encapsulant [%]
-
-    """
-
-    rh_surface = surface_outside(
-        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
-    )
-
-    Csat = _csat(temp_module=temp_module, So=So, Eas=Eas)
-    Ceq = _ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
-
-    start = Ceq.iloc[0]
-
-    # Need to convert these series to numpy arrays for numba function
-    temp_module_numba = temp_module.to_numpy()
-    rh_surface_numba = rh_surface.to_numpy()
-    Ce_nparray = Ce_numba(
-        start=start,
-        temp_module=temp_module_numba,
-        rh_surface=rh_surface_numba,
-        WVTRo=WVTRo,
-        EaWVTR=EaWVTR,
-        So=So,
-        l=l,
-        Eas=Eas,
-    )
-
-    # RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) /
-    #                   (0.00831446261815324 * (temp_module + 273.15))  )) ))
-    RHback_series = 100 * (Ce_nparray / Csat)
-
-    return RHback_series
 
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
@@ -595,13 +554,19 @@ def backsheet(
     rh_ambient,
     temp_ambient,
     temp_module,
-    WVTRo=7970633554,
-    EaWVTR=55.0255,
-    So=1.81390702,
-    l=0.5,
-    Eas=16.729,
-):
-    """Function to calculate the Relative Humidity of solar module backsheet as timeseries.
+    start=None,
+    Po_b=None,
+    Ea_p_b=None,
+    t=None,
+    So_e=None,
+    Ea_s_e=None,
+    l=None,
+    backsheet = 'W017',
+    encapsulant = 'W001'):
+    
+    """
+    Function to calculate the relative humidity in a solar module backsheet as timeseries.
+    It assume a value that is the average of the RH of the backside encapsulant and the outside surface of the module.
 
     Parameters
     ----------
@@ -613,22 +578,33 @@ def backsheet(
     temp_module : list (float)
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
-    WVTRo : float
-        Water Vapor Transfer Rate prefactor [g/m2/day].
-        The suggested value for EVA is WVTRo = 7970633554[g/m2/day].
-    EaWVTR : float
-        Water Vapor Transfer Rate activation energy [kJ/mol] .
-        It is suggested to use 0.15[mm] thick PET as a default
-        for the backsheet and set EaWVTR=55.0255[kJ/mol]
-    So : float
-        Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702[g/cm3] is the suggested value for EVA.
+    start : float
+        Initial value of the Concentration of water in the encapsulant.
+        by default, the function will use an equilibrium value as the first value
+    Po_b : float
+        Water permeation rate prefactor [g·mm/m²/day].
+        The suggested value for PET W17 is Po = 1319534666.90318 [g·mm/m²/day].
+    Ea_p_b : float
+        Backsheet permeation  activation energy [kJ/mol] .
+        For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
+    t : float
+        Thickness of the backsheet [mm].
+        The suggested default for a PET backsheet is t=0.3 [mm]
+    So_e : float
+        Encapsulant solubility prefactor in [g/cm³]
+        So = 1.81390702(g/cm³) is the suggested value for EVA W001.
+    Ea_s_e : float
+        Encapsulant solubility activation energy in [kJ/mol]
+        Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
     l : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.5[mm]
-    Eas : float
-        Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729[kJ/mol] is the suggested value for EVA.
+        The suggested value for encapsulat is EVA l=0.46 [mm]
+    backsheet : str
+        This is the code number for the backsheet. 
+        The default is PET 'W017'.
+    encapsulant : str
+        This is the code number for the encapsulant. 
+        The default is EVA 'W001'.
 
     Returns
     --------
@@ -636,21 +612,26 @@ def backsheet(
         relative humidity of the PV backsheet as a time-series [%]
     """
 
-    RHback_series = back_encap(
-        rh_ambient=rh_ambient,
+    # Get the relative humidity of the surface
+    surface = surface_outside(rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module)
+
+    # Get the relative humidity of the back encapsulant
+    RHback_series = Ce(
+        rh_surface=surface,
         temp_ambient=temp_ambient,
         temp_module=temp_module,
-        WVTRo=WVTRo,
-        EaWVTR=EaWVTR,
-        So=So,
+        start=start,
+        Po_b=Po_b,
+        Ea_p_b=Ea_p_b,
+        t=t,
+        So_e=So_e,
+        Ea_s_e=Ea_s_e,
         l=l,
-        Eas=Eas,
-    )
-    surface = surface_outside(
-        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
-    )
-    backsheet = (RHback_series + surface) / 2
-    return backsheet
+        backsheet = backsheet,
+        encapsulant = encapsulant,
+        output="rh")
+
+    return (RHback_series + surface) / 2
 
 
 @decorators.geospatial_quick_shape('timeseries', ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
