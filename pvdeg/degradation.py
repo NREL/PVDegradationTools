@@ -15,7 +15,7 @@ from . import (
 
 
 def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
-    """Helper function.
+    """Find degradation rate, helper function.
 
     Find the rate of degradation kenetics using the Fischer model.
     Degradation kentics model interpolated 50 coatings with respect to color shift,
@@ -167,7 +167,7 @@ def vantHoff_deg(
         See ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
         or more.
 
     Returns
@@ -248,6 +248,8 @@ def IwaVantHoff(
     irradiance_kwarg={},
 ):
     """
+    Environment characterization function.
+
     IWa : Environment Characterization [W/m²].
 
     For one year of degredation the controlled environmnet lamp settings will
@@ -298,7 +300,7 @@ def IwaVantHoff(
         ee ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
         for more.
 
     Returns
@@ -344,7 +346,7 @@ def IwaVantHoff(
 
 
 def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
-    """Helper function.
+    """Calculate environment degradation rate, helper function.
 
     Calculates the rate of degredation of the Environmnet.
 
@@ -370,7 +372,6 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
     environmentDegradationRate : pandas series
         Degradation rate of environment
     """
-
     # environmentDegradationRate = (
     #     poa_global ** (p)
     #     * rh_outdoor ** (n)
@@ -390,7 +391,7 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
 
 
 def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
-    """Helper function.
+    """Calculate degradation rate, helper function.
 
     Find the rate of degradation of a simulated chamber.
 
@@ -415,7 +416,6 @@ def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
     arrheniusNumerator : float
         Degradation rate of the chamber
     """
-
     # arrheniusNumerator = (
     #     I_chamber ** (p)
     #     * rh_chamber ** (n)
@@ -525,7 +525,7 @@ def arrhenius_deg(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
         for more.
 
     Returns
@@ -719,7 +719,7 @@ def IwaArrhenius(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
         for more.
 
     Returns
