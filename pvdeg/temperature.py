@@ -232,7 +232,6 @@ def cell(
     temp_cell : pandas.Series
         This is the temperature of the cell in a module at every time step.[°C]
     """
-
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
