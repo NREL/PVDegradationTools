@@ -768,7 +768,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01" :],
+                        this_year[str(year) + "-03-01":],
                     ]
                 )
                 new_time_series = this_year
@@ -800,7 +800,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01" :],
+                        this_year[str(year) + "-03-01":],
                     ]
                 )
                 new_time_series = pd.concat([new_time_series, this_year])
@@ -959,7 +959,6 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-
     weather_arg = {
         "api_key": "DEMO_KEY",  # Pass in a custom key to avoid access limitations.
         "email": "user@mail.com",
