@@ -1,4 +1,4 @@
-"""utilities.py"""
+"""utilities.py."""
 
 import os
 import json
@@ -995,8 +995,10 @@ def restore_gids(
 
 
 def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
-    """Find the min and max latitude and longitude values from 2 lists or a tall numpy
-    array of the shape [[lat, long], ...]
+    """Find min/max latitude and longitude.
+
+       Find min and max latitude and longitude coordinates from two lists or a tall
+       numpy array of the shape [[lat, long], ...]
 
     Parameters:
     -----------
@@ -1083,10 +1085,10 @@ def _calc_elevation_weights(
     normalization: str,
     kdtree,
 ) -> np.array:
-    """Utility function.
+    """Calculate elevation weights, utility function.
 
-    caluclate a weight for each point in a dataset to use for
-    probabalistic downselection.
+    Caluclate a weight for each point in a dataset to use for probabalistic
+    downselection.
 
     Parameters
     ----------
@@ -1231,8 +1233,8 @@ def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
 
 
 def _update_pipeline_task(task):
-    """Convert qualified name to callable function reference and matain odict items
-    ordering.
+    """
+    Convert qualified name to callable function reference, mantain odict items ordering.
 
     Use to restore scenario from json.
     """
@@ -1459,7 +1461,8 @@ def search_json(
     Returns
     ---------
     jsonkey: str
-        arbitrary key from json that owns the matching subattribute of `name` or `alias`.
+        arbitrary key from json that owns the matching subattribute of `name` or
+        `alias`.
     """
 
     if pvdeg_file:
