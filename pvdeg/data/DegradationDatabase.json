@@ -1,6 +1,6 @@
 {
     "D001":	{"DataEntryPerson": "Michael Kempe",
-        	"EquationType": "Arrhenius",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*e^(-E_a/(R*T_K ))",
         	"R_D": {"units": "%/h"},
         	"R_0": {"units": "%/h"},
@@ -16,7 +16,7 @@
         	"R_D": {},
         	"R_0": {"units": "%/h"},
         	"x": {"value": 0.64,
-             	"stdev": 0.64},
+             	"stdev": 0.20},
         	"b": {"value": 1.07,
              	"stdev": 0.11},
         	"m": {"value": -0.000028,
@@ -76,10 +76,10 @@
         	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
         	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
         	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        	"KeyWords": "Humidity, Irradiance,",
+        	"KeyWords": "humidity, irradiance, frontsheet, UV cut-on",
         	"Material": "Flexible Frontsheet, Frontsheet Coatings",
         	"Degradation": "UV Cut On",
-        	"EquationType": "Arrhenius_RH_Irradiance",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
         	"R_D": {"units": "%/h"},
         	"R_0": {"units": "%/h"},
@@ -94,10 +94,10 @@
         	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
         	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
         	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        	"KeyWords": "Humidity, Irradiance",
+        	"KeyWords": "humidity, irradiance, frontsheet, ultraviolet, transmittance",
         	"Material": "Flexible Frontsheet, Frontsheet Coatings",
         	"Degradation": "UV Transmittance 310nm-350nm",
-        	"EquationType": "Arrhenius_RH_Irradiance",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
         	"R_D": {"units": "%/h"},
         	"R_0": {"units": "%/h"},
@@ -115,7 +115,7 @@
         	"KeyWords": "humidity, irradiance, yellowness, yellowness index",
         	"Material": "Flexible Frontsheet, Frontsheet Coatings",
         	"Degradation": "yellowness_index",
-        	"EquationType": "Arrhenius_RH_Irradiance",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
         	"R_D": {"units": "%/h"},
         	"R_0": {"units": "%/h"},
@@ -130,10 +130,10 @@
         	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
         	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
         	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        	"KeyWords": "Humidity, Irradiance",
+        	"KeyWords": "humidity, irradiance, frontsheet, transmittance",
         	"Material": "Flexible Frontsheet, Frontsheet Coatings",
         	"Degradation": "SPQEWT",
-        	"EquationType": "Arrhenius_RH_Irradiance",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
         	"R_D": {"units": "%/h"},
         	"R_0": {"units": "%/h"},
@@ -149,23 +149,33 @@
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, Polycarbonate, Polyarylate, Aryl Ester, Aromatic Polyester, Hydrolysis",
-        "Material": "PC",
+        "KeyWords": "PC, humidity, hydrothermal, polycarbonate, polyarylate, aryl ester, aromatic polyester, hydrolysis",
+        "Material": "Bisphenol-A polycarbonate (PC)",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_fail=R_0*e^(E_a/(R*T_K))/(RH^2)",
         "t_fail": {
             "units": "days"
         },
-        "ln(A)": {
+        "R_0": {
+            "value": 6.52E+10,
+            "units": "days"
+        },
+        "ln(R_0)": {
             "value": 24.9,
-            "stdev": 3.2
+            "stdev": 1.6,
+            "units": "ln(days)"
         },
         "E_a": {
             "value": 92,
-            "stdev": 9.6,
+            "stdev": 4.8,
             "units": "kJ/mol"
+        },
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
         }
     },
     "D011": {
@@ -174,23 +184,33 @@
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, PET ,Polyarylate, Aryl Ester, Aromatic Polyester, Hydrolysis, Poly(ethylene terephthalate)",
-        "Material": "PET-A,B,C",
+        "KeyWords": "PET, humidity, hydrothermal, polyester, PET, polyarylate, aryl ester, aromatic polyester, hydrolysis, poly(ethylene terephthalate)",
+        "Material": "poly(ethylene terephthalate), Average of three materials, PET-A,B,C",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_fail=R_0*e^(E_a/(R*T_K))/(RH^2)",
         "t_fail": {
             "units": "days"
         },
-        "ln(A)": {
+        "R_0": {
+            "value": 1.689E+17,
+            "units": "days"
+        },
+        "ln(R_0)": {
             "value": 39.3,
-            "stdev": 2.2
+            "stdev": 1.1,
+            "units": "ln(days)"
         },
         "E_a": {
             "value": 129,
-            "stdev": 6.7,
+            "stdev": 3.35,
             "units": "kJ/mol"
+        },        
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
         }
     },
     "D012": {
@@ -199,23 +219,33 @@
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, PET, Polyarylate, Aryl Ester, Aromatic Polyester, Hydrolysis, Poly(ethylene terephthalate)",
-        "Material": "PET-D",
+        "KeyWords": "PET, humidity, hydrothermal, polyester, pET, aryl ester, aromatic polyester, hydrolysis, poly(ethylene terephthalate)",
+        "Material": "poly(ethylene terephthalate), PET-D",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation. This is the time to failure for the PET-D material.",
+        "EquationType": "arrhenius",
+        "Equation": "t_fail=R_0*e^(E_a/(R*T_K))/(RH^2)",
         "t_fail": {
             "units": "days"
         },
-        "ln(A)": {
+        "R_0": {
+            "value": 7.835E+16,
+            "units": "days"
+        },
+        "ln(R_0)": {
             "value": 38.9,
-            "stdev": 2
+            "stdev": 1,
+            "units": "ln(days)"
         },
         "E_a": {
             "value": 128,
-            "stdev": 5.9,
+            "stdev": 2.95,
             "units": "kJ/mol"
+        },        
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
         }
     },
     "D013": {
@@ -224,23 +254,33 @@
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, Polyarylate, Aryl Ester, Aromatic Polyester, Resorcinol Polyarylate, Hydrolysis",
-        "Material": "RPA-A",
+        "KeyWords": "RPA, resorcinol polyarylate, humidity, hydrothermal, polyester, polyarylate, aryl ester, aromatic polyester, hydrolysis",
+        "Material": "resorcinol polyarylate (RPA-A)",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_fail=R_0*e^(E_a/(R*T_K))/(RH^2)",
         "t_fail": {
             "units": "days"
         },
-        "ln(A)": {
+        "R_0": {
+            "value": 6.4649E+13,
+            "units": "days"
+        },
+        "ln(R_0)": {
             "value": 31.8,
-            "stdev": 3.7
+            "stdev": 1.85,
+            "units": "ln(days)"
         },
         "E_a": {
             "value": 105,
-            "stdev": 10.9,
+            "stdev": 5.45,
             "units": "kJ/mol"
+        },        
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
         }
     },
     "D014": {
@@ -249,23 +289,33 @@
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, Polyarylate, Aryl Ester, Aromatic Polyester, Resorcinol Polyarylate, Hydrolysis",
+        "KeyWords": "Humidity, hydrothermal, polyester, polyarylate, aryl ester, aromatic polyester, resorcinol polyarylate, hydrolysis",
         "Material": "RPA-B,C",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_fail=R_0*e^(E_a/(R*T_K))/(RH^2)",
         "t_fail": {
             "units": "days"
         },
-        "ln(A)": {
+        "ln(R_0)": {
             "value": 30,
-            "stdev": 4
+            "stdev": 2,
+            "units": "ln(days)"
+        },
+        "R_0": {
+            "value": 198626E+44,
+            "units": "days"
         },
         "E_a": {
             "value": 102,
-            "stdev": 12.1,
+            "stdev": 6.05,
             "units": "kJ/mol"
+        },        
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
         }
     },
     "D015": {
@@ -448,8 +498,8 @@
         "KeyWords": "Acceleration Factor, Arrhenius, degradation rate, encapsulant discoloration, Lifetime prediction",
         "Material": "EVA Encapsulent, Si-cells",
         "Degradation": "Encapsulent Discoloration, Isc loss",
-        "EquationType": "Modified_Arrhenius_G",
-        "Equation": "R_D=R_0*G*e^(E_a/(R*T_K))",
+        "EquationType": "arrhenius",
+        "Equation": "R_D=R_0*G^p*e^(E_a/(R*T_K))",
         "R_D": {
             "value": 0.1,
             "units": "%/year"
@@ -808,11 +858,13 @@
         	"KeyWords": "Durability, EMMA, Degradation Rate",
         	"Material": "Polycarbonate",
         	"Degradation": "Yellowness index",
-        	"EquationType": "Arrhenius_Schwarzchild_340",
+        	"EquationType": "Arrhenius",
         	"Equation": "R_D=R_0*G_340^P*e^(E_a/(R*T_K))",
-        	"R_D": {"units": "YI/s"},
-        	"P": {"value": -4.655},
-        	"E_a": {"value": 3704,
+        	"R_D": {
+                "units": "YI/s"},
+        	"P": {
+                "value": 0.89},
+        	"E_a": {
             	"units": "kJ/mol"}},
  	"D032": {"DataEntryPerson": "Weston Wall",
         	"DateEntered": "6/16/2023",
@@ -823,7 +875,7 @@
         	"KeyWords": "Aging, Damp heat, Outdoor, PV modeling, Models, PV module, degradation rate, Activation Energy, PID, cracks, UV",
         	"Material": "Double Diode module",
         	"Degradation": "Damp Heat Corrosion Model",
-        	"EquationType": "Modified Peck",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*(RH)^n*e^(E_a/(k_b*T_K ))",
         	"R_D": {},
         	"R_0": {},
@@ -871,12 +923,12 @@
         	"DateEntered": "2/14/2025",
         	"DOI": "10.1109/PVSC45281.2020.9300357",
         	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
-        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
+        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
         	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
         	"KeyWords": "Humidity, Irradiance, reciprocity",
         	"Material": "Flexible Frontsheet, Frontsheet Coatings",
         	"Degradation": "UV Cut On, UV Transmittance 310nm-350nm, Yellowness index, SPQEWT",
-        	"EquationType": "Arrhenius_RH_Irradiance",
+        	"EquationType": "arrhenius",
         	"Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
         	"R_D": {"units": "%/h"},
         	"R_0": {"units": "%/h"},
