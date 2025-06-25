@@ -110,7 +110,7 @@ def poa_irradiance(
             f"The input module_mount '{module_mount}' is not implemented"
         )
 
-    return poa
+    return poa.fillna(0)  # Fill NaN values with 0 for irradiance values
 
 
 @decorators.geospatial_quick_shape(
