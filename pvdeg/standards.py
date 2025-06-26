@@ -441,7 +441,7 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
                 if x80 > 0:
                     Output = (
                         Output
-                        + "Level 1 certification is required for a standoff between than "
+                        + "Level 1 certification is required for a standoff between "
                         + "%.1f" % x70
                         + " cm, and "
                         + "%.1f" % x80
@@ -485,7 +485,9 @@ def T98_estimate(
     x_0=6.5,
     model_kwarg={},
 ):
-    """Estimate the 98ᵗʰ percential temperature for the module at the given tilt,
+    """Estimate 98th percentile module temperature for given tilt, azimuth, and x_eff.
+
+    Estimate the 98ᵗʰ percentile temperature for the module at the given tilt,
     azimuth, and x_eff. If any of these factors are supplied, it default to latitide
     tilt, equatorial facing, and open rack mounted, respectively.
 
@@ -537,7 +539,6 @@ def T98_estimate(
         This is the 98ᵗʰ percential temperature for the module at the given tilt,
         azimuth, and x_eff.
     """
-
     parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
 
     if isinstance(weather_df, dd.DataFrame):

@@ -9,6 +9,8 @@ import inspect
 
 class Corr:
     """
+    Correlation class.
+
     corrlation class :
     stores modeling constants and corresponding correlation coefficient to access at
     runtime
@@ -153,7 +155,7 @@ def _createStats(stats: dict[str, dict[str, float]], corr: list[Corr]) -> pd.Dat
 def _correlateData(
     samples_to_correlate: pd.DataFrame, stats_for_correlation: pd.DataFrame
 ) -> pd.DataFrame:
-    """Helper function.
+    """Manipulate correlated samples, helper function.
 
     Uses meaningless correlated samples and makes meaningful by
     multiplying random samples by their parent modeling constant's standard deviation
@@ -175,7 +177,6 @@ def _correlateData(
         inputs, integer indexes. See generateCorrelatedSamples() references section for
         process info.
     """
-
     # accounts for out of order column names, AS LONG AS ALL MATCH
     # UNKNOWN CASE: what will happen if there is an extra NON matching column in stats
     columns = list(samples_to_correlate.columns.values)
@@ -269,7 +270,8 @@ def generateCorrelatedSamples(
 
 
 # monte carlo function
-# model after - https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb
+# model after -
+# https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb #noqa
 
 
 def simulate(

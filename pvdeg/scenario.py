@@ -28,8 +28,7 @@ from dask.distributed import Client
 
 
 class Scenario:
-    """The scenario object contains all necessary parameters and criteria for a given
-    scenario.
+    """Scenario object, contains all parameters and criteria for a given scenario.
 
     Generally speaking, this will be information such as: Scenario Name, Path,
     Geographic Location, Module Type, Racking Type
@@ -284,13 +283,12 @@ class Scenario:
             temperature (``noct``). This is where other values such as noct
             should be provided.
             Pvlib temp models:
-            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html #noqa
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         see_added : (bool), optional
         """
-
         try:
             mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
         except KeyError:
@@ -892,9 +890,9 @@ class Scenario:
             file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
 
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;"> #noqa
             <h2>self.name: {self.name}</h2>
-            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p> #noqa
             <p><strong>self.gids:</strong> {self.gids}</p>
             <p><strong>self.email:</strong> {self.email}</p>
             <p><strong>self.api_key:</strong> {self.api_key}</p>
@@ -950,13 +948,13 @@ class Scenario:
             )
 
             module_content = f"""
-            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span>
                     {module["module_name"]}
                 </h4>
             </div>
-            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                 <p><strong>Racking:</strong> {module["racking"]}</p>
                 <p><strong>Temperature Model:</strong> {module["temp_model"]}</p>
                 <p><strong>Material Parameters:</strong></p>
@@ -982,25 +980,25 @@ class Scenario:
         for module_name, functions in sorted(self.results.items()):
             module_id = f"result_module_{module_name}"
             module_content = f"""
-            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span>
                     {module_name}
                 </h4>
             </div>
-            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
             """
             for function_name, output in functions.items():
                 function_id = f"{module_id}_{function_name}"
                 formatted_output = self.format_output(output)
                 module_content += f"""
-                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                     <h5 style="font-family: monospace; margin: 0;">
                         <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span>
                         {function_name}
                     </h5>
                 </div>
-                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                     {formatted_output}
                 </div>
                 """
@@ -1054,13 +1052,13 @@ class Scenario:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>
                     Weather Data
                 </h4>
             </div>
-            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                 {display_data.to_html()}
             </div>
             """
@@ -1078,13 +1076,13 @@ class Scenario:
                 params_html = "<pre>Unserializable data type</pre>"
 
             step_content = f"""
-            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
-                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span>
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> #noqa
+                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span> #noqa
                 </h4>
             </div>
-            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                 <p>Job: {step["job"].__name__}</p>
                 <p>Parameters:</p>
                 <div style="margin-left: 20px;">
@@ -1523,12 +1521,12 @@ class GeospatialScenario(Scenario):
             Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
             kdtree as a path to the .pkl file.
 
-        Returns:
-        --------
+        Returns
+        -------
         None, strictly updates meta_data attribute of scenario.
 
-        See Also:
-        ---------
+        See Also
+        --------
         `pvdeg.geospatial.feature_downselect`
         """
         self.set_kdtree(kdtree=kdtree)
@@ -1553,8 +1551,7 @@ class GeospatialScenario(Scenario):
         normalization="linear",
         kdtree=None,
     ):
-        """Prefenetially downselect data points based on elevation and update scenario
-        metadata.
+        """Downselect data points based on elevation and update scenario metadata.
 
         Parameters:
         -----------
@@ -1632,7 +1629,9 @@ class GeospatialScenario(Scenario):
         return list(self.meta_data.index)
 
     def coords_tonumpy(self) -> np.array:
-        """Create a tall 2d numpy array of gids of the shape ``` [ [lat, long], ...
+        """Create tall numpy array of lat-long pairs.
+    
+        Create a tall 2d numpy array of grids of the shape ``` [ [lat, long], ...
         [lat, long] ] ```
 
         Returns:
@@ -1790,7 +1789,8 @@ class GeospatialScenario(Scenario):
             weather_ds=self.weather_data,
             meta_df=self.meta_data,
             func=self.func,
-            template=self.template,  # provided or generated via autotemplate in# GeospatialScenario.addJob
+            template=self.template,  # provided or generated via autotemplate
+            # in# GeospatialScenario.addJob
         )
 
         self.results = analysis_result
@@ -1803,7 +1803,6 @@ class GeospatialScenario(Scenario):
         Assumes results will be in the same order as input metadata rows. Otherwise will
         fail silently and restore incorrect gids
         """
-
         flattened = self.results.stack(points=("latitude", "longitude"))
 
         gids = self.meta_data.index.values
@@ -1817,9 +1816,7 @@ class GeospatialScenario(Scenario):
         self.results = self.results.assign(gids=gids_da)
 
     def _get_geospatial_data(year: int):
-        """Helper function.
-
-        gets geospatial weather dataset and metadata dictionary.
+        """Get geospatial weather dataset and metadata dictionary, helper function.
 
         Parameters
         ----------
@@ -1827,7 +1824,7 @@ class GeospatialScenario(Scenario):
             select the year of data to take from the NSRDB
 
         Returns
-        --------
+        -------
         weather_ds : xarray.Dataset
             dataset with coordinates of gid and time and weather data as datavariables
         meta_df : pd.DataFrame
@@ -1893,8 +1890,7 @@ class GeospatialScenario(Scenario):
         return meta_df[target_region].unique()
 
     def plot(self):
-        """Not Usable in GeospatialScenario class instance, only in Scenario
-        instance."""
+        """Not Usable in GeospatialScenario class instance, only Scenario instance."""
         # python has no way to hide a parent class method in the child, so this only
         # exists to prevent access
         raise AttributeError(
@@ -2141,16 +2137,16 @@ class GeospatialScenario(Scenario):
     def format_dask_link(self):
         if self.dask_client:
             return f"""
-                <a href="{self.dask_client.dashboard_link}" target="_blank">{self.dask_client.dashboard_link}</a></p>
+                <a href="{self.dask_client.dashboard_link}" target="_blank">{self.dask_client.dashboard_link}</a></p> #noqa
             """
         return ""
 
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;"> #noqa
             <h2>self.name: {self.name}</h2>
-            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p> #noqa
             <p><strong>self.hpc:</strong> {self.hpc}</p>
             <p><strong>self.gids:</strong> {self.gids}</p>
             <div>
@@ -2206,13 +2202,13 @@ class GeospatialScenario(Scenario):
             result_id = "geospatial_result"
             formatted_output = self.format_output(result)
             result_content = f"""
-            <div id="{result_id}" onclick="toggleVisibility('content_{result_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="{result_id}" onclick="toggleVisibility('content_{result_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span>
+                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span> #noqa
                     Geospatial Result
                 </h4>
             </div>
-            <div id="content_{result_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="content_{result_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                 {formatted_output}
             </div>
             """
@@ -2225,13 +2221,13 @@ class GeospatialScenario(Scenario):
 
         if self.meta_data is not None:
             meta_data_html = f"""
-            <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_content_meta_data" style="color: #b676c2;">►</span>
                     Meta Data
                 </h4>
             </div>
-            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px;">
+            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px;"> #noqa
                 {self.meta_data._repr_html_()}
             </div>
             """
@@ -2249,7 +2245,7 @@ class GeospatialScenario(Scenario):
                     Template
                 </h4>
             </div>
-            <div id="content_template" style="display:none; margin-left: 20px; padding: 5px;">
+            <div id="content_template" style="display:none; margin-left: 20px; padding: 5px;"> #noqa
                 {self.template._repr_html_()}
             </div>
             """
@@ -2261,9 +2257,9 @@ class GeospatialScenario(Scenario):
 
         if self.weather_data is not None:
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_weather_data" style="color: #b676c2;">►</span>
+                    <span id="arrow_content_weather_data" style="color: #b676c2;">►</span> #noqa
                     Weather Data
                 </h4>
             </div>
