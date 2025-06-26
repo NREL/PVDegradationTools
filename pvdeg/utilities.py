@@ -44,8 +44,8 @@ def gid_downsampling(meta, n):
         gids_sub = meta.index.values
         return meta, gids_sub
 
-    lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
-    lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
+    lon_sub = sorted(meta["longitude"].unique())[0: -1 : max(1, 2 * n)]
+    lat_sub = sorted(meta["latitude"].unique())[0: -1 : max(1, 2 * n)]
 
     gids_sub = meta[
         (meta["longitude"].isin(lon_sub)) & (meta["latitude"].isin(lat_sub))
@@ -1406,7 +1406,8 @@ def display_json(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}"
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are \
+                    {pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r") as file:
@@ -1442,11 +1443,13 @@ def search_json(
     fp: str = None,
     name_or_alias: str = None,
 ) -> str:
-    """Search through a 2 level JSON with arbitrary key names for subkeys with matching
-    attributes of name or alias.
+    """Search through 2 level JSON.
+
+       Search through 2 level JSON with arbitrary key names for subkeys with matching
+       attributes of name or alias.
 
     Parameters
-    ------------
+    ----------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
@@ -1459,12 +1462,11 @@ def search_json(
         Exits on the first matching instance.
 
     Returns
-    ---------
+    -------
     jsonkey: str
         arbitrary key from json that owns the matching subattribute of `name` or
         `alias`.
     """
-
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
