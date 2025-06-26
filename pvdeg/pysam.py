@@ -442,7 +442,9 @@ INSPIRE_NSRDB_ATTRIBUTES = [
 
 
 def inspire_ground_irradiance(weather_df, meta, config_files):
-    """Get ground irradiance array and annual poa irradiance for a given point using
+    """Get ground irradiance array and annual poa irradiance.
+
+    Get ground irradiance array and annual poa irradiance for a given point using
     pvsamv1.
 
     Parameters
@@ -460,7 +462,6 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     result : inspirePysamReturn
         returns an custom class object so we can unpack it later.
     """
-
     if not isinstance(weather_df, pd.DataFrame) or not isinstance(meta, dict):
         raise ValueError(
             f"""
@@ -490,7 +491,6 @@ def solar_resource_dict(weather_df, meta):
 
     Works on PVGIS and appears to work on NSRDB (NOT PSM3).
     """
-
     # weather_df = weather_df.reset_index(drop=True) # Probably dont need to do this
     weather_df = utilities.add_time_columns_tmy(weather_df)  # only supports hourly data
 
