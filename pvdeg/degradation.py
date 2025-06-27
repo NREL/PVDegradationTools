@@ -51,30 +51,6 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
 
     return (poa_global ** p) * (Tf ** ((temp - temp_chamber) / 10))
 
-def _deg_rate_chamber(I_chamber, p):
-    """
-    Helper function. Find the rate of degradation kenetics of a simulated chamber. Mike Kempe's
-    calculation of the rate of degradation inside a accelerated degradation chamber.
-
-    (ADD IEEE reference)
-
-    Parameters
-    ----------
-    I_chamber : float
-        Irradiance of Controlled Condition W/m²
-    p : float
-        Fit parameter
-
-    Returns
-    --------
-    chamberdegradationrate : float
-        Degradation rate of chamber
-    """
-    # chamberdegradationrate = I_chamber ** (p)
-    chamberdegradationrate = np.power(I_chamber, p)
-
-    return chamberdegradationrate
-
 
 def vantHoff_deg(
     weather_df,
@@ -173,7 +149,7 @@ def vantHoff_deg(
     # sumOfDegEnv = rateOfDegEnv.sum(axis = 0, skipna = True)
     avgOfDegEnv = rateOfDegEnv.mean()
 
-    rateOfDegChamber = _deg_rate_chamber(I_chamber, p)
+    rateOfDegChamber = I_chamber ** p
 
     accelerationFactor = rateOfDegChamber / avgOfDegEnv
 
