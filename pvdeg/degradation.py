@@ -736,58 +736,6 @@ def IwaArrhenius(
     return IWa
 
 
-############
-# Misc. Functions for Energy Calcs
-############
-
-
-def _rh_Above85(rh):
-    """
-    Helper function. Determines if the relative humidity is above 85%.
-
-    Parameters
-    ----------
-    rh : float
-        Relative Humidity %
-
-    Returns
-    --------
-    rhabove85 : boolean
-        True if the relative humidity is above 85% or False if the relative
-        humidity is below 85%
-
-    """
-
-    if rh > 85:
-        rhabove85 = True
-
-    else:
-        rhabove85 = False
-
-    return rhabove85
-
-
-def _hoursRH_Above85(df):
-    """
-    Helper Function. Count the number of hours relative humidity is above 85%.
-
-    Parameters
-    ----------
-    df : dataframe
-        DataFrame, dataframe containing Relative Humidity %
-
-    Returns
-    -------
-    numhoursabove85 : int
-        Number of hours relative humidity is above 85%
-
-    """
-    booleanDf = df.apply(lambda x: _rh_Above85(x))
-    numhoursabove85 = booleanDf.sum()
-
-    return numhoursabove85
-
-
 def degradation(
     spectra: pd.Series,
     rh_module: pd.Series,
