@@ -273,7 +273,7 @@ def cell(
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta)
 
     if temp_model == "sapm":
         temp_cell = pvlib.temperature.sapm_cell(
