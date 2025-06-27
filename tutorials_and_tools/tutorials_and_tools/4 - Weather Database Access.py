@@ -48,7 +48,8 @@ import pvdeg
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
