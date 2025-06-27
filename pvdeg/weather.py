@@ -82,7 +82,35 @@ def get(database, id=None, geospatial=False, **kwargs):
     .. code-block:: python
 
         weather_df, meta_dict = pvdeg.weather.get(database="PVGIS", id=(49.95, 1.5))
+
+    Collecting geospatial data from NSRDB on Kestrel (NREL INTERNAL USERS ONLY)
+
+    satellite options:
+        ``"GOES", "METEOSAT", "Himawari", "SUNY", "CONUS", "Americas"``
+
+
+    .. code-block:: python
+
+        weather_db = "NSRDB"
+        weather_arg = {
+            "satellite": "Americas",
+            "names": "TMY",
+            "NREL_HPC": True,
+            "attributes": [
+                    "air_temperature",
+                    "wind_speed",
+                    "dhi",
+                    "ghi",
+                    "dni",
+                    "relative_humidity",
+                ],
+        }
+
+        geo_weather, geo_meta = pvdeg.weather.get(
+            weather_db, geospatial=True, **weather_arg
+        )
     """
+
     META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     if type(id) is tuple:
@@ -768,7 +796,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01":],
+                        this_year[str(year) + "-03-01" :],
                     ]
                 )
                 new_time_series = this_year
@@ -800,7 +828,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01":],
+                        this_year[str(year) + "-03-01" :],
                     ]
                 )
                 new_time_series = pd.concat([new_time_series, this_year])
