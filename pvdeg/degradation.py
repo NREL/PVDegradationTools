@@ -788,28 +788,6 @@ def _hoursRH_Above85(df):
     return numhoursabove85
 
 
-def _gJtoMJ(gJ):
-    """
-    NOTE: unused, remove?
-
-    Helper Function to convert GJ/m² to MJ/y
-
-    Parameters
-    -----------
-    gJ : float
-        Value in GJ/m^-2
-
-    Returns
-    -------
-    MJ : float
-        Value in MJ/m^-2
-
-    """
-    MJ = gJ * 1000
-
-    return MJ
-
-
 def degradation(
     spectra: pd.Series,
     rh_module: pd.Series,
