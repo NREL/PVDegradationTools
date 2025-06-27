@@ -788,29 +788,6 @@ def _hoursRH_Above85(df):
     return numhoursabove85
 
 
-def _whToGJ(wh):
-    """
-    NOTE: unused, remove?
-
-    Helper Function to convert Wh/m² to GJ/m²
-
-    Parameters
-    -----------
-    wh : float
-        Input Value in Wh/m²
-
-    Returns
-    -------
-    gj : float
-        Value in GJ/m²
-
-    """
-
-    gj = 0.0000036 * wh
-
-    return gj
-
-
 def _gJtoMJ(gJ):
     """
     NOTE: unused, remove?
