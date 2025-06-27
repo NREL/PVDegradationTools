@@ -49,12 +49,7 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
 
     """
 
-    # poa_global ** (p) * Tf ** ((temp - temp_chamber) / 10)
-    return np.multiply(
-        np.power(poa_global, p),
-        np.power(Tf, np.divide(np.subtract(temp, temp_chamber), 10)),
-    )
-
+    return (poa_global ** p) * (Tf ** ((temp - temp_chamber) / 10))
 
 def _deg_rate_chamber(I_chamber, p):
     """
