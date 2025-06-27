@@ -174,8 +174,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
 
     """
 
-    # toSum = Tf ** (temp / 10)
-    toSum = np.power(Tf, np.divide(temp, 10))
+    toSum = Tf ** (temp / 10)
     summation = toSum.sum(axis=0, skipna=True)
 
     Toeq = (10 / np.log(Tf)) * np.log(summation / len(temp))
