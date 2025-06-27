@@ -512,6 +512,7 @@ def template_parameters(func):
 def zero_template(
     lat_grid, lon_grid, shapes, attrs=dict(), global_attrs=dict(), add_dims=dict()
 ):
+    """Create zero-filled xarray.Dataset based on provided grids and shapes."""
     gids = len(lat_grid)
 
     dims_size = {"gid": gids} | add_dims
