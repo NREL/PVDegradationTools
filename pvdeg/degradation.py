@@ -81,31 +81,6 @@ def _deg_rate_chamber(I_chamber, p):
     return chamberdegradationrate
 
 
-def _acceleration_factor(numerator, denominator):
-    """
-    Helper Function. Find the acceleration factor
-
-    (ADD IEEE reference)
-
-    Parameters
-    ----------
-    numerator : float
-        Typically the numerator is the chamber settings
-    denominator : float
-        Typically the TMY data summation
-
-    Returns
-    -------
-    chamberAccelerationFactor : float
-        Acceleration Factor of chamber (NEED TO ADD METRIC)
-    """
-
-    chamberAccelerationFactor = np.divide(numerator, denominator)
-    # chamberAccelerationFactor = numerator / denominator
-
-    return chamberAccelerationFactor
-
-
 def vantHoff_deg(
     weather_df,
     meta,
@@ -205,7 +180,7 @@ def vantHoff_deg(
 
     rateOfDegChamber = _deg_rate_chamber(I_chamber, p)
 
-    accelerationFactor = _acceleration_factor(rateOfDegChamber, avgOfDegEnv)
+    accelerationFactor = rateOfDegChamber / avgOfDegEnv
 
     return accelerationFactor
 
@@ -560,7 +535,7 @@ def arrhenius_deg(
         n=n,
     )
 
-    accelerationFactor = _acceleration_factor(arrheniusNumerator, AvgOfDenominator)
+    accelerationFactor = arrheniusNumerator / AvgOfDenominator
 
     return accelerationFactor
 
