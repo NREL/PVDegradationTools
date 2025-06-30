@@ -15,7 +15,6 @@ from . import letid
 from . import montecarlo
 from . import pysam
 from . import spectral
-from . import store
 from . import symbolic
 from . import standards
 from . import temperature
