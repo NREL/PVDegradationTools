@@ -43,9 +43,7 @@ def vantHoff_deg(
     retroreflectance loss, adhesive transfer, and shrinkage.
 
     Parameters
-    -----------
-    weather_df : pd.dataframe
-        Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
+    ----------
     weather_df : pd.DataFrame
         DataFrame containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
@@ -53,9 +51,9 @@ def vantHoff_deg(
     I_chamber : float
         Irradiance of Controlled Condition [W/m²]
     temp_chamber : float
-    poa : series or data frame, optional
-        dataframe containing 'poa_global', Global Plane of Array Irradiance [W/m²]
         Reference temperature [°C] ("Chamber Temperature")
+    poa : pd.Series or pd.DataFrame, optional
+        Series or DataFrame containing 'poa_global', Global Plane of Array Irradiance [W/m²]
     temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]. If not provided, it will
         be generated using the default parameters of pvdeg.temperature.cell
@@ -138,20 +136,20 @@ def IwaVantHoff(
     irradiance_kwarg={},
 ):
     """
-    IWa : Environment Characterization [W/m²]
-    For one year of degradation the controlled environment lamp settings will need to be set to IWa.
-
+    Calculate IWa: Environment Characterization [W/m²].
+    For one year of degradation, the controlled environment lamp settings will need to be set to IWa.
 
     Parameters
-    -----------
-    weather_df : pd.dataframe
-        Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
+    ----------
+    weather_df : pd.DataFrame
+        DataFrame containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
-        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
-    temp : float series
+    poa : pd.Series or pd.DataFrame, optional
+        Series or DataFrame containing 'poa_global', Global Plane of Array Irradiance [W/m²]
+    temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]
-    Teq : series
+    Teq : pd.Series, optional
         VantHoff equivalent temperature [°C]
     p : float
         Fit parameter
@@ -251,6 +249,8 @@ def arrhenius_deg(
 
     Parameters
     ----------
+    weather_df : pd.DataFrame
+        DataFrame containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.Series
@@ -310,7 +310,6 @@ def arrhenius_deg(
     -------
     accelerationFactor : float or pd.Series
         Degradation acceleration factor
-
     """
 
     if poa is None:
@@ -453,18 +452,19 @@ def IwaArrhenius(
 
     Parameters
     ----------
-    weather_df : pd.dataframe
+    weather_df : pd.DataFrame
         Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
-    rh_outdoor : pd.series
+    rh_outdoor : pd.Series
         Relative Humidity of material of interest
         Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(), rh_front_encap(),
         rh_surface_outside()
     Ea : float
         Degradation Activation Energy [kJ/mol]
+    poa : pd.DataFrame, optional
         must contain 'poa_global', Global Plane of Array irradiance [W/m²]
-    temp : pd.series, optional
+    temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]
     RHwa : float, optional
         Relative Humidity Weighted Average [%]
