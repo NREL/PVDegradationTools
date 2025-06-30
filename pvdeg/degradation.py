@@ -125,32 +125,6 @@ def vantHoff_deg(
     return accelerationFactor
 
 
-def _to_eq_vantHoff(temp, Tf=1.41):
-    """
-    Function to obtain the Vant Hoff temperature equivalent [°C]
-
-    Parameters
-    ----------
-    Tf : float
-        Multiplier for the increase in degradation for every 10[°C] temperature increase. Default value of 1.41.
-    temp : pandas series
-        Solar module surface or Cell temperature [°C]
-
-    Returns
-    -------
-    Toeq : float
-        Vant Hoff temperature equivalent [°C]
-
-    """
-
-    toSum = Tf ** (temp / 10)
-    summation = toSum.sum(axis=0, skipna=True)
-
-    Toeq = (10 / np.log(Tf)) * np.log(summation / len(temp))
-
-    return Toeq
-
-
 @decorators.geospatial_quick_shape('numeric', ["Iwa"])
 def IwaVantHoff(
     weather_df,
@@ -168,8 +142,8 @@ def IwaVantHoff(
 ):
     """
     IWa : Environment Characterization [W/m²]
-    For one year of degradation the controlled environment lamp settings will
-    need to be set to IWa.
+    For one year of degradation the controlled environment lamp settings will need to be set to IWa.
+
 
     Parameters
     -----------
@@ -238,7 +212,9 @@ def IwaVantHoff(
         )
 
     if Teq is None:
-        Teq = _to_eq_vantHoff(temp, Tf)
+        toSum = Tf ** (temp / 10)
+        summation = toSum.sum(axis=0, skipna=True)
+        Teq = (10 / np.log(Tf)) * np.log(summation / len(temp))
 
     if isinstance(poa, pd.DataFrame):
         poa_global = poa["poa_global"]
@@ -252,77 +228,6 @@ def IwaVantHoff(
     Iwa = (summation / len(poa_global)) ** (1 / p)
 
     return Iwa
-
-
-def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
-    """
-    Helper function. Calculates the rate of degradation of the Environment
-
-    Parameters
-    ----------
-    poa_global : float series
-        (Global) Plan of Array irradiance [W/m²]
-    p : float
-        Fit parameter
-    rh_outdoor : pandas series
-        Relative Humidity of material of interest. Acceptable relative
-        humiditys can be calculated from these functions: rh_backsheet(),
-        rh_back_encap(); rh_front_encap();  rh_surface_outside()
-    n : float
-        Fit parameter for relative humidity
-    temp : pandas series
-        Solar module temperature or Cell temperature [°C]
-    Ea : float
-        Degradation Activation Energy [kJ/mol]
-
-    Returns
-    -------
-    environmentDegradationRate : pandas series
-        Degradation rate of environment
-    """
-
-    environmentDegradationRate = (
-        (poa_global ** p)
-        * (rh_outdoor ** n)
-        * np.exp(-Ea / (0.00831446261815324 * (temp + 273.15)))
-    )
-
-    return environmentDegradationRate
-
-
-def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
-    """
-    Helper function. Find the rate of degradation of a simulated chamber.
-
-    Parameters
-    ----------
-    I_chamber : float
-        Irradiance of Controlled Condition [W/m²]
-    Rhchamber : float
-        Relative Humidity of Controlled Condition [%]
-        EXAMPLE: "50 = 50% NOT .5 = 50%"
-    temp_chamber : float
-        Reference temperature [°C] "Chamber Temperature"
-    Ea : float
-        Degradation Activation Energy [kJ/mol]
-    p : float
-        Fit parameter
-    n : float
-        Fit parameter for relative humidity
-
-    Returns
-    --------
-    arrheniusNumerator : float
-        Degradation rate of the chamber
-    """
-
-    arrheniusNumerator = (
-        (I_chamber ** p)
-        * (rh_chamber ** n)
-        * np.exp(-Ea / (0.00831446261815324 * (temp_chamber + 273.15)))
-    )
-
-    return arrheniusNumerator
 
 
 def arrhenius_deg(
@@ -435,19 +340,20 @@ def arrhenius_deg(
     else:
         poa_global = poa
 
-    arrheniusDenominator = _arrhenius_denominator(
-        poa_global=poa_global, rh_outdoor=rh_outdoor, temp=temp, Ea=Ea, p=p, n=n
+    # rate of degradation of the environment
+    arrheniusDenominator = (
+        (poa_global ** p)
+        * (rh_outdoor ** n)
+        * np.exp(-Ea / (0.00831446261815324 * (temp + 273.15)))
     )
 
     AvgOfDenominator = arrheniusDenominator.mean()
 
-    arrheniusNumerator = _arrhenius_numerator(
-        I_chamber=I_chamber,
-        rh_chamber=rh_chamber,
-        temp_chamber=temp_chamber,
-        Ea=Ea,
-        p=p,
-        n=n,
+# rate of degradation of the simulated chamber
+    arrheniusNumerator = (
+        (I_chamber ** p)
+        * (rh_chamber ** n)
+        * np.exp(-Ea / (0.00831446261815324 * (temp_chamber + 273.15)))
     )
 
     accelerationFactor = arrheniusNumerator / AvgOfDenominator
