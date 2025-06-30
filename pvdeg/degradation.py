@@ -312,19 +312,10 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
         Degradation rate of environment
     """
 
-    # environmentDegradationRate = (
-    #     poa_global ** (p)
-    #     * rh_outdoor ** (n)
-    #     * np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
-    # )
-
-    environmentDegradationRate = np.multiply(
-        np.multiply(np.power(poa_global, p), np.power(rh_outdoor, n)),
-        np.exp(
-            np.negative(
-                np.divide(Ea, np.multiply(0.00831446261815324, np.add(temp, 273.15)))
-            )
-        ),
+    environmentDegradationRate = (
+        (poa_global ** p)
+        * (rh_outdoor ** n)
+        * np.exp(-Ea / (0.00831446261815324 * (temp + 273.15)))
     )
 
     return environmentDegradationRate
@@ -356,21 +347,10 @@ def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
         Degradation rate of the chamber
     """
 
-    # arrheniusNumerator = (
-    #     I_chamber ** (p)
-    #     * rh_chamber ** (n)
-    #     * np.exp(-(Ea / (0.00831446261815324 * (temp_chamber + 273.15))))
-    # )
-
-    arrheniusNumerator = np.multiply(
-        np.multiply(np.power(I_chamber, p), np.power(rh_chamber, n)),
-        np.exp(
-            np.negative(
-                np.divide(
-                    Ea, np.multiply(0.00831446261815324, np.add(temp_chamber, 273.15))
-                )
-            )
-        ),
+    arrheniusNumerator = (
+        (I_chamber ** p)
+        * (rh_chamber ** n)
+        * np.exp(-Ea / (0.00831446261815324 * (temp_chamber + 273.15)))
     )
 
     return arrheniusNumerator
