@@ -276,15 +276,11 @@ def IwaVantHoff(
     else:
         poa_global = poa
 
-    # toSum = (poa_global**p) * (Tf ** ((temp - Teq) / 10))
-    toSum = np.multiply(
-        np.power(poa_global, p), np.power(Tf, np.divide(np.subtract(temp, Teq), 10))
-    )
+    toSum = (poa_global**p) * (Tf ** ((temp - Teq) / 10))
 
     summation = toSum.sum(axis=0, skipna=True)
 
-    # Iwa = (summation / len(poa_global)) ** (1 / p)
-    Iwa = np.power(np.divide(summation, len(poa_global)), np.divide(1, p))
+    Iwa = (summation / len(poa_global)) ** (1 / p)
 
     return Iwa
 
