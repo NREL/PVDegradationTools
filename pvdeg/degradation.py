@@ -46,19 +46,21 @@ def vantHoff_deg(
     -----------
     weather_df : pd.dataframe
         Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
+    weather_df : pd.DataFrame
+        DataFrame containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
     I_chamber : float
         Irradiance of Controlled Condition [W/m²]
     temp_chamber : float
-        Reference temperature [°C] "Chamber Temperature"
     poa : series or data frame, optional
         dataframe containing 'poa_global', Global Plane of Array Irradiance [W/m²]
-    temp : pandas series, optional
-        Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
+        Reference temperature [°C] ("Chamber Temperature")
+    temp : pd.Series, optional
+        Solar module temperature or Cell temperature [°C]. If not provided, it will
         be generated using the default parameters of pvdeg.temperature.cell
     p : float
-        fit parameter
+        Fit parameter
     Tf : float
         Multiplier for the increase in degradation for every 10[°C] temperature increase
     temp_model : (str, optional)
@@ -91,9 +93,8 @@ def vantHoff_deg(
 
     Returns
     -------
-    accelerationFactor : float or series
+    accelerationFactor : float or pd.Series
         Degradation acceleration factor
-
     """
 
     if poa is None:
@@ -147,7 +148,6 @@ def IwaVantHoff(
         Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
-    poa : float series or dataframe
         Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
     temp : float series
         Solar module temperature or Cell temperature [°C]
@@ -186,10 +186,9 @@ def IwaVantHoff(
 
 
     Returns
-    --------
+    -------
     Iwa : float
         Environment Characterization [W/m²]
-
     """
     if poa is None:
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
@@ -247,14 +246,14 @@ def arrhenius_deg(
     Calculate the Acceleration Factor between the rate of degradation of a
     modeled environment versus a modeled controlled environment. Example: "If the AF=25 then 1 year
     of Controlled Environment exposure is equal to 25 years in the field"
+    modeled environment versus a modeled controlled environment.
+    Example: If AF=25, then 1 year of Controlled Environment exposure is equal to 25 years in the field.
 
     Parameters
     ----------
-    weather_df : pd.dataframe
-        Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
-    rh_outdoor : float series
+    rh_outdoor : pd.Series
         Relative Humidity of material of interest
         Acceptable relative humiditys can be calculated
         from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(),
@@ -265,13 +264,13 @@ def arrhenius_deg(
         Relative Humidity of Controlled Condition [%].
         EXAMPLE: "50 = 50% NOT .5 = 50%"
     temp_chamber : float
-        Reference temperature [°C] "Chamber Temperature"
+        Reference temperature [°C] ("Chamber Temperature")
     Ea : float
         Degradation Activation Energy [kJ/mol]
         if Ea=0 is used there will be not dependence on temperature and degradation will proceed according to the amount of light and humidity.
-    poa : pd.dataframe, optional
+    poa : pd.DataFrame, optional
         Global Plane of Array Irradiance [W/m²]
-    temp : pd.series, optional
+    temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
         be generated using the default parameters from pvdeg.temperature.cell
     p : float
@@ -308,8 +307,8 @@ def arrhenius_deg(
         See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
 
     Returns
-    --------
-    accelerationFactor : pandas series
+    -------
+    accelerationFactor : float or pd.Series
         Degradation acceleration factor
 
     """
@@ -464,7 +463,6 @@ def IwaArrhenius(
         rh_surface_outside()
     Ea : float
         Degradation Activation Energy [kJ/mol]
-    poa : pd.dataframe, optional
         must contain 'poa_global', Global Plane of Array irradiance [W/m²]
     temp : pd.series, optional
         Solar module temperature or Cell temperature [°C]
