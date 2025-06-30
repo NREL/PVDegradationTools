@@ -38,8 +38,9 @@ def vantHoff_deg(
     Calculate Van't Hoff Irradiance Degradation acceleration factor.
 
     In this calculation, the rate of degradation kinetics is calculated using
-    the Fischer model. This degradation kinetics model was developed by interpolating 50 coatings with respect to color shift, cracking, gloss
-    loss, fluorescence loss, retroreflectance loss, adhesive transfer, and shrinkage.
+    the Fischer model. This degradation kinetics model was developed by interpolating 50
+    coatings with respect to color shift, cracking, gloss loss, fluorescence loss,
+    retroreflectance loss, adhesive transfer, and shrinkage.
 
     Parameters
     -----------
