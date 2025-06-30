@@ -8,7 +8,8 @@ Breaking Changes
   - numpy: was ==1.26.4, now >1.19.3
   - scipy: was <1.14.0, now >1.6.0
   (:issue:`103`, :pull:`163`)
-    
+* Remove deprecated `pvdeg.store` module. (:issue:`168`, :pull:`180`)
+
 
 Enhancements
 ------------
