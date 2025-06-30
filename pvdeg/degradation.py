@@ -19,39 +19,6 @@ from . import (
 # TODO: Clean up all those functions and add gaps functionality
 
 
-def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
-    """
-    Helper function. Find the rate of degradation kinetics using the Fischer model.
-    Degradation kinetics model interpolated 50 coatings with respect to
-    color shift, cracking, gloss loss, fluorescence loss,
-    retroreflectance loss, adhesive transfer, and shrinkage.
-
-    (ADD IEEE reference)
-
-    Parameters
-    ------------
-    poa_global : float
-        (Global) Plane of Array irradiance [W/m²]
-    temp : float
-        Solar module temperature [°C]
-    temp_chamber : float
-        Reference temperature [°C] "Chamber Temperature"
-    p : float
-        Fit parameter
-    Tf : float
-        Multiplier for the increase in degradation
-                                        for every 10[°C] temperature increase
-
-    Returns
-    -------
-    degradationrate : float
-        rate of Degradation (NEED TO ADD METRIC)
-
-    """
-
-    return (poa_global ** p) * (Tf ** ((temp - temp_chamber) / 10))
-
-
 def vantHoff_deg(
     weather_df,
     meta,
@@ -68,7 +35,11 @@ def vantHoff_deg(
     model_kwarg={},
 ):
     """
-    Van't Hoff Irradiance Degradation
+    Calculate Van't Hoff Irradiance Degradation acceleration factor.
+
+    In this calculation, the rate of degradation kinetics is calculated using
+    the Fischer model. This degradation kinetics model was developed by interpolating 50 coatings with respect to color shift, cracking, gloss
+    loss, fluorescence loss, retroreflectance loss, adhesive transfer, and shrinkage.
 
     Parameters
     -----------
@@ -143,10 +114,7 @@ def vantHoff_deg(
             model_kwarg=model_kwarg,
         )
 
-    rateOfDegEnv = _deg_rate_env(
-        poa_global=poa_global, temp=temp, temp_chamber=temp_chamber, p=p, Tf=Tf
-    )
-    # sumOfDegEnv = rateOfDegEnv.sum(axis = 0, skipna = True)
+    rateOfDegEnv = (poa_global ** p) * (Tf ** ((temp - temp_chamber) / 10))
     avgOfDegEnv = rateOfDegEnv.mean()
 
     rateOfDegChamber = I_chamber ** p
