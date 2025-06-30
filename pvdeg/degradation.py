@@ -103,7 +103,6 @@ def vantHoff_deg(
         poa_global = poa["poa_global"]
 
     if temp is None:
-        # temp = temperature.cell(weather_df=weather_df, meta=meta, poa=poa)
         temp = temperature.temperature(
             cell_or_mod="cell",
             temp_model=temp_model,
@@ -117,11 +116,8 @@ def vantHoff_deg(
 
     rateOfDegEnv = (poa_global ** p) * (Tf ** ((temp - temp_chamber) / 10))
     avgOfDegEnv = rateOfDegEnv.mean()
-
     rateOfDegChamber = I_chamber ** p
-
     accelerationFactor = rateOfDegChamber / avgOfDegEnv
-
     return accelerationFactor
 
 
@@ -199,7 +195,6 @@ def IwaVantHoff(
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if temp is None:
-        # temp = temperature.cell(weather_df, meta, poa)
         temp = temperature.temperature(
             cell_or_mod="cell",
             temp_model=temp_model,
@@ -323,7 +318,6 @@ def arrhenius_deg(
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if temp is None:
-        # temp = temperature.cell(weather_df, meta, poa)
         temp = temperature.temperature(
             cell_or_mod="cell",
             temp_model=temp_model,
@@ -521,7 +515,6 @@ def IwaArrhenius(
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
     if temp is None:
-        # temp = temperature.cell(weather_df, meta, poa)
         temp = temperature.temperature(
             cell_or_mod="cell",
             temp_model=temp_model,
