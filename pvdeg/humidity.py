@@ -4,7 +4,7 @@
 import numpy as np
 import pandas as pd
 import pvlib
-from numba import njit
+from numba import jit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
@@ -56,7 +56,7 @@ def _ambient(weather_df):
 
 
 # TODO: When is dew_yield used?
-@njit
+@jit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """
     Estimates the dew yield in [mm/day].  Calculation taken from:
@@ -401,7 +401,6 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-@jit
 def Ce(
     temp_module,
     rh_surface,
@@ -437,7 +436,7 @@ def Ce(
         EXAMPLE: "50 = 50% NOT .5 = 50%"
     start : float
         Initial value of the Concentration of water in the encapsulant.
-        by default, the function will use an equilibrium value as the first value
+        by default, the function will use half the equilibrium value as the first value
     Po_b : float
         Water permeation rate prefactor [g·mm/m²/day].
         The suggested value for PET W17 is Po = 1319534666.90318 [g·mm/m²/day].
@@ -503,29 +502,59 @@ def Ce(
     EaWVTR = Ea_p_b / 0.00831446261815324
     So = So_e * l / 10
     Eas = Ea_s_e / 0.00831446261815324
-    for i in range(0, len(rh_surface)):
-        if i == 0:
-            # Ce = Initial start of concentration of water
-            if start is None:
-                Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100
-            else:
-                Ce = start
-        else:
-            Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
-                    ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
-                            ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
+    #Ce is the initial start of concentration of water
+    if start is None:
+        Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100/2
+    else:
+        Ce = start
+ #   for i in range(0, len(rh_surface)):
+ #       if i == 0:
+ #           # Ce = Initial start of concentration of water
+ #           if start is None:
+ #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100
+ #           else:
+ #               Ce = start
+ #       else:
+ #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
+ #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
+ #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
 
-        Ce_list[i] = Ce
+        Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce, rh_surface)
+
     if output == "rh":
         # Convert the concentration to relative humidity
         Ce_list = 100 * (Ce_list / (So * np.exp(-(Eas / (temp_module + 273.15)))))
-        Ce_list = pd.DataFrame(Ce_list, columns=["rh"])     
+        Ce_list = pd.Series(Ce_list, name="RH_back_encapsulant")     
     else:
-        Ce_list = pd.DataFrame(Ce_list, columns=["Ce"])
+        Ce_list = pd.Series(Ce_list, name="Ce_back_encapsulant")
     
     Ce_list.index = Ce_out.index
     return Ce_list
 
+@jit
+def _Ce(
+    WVTRo,
+    EaWVTR,
+    temp_module,
+    So,
+    Eas,
+    Ce,
+    rh_surface,
+):
+    """
+    This This is a helper function for the Ce function that is used to calculate the concentration of water in the encapsulant.
+
+    Returns
+    --------
+    Ce_list : Numba array (float)
+        Concentration of water in the encapsulant at every time step in [g/cm³].
+
+    """
+    for i in range(1, len(rh_surface)):
+        Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
+                ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
+        
+    return Ce
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
     """
