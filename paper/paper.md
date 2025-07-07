@@ -40,8 +40,22 @@ PVDegradationTools, or PVDeg for short, is a national-laboratory-developed, comm
 [comment]: Hosting and documentation
 PVDeg is hosted on Github and PyPi, and it was developed by contributors from national laboratories, academia, and private industry. PVDeg is copyrighted by the Alliance for Sustainable Energy with a BSD 3-clause license allowing permissive use with attribution. PVDeg is extensively tested for functional and algorithm consistency. Continuous integration services check each pull request on Linux and Python versions 2.7 and 3.6. PVDeg is thoroughly documented, and detailed tutorials are provided for many features. The documentation includes help for installation and guidelines for contributions. The documentation is hosted at readthedocs.org. Github’s issue trackers provide venues for user discussions and help.
 
-[comment]: Introducing the 3 parts: classes/functions, the library, and the geospatial
-The PVDeg library .... 
+[comment]: Introducing the 3 parts: classes/functions, the library, and the
+geospatial
+The PVDeg python library is a spatio-temporal modeling assessment tool
+that empowers users to calculate various PV degradation modes, for different
+PV technologies and materials in its database. It is designed to serve the PV
+community, including researchers, device manufacturers, and other PV
+stakeholders to assess different degradation modes in locations around the
+world. The library is developed and hosted open-source on GitHub, and is
+structured in three layers: core functions and classes, scenario analysis, and
+geospatial analysis. These algorithms are typically implementations of models
+published in the existing peer-reviewed literature. In addition, data for
+PVDeg is sourced from the National Solar Radiation Database and the (NSRDB)
+and Photovoltaic Geographcial Information System (PVGIS). The core API
+consists of functions and classes [XX...]. The second layer is the scenario
+analysis
+
 The bifacial_radiance API and graphical user interface (GUI) were designed to serve the various needs of the many subfields of bifacial solar panel power research and engineering. The intended audience ranges from PV performance researchers, Engineering Procurement Construction (EPC) companies, installers, investors, consumers and analysts of the PV industry interested in predicting and evaluating bifacial photovoltaic systems. It is implemented in three layers: core RADIANCE-interface functions; ``Bifacial-Radiance``, ``Meteorological``, ``Scene``, and ``Analysis`` classes; and the ``GUI`` and ``model-chain`` classes. The core API consists of a collection of functions that implement commands directly to the RADIANCE software. These commands are typical implementations of algorithms and models described in peer-reviewed publications. The functions provide maximum user flexibility; however, some of the function arguments require an unwieldy number of parameters. The next API level contains the ``Bifacial-Radiance``, ``Meteorological``, ``Scene``, and ``Analysis`` classes. These abstractions provide simple methods that wrap the core function API layer and communicate with the RADIANCE software, which provides ray-trace processing capabilities. The method API simplification is achieved by separating the data that represent the object (object attributes) from the data that the object methods operate on (method arguments). For example, a ``Bifacial-Radiance`` object is represented by a ``module`` object, meteorological data, and ``scene`` objects. The ``gendaylit`` method operates on the meteorological data to calculate solar position with the support of algorithms from pvlib python [@pvlib], and generate corresponding sky files, linking them to the ``Bifacial-Radiance`` object. Then the ``makeOct`` method combines the sky files, ``module`` and ``scene`` objects when calling the function layer, returning the results from an ``Analysis`` object to the user. The final level of API is the ``ModelChain`` class, designed to simplify and standardize the process of stitching together the many modeling steps necessary to convert a time series of weather data to AC solar power generation, given a PV system and a location. The ``ModelChain`` also powers the ``GUI``, which provides a cohesive visualization of all the input parameters and options for most common modeling needs.
 
 [comment]: Release Info
