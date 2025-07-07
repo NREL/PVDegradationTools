@@ -18,6 +18,19 @@ import h5py
 import dask.dataframe as dd
 import xarray as xr
 
+# Global metadata mapping for standardizing metadata keys across different
+# weather data sources
+META_MAP = {
+    "elevation": "altitude",
+    "Elevation": "altitude", 
+    "Local Time Zone": "tz",
+    "Time Zone": "tz",
+    "timezone": "tz",
+    "Dew Point": "dew_point",
+    "Longitude": "longitude",
+    "Latitude": "latitude",
+}
+
 
 TIME_PERIODICITY_MAP = {
     # pandas time freq string arg
@@ -90,8 +103,6 @@ def get(database, id=None, geospatial=False, **kwargs):
 
         weather_df, meta_dict = pvdeg.weather.get(database="PVGIS", id=(49.95, 1.5))
     """
-
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     if type(id) is tuple:
         location = id
@@ -179,8 +190,6 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         type of weather file from list below (verified)
         [psm3, tmy3, epw, h5, csv]
     """
-
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
@@ -299,17 +308,6 @@ def map_meta(meta):
     meta : dictionary
         DataFrame of weather data with modified column headers.
     """
-
-    META_MAP = {
-        "elevation": "altitude",
-        "Elevation": "altitude",
-        "Local Time Zone": "tz",
-        "Time Zone": "tz",
-        "timezone": "tz",
-        "Dew Point": "dew_point",
-        "Longitude": "longitude",
-        "Latitude": "latitude",
-    }
 
     # map meta-names as needed
     for key in [*meta.keys()]:
@@ -630,7 +628,6 @@ def get_NSRDB(
     """
 
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz", "timezone": "tz"}
 
     if (
         satellite == None
