@@ -35,21 +35,21 @@ jobs:
         pip install nbval
     - name: Run notebook and check output
       run: |
-        # --sanitize-with: pre-process text to remove irrelevant differences
+        # --nbval-sanitize-with: pre-process text to remove irrelevant differences
         pytest --nbval \
                "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}" \
-               --sanitize-with nbval_sanitization_rules.cfg
+               --nbval-sanitize-with nbval_sanitization_rules.cfg
     - name: Run notebooks again, save files
       run: |
         pip install nbconvert[webpdf]
         NOTEBOOK_DIR="tutorials_and_tools/tutorials_and_tools"
         mkdir -p "$NOTEBOOK_DIR/artifacts"
+        cd "$NOTEBOOK_DIR"
         jupyter nbconvert --to html --execute \
                           --ExecutePreprocessor.timeout=600 \
                           --allow-errors \
-                          --output \
-                          "$NOTEBOOK_DIR/artifacts/${{ matrix.notebook-file }}.html" \
-                          "$NOTEBOOK_DIR/${{ matrix.notebook-file }}"
+                          --output "artifacts/${{ matrix.notebook-file }}.html" \
+                          "${{ matrix.notebook-file }}"
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
