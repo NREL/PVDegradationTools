@@ -36,19 +36,22 @@ jobs:
     - name: Run notebook and check output
       run: |
         # --sanitize-with: pre-process text to remove irrelevant differences
-        pytest --nbval "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}" \
+        pytest --nbval \
+               "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}" \
                --sanitize-with nbval_sanitization_rules.cfg
     - name: Run notebooks again, save files
       run: |
         pip install nbconvert[webpdf]
-        mkdir -p artifacts
+        NOTEBOOK_DIR="tutorials_and_tools/tutorials_and_tools"
+        mkdir -p "$NOTEBOOK_DIR/artifacts"
         jupyter nbconvert --to html --execute \
                           --ExecutePreprocessor.timeout=600 \
                           --allow-errors \
-                          --output "artifacts/${{ matrix.notebook-file }}.html" \
-                          "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}"
+                          --output \
+                          "$NOTEBOOK_DIR/artifacts/${{ matrix.notebook-file }}.html" \
+                          "$NOTEBOOK_DIR/${{ matrix.notebook-file }}"
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
         name: executed_notebook_${{ matrix.notebook-file }}
-        path: artifacts
+        path: tutorials_and_tools/tutorials_and_tools/artifacts
