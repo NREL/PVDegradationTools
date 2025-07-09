@@ -73,7 +73,7 @@ docs = [
 test = [
     "pytest",
     "pytest-cov",
-    "pytest-nbval",
+    "nbval",
     "scikit-learn",
 ]
 books = [
