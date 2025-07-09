@@ -1,0 +1,54 @@
+name: nbval
+
+on: [pull_request]
+
+jobs:
+  notebook-check:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # don't cancel other matrix jobs when one fails
+      matrix:
+        notebook-file: [
+          '1 - Basics, Humidity, Design.ipynb',
+          '2 - Degradation.ipynb',
+          '3 - Spectral Degradation.ipynb',
+          '4 - Weather Database Access.ipynb',
+          'Monte Carlo - Arrhenius.ipynb',
+          'Monte Carlo - Standoff.ipynb',
+          'Scenario - Single Location.ipynb',
+          'Scenario - Geospatial.ipynb'
+        ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install notebook environment
+      run: |
+        python -m pip install --upgrade pip wheel
+        pip install --timeout=300 \
+            -r tutorials_and_tools/requirements.txt
+        pip install --timeout=300 -e .[test]
+        pip install pytest-nbval
+    - name: Run notebook and check output
+      run: |
+        # --sanitize-with: pre-process text to remove irrelevant differences
+        pytest --nbval "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}" \
+               --sanitize-with nbval_sanitization_rules.cfg
+    - name: Run notebooks again, save files
+      run: |
+        pip install nbconvert[webpdf]
+        mkdir -p artifacts
+        jupyter nbconvert --to html --execute \
+                          --ExecutePreprocessor.timeout=600 \
+                          --allow-errors \
+                          --output "artifacts/${{ matrix.notebook-file }}.html" \
+                          "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}"
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: executed_notebook_${{ matrix.notebook-file }}
+        path: artifacts
