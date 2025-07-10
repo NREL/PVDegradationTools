@@ -18,7 +18,8 @@ import dask.dataframe as dd
 from dask.delayed import delayed
 import xarray as xr
 
-# Global metadata mapping for standardizing metadata keys across different
+
+# Global dataset mapping for standardizing weather variable names across different
 # weather data sources
 META_MAP = {
     "elevation": "altitude",
@@ -29,6 +30,34 @@ META_MAP = {
     "Dew Point": "dew_point",
     "Longitude": "longitude",
     "Latitude": "latitude",
+}
+
+DSET_MAP = {
+    "year": "Year",
+    "month": "Month",
+    "day": "Day",
+    "hour": "Hour",
+    "minute": "Minute",
+    "second": "Second",
+    "GHI": "ghi",
+    "DHI": "dhi",
+    "DNI": "dni",
+    "Clearsky GHI": "ghi_clear",
+    "Clearsky DHI": "dhi_clear",
+    "Clearsky DNI": "dni_clear",
+    "Solar Zenith Angle": "solar_zenith",
+    "Temperature": "temp_air",
+    "air_temperature": "temp_air",
+    "Relative Humidity": "relative_humidity",
+    "Dew Point": "dew_point",
+    "temp_dew": "dew_point",
+    "Pressure": "pressure",
+    "Wind Speed": "wind_speed",
+    "Wind Direction": "wind_direction",
+    "Surface Albedo": "albedo",
+    "surface_albedo": "albedo",
+    "Precipitable Water": "precipitable_water",
+    "Module_Temperature": "module_temperature",
 }
 
 
@@ -363,34 +392,6 @@ def map_weather(weather_df):
         DataFrame of weather data with modified column headers.
     """
 
-    DSET_MAP = {
-        "year": "Year",
-        "month": "Month",
-        "day": "Day",
-        "hour": "Hour",
-        "minute": "Minute",
-        "second": "Second",
-        "GHI": "ghi",
-        "DHI": "dhi",
-        "DNI": "dni",
-        "Clearsky GHI": "ghi_clear",
-        "Clearsky DHI": "dhi_clear",
-        "Clearsky DNI": "dni_clear",
-        "Solar Zenith Angle": "solar_zenith",
-        "Temperature": "temp_air",
-        "air_temperature": "temp_air",
-        "Relative Humidity": "relative_humidity",
-        "Dew Point": "dew_point",
-        "temp_dew": "dew_point",
-        "Pressure": "pressure",
-        "Wind Speed": "wind_speed",
-        "Wind Direction": "wind_direction",
-        "Surface Albedo": "albedo",
-        "surface_albedo": "albedo",
-        "Precipitable Water": "precipitable_water",
-        "Module_Temperature": "module_temperature",
-    }
-
     if isinstance(weather_df, pd.DataFrame):
         for column_name in weather_df.columns:
             if column_name in [*DSET_MAP.keys()]:
@@ -668,8 +669,6 @@ def get_NSRDB(
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-
-    DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
 
     if (
         satellite == None
