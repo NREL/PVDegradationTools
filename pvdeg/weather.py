@@ -21,6 +21,17 @@ import xarray as xr
 
 # Global dataset mapping for standardizing weather variable names across different
 # weather data sources
+META_MAP = {
+    "elevation": "altitude",
+    "Elevation": "altitude",
+    "Local Time Zone": "tz",
+    "Time Zone": "tz",
+    "timezone": "tz",
+    "Dew Point": "dew_point",
+    "Longitude": "longitude",
+    "Latitude": "latitude",
+}
+
 DSET_MAP = {
     "year": "Year",
     "month": "Month",
@@ -658,8 +669,6 @@ def get_NSRDB(
     meta : (dict)
         Dictionary of metadata for the weather data
     """
-
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz", "timezone": "tz"}
 
     if (
         satellite == None
