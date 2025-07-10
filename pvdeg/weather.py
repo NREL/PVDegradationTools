@@ -11,7 +11,22 @@ from rex import NSRDBX, Outputs
 import datetime
 import numpy as np
 import h5py
+import dask.dataframe as dd
+from dask.delayed import delayed
 import xarray as xr
+
+# Global metadata mapping for standardizing metadata keys across different
+# weather data sources
+META_MAP = {
+    "elevation": "altitude",
+    "Elevation": "altitude",
+    "Local Time Zone": "tz",
+    "Time Zone": "tz",
+    "timezone": "tz",
+    "Dew Point": "dew_point",
+    "Longitude": "longitude",
+    "Latitude": "latitude",
+}
 
 
 TIME_PERIODICITY_MAP = {
@@ -32,8 +47,10 @@ ENTRIES_PERIODICITY_MAP = {
 }
 
 
-def get(database, id=None, geospatial=False, **kwargs):
-    """Load weather data from  NSRDB or any other PVLIB io tools function.
+def get(database: str, id=None, geospatial=False, **kwargs):
+    """
+    Load weather data directly from  NSRDB or through any other PVLIB i/o
+    tools function.
 
     Parameters
     ----------
@@ -111,8 +128,6 @@ def get(database, id=None, geospatial=False, **kwargs):
         )
     """
 
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
-
     if type(id) is tuple:
         location = id
         gid = None
@@ -132,10 +147,11 @@ def get(database, id=None, geospatial=False, **kwargs):
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
             URL = "https://re.jrc.ec.europa.eu/api/v5_2/"
-            weather_df, _, meta, _ = iotools.get_pvgis_tmy(
+            weather_df, meta = iotools.get_pvgis_tmy(
                 latitude=lat, longitude=lon, url=URL, **kwargs
             )
-            meta = meta["location"]
+            inputs = meta["inputs"]
+            meta = inputs["location"]
         elif database == "PSM3":
             weather_df, meta = iotools.get_psm3(latitude=lat, longitude=lon, **kwargs)
         elif database == "local":
@@ -206,7 +222,6 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         type of weather file from list below (verified)
         [psm3, tmy3, epw, h5, csv]
     """
-    # META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
@@ -324,16 +339,6 @@ def map_meta(meta):
     meta : dictionary
         DataFrame of weather data with modified column headers.
     """
-    META_MAP = {
-        "elevation": "altitude",
-        "Elevation": "altitude",
-        "Local Time Zone": "tz",
-        "Time Zone": "tz",
-        "timezone": "tz",
-        "Dew Point": "dew_point",
-        "Longitude": "longitude",
-        "Latitude": "latitude",
-    }
 
     # map meta-names as needed
     for key in [*meta.keys()]:
@@ -653,7 +658,6 @@ def get_NSRDB(
         Dictionary of metadata for the weather data
     """
     DSET_MAP = {"air_temperature": "temp_air", "Relative Humidity": "relative_humidity"}
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz", "timezone": "tz"}
 
     if (
         satellite is None
@@ -962,9 +966,9 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
 
 
 def get_anywhere(database="PSM3", id=None, **kwargs):
-    """Load weather data directly from  NSRDB or through any other PVLIB i/o tools.
-
-    function. Only works for a single location look-up, not for geospatial analysis.
+    """
+    Load weather data directly from  NSRDB or through any other PVLIB i/o
+    tools function. Only works for a single location look-up, not for geospatial analysis.
 
     Parameters:
     -----------
@@ -987,6 +991,7 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
     meta : (dict)
         Dictionary of metadata for the weather data
     """
+
     weather_arg = {
         "api_key": "DEMO_KEY",  # Pass in a custom key to avoid access limitations.
         "email": "user@mail.com",
@@ -1150,13 +1155,15 @@ def _process_weather_result_distributed(weather_df):
     return weather_ds
 
 
+@delayed
 def _weather_distributed_vec(
     database: str,
-    coord: tuple[float],
+    coord: float,
     api_key: str,  # NSRDB api key
     email: str,  # NSRDB developer email
 ):
-    """Distributed weather calculation for use with dask futures/delayed.
+    """
+    Distributed weather calculation for use with dask futures/delayed
 
     Parameters
     ----------
@@ -1170,25 +1177,24 @@ def _weather_distributed_vec(
         NSRDB developer email (see `pvdeg.weather.get`)
 
     Returns
-    -------
+    --------
         Returns ds, dict, None if unsucessful
         Returns None, None, Exception if unsucessful
     """
-    try:
-        if database == "PVGIS":  # does not need api key
-            weather_df, meta_dict = get(database=database, id=coord)
-        elif database == "PSM3":
-            weather_df, meta_dict = get(
-                database=database, id=coord, api_key=api_key, email=email
-            )
-        else:
-            raise NotImplementedError(
-                f'database {database} not implemented, options: "PVGIS", "PSM3"'
-            )
 
-    except Exception as e:
-        return None, None, e
+    # we want to fail loudly, quickly
+    if database == "PVGIS":  # does not need api key
+        weather_df, meta_dict = get(database=database, id=coord)
+    elif database == "PSM3":
+        weather_df, meta_dict = get(
+            database=database, id=coord, api_key=api_key, email=email
+        )
+    else:
+        raise NotImplementedError(
+            f'database {database} not implemented, options: "PVGIS", "PSM3"'
+        )
 
+    # convert single location dataframe to xarray dataset
     weather_ds = _process_weather_result_distributed(weather_df=weather_df)
 
     return weather_ds, meta_dict, None
@@ -1197,10 +1203,11 @@ def _weather_distributed_vec(
 # THE NSRDB shapes could be moved to their own definition
 # organization style question?
 def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
-    """Create an empty weather dataframe for generalized input.
+    """
+    Create an empty weather dataframe for generalized input.
 
     Parameters
-    ----------
+    ---------
     gids_size: int
         number of entries to create along gid axis
     periodicity: str
@@ -1255,7 +1262,7 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
     attrs = {}
     global_attrs = {}
 
-    # dims = {"gid", "time"}
+    dims = {"gid", "time"}
     dims_size = {"time": TIME_PERIODICITY_MAP[periodicity], "gid": gids_size}
 
     if database == "NSRDB" or database == "PSM3":
@@ -1292,22 +1299,21 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
 
 
 # TODO: implement rate throttling so we do not make too many requests.
-# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means
-# twice the speed ;)
+# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
 # TODO: this overwrites NSRDB GIDS when database == "PSM3"
 
 
 def weather_distributed(
-    database: str, coords: list[tuple], api_key: str = None, email: str = None
+    database: str,
+    coords: list[tuple],
+    api_key: str = "",
+    email: str = "",
 ):
-    """Grab weather using pvgis for all following locations using dask.
+    """
+    Grab weather using pvgis for all of the following locations using dask for parallelization.
+    You must create a dask client with multiple processes before calling this function, otherwise results will not be properly calculated.
 
-    Dask is used for parallelization. You must create a dask client with multiple
-    processes before calling this function, otherwise results will not be properly
-    calculated.
-
-    PVGIS supports up to 30 requests per second so your dask client should not have more
-    than $x$ workers/threads
+    PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads
     that would put you over this limit.
 
     NSRDB (including `database="PSM3"`) is rate limited and your key will face
@@ -1336,8 +1342,7 @@ def weather_distributed(
 
     email: str
         Only required when making NSRDB requests using "PSM3".
-        [NSRDB developer account email associated with `api_key`]
-        https://developer.nrel.gov/signup/)
+        [NSRDB developer account email associated with `api_key`](https://developer.nrel.gov/signup/)
 
     Returns
     -------
@@ -1364,17 +1369,12 @@ def weather_distributed(
             f"Only 'PVGIS' and 'PSM3' are implemented, you entered {database}"
         )
 
-    futures = [
-        dask.delayed(_weather_distributed_vec)(database, coord, api_key, email)
-        for coord in coords
+    delays = [
+        _weather_distributed_vec(database, coord, api_key, email) for coord in coords
     ]
-    results = dask.compute(futures)[0]  # values are returned in a list with one entry
 
-    # what is the difference between these two approaches for dask distributed work,
-    # how can we schedule differently
-    # i believe futures might be better for our needs
-    # futures = [client.submit(weather_distributed, "PVGIS", coord) for coord in coords]
-    # client.gather(futures)
+    futures = client.compute(delays)
+    results = client.gather(futures)
 
     # results is a 2d list
     # results[0] is the weather_ds with dask backend
@@ -1412,8 +1412,7 @@ def weather_distributed(
 
     return weather_ds, meta_df, indexes_failed
 
-    # def _nsrdb_to_uniform(
-    # weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+    # def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
     #     map_weather(weather_df=weather_df)
     #     map_meta(meta)
@@ -1454,8 +1453,7 @@ def weather_distributed(
     ...
 
 
-# def _pvgis_to_uniform(
-# weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
 # map_weather(weather_df=weather_df)
 # map_meta(meta)
