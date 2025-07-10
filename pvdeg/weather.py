@@ -148,8 +148,6 @@ def get(database: str, id=None, geospatial=False, **kwargs):
         )
     """
 
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
-
     if type(id) is tuple:
         location = id
         gid = None
@@ -245,8 +243,6 @@ def read(file_in, file_type, map_variables=True, **kwargs):
         type of weather file from list below (verified)
         [psm3, tmy3, epw, h5, csv]
     """
-
-    META_MAP = {"elevation": "altitude", "Local Time Zone": "tz"}
 
     supported = ["psm3", "tmy3", "epw", "h5", "csv"]
     file_type = file_type.upper()
@@ -365,18 +361,6 @@ def map_meta(meta):
     meta : dictionary
         DataFrame of weather data with modified column headers.
     """
-
-    META_MAP = {
-        "elevation": "altitude",
-        "Elevation": "altitude",
-        "Local Time Zone": "tz",
-        "Time Zone": "tz",
-        "timezone": "tz",
-        "TZ": "tz",
-        "Dew Point": "dew_point",
-        "Longitude": "longitude",
-        "Latitude": "latitude",
-    }
 
     # map meta-names as needed
     for key in [*meta.keys()]:

@@ -5,6 +5,8 @@ Enhancements
 --------------
 - Changed ``GeospatialScenario.get_geospatial_data()`` to a ``@property``, now use ``GeospatialScenario.geospatial_data``
 - Changed ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use ``GeospatialScenario.coords``
+- Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
+  (:pull:`182`)
 
 Deprecations
 -------------
@@ -21,3 +23,4 @@ Bug Fixes
 Contributors
 -----------
 - Tobin Ford (:ghuser:`tobin-ford`)
+- Rajiv Daxini (:ghuser:`RDaxini`)
