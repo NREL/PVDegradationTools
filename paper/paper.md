@@ -56,16 +56,24 @@ and Photovoltaic Geographcial Information System (PVGIS). PVDeg also contains
 its own internal database of material and degradation parameters. The core API
 consists of functions and classes that provide specialized calculations for
 individual degradation mechanisms, material properties, and environmental
-modeling. The scenario analysis class layer wraps the core API functions into
-user-friendly workflows, simplifying the setup and execution of complex
-multi-parameter degradation studies. This layer provides an intuitive interface
-for multiple analysis components, with practical implementation examples in a
-series of Jupyter notebook tutorials. Finally, the geospatial analysis layer
-enables large-scale spatial analyses by automatically distributing degradation
-calculations across geographic regions using parallel processing and advanced
-data structures. The geospatial layer includes specialized visualization
-functions for mapping results and supports both uniform and stochastic spatial
-sampling strategies to balance computational efficiency with geographic coverage.
+modeling. Examples include `pvdeg.humidity.module()` for moisture ingress
+modeling, and pvdeg.letid.calc_letid_outdoors()` for light and elevated temperature
+induced degradation. The scenario analysis class layer wraps the core API
+functions into user-friendly workflows, simplifying the setup and execution of
+complex multi-parameter degradation studies. This layer provides an intuitive
+interface for multiple analysis components, with practical implementation
+examples in a series of Jupyter notebook tutorials. Users can create `Scenario`
+objects to define locations, modules, and analysis pipelines, then execute
+multiple degradation calculations simultaneously across different module
+configurations and extract results for comparative analysis. Finally, the
+geospatial analysis layer enables large-scale spatial analyses by automatically
+distributing degradation calculations across geographic regions using parallel
+processing and advanced data structures. This layer supports studies such as mapping
+standoff distances across the United States, analyzing LETID degradation patterns across
+climate zones, and identifying optimal locations for specific PV technologies. The
+geospatial layer includes specialized visualization functions for mapping results and
+supports both uniform and stochastic spatial sampling strategies to balance
+computational efficiency with geographic coverage.
 
 
 [comment]: Release Info
