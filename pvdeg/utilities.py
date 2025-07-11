@@ -463,19 +463,17 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 
     src_data, src_meta = iotools.tmy.read_tmy3(file_in, coerce_year=2023)
 
-    save_cols = {
-        "DNI": "dni",
-        "DHI": "dhi",
-        "GHI": "ghi",
-        "DryBulb": "temp_air",
-        "DewPoint": "dew_point",
-        "RHum": "relative_humidity",
-        "Wspd": "wind_speed",
-        "Alb": "albedo",
-    }
-
-    df_new = src_data[save_cols.keys()].copy()
-    df_new.columns = save_cols.values()
+    save_cols = [
+        "dni",
+        "dhi",
+        "ghi",
+        "temp_air",
+        "relative_humidity",
+        "wind_speed",
+        "albedo",
+    ]
+    
+    df_new = src_data[save_cols].copy()
     time_index = df_new.index
 
     meta = {
@@ -1533,49 +1531,4 @@ def read_material(
         material_dict = {k: material_dict.get(k, None) for k in parameters} 
 
     return material_dict
-
-def add_time_columns_tmy(weather_df, coerce_year=1979):
-    """
-    Add time columns to a tmy weather dataframe.
-
-    Parameters:
-    -----------
-    weather_df: pd.DataFrame
-        tmy weather dataframe containing 8760 rows.
-    coerce_year: int
-        year to set the dataframe to.
-
-    Returns:
-    --------
-    weather_df: pd.DataFrame
-        dataframe with columns added new columns will be 
-
-        ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
-    """
-
-    weather_df = weather_df.reset_index(drop=True)    
-
-    if len(weather_df) == 8760:
-        freq = 'h'
-    elif len(weather_df) == 17520:
-        freq = '30min'
-    else:
-        raise ValueError("weather df must be in 1 hour or 30 minute intervals")
-
-    date_range = pd.date_range(
-        start=f'{coerce_year}-01-01 00:00:00', 
-        end=f'{coerce_year}-12-31 23:45:00', # 15 minute internval is highest granularity
-        freq=freq
-    )
-
-    df = pd.DataFrame({
-        'Year': date_range.year,
-        'Month': date_range.month,
-        'Day': date_range.day,
-        'Hour': date_range.hour,
-        'Minute': date_range.minute
-    })
-
-    weather_df = pd.concat([weather_df, df], axis=1)
-    return weather_df
 
