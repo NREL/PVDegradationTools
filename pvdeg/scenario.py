@@ -352,11 +352,29 @@ class Scenario:
         if see_added:
             print(f'Module "{module_name}" added.')
 
-    def add_material(
-        self, materials, see_added=False,
-    ):
+    def add_material(self, materials, see_added=False):
         """
-        add a new material type to main list
+        Add new material types to multiple layers/files.
+        
+        Parameters:
+        -----------
+        materials : dict
+            Dictionary with layer names as keys, and material info including:
+            - material_file: str - Name of the material file (e.g., "O2permeation")
+            - material_name: str - Name of the material to add
+            
+        see_added : bool, optional
+            If True, print confirmation for each material added
+            
+        Example:
+        --------
+        scenario.add_material({
+            "encapsulant": {
+                "material_file": "O2permeation",
+                "material_name": "EVA_001"
+            },
+            "backsheet": {
+                "material_file": "H2Opermeation", 
                 "material_name": "PET_001"
             }
         })
