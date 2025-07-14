@@ -234,7 +234,7 @@ class Scenario:
         self,
         module_name: str = None,
         racking: str = "open_rack_glass_polymer",
-        material: str = "OX003",
+        materials: Union[str, dict] = "OX003",
         material_file: str = "O2permeation",
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
@@ -254,12 +254,34 @@ class Scenario:
             temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
-        material : str
-            Key of the material desired. For a complete list, see pvdeg/data/O2permeation.json
-            or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
-            To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
+        materials : Union[str, dict]
+            Materials specification. Can be either:
+            - str: Single material key e.g., "OX003"
+            - dict: Nested dictionary with structure PV layer, materials file, material
+            key, and parameters if custom material is specifed. For example:
+        {
+            "encapsulant": {
+                "material_file": "O2permeation",
+                "material_name": "OX003"  # Added a key for the material name
+            },
+            "backsheet": {
+                "material_file": "H20permeation",
+                "material_name": "W024"  # Added a key for the material name
+            },
+            "custom_layer": {
+                "material_file": "H2Opermeation",
+                "parameters": {
+                    "Ead": 95,
+                    "Do": 40e5,
+                    "Eas": -10,
+                    "So": 20e-6,
+                    "Eap": 84,
+                    "Po": 99e9
+                }
+            }
+        }
         material_file : str
-            Material file used to access parameters from.
+            Material file used to access parameters
             Use material json file in `pvdeg/data`. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
         temp_model : str
