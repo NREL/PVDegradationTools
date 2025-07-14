@@ -262,11 +262,11 @@ class Scenario:
         {
             "encapsulant": {
                 "material_file": "O2permeation",
-                "material_name": "OX003"  # Added a key for the material name
+                "material_name": "OX003"
             },
             "backsheet": {
                 "material_file": "H20permeation",
-                "material_name": "W024"  # Added a key for the material name
+                "material_name": "W024"
             },
             "custom_layer": {
                 "material_file": "H2Opermeation",
@@ -352,7 +352,6 @@ class Scenario:
         if see_added:
             print(f'Module "{module_name}" added.')
 
-    # add testing
     def add_material(
         self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname="O2permeation.json",
     ):
