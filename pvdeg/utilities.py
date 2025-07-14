@@ -502,7 +502,7 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 ### DEPRECATE ###
 def _read_material(name, fname="O2permeation.json"):
     """
-    read a material from materials.json and return the parameter dictionary
+    read a material from materials.json and return the parameter dictionary in normalized format
 
     Parameters:
     -----------
@@ -512,7 +512,7 @@ def _read_material(name, fname="O2permeation.json"):
     Returns:
     --------
     mat_dict : (dict)
-        dictionary of material parameters
+        dictionary with normalized structure containing material_file, material_name, and parameters
     """
     # TODO: test then delete commented code
     # root = os.path.realpath(__file__)
@@ -538,7 +538,13 @@ def _read_material(name, fname="O2permeation.json"):
         # return [*material_list]
 
     mat_dict = data[name]
-    return mat_dict
+    
+    # Return in normalized format to match scenario.py structure
+    return {
+        "material_file": fname.replace('.json', ''),  # Remove .json extension
+        "material_name": name,
+        "parameters": mat_dict
+    }
 
 
 # previously: fname="materials.json"
