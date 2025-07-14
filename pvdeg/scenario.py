@@ -281,7 +281,7 @@ class Scenario:
             }
         }
         material_file : str
-            Material file used to access parameters
+            Material file used to access parameters if ``material`` is a single string.
             Use material json file in `pvdeg/data`. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
         temp_model : str
