@@ -309,6 +309,27 @@ class Scenario:
                 print("Material Not Found - No module added to scenario.")
                 print("If you need to add a custom material, use .add_material()")
                 return
+        elif isinstance(materials, dict):
+            # handle multiple material dictionary format 
+            mat_params = {}
+            for layer, material_name in materials.items():
+                if isinstance(material_name, str):
+                    try:
+                        material_parameters = utilities.read_material(pvdeg_file=material_file, key=material_name, layer=layer)
+                    except KeyError:
+                        print(f"Material '{material_name}' not found for layer '{layer}' - No module added to scenario.")
+                        print("If you need to add a custom material, use .add_material()")
+                        return
+
+                    # Create normalized structure with material parameters
+                    mat_params[layer] = {
+                        "material_file": material_file,
+                        "material_name": material_name,
+                        "parameters": material_parameters
+                    }
+
+        else:
+            print("Materials parameter must be either a string (legacy format) or dict (nested format).")
             return
 
         old_modules = [mod["module_name"] for mod in self.modules]
