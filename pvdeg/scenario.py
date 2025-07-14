@@ -357,37 +357,25 @@ class Scenario:
     ):
         """
         add a new material type to main list
+                "material_name": "PET_001"
+            }
+        })
         """
         if not isinstance(materials, dict):
             raise ValueError("Materials parameter must be a dict with layer names as keys")
-        
-        # Simple loop through each layer
+
         for layer, material_spec in materials.items():
             if not isinstance(material_spec, dict):
                 print(f"Warning: Skipping invalid material spec for layer '{layer}' (not a dict): {material_spec}")
                 continue
-                
+
             material_file = material_spec.get("material_file")
             material_name = material_spec.get("material_name")
-            
-            if not material_file or not material_name:
-                print(f"Warning: Skipping layer '{layer}' - missing material_file or material_name")
-                continue
-                
-            try:
-                # Read the existing material to get its parameters
-                material_params = utilities._read_material(fname=material_file, name=material_name)
-                
-                # Add the material using existing utilities function
-                utilities._add_material(**material_params["parameters"], fname=f"{material_file}.json")
-                
-                if see_added:
-                    print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
-                    
-            except KeyError:
-                print(f"Error: Material '{material_name}' not found in {material_file}")
-            except Exception as e:
-                print(f"Error adding material '{material_name}' for layer '{layer}': {e}")
+
+            material_params = utilities._read_material(fname=material_file, name=material_name)
+            utilities._add_material(**material_params["parameters"], fname=f"{material_file}.json")
+            if see_added:
+                print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
 
     def viewScenario(self):
         """
