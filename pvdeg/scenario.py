@@ -353,25 +353,41 @@ class Scenario:
             print(f'Module "{module_name}" added.')
 
     def add_material(
-        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname="O2permeation.json",
+        self, materials, see_added=False,
     ):
         """
         add a new material type to main list
         """
-        utilities._add_material(
-            name=name,
-            alias=alias,
-            Ead=Ead,
-            Eas=Eas,
-            So=So,
-            Do=Do,
-            Eap=Eap,
-            Po=Po,
-            fickian=fickian,
-            fname=fname,
-        )
-        print("Material has been added.")
-        print("To add the material as a module in your current scene, run .addModule()")
+        if not isinstance(materials, dict):
+            raise ValueError("Materials parameter must be a dict with layer names as keys")
+        
+        # Simple loop through each layer
+        for layer, material_spec in materials.items():
+            if not isinstance(material_spec, dict):
+                print(f"Warning: Skipping invalid material spec for layer '{layer}' (not a dict): {material_spec}")
+                continue
+                
+            material_file = material_spec.get("material_file")
+            material_name = material_spec.get("material_name")
+            
+            if not material_file or not material_name:
+                print(f"Warning: Skipping layer '{layer}' - missing material_file or material_name")
+                continue
+                
+            try:
+                # Read the existing material to get its parameters
+                material_params = utilities._read_material(fname=material_file, name=material_name)
+                
+                # Add the material using existing utilities function
+                utilities._add_material(**material_params["parameters"], fname=f"{material_file}.json")
+                
+                if see_added:
+                    print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
+                    
+            except KeyError:
+                print(f"Error: Material '{material_name}' not found in {material_file}")
+            except Exception as e:
+                print(f"Error adding material '{material_name}' for layer '{layer}': {e}")
 
     def viewScenario(self):
         """
