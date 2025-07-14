@@ -301,11 +301,14 @@ class Scenario:
         see_added : (bool), optional
         """
 
-        try:
-            mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
-        except KeyError:
-            print("Material Not Found - No module added to scenario.")
-            print("If you need to add a custom material, use .add_material()")
+        if isinstance(materials, str):
+            # handle single material string format 
+            try:
+                mat_params = utilities.read_material(pvdeg_file=material_file, key=materials)
+            except KeyError:
+                print("Material Not Found - No module added to scenario.")
+                print("If you need to add a custom material, use .add_material()")
+                return
             return
 
         old_modules = [mod["module_name"] for mod in self.modules]
