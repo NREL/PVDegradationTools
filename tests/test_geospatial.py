@@ -172,7 +172,7 @@ def test_mixed_res_dict():
 
     with pytest.raises(
         NotImplementedError,
-        match=r"function return type: <class 'dict'> not available for geospatial analysis yet",
+        match=r"function return type: <class 'dict'> not available",
     ):
         pvdeg.geospatial.analysis(
             weather_ds=GEO_WEATHER,

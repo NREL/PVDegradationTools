@@ -144,9 +144,9 @@ def _df_from_arbitrary(res, func):
         )  # they must all be the same length here or this will error out
     else:
         raise NotImplementedError(
-            f"function return type: {type(res)} not available for geospatial analysis \
-                yet. This could be result of mismatched coordinates of outputs. \
-                    EX. tuple(dataframe, int)."
+            f"function return type: {type(res)} not available for geospatial "
+            "analysis yet. This could be result of mismatched coordinates of "
+            "outputs. EX. tuple(dataframe, int)."
         )
 
 

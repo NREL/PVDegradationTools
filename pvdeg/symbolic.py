@@ -100,9 +100,9 @@ def calc_kwarg_timeseries(
 
     if not _have_same_length(list(timeseries.values())):
         raise NotImplementedError(
-            "arrays/series are different lengths. fix mismatched length. otherwise \
-            arbitrary symbolic solution is too complex for solver. nested loops or \
-                loops dependent on previous results not supported."
+            "arrays/series are different lengths. fix mismatched length. "
+            "otherwise arbitrary symbolic solution is too complex for solver. "
+            "nested loops or loops dependent on previous results not supported."
         )
 
     # calculate the expression. we will seperately calculate all values and store then
