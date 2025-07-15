@@ -242,16 +242,17 @@ class Scenario:
         see_added: bool = False,
     ):
         """
-        Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
-        the given scenario.
+        Add a module to the Scenario. Multiple modules can be added. Each module will
+        be tested in the given scenario.
 
         Parameters
         -----------
         module_name : str
-            unique name for the module. adding multiple modules of the same name will replace the
-            existing entry.
+            unique name for the module. adding multiple modules of the same name will
+            replace the existing entry.
         racking : str
-            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
+            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed
+            entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
         materials : Union[str, dict]
@@ -285,8 +286,9 @@ class Scenario:
             Use material json file in `pvdeg/data`. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
         temp_model : str
-            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
-            Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
+            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
+            more. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes',
+            'ross'``
         model_kwarg : dict, (optional)
             provide a dictionary of temperature model coefficents to be used
             instead of pvlib defaults. Some models will require additional
@@ -304,7 +306,8 @@ class Scenario:
         if isinstance(materials, str):
             # handle single material string format 
             try:
-                mat_params = utilities.read_material(pvdeg_file=material_file, key=materials)
+                mat_params = utilities.read_material(pvdeg_file=material_file,
+                                                     key=materials)
             except KeyError:
                 print("Material Not Found - No module added to scenario.")
                 print("If you need to add a custom material, use .add_material()")
@@ -315,10 +318,13 @@ class Scenario:
             for layer, material_name in materials.items():
                 if isinstance(material_name, str):
                     try:
-                        material_parameters = utilities.read_material(pvdeg_file=material_file, key=material_name, layer=layer)
+                        material_parameters = utilities.read_material(
+                            pvdeg_file=material_file, key=material_name, layer=layer)
                     except KeyError:
-                        print(f"Material '{material_name}' not found for layer '{layer}' - No module added to scenario.")
-                        print("If you need to add a custom material, use .add_material()")
+                        print(f"Material '{material_name}' not found for layer '{layer}'
+                              - No module added to scenario.")
+                        print("If you need to add a custom material, use"
+                        ".add_material()")
                         return
 
                     # Create normalized structure with material parameters
@@ -329,7 +335,8 @@ class Scenario:
                     }
 
         else:
-            print("Materials parameter must be either a string (legacy format) or dict (nested format).")
+            print("Materials parameter must be either a string (legacy format) or dict"
+            "(nested format).")
             return
 
         old_modules = [mod["module_name"] for mod in self.modules]
@@ -380,20 +387,25 @@ class Scenario:
         })
         """
         if not isinstance(materials, dict):
-            raise ValueError("Materials parameter must be a dict with layer names as keys")
+            raise ValueError("Materials parameter must be a dict with layer names as"
+            "keys")
 
         for layer, material_spec in materials.items():
             if not isinstance(material_spec, dict):
-                print(f"Warning: Skipping invalid material spec for layer '{layer}' (not a dict): {material_spec}")
+                print(f"Warning: Skipping invalid material spec for layer '{layer}'
+                      (not a dict): {material_spec}")
                 continue
 
             material_file = material_spec.get("material_file")
             material_name = material_spec.get("material_name")
 
-            material_params = utilities._read_material(fname=material_file, name=material_name)
-            utilities._add_material(**material_params["parameters"], fname=f"{material_file}.json")
+            material_params = utilities._read_material(fname=material_file,
+                                                       name=material_name)
+            utilities._add_material(**material_params["parameters"],
+                                    fname=f"{material_file}.json")
             if see_added:
-                print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
+                print(f'Material "{material_name}" added to {material_file}.json for
+                      layer "{layer}".')
 
     def viewScenario(self):
         """
