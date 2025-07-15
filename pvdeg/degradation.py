@@ -2,7 +2,8 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit
+#from numba import jit, njit
+from numba import njit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path

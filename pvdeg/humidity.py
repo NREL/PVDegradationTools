@@ -401,7 +401,7 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-@jit
+@njit
 def Ce(
     temp_module,
     rh_surface,

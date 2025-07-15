@@ -1,0 +1,3 @@
+Latitude(deg),Longitude(deg),Time Zone,Tilt(deg),PV Azimuth(deg),Hub_Height,Pitch,RowType(first interior last single),TransmissionFactor(open area fraction),sensorsy(# hor rows in panel),PVfrontSurface(glass or ARglass),PVbackSurface(glass or ARglass),Albedo,Tracking,backtracking
+33.41,-111.82,-7,0,180,0.4,1.5,interior,0.013,6,glass,glass,0.62,True,False
+date,DNI,DHI,albedo,decHRs,ghi,inc,zen,azm,pvFrontSH,aveFrontGroundGHI,GTIfrontBroadBand,pvBackSH,aveBackGroundGHI,GTIbackBroadBand,maxShadow,Tamb,VWind,No_1_RowFrontGTI,No_2_RowFrontGTI,No_3_RowFrontGTI,No_4_RowFrontGTI,No_5_RowFrontGTI,No_6_RowFrontGTI,No_1_RowBackGTI,No_2_RowBackGTI,No_3_RowBackGTI,No_4_RowBackGTI,No_5_RowBackGTI,No_6_RowBackGTI,tilt,sazm,height,D
