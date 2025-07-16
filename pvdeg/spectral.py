@@ -466,7 +466,8 @@ def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelen
     spectrum_sums.to_csv('spectrum_sums.csv')
 
     print(weather_df)
-    composite_data = bifacialvf.skycomposition_method(myTMY3=myTMY3, spectral_file_path='data/spectral_tmys', lambda_range=wavelengths, integrated_spectrum=spectrum_sums, meta=meta, writefiletitle=composite_file, 
+    composite_data = bifacialvf.skycomposition_method(myTMY3=myTMY3, spectral_file_path='data/spectral_tmys', lambda_range=wavelengths, integrated_spectrum=spectrum_sums, meta=meta, 
+            custom_albedo_df=custom_albedo_df, writefiletitle=composite_file, 
             tilt=tilt, sazm=sazm, pitch=pitch, clearance_height=clearance_height, 
             rowType=rowType, transFactor=transFactor, sensorsy=sensorsy, 
             PVfrontSurface=PVfrontSurface, PVbackSurface=PVbackSurface, 
