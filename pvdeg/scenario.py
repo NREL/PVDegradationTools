@@ -284,7 +284,7 @@ class Scenario:
             Material file used to access parameters if ``material`` is a single string.
             Use material json file in `pvdeg/data`. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
-        temp_model : str
+        temperature_model : str
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
             more. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes',
             'ross'``
@@ -303,7 +303,7 @@ class Scenario:
         """
 
         if isinstance(materials, str):
-            # handle single material string format 
+            # Handle single material string format 
             try:
                 mat_params = utilities.read_material(pvdeg_file=material_file,
                                                      key=materials)
@@ -312,16 +312,16 @@ class Scenario:
                 print("If you need to add a custom material, use .add_material()")
                 return
         elif isinstance(materials, dict):
-            # handle multiple material dictionary format 
+            # Handle multiple material dictionary format 
             mat_params = {}
             for layer, material_spec in materials.items():
                 if not isinstance(material_spec, dict):
-                    print(f"Invalid material specification for layer '{layer}'\
-                          - must be a dict")
+                    print(f"Invalid material specification for layer '{layer}' - must be a dict")
                     return
 
                 material_file_layer = material_spec.get("material_file")
                 material_name = material_spec.get("material_name")
+                custom_params = material_spec.get("parameters")
 
                 if not material_file_layer:
                     print(f"Missing 'material_file' for layer '{layer}'")
@@ -332,38 +332,37 @@ class Scenario:
                     try:
                         material_parameters = utilities.read_material(
                             pvdeg_file=material_file_layer, key=material_name)
+                        mat_params[layer] = {
+                            "material_file": material_file_layer,
+                            "material_name": material_name,
+                            "parameters": material_parameters
+                        }
                     except KeyError:
-                        print(f"Material '{material_name}' not found in\
-                              {material_file_layer}")
+                        print(f"Material '{material_name}' not found in {material_file_layer}")
                         return
-
-                    mat_params[layer] = {
-                        "material_file": material_file_layer,
-                        "material_name": material_name,
-                        "parameters": material_parameters
-                    }
-                elif "parameters" in material_spec:
+                elif custom_params:
                     # Use custom parameters directly
                     mat_params[layer] = {
                         "material_file": material_file_layer,
-                        "material_name": layer,
-                        "parameters": material_spec["parameters"]
+                        "material_name": layer,  # Use layer name as material name
+                        "parameters": custom_params
                     }
                 else:
-                    print(f"Layer '{layer}' must have either 'material_name' or\
-                          'parameters'")
+                    print(f"Layer '{layer}' must have either 'material_name' or 'parameters'")
                     return
 
         else:
             print("Materials parameter must be either a string or dict")
             return
 
+        # Check for existing module and warn user
         old_modules = [mod["module_name"] for mod in self.modules]
         if module_name in old_modules:
             print(f'WARNING - Module already found by name "{module_name}"')
             print("Module will be replaced with new instance.")
             self.modules.pop(old_modules.index(module_name))
 
+        # Add the module to the scenario
         self.modules.append(
             {
                 "module_name": module_name,
