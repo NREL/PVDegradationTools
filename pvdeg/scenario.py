@@ -429,13 +429,8 @@ class Scenario:
             material_file = material_spec.get("material_file")
             material_name = material_spec.get("material_name")
 
-            if material_name:
-                # Add existing material by name - requires material_file
-                if not material_file:
-                    print(f"Warning: No material_file specified for layer '{layer}' \
-                          with material_name")
-                    continue
-                
+            if material_name and material_file:
+                # Add existing material by name from file
                 try:
                     material_params = utilities._read_material(
                         name=material_name, fname=f"{material_file}.json")
@@ -450,15 +445,16 @@ class Scenario:
                 # Add new material with custom parameters
                 material_parameters = material_spec.get("parameters")
                 if not all(param in material_parameters for param in ['Ead', 'Eas', 'So']):
-                    print(f"Warning: Missing required parameters (Ead, Eas, So) for\
-                          layer '{layer}'")
+                    print(f"Warning: Missing required parameters (Ead, Eas, So) for layer '{layer}'")
                     continue
 
-                # Material name is required for custom parameters
-                if not material_name:
-                    print(f"Warning: material_name is required when providing\
-                          custom parameters for layer '{layer}'")
-                    continue
+            if not material_name:
+                print(f"Warning: material_name is required")
+                continue
+
+                # Use default material file for custom materials if not provided
+                if not material_file:
+                    material_file = "custom_materials"
 
                 try:
                     utilities._add_material(
