@@ -8,6 +8,7 @@ from rex import Outputs
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Union
+from pvdeg import humidity
 
 from . import (
     temperature,
@@ -126,7 +127,7 @@ def arrhenius(
     if temperature is None:
         temperature = weather_df["temp"]
     if RH==None and "relative_humidity" in weather_df and "temp_air" in weather_df and "temp_module" in weather_df:
-        RH = pvdeg.humidity.surface_outside(weather_df["relative_humidity"], weather_df["temp_air"], weather_df["temp_module"])
+        RH = humidity.surface_outside(weather_df["relative_humidity"], weather_df["temp_air"], weather_df["temp_module"])
 
     if C2==None:
         if parameters is not None:
@@ -140,7 +141,7 @@ def arrhenius(
         if C2 !=0 or p !=0:
             if weather_df is not None:
                 for col in weather_df.columns:
-                    if "SPECTRA" in upper(col[:7]):
+                    if "SPECTRA" in (col[:7]).upper():
                         irradiance = weather_df[col].copy
                         irradiance.columns = [col]
                         break  
@@ -170,7 +171,7 @@ def arrhenius(
                 else: 
                     degradation = Ro * (RH**n)
         else:
-            degradation = bin_widths * ((np.exp(-c2*wavelengths)*irradiance)**p) 
+            degradation = bin_widths * ((np.exp(-C2*wavelengths)*irradiance)**p) 
             if Ea!=0:
                 if n==0:
                     degradation = degradation * Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))  
