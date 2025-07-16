@@ -385,8 +385,9 @@ class Scenario:
         -----------
         materials : dict
             Dictionary with layer names as keys, and material info including:
-            - material_file: str - Name of the material file (e.g., "O2permeation")
+            - material_file: str - Name of the material file (e.g., "O2permeation") - required only for existing materials
             - material_name: str - Name of the material to add
+            - parameters: dict - Custom material parameters (for custom materials)
             
         see_added : bool, optional
             If True, print confirmation for each material added
@@ -403,6 +404,7 @@ class Scenario:
                 "material_name": "PET_001"
             },
             "custom_layer": {
+                "material_name": "CUSTOM_001",
                 "parameters": {
                     "Ead": 95,
                     "Do": 40e5,
@@ -415,8 +417,7 @@ class Scenario:
         })
         """
         if not isinstance(materials, dict):
-            raise ValueError("Materials parameter must be a dict with layer names as"
-            "keys")
+            raise ValueError("Materials parameter must be a dict with layer names as keys")
 
         for layer, material_spec in materials.items():
             if not isinstance(material_spec, dict):
@@ -426,35 +427,39 @@ class Scenario:
 
             material_file = material_spec.get("material_file")
             material_name = material_spec.get("material_name")
+            custom_params = material_spec.get("parameters")
 
-            if material_name and material_file:
-                # Add existing material by name from file
-                try:
-                    material_params = utilities._read_material(
-                        name=material_name, fname=f"{material_file}.json")
-                    if see_added:
-                        print(f'Material "{material_name}" found in\
-                              {material_file}.json for '
-                              f'layer "{layer}".')
-                except KeyError:
-                    print(f'Material "{material_name}" not found in {material_file}.json')
-                    continue
-            elif "parameters" in material_spec:
-                # Add new material with custom parameters
-                material_parameters = material_spec.get("parameters")
-                if not all(param in material_parameters for param in ['Ead', 'Eas', 'So']):
-                    print(f"Warning: Missing required parameters (Ead, Eas, So) for layer '{layer}'")
-                    continue
-
-            if not material_name:
-                print(f"Warning: material_name is required")
+            if material_name is None:
+                print(f"Warning: material_name is required for layer '{layer}' - skipping")
                 continue
 
-                # Use default material file for custom materials if not provided
-                if not material_file:
-                    material_file = "custom_materials"
-
+            if custom_params is not None and material_file is None:
+                material_file = "custom_materials"
                 try:
+                    utilities._add_material(
+                        name=material_name,
+                        alias=custom_params.get('alias', layer),
+                        Ead=custom_params['Ead'],
+                        Eas=custom_params['Eas'],
+                        So=custom_params['So'],
+                        Do=custom_params.get('Do'),
+                        Eap=custom_params.get('Eap'),
+                        Po=custom_params.get('Po'),
+                        fickian=custom_params.get('fickian', True),
+                        fname=f"{material_file}.json"
+                    )
+                    if see_added:
+                        print(f'Custom material "{material_name}" added to {material_file}.json for layer "{layer}".')
+                except Exception as e:
+                    print(f"Error adding custom material for layer '{layer}': {e}")
+
+            elif material_file is not None:
+                # Handle existing material from file - read and add to database
+                try:
+                    material_parameters = utilities.read_material(
+                        pvdeg_file=material_file, key=material_name)
+                    
+                    # Add the existing material to the database
                     utilities._add_material(
                         name=material_name,
                         alias=material_parameters.get('alias', layer),
@@ -467,14 +472,17 @@ class Scenario:
                         fickian=material_parameters.get('fickian', True),
                         fname=f"{material_file}.json"
                     )
+                    
                     if see_added:
-                        print(f'Material "{material_name}" added to {material_file}.json for '
-                              f'layer "{layer}".')
+                        print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
+                except KeyError:
+                    print(f'Material "{material_name}" not found in {material_file} - skipping layer "{layer}"')
+                    continue
                 except Exception as e:
-                    print(f"Error adding material for layer '{layer}': {e}")
+                    print(f"Error adding existing material for layer '{layer}': {e}")
+
             else:
-                print(f"Warning: No material_name or parameters specified for layer\
-                      '{layer}'")
+                print(f"Warning: Either 'material_file' or 'parameters' must be provided for layer '{layer}' - skipping")
 
     def viewScenario(self):
         """
@@ -1229,4 +1237,5 @@ class Scenario:
             """
             pipeline_html += step_content
         pipeline_html += "</div>"
+        return pipeline_html
         return pipeline_html
