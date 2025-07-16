@@ -294,7 +294,7 @@ class Scenario:
             arguments such as ``ross`` which requires nominal operating cell
             temperature (``noct``). This is where other values such as noct
             should be provided.
-            Pvlib temp models:
+            pvlib-python temperature models:
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
@@ -309,7 +309,6 @@ class Scenario:
                                                      key=materials)
             except KeyError:
                 print("Material Not Found - No module added to scenario.")
-                print("If you need to add a custom material, use .add_material()")
                 return
         elif isinstance(materials, dict):
             # Handle multiple material dictionary format 
@@ -321,7 +320,7 @@ class Scenario:
 
                 material_file_layer = material_spec.get("material_file")
                 material_name = material_spec.get("material_name")
-                custom_params = material_spec.get("parameters")
+                custom_params = material_spec.get("parameters")  # returns None if no custom material specified
 
                 if not material_file_layer:
                     print(f"Missing 'material_file' for layer '{layer}'")
@@ -340,7 +339,7 @@ class Scenario:
                     except KeyError:
                         print(f"Material '{material_name}' not found in {material_file_layer}")
                         return
-                elif custom_params:
+                elif custom_params is not None:
                     # Use custom parameters directly
                     mat_params[layer] = {
                         "material_file": material_file_layer,
