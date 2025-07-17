@@ -15,7 +15,6 @@ def test_addModule_string_material_valid():
         material_file="O2permeation",
         parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
     )
-
     assert len(scenario.modules) == 1
     assert scenario.modules[0]["module_name"] == "test_module"
     assert scenario.modules[0]["material_params"] == {
@@ -32,11 +31,10 @@ def test_addModule_string_material_invalid_name():
     scenario = Scenario(name="test_scenario")
     scenario.addModule(
         module_name="test_module",
-        materials="OX003",
+        materials="invalid_name",
         material_file="O2permeation",
         parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
     )
-
     assert len(scenario.modules) == 0 
     # note: key error in scenario.py is irrelevant because the keyerror raised is from
     # readmaterials in utilities.py
@@ -46,11 +44,10 @@ def test_addModule_string_material_invalid_file():
     scenario = Scenario(name="test_scenario")
     scenario.addModule(
         module_name="test_module",
-        materials="invalid_material",
-        material_file="invalid_name",
+        materials="OX003",
+        material_file="invalid_file",
         parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
     )
-
     assert len(scenario.modules) == 0 
 
 
@@ -61,14 +58,12 @@ def test_addModule_dict_single_material_valid_name():
             "material_name": "OX003"
         }
     }
-
     scenario = Scenario(name="test_scenario")
     scenario.addModule(
         module_name="test_module",
         materials=materials_dict,
         parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
     )
-
     assert len(scenario.modules) == 1
     assert scenario.modules[0]["module_name"] == "test_module"
     assert scenario.modules[0]["material_params"] == {
@@ -82,6 +77,7 @@ def test_addModule_dict_single_material_valid_name():
         }
     }
 
+
 def test_addModule_dict_single_material_invalid_name():
     materials_dict = {
         "encapsulant": {
@@ -89,8 +85,14 @@ def test_addModule_dict_single_material_invalid_name():
             "material_name": "invalid_name"
         }
     }
+    scenario = Scenario(name="test_scenario")
+    scenario.addModule(
+        module_name="test_module",
+        materials=materials_dict,
+        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+    )
+    assert len(scenario.modules) == 0
 
-     assert len(scenario.modules) == 0
 
 def test_addModule_dict_single_material_invalid_file():
     materials_dict = {
@@ -100,4 +102,11 @@ def test_addModule_dict_single_material_invalid_file():
         }
     }
 
-     assert len(scenario.modules) == 0
+    scenario = Scenario(name="test_scenario")
+    scenario.addModule(
+        module_name="test_module",
+        materials=materials_dict,
+        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+    )
+
+    assert len(scenario.modules) == 0
