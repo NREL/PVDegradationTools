@@ -28,7 +28,7 @@ def test_addModule_string_material_valid():
         }
 
 
-def test_addModule_string_material_invalid():
+def test_addModule_string_material_invalid_name():
     scenario = Scenario(name="test_scenario")
     with pytest.raises(KeyError, match="Material Not Found"):
         scenario.addModule(
