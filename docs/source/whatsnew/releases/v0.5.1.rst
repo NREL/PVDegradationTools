@@ -1,0 +1,26 @@
+v0.5.1 (2025-2-28)
+===================
+
+Enhancements
+--------------
+- Changed ``GeospatialScenario.get_geospatial_data()`` to a ``@property``, now use ``GeospatialScenario.geospatial_data``
+- Changed ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use ``GeospatialScenario.coords``
+- Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
+  (:pull:`182`)
+
+Deprecations
+-------------
+- ``GeospatialScenario._get_geospatial_data()``
+- ``GeospatialScenario.getValidRegions()``
+- ``GeospatialScenario.gids_tonumpy()``
+- ``GeospatialScenario.gids_tolist()``
+
+Bug Fixes
+---------
+``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to ``pvdeg/geospatialscenario.py``. Completed the move.
+
+
+Contributors
+-----------
+- Tobin Ford (:ghuser:`tobin-ford`)
+- Rajiv Daxini (:ghuser:`RDaxini`)
