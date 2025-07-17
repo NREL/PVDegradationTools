@@ -37,7 +37,7 @@ class Scenario:
         name: Optional[str] = None,
         path: Optional[str] = None,
         gids: Optional[Union[int, List[int], np.ndarray[int]]] = None,
-        modules: Optional[list] = [],
+        modules: Optional[list] = None,
         pipeline=OrderedDict(),
         file: Optional[str] = None,
         results=None,
@@ -71,7 +71,7 @@ class Scenario:
 
         self.name = name
         self.path = path
-        self.modules = modules
+        self.modules = modules if modules is not None else []
         self.gids = gids
         self.pipeline = pipeline
         self.results = results
@@ -1238,4 +1238,3 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += "</div>"
         return pipeline_html
-    
