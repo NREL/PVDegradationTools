@@ -91,7 +91,15 @@ class Scenario:
             self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
             if not os.path.exists(self.path):
                 os.makedirs(self.path)
-        os.chdir(self.path)
+        else:
+            self.path = path
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
+        
+        # Only change directory if we're not in a test environment
+        # or if the scenario actually needs to work with files
+        if not os.environ.get('PYTEST_CURRENT_TEST'):
+            os.chdir(self.path)
 
         if file:
             self.load_json(file_path=file, email=email, api_key=api_key)
