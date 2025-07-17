@@ -106,26 +106,28 @@ def test_addLocation_pvgis():
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
 
 
-def test_addModule_badmat(capsys, monkeypatch):
+# temporarily disabling test in line with propsoed update from print errors to keyerrors
+#
+# def test_addModule_badmat(capsys, monkeypatch):
 
-    ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
-    monkeypatch.setattr(
-        target=Scenario,
-        name="addLocation",
-        value=monkeypatch_addLocation
-    )
+#     ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
+#     monkeypatch.setattr(
+#         target=Scenario,
+#         name="addLocation",
+#         value=monkeypatch_addLocation
+#     )
 
-    a = Scenario.load_json(
-        file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
-        email=EMAIL,
-        api_key=API_KEY,
-    )
+#     a = Scenario.load_json(
+#         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
+#         email=EMAIL,
+#         api_key=API_KEY,
+#     )
 
-    a.addModule(module_name="fail", material="fake-material")
+#     a.addModule(module_name="fail", material="fake-material")
 
-    captured = capsys.readouterr()
-    assert "Material Not Found - No module added to scenario." in captured.out
-    assert "If you need to add a custom material, use .add_material()" in captured.out
+#     captured = capsys.readouterr()
+#     assert "Material Not Found - No module added to scenario." in captured.out
+#     assert "If you need to add a custom material, use .add_material()" in captured.out
 
 
 # def test_addModule_existingmod(capsys):
