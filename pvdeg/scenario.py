@@ -339,21 +339,13 @@ class Scenario:
                             pvdeg_file=material_file_layer, 
                             key=material_name,
                             parameters=parameters)
-                        mat_params[layer] = {
-                            "material_file": material_file_layer,
-                            "material_name": material_name,
-                            "parameters": material_parameters
-                        }
+                        mat_params[layer] = material_parameters
                     except KeyError:
                         print(f"Material '{material_name}' not found in {material_file_layer}")
                         return
                 elif custom_params is not None:
                     # Use custom parameters directly
-                    mat_params[layer] = {
-                        "material_file": material_file_layer,
-                        "material_name": layer,  # Use layer name as material name
-                        "parameters": custom_params
-                    }
+                    mat_params[layer] = custom_params
                 else:
                     print(f"Layer '{layer}' must have either 'material_name' or 'parameters'")
                     return
@@ -1246,3 +1238,4 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += "</div>"
         return pipeline_html
+    
