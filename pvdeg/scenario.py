@@ -284,6 +284,10 @@ class Scenario:
             Material file used to access parameters if ``material_name`` exists in one
             of the local material json databases. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
+        parameters : list
+            List of parameter names to retrieve from the material database. If None, all
+            parameters are retrieved. This argument is passed to the ``parameters``
+            argument of utilities._read_material.
         temperature_model : str
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
             more. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes',
@@ -306,7 +310,7 @@ class Scenario:
             # Handle single material string format 
             try:
                 mat_params = utilities.read_material(pvdeg_file=material_file,
-                                                     key=materials)
+                                                     key=materials, parameters=parameters)
             except KeyError:
                 print("Material Not Found - No module added to scenario.")
                 return
