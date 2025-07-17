@@ -7,7 +7,6 @@ import pytest
 from pvdeg.scenario import Scenario
 from pvdeg import utilities
 
-
 def test_addModule_string_material_valid():
     scenario = Scenario(name="test_scenario")
     scenario.addModule(
@@ -30,26 +29,26 @@ def test_addModule_string_material_valid():
 
 def test_addModule_string_material_invalid_name():
     scenario = Scenario(name="test_scenario")
-    scenario.addModule(
-        module_name="test_module",
-        materials="invalid_name",
-        material_file="O2permeation",
-        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
-    )
-    assert len(scenario.modules) == 0 
-    # note: key error in scenario.py is irrelevant because the keyerror raised is from
-    # readmaterials in utilities.py
+    with pytest.raises(ValueError, match="Material 'invalid_name' not found in O2permeation"):
+        scenario.addModule(
+            module_name="test_module",
+            materials="invalid_name",
+            material_file="O2permeation",
+            parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+        )
+    assert len(scenario.modules) == 0
 
 
 def test_addModule_string_material_invalid_file():
     scenario = Scenario(name="test_scenario")
-    scenario.addModule(
-        module_name="test_module",
-        materials="OX003",
-        material_file="invalid_file",
-        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
-    )
-    assert len(scenario.modules) == 0 
+    with pytest.raises(ValueError, match="Material 'OX003' not found in invalid_file"):
+        scenario.addModule(
+            module_name="test_module",
+            materials="OX003",
+            material_file="invalid_file",
+            parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+        )
+    assert len(scenario.modules) == 0
 
 
 def test_addModule_dict_single_material_valid_name():
@@ -87,11 +86,12 @@ def test_addModule_dict_single_material_invalid_name():
         }
     }
     scenario = Scenario(name="test_scenario")
-    scenario.addModule(
-        module_name="test_module",
-        materials=materials_dict,
-        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
-    )
+    with pytest.raises(ValueError, match="Material 'invalid_name' not found in O2permeation"):
+        scenario.addModule(
+            module_name="test_module",
+            materials=materials_dict,
+            parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+        )
     assert len(scenario.modules) == 0
 
 
@@ -104,12 +104,12 @@ def test_addModule_dict_single_material_invalid_file():
     }
 
     scenario = Scenario(name="test_scenario")
-    scenario.addModule(
-        module_name="test_module",
-        materials=materials_dict,
-        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
-    )
-
+    with pytest.raises(ValueError, match="Material 'OX003' not found in invalid_file"):
+        scenario.addModule(
+            module_name="test_module",
+            materials=materials_dict,
+            parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+        )
     assert len(scenario.modules) == 0
 
 
