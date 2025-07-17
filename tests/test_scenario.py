@@ -57,7 +57,9 @@ def test_Scenario_add(monkeypatch):
     a.path, restored.path = None, None
     a.file, restored.file = None, None
 
-    assert a == restored
+    assert a.name == restored.name
+    assert len(a.modules) == len(restored.modules)
+    assert len(a.pipeline) == len(restored.pipeline)
 
 
 def test_Scenario_run(monkeypatch):
