@@ -1238,4 +1238,3 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += "</div>"
         return pipeline_html
-        return pipeline_html
