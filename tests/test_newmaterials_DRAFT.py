@@ -27,6 +27,19 @@ def test_addModule_string_material_valid():
         'Po': 528718258.338532
         }
 
+
+def test_addModule_string_material_invalid():
+    scenario = Scenario(name="test_scenario")
+    with pytest.raises(KeyError, match="Material Not Found"):
+        scenario.addModule(
+            module_name="test_module",
+            materials="invalid_material",
+            material_file="O2permeation",
+            parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+        )
+    assert len(scenario.modules) == 0
+    
+
 def test_addModule_dict_single_material_valid():
     materials_dict = {
         "encapsulant": {
