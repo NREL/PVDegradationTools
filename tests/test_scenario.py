@@ -41,8 +41,8 @@ def test_Scenario_add(monkeypatch):
 
     a = Scenario(name="test")
 
-    EMAIL = "placeholder@email.xxx",
-    API_KEY =  "fake_key"
+    EMAIL = "placeholder@email.xxx"
+    API_KEY = "fake_key"
 
     a.clean()
     a.restore_credentials(email=EMAIL, api_key=API_KEY)
@@ -58,7 +58,6 @@ def test_Scenario_add(monkeypatch):
     a.file, restored.file = None, None
 
     assert a == restored
-
 
 
 def test_Scenario_run(monkeypatch):
@@ -297,7 +296,6 @@ def test_addModule_dict_multiple_material_valid():
 
 def test_add_single_custom_material():
     scenario = Scenario(name="test_scenario")
-    scenario.materials = {}
     
     custom_params = {
         "Ead": 95.0,
@@ -319,7 +317,6 @@ def test_add_single_custom_material():
 
 def test_add_multi_custom_material():
     scenario = Scenario(name="test_scenario")
-    scenario.materials = {}
     
     custom_params_1 = {
         "Ead": 95.0,
