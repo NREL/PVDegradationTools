@@ -7,6 +7,7 @@ import pytest
 from pvdeg.scenario import Scenario
 from pvdeg import utilities
 
+
 def test_addModule_string_material_valid():
     scenario = Scenario(name="test_scenario")
     scenario.addModule(
@@ -110,3 +111,42 @@ def test_addModule_dict_single_material_invalid_file():
     )
 
     assert len(scenario.modules) == 0
+
+
+def test_addModule_dict_multiple_material_valid():
+    materials_dict = {
+        "encapsulant": {
+            "material_file": "O2permeation",
+            "material_name": "OX003"
+        },
+        "backsheet": {
+                "material_file": "H2Opermeation",
+                "material_name": "W024"
+        }
+    }
+    scenario = Scenario(name="test_scenario")
+    scenario.addModule(
+        module_name="test_module",
+        materials=materials_dict,
+        parameters=['Ead', 'Do', 'Eas', 'So', 'Eap', 'Po']
+    )
+    assert len(scenario.modules) == 1
+    assert scenario.modules[0]["module_name"] == "test_module"
+    assert scenario.modules[0]["material_params"] == {
+        'encapsulant': {
+            'Ead': 29.43112031,
+            'Do': 0.129061678,
+            'Eas': 16.6314948252219,
+            'So': 0.136034525059804,
+            'Eap': 49.1083457348515,
+            'Po': 528718258.338532
+        },
+        'backsheet': {
+            'Ead': 96.5385865449266,
+            'Do': 4172967.14420414,
+            'Eas': -12.3825598156611,
+            'So': 0.000027596664527881,
+            'Eap': 84.1560267292654,
+            'Po': 994982178508.989
+        }
+    }
