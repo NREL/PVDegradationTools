@@ -150,3 +150,86 @@ def test_addModule_dict_multiple_material_valid():
             'Po': 994982178508.989
         }
     }
+
+
+def test_add_single_custom_material():
+    scenario = Scenario(name="test_scenario")
+    scenario.materials = {}
+    
+    custom_params = {
+        "Ead": 95.0,
+        "Do": 40e5,
+        "Eas": -10.0,
+        "So": 20e-6,
+        "Eap": 84.0,
+        "Po": 99e9
+    }
+    materials_dict = {
+        "custom_layer": {
+            "material_name": "custom_material_name",
+            "parameters": custom_params
+        }
+    }
+    with pytest.raises(ValueError, match="Error adding custom material for layer 'custom_layer'"):
+        scenario.add_material(materials_dict)
+
+
+def test_add_multi_custom_material():
+    scenario = Scenario(name="test_scenario")
+    scenario.materials = {}
+    
+    custom_params_1 = {
+        "Ead": 95.0,
+        "Do": 40e5,
+        "Eas": -10.0,
+        "So": 20e-6,
+        "Eap": 84.0,
+        "Po": 99e9
+    }
+    custom_params_2 = {
+        "Ead": 100.0,
+        "Do": 30e5,
+        "Eas": -20.0,
+        "So": 30e-6,
+        "Eap": 80.0,
+        "Po": 90e9
+    }
+    materials_dict = {
+        "custom_layer_1": {
+            "material_name": "custom_material_name_1",
+            "parameters": custom_params_1
+        },
+        "custom_layer_2": {
+            "material_name": "custom_material_name_2",
+            "parameters": custom_params_2
+        }
+    }
+    with pytest.raises(ValueError, match="Error adding custom material for layer 'custom_layer_1'"):
+        scenario.add_material(materials_dict)
+
+
+def test_add_material_invalid_layer_spec():
+    scenario = Scenario(name="test_scenario")
+    materials_dict = {
+        "encapsulant": "not_a_dict"  # Should be a dict
+    }
+    
+    with pytest.raises(ValueError, match="Invalid material spec for layer 'encapsulant' - must be a dict"):
+        scenario.add_material(materials_dict)
+
+
+def test_add_material_mixed_valid_invalid():
+    scenario = Scenario(name="test_scenario")
+    materials_dict = {
+        "valid_layer": {
+            "material_file": "O2permeation",
+            "material_name": "OX003"
+        },
+        "invalid_layer": {
+            "material_file": "O2permeation"
+            # Missing material_name
+        }
+    }
+    
+    with pytest.raises(ValueError, match="material_name is required for layer 'invalid_layer'"):
+        scenario.add_material(materials_dict)
