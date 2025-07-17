@@ -1529,4 +1529,3 @@ def read_material(
         material_dict = {k: material_dict.get(k, None) for k in parameters} 
 
     return material_dict
-
