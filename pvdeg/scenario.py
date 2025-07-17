@@ -236,6 +236,7 @@ class Scenario:
         racking: str = "open_rack_glass_polymer",
         materials: Union[str, dict] = "OX003",
         material_file: str = "O2permeation",
+        parameters: Optional[list] = None,
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
@@ -288,7 +289,7 @@ class Scenario:
             List of parameter names to retrieve from the material database. If None, all
             parameters are retrieved. This argument is passed to the ``parameters``
             argument of utilities._read_material.
-        temperature_model : str
+        temperature_model : list[str]
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
             more. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes',
             'ross'``
@@ -310,7 +311,8 @@ class Scenario:
             # Handle single material string format 
             try:
                 mat_params = utilities.read_material(pvdeg_file=material_file,
-                                                     key=materials, parameters=parameters)
+                                                     key=materials, 
+                                                     parameters=parameters)
             except KeyError:
                 print("Material Not Found - No module added to scenario.")
                 return
@@ -334,7 +336,9 @@ class Scenario:
                     # Use existing material from file
                     try:
                         material_parameters = utilities.read_material(
-                            pvdeg_file=material_file_layer, key=material_name)
+                            pvdeg_file=material_file_layer, 
+                            key=material_name,
+                            parameters=parameters)
                         mat_params[layer] = {
                             "material_file": material_file_layer,
                             "material_name": material_name,
