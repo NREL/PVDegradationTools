@@ -322,23 +322,20 @@ class Scenario:
                                                      key=materials, 
                                                      parameters=parameters)
             except KeyError:
-                print("Material Not Found - No module added to scenario.")
-                return
+                raise ValueError(f"Material '{materials}' not found in {material_file}")
         elif isinstance(materials, dict):
             # Handle multiple material dictionary format 
             mat_params = {}
             for layer, material_spec in materials.items():
                 if not isinstance(material_spec, dict):
-                    print(f"Invalid material specification for layer '{layer}' - must be a dict")
-                    return
+                    raise ValueError(f"Invalid material specification for layer '{layer}' - must be a dict")
 
                 material_file_layer = material_spec.get("material_file")
                 material_name = material_spec.get("material_name")
                 custom_params = material_spec.get("parameters")  # returns None if no custom material specified
 
                 if not material_file_layer:
-                    print(f"Missing 'material_file' for layer '{layer}'")
-                    return
+                    raise ValueError(f"Missing 'material_file' for layer '{layer}'")
 
                 if material_name:
                     # Use existing material from file
@@ -349,18 +346,15 @@ class Scenario:
                             parameters=parameters)
                         mat_params[layer] = material_parameters
                     except KeyError:
-                        print(f"Material '{material_name}' not found in {material_file_layer}")
-                        return
+                        raise ValueError(f"Material '{material_name}' not found in {material_file_layer}")
                 elif custom_params is not None:
                     # Use custom parameters directly
                     mat_params[layer] = custom_params
                 else:
-                    print(f"Layer '{layer}' must have either 'material_name' or 'parameters'")
-                    return
+                    raise ValueError(f"Layer '{layer}' must have either 'material_name' or 'parameters'")
 
         else:
-            print("Materials parameter must be either a string or dict")
-            return
+            raise ValueError("Materials parameter must be either a string or dict")
 
         # Check for existing module and warn user
         old_modules = [mod["module_name"] for mod in self.modules]
@@ -429,17 +423,14 @@ class Scenario:
 
         for layer, material_spec in materials.items():
             if not isinstance(material_spec, dict):
-                print(f"Warning: Skipping invalid material spec for layer '{layer}' "
-                      f"(not a dict): {material_spec}")
-                continue
+                raise ValueError(f"Invalid material spec for layer '{layer}' - must be a dict")
 
             material_file = material_spec.get("material_file")
             material_name = material_spec.get("material_name")
             custom_params = material_spec.get("parameters")
 
             if material_name is None:
-                print(f"Warning: material_name is required for layer '{layer}' - skipping")
-                continue
+                raise ValueError(f"material_name is required for layer '{layer}'")
 
             if custom_params is not None and material_file is None:
                 material_file = "custom_materials"
@@ -459,7 +450,7 @@ class Scenario:
                     if see_added:
                         print(f'Custom material "{material_name}" added to {material_file}.json for layer "{layer}".')
                 except Exception as e:
-                    print(f"Error adding custom material for layer '{layer}': {e}")
+                    raise ValueError(f"Error adding custom material for layer '{layer}': {e}")
 
             elif material_file is not None:
                 # Handle existing material from file - read and add to database
@@ -484,13 +475,12 @@ class Scenario:
                     if see_added:
                         print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
                 except KeyError:
-                    print(f'Material "{material_name}" not found in {material_file} - skipping layer "{layer}"')
-                    continue
+                    raise ValueError(f'Material "{material_name}" not found in {material_file}')
                 except Exception as e:
-                    print(f"Error adding existing material for layer '{layer}': {e}")
+                    raise ValueError(f"Error adding existing material for layer '{layer}': {e}")
 
             else:
-                print(f"Warning: Either 'material_file' or 'parameters' must be provided for layer '{layer}' - skipping")
+                raise ValueError(f"Either 'material_file' or 'parameters' must be provided for layer '{layer}'")
 
     def viewScenario(self):
         """
