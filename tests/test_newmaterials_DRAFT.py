@@ -58,10 +58,12 @@ def test_addModule_dict_single_material_valid():
     assert len(scenario.modules) == 1
     assert scenario.modules[0]["module_name"] == "test_module"
     assert scenario.modules[0]["material_params"] == {
-        'Ead': 29.43112031,
-        'Do': 0.129061678,
-        'Eas': 16.6314948252219,
-        'So': 0.136034525059804,
-        'Eap': 49.1083457348515,
-        'Po': 528718258.338532
+        'encapsulant': {
+            'Ead': 29.43112031,
+            'Do': 0.129061678,
+            'Eas': 16.6314948252219,
+            'So': 0.136034525059804,
+            'Eap': 49.1083457348515,
+            'Po': 528718258.338532
         }
+    }
