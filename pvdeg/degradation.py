@@ -53,7 +53,8 @@ def vantHoff_deg(
     temp_chamber : float
         Reference temperature [°C] ("Chamber Temperature")
     poa : pd.Series or pd.DataFrame, optional
-        Series or DataFrame containing 'poa_global', Global Plane of Array Irradiance [W/m²]
+        Series or DataFrame containing 'poa_global', Global Plane of Array Irradiance
+        [W/m²]
     temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]. If not provided, it will
         be generated using the default parameters of pvdeg.temperature.cell
@@ -75,18 +76,20 @@ def vantHoff_deg(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
+        height. It is recommended that a power-law relationship between height and wind
+        speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
+        It is acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance calculation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        for more.
 
 
     Returns
@@ -137,7 +140,8 @@ def IwaVantHoff(
 ):
     """
     Calculate IWa: Environment Characterization [W/m²].
-    For one year of degradation, the controlled environment lamp settings will need to be set to IWa.
+    For one year of degradation, the controlled environment lamp settings will need to
+    be set to IWa.
 
     Parameters
     ----------
@@ -146,7 +150,8 @@ def IwaVantHoff(
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
     poa : pd.Series or pd.DataFrame, optional
-        Series or DataFrame containing 'poa_global', Global Plane of Array Irradiance [W/m²]
+        Series or DataFrame containing 'poa_global', Global Plane of Array Irradiance
+        [W/m²]
     temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]
     Teq : pd.Series, optional
@@ -169,18 +174,20 @@ def IwaVantHoff(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
+        height. It is recommended that a power-law relationship between height and wind
+        speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
+        It is acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance calculation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        for more.
 
 
     Returns
@@ -242,10 +249,9 @@ def arrhenius_deg(
 ):
     """
     Calculate the Acceleration Factor between the rate of degradation of a
-    modeled environment versus a modeled controlled environment. Example: "If the AF=25 then 1 year
-    of Controlled Environment exposure is equal to 25 years in the field"
     modeled environment versus a modeled controlled environment.
-    Example: If AF=25, then 1 year of Controlled Environment exposure is equal to 25 years in the field.
+    Example: If AF=25, then 1 year of Controlled Environment exposure is equal to
+    25 years in the field.
 
     Parameters
     ----------
@@ -267,15 +273,20 @@ def arrhenius_deg(
         Reference temperature [°C] ("Chamber Temperature")
     Ea : float
         Degradation Activation Energy [kJ/mol]
-        if Ea=0 is used there will be not dependence on temperature and degradation will proceed according to the amount of light and humidity.
+        if Ea=0 is used there will be not dependence on temperature and degradation will
+        proceed according to the amount of light and humidity.
     poa : pd.DataFrame, optional
         Global Plane of Array Irradiance [W/m²]
     temp : pd.Series, optional
-        Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
-        be generated using the default parameters from pvdeg.temperature.cell
+        Solar module temperature or Cell temperature [°C]. If no cell temperature is
+        given, it will be generated using the default parameters from pvdeg.temperature.cell
     p : float
         Fit parameter
-        When p=0 the dependence on light will be ignored and degradation will happen both day an night. As a caution or a feature, a very small value of p (e.g. p=0.0001) will provide very little degradation dependence on irradiance, but degradation will only be accounted for during daylight. i.e. averages will be computed over half of the time only.
+        When p=0 the dependence on light will be ignored and degradation will happen both
+        day an night. As a caution or a feature, a very small value of p (e.g. p=0.0001)
+        will provide very little degradation dependence on irradiance, but degradation will
+        only be accounted for during daylight. i.e. averages will be computed over half of
+        the time only.
     n : float
         Fit parameter for relative humidity
         When n=0 the degradation rate will not be dependent on humidity.
@@ -293,18 +304,20 @@ def arrhenius_deg(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
+        height. It is recommended that a power-law relationship between height and wind
+        speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
+        It is acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance calculation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        for more.
 
     Returns
     -------
@@ -355,7 +368,7 @@ def arrhenius_deg(
 
 def _T_eq_arrhenius(temp, Ea):
     """
-    Get the Temperature equivalent required for the settings of the controlled environment
+    Get the Temperature equivalent required for the settings of the controlled environment.
     Calculation is used in determining Arrhenius Environmental Characterization
 
     Parameters
@@ -458,8 +471,8 @@ def IwaArrhenius(
         Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.Series
         Relative Humidity of material of interest
-        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(), rh_front_encap(),
-        rh_surface_outside()
+        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(),
+        rh_front_encap(), rh_surface_outside()
     Ea : float
         Degradation Activation Energy [kJ/mol]
     poa : pd.DataFrame, optional
@@ -489,18 +502,20 @@ def IwaArrhenius(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
+        height. It is recommended that a power-law relationship between height and wind
+        speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
+        It is acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance calculation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        for more.
 
 
 
