@@ -2,7 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from numba import njit
+from numba import jit
 
 from pvdeg import temperature, spectral, decorators, utilities
 
