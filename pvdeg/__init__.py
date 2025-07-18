@@ -1,3 +1,5 @@
+"""init.py."""
+
 from importlib.metadata import version
 import logging
 
