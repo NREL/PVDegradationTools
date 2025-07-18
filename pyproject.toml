@@ -103,7 +103,6 @@ include = ["pvdeg"]
 [tool.setuptools_scm]
 
 [tool.pytest.ini_options]
-maxfail = 0
 testpaths = "tests"
 addopts = [
     "-p no:warnings",
