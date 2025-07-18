@@ -25,6 +25,7 @@ from functools import partial
 import pprint
 from IPython.display import display, HTML
 
+
 class Scenario:
     """
     The scenario object contains all necessary parameters and criteria for a given scenario.
@@ -113,7 +114,9 @@ class Scenario:
             and self.path == other.path
             and np.array_equal(self.gids, other.gids)
             and self.modules == other.modules
-            and compare_ordereddict_values(self.pipeline, other.pipeline) # keys are random
+            and compare_ordereddict_values(
+                self.pipeline, other.pipeline
+            )  # keys are random
             and self.file == other.file
             and self.results == other.results
             and (
@@ -308,7 +311,17 @@ class Scenario:
 
     # add testing
     def add_material(
-        self, name, alias, Ead, Eas, So, Do=None, Eap=None, Po=None, fickian=True, fname="O2permeation.json",
+        self,
+        name,
+        alias,
+        Ead,
+        Eas,
+        So,
+        Do=None,
+        Eap=None,
+        Po=None,
+        fickian=True,
+        fname="O2permeation.json",
     ):
         """
         add a new material type to main list
@@ -461,7 +474,7 @@ class Scenario:
             self.results = results_dict  # 2d dictionary array
 
             for module, pipeline_result in self.results.items():
-                module_dir = f"pipeline_results/{module}_pipeline_results"
+                module_dir = f"./pipeline_results/{module}_pipeline_results"
                 os.makedirs(module_dir, exist_ok=True)
                 for function, result in pipeline_result.items():
                     if isinstance(result, (pd.Series, pd.DataFrame)):
@@ -874,7 +887,7 @@ class Scenario:
         return fig, ax
 
     def _ipython_display_(self):
-        file_url = "no file provided" 
+        file_url = "no file provided"
         if self.path:
             file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
 
@@ -1082,5 +1095,3 @@ class Scenario:
             pipeline_html += step_content
         pipeline_html += "</div>"
         return pipeline_html
-
-
