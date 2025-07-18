@@ -17,7 +17,15 @@ Deprecations
 
 Bug Fixes
 ---------
-``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to ``pvdeg/geospatialscenario.py``. Completed the move.
+- ``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to
+  ``pvdeg/geospatialscenario.py``. Completed the move.
+- Code cleanup and standardization in :py:mod:`pvdeg.degradation` module:
+  - Improve readability of mathematical expressions
+  - Refactor redundant helper functions
+  - Update docstrings
+  - Remove unused functions and variables
+  - Improve code consistency
+  (:issue:`177`, :pull:`178`)
 
 Dependencies
 ------------
