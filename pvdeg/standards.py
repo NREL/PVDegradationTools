@@ -25,7 +25,7 @@ from pvdeg import (
 # passing all tests after updating temperature models but this should be checked throughly before final release
 
 
-@decorators.geospatial_quick_shape('timeseries', ["T_0", "T_inf", "poa"])
+@decorators.geospatial_quick_shape("timeseries", ["T_0", "T_inf", "poa"])
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
@@ -206,7 +206,7 @@ def eff_gap(T_0, T_inf, T_measured, T_ambient, poa, x_0=6.5, poa_min=400, t_amb_
 
 # test conf for other temperature models
 @decorators.geospatial_quick_shape(
-    'numeric', ["x", "T98_0", "T98_inf"]
+    "numeric", ["x", "T98_0", "T98_inf"]
 )  # numeric result, with corresponding datavariable names
 def standoff(
     weather_df: pd.DataFrame = None,
@@ -245,7 +245,7 @@ def standoff(
         other variables needed to access a particular weather dataset.
     tilt : float, optional
         Tilt angle of rack mounted PV system relative to horizontal. [°]
-        If tracker mounted, specify keyword '1_axis'
+        If single-axis tracker mounted, specify keyword 'single_axis'
     azimuth : float, optional
         Azimuth angle of PV system relative to north. [°]
     sky_model : str, optional
@@ -322,7 +322,7 @@ def standoff(
 
     solar_position = spectral.solar_position(weather_df, meta)
 
-    if tilt == "1_axis":
+    if tilt == "single_axis":
         irradiance_dict = {
             "sol_position": solar_position,
             "axis_azimuth": azimuth,
@@ -485,7 +485,7 @@ def interpret_standoff(standoff_1=None, standoff_2=None):
     return Output
 
 
-@decorators.geospatial_quick_shape('numeric', ["T98"])
+@decorators.geospatial_quick_shape("numeric", ["T98"])
 def T98_estimate(
     weather_df=None,
     meta=None,
@@ -653,3 +653,121 @@ def standoff_x(
 
     return temp_df
 
+
+def x_eff_temperature_estimate(
+    weather_df=None,
+    meta=None,
+    weather_kwarg=None,
+    sky_model="isotropic",
+    temp_model="sapm",
+    conf_0="insulated_back_glass_polymer",
+    conf_inf="open_rack_glass_polymer",
+    wind_factor=0.33,
+    module_mount=None,
+    tilt=None,
+    azimuth=None,
+    x_eff=None,
+    x_0=6.5,
+    model_kwarg={},
+):
+    """
+    Estimate the temperature for the module at the given tilt, azimuth, and x_eff.
+    If any of these factors are not supplied, it default to latitide tilt, equatorial facing, and
+    open rack mounted, respectively.
+
+    Parameters
+    ----------
+    x_eff : float
+        This is the effective module standoff distance according to the model. [cm]
+    x_0 : float, optional
+        Thermal decay constant. [cm]
+    weather_df : pd.DataFrame
+        Weather data for a single location.
+    meta : pd.DataFrame
+        Meta data for a single location.
+    weather_kwarg : dict
+        other variables needed to access a particular weather dataset.
+    tilt : float,
+        Tilt angle of PV system relative to horizontal. [°]
+    azimuth : float, optional
+        Azimuth angle of PV system relative to north. [°]
+    sky_model : str, optional
+        Options: 'isotropic', 'klucher', 'haydavies', 'reindl', 'king', 'perez'.
+    temp_model : str, optional
+        Options: 'sapm'.  'pvsyst' and 'faiman' will be added later.
+        Performs the calculations for the cell temperature.
+    conf_0 : str, optional
+        Model for the high temperature module on the exponential decay curve.
+        Default: 'insulated_back_glass_polymer'
+    conf_inf : str, optional
+        Model for the lowest temperature module on the exponential decay curve.
+        Default: 'open_rack_glass_polymer'
+    wind_factor : float, optional
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
+    model_kwarg : dict, optional
+        keyword argument dictionary to provide other arguments to the temperature model.
+        See temperature.temperature for more information.
+
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
+        estimation, analysis of wind characteristics and energy potential assessment for selected
+        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+
+    Returns
+    -------
+    T_x_eff: Pandas Dataframe
+        This is the estimate for the module temperature at the given tilt, azimuth, and x_eff.
+
+    """
+
+    parameters = ["temp_air", "wind_speed", "dhi", "ghi", "dni"]
+
+    if isinstance(weather_df, dd.DataFrame):
+        weather_df = weather_df[parameters].compute()
+        weather_df.set_index("time", inplace=True)
+    elif isinstance(weather_df, pd.DataFrame):
+        weather_df = weather_df[parameters]
+    elif weather_df is None:
+        weather_df, meta = weather.get(**weather_kwarg)
+
+    solar_position = spectral.solar_position(weather_df, meta)
+    poa = spectral.poa_irradiance(
+        weather_df=weather_df,
+        meta=meta,
+        sol_position=solar_position,
+        module_mount=module_mount,
+        tilt=tilt,
+        azimuth=azimuth,
+        sky_model=sky_model,
+    )
+    T_inf = temperature.temperature(
+        cell_or_mod="cell",
+        weather_df=weather_df,
+        meta=meta,
+        poa=poa,
+        temp_model=temp_model,
+        conf=conf_inf,
+        wind_factor=wind_factor,
+        model_kwarg=model_kwarg,
+    )
+
+    if x_eff == None:
+        return T_inf
+    else:
+        T_0 = temperature.temperature(
+            cell_or_mod="cell",
+            weather_df=weather_df,
+            meta=meta,
+            poa=poa,
+            temp_model=temp_model,
+            conf=conf_0,
+            wind_factor=wind_factor,
+            model_kwarg=model_kwarg,
+        )
+        T_x_eff = T_0 - (T_0 - T_inf) * (1 - np.exp(-x_eff / x_0))
+
+        return T_x_eff
