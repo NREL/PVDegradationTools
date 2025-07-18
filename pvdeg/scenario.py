@@ -479,7 +479,7 @@ class Scenario:
             self.results = results_dict  # 2d dictionary array
 
             for module, pipeline_result in self.results.items():
-                module_dir = f"pipeline_results/{module}_pipeline_results"
+                module_dir = f"./pipeline_results/{module}_pipeline_results"
                 os.makedirs(module_dir, exist_ok=True)
                 for function, result in pipeline_result.items():
                     if isinstance(result, (pd.Series, pd.DataFrame)):
