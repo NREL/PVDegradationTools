@@ -6,7 +6,7 @@ import pvlib
 import pandas as pd
 import inspect
 import warnings
-from pvdeg.decorators import geospatial_quick_shape
+from pvdeg import decorators
 
 
 @decorators.geospatial_quick_shape(
