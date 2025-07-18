@@ -1,3 +1,5 @@
+"""utilities.py."""
+
 import os
 import json
 import pandas as pd
@@ -5,7 +7,6 @@ import numpy as np
 from rex import NSRDBX, Outputs
 from pvdeg import DATA_DIR
 from typing import Callable
-import inspect
 from random import choices
 from string import ascii_uppercase
 from collections import OrderedDict
@@ -15,7 +16,7 @@ import cartopy.feature as cfeature
 
 
 # A mapping to simplify access to files stored in `pvdeg/data`
-pvdeg_datafiles = { 
+pvdeg_datafiles = {
     "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
@@ -24,8 +25,7 @@ pvdeg_datafiles = {
 
 
 def gid_downsampling(meta, n):
-    """
-    Downsample the NSRDB GID grid by a factor of n
+    """Downsample the NSRDB GID grid by a factor of n.
 
     Parameters:
     -----------
@@ -41,7 +41,6 @@ def gid_downsampling(meta, n):
     gids_sub : (list)
         List of GIDs for the downsampled NSRDB meta data
     """
-
     if n == 0:
         gids_sub = meta.index.values
         return meta, gids_sub
@@ -59,34 +58,32 @@ def gid_downsampling(meta, n):
 
 
 def meta_as_dict(rec):
-    """
-    Turn a numpy recarray record into a dict.
+    """Turn a numpy recarray record into a dict.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     rec : (np.recarray)
         numpy structured array with labels as dtypes
 
-    Returns:
-    --------
+    Returns
+    -------
      : (dict)
         dictionary of numpy structured array
     """
-
     return {name: rec[name].item() for name in rec.dtype.names}
 
 
-def get_kinetics(name=None, fname="kinetic_parameters.json"): #This should be combined into the Degradation Database file.
-    """
-    Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
+def get_kinetics(name=None, fname="kinetic_parameters.json"):
+    """Return a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     name : str
-        unique name of kinetic parameter set. If None, returns a list of the possible options.
+        unique name of kinetic parameter set. If None, returns a list of the possible
+        options.
 
-    Returns:
-    --------
+    Returns
+    -------
     parameter_dict : (dict)
         dictionary of kinetic parameters
     """
@@ -112,9 +109,9 @@ def write_gids(
     gids=None,
     out_fn="gids",
 ):
-    """
-    Generate a .CSV file containing the GIDs for the spatial test range.
-    The .CSV file will be saved to the working directory
+    """Generate a .CSV file containing the GIDs for the spatial test range.
+
+    The .CSV  file will be saved to the working directory.
 
     TODO: specify output file name and directory?
 
@@ -131,12 +128,11 @@ def write_gids(
     out_fd : (str, default = "gids")
         Name of data column you want to retrieve. Generally, this should be "gids"
 
-    Returns:
-    -----------
+    Return
+    ------
     project_points_path : (str)
         File path to the newly created "gids.csv"
     """
-
     if not gids:
         with NSRDBX(nsrdb_fp, hsds=False) as f:
             if lat_long:
@@ -154,16 +150,15 @@ def write_gids(
 
 
 def _get_state(id):
-    """
-    Returns the full name of a state based on two-letter state code
+    """Return the full name of a state based on two-letter state code.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     id : (str)
         two letter state code (example: CO, AZ, MD)
 
-    Returns:
-    -----------
+    Returns
+    -------
     state_name : (str)
         full name of US state (example: Colorado, Arizona, Maryland)
     """
@@ -233,10 +228,7 @@ def _get_state(id):
 def get_state_bbox(
     abbr: str = None,
 ) -> np.ndarray:
-    """
-    Retrieve the top left and bottom right coordinate pairs for state bounding boxes.
-    """
-
+    """Retrieve top left and bottom right coordinate pairs for state bounding boxes."""
     # can move to its own file in pvdeg.DATA_DIR
     bbox_dict = {
         "Alabama": [
@@ -446,8 +438,7 @@ def get_state_bbox(
 
 
 def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
-    """
-    Read a older TMY-like weather file and convert to h5 for use in pvdeg
+    """Read a older TMY-like weather file and convert to h5 for use in pvdeg.
 
     TODO: figure out scale_facator and np.int32 for smaller file
           expand for international locations?
@@ -472,7 +463,7 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         "wind_speed",
         "albedo",
     ]
-    
+
     df_new = src_data[save_cols].copy()
     time_index = df_new.index
 
@@ -506,8 +497,8 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
     If name=None it will return the Json file if item=None, or a list of specific fields in each Json entry identified by item.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     name : (str)
         unique name of material in a given database
     fname : (str)
@@ -523,7 +514,7 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     mat_dict : (dict)
         dictionary of material parameters, or "not found" message, or a summary of all entries with specific item entries.
     """
-    
+
     if fp == None:
         with open(pvdeg_datafiles[fname]) as f:
             data = json.load(f)
@@ -538,8 +529,14 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
         if item is None:
             mat_dict = data
         else:
-            mat_dict = {keys: {keyss: data[keys][keyss] for keyss in data[keys] if keyss in item} for keys in data 
-                    if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})!={}  }
+            mat_dict = {
+                keys: {
+                    keyss: data[keys][keyss] for keyss in data[keys] if keyss in item
+                }
+                for keys in data
+                if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})
+                != {}
+            }
     else:
         try:
             mat_dict = data[name]
@@ -548,9 +545,7 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     return mat_dict
 
 
- 
-
-#currently this is only designed for Oxygen Permeation. It could easily be adapted for all permeation data.
+# currently this is only designed for Oxygen Permeation. It could easily be adapted for all permeation data.
 def _add_material(
     name,
     alias,
@@ -563,9 +558,10 @@ def _add_material(
     fickian=True,
     fname="O2permeation.json",
 ):
-    """
-    Add a new material to the materials.json database. Check the parameters for specific units.
-    If material already exists, parameters will be updated.
+    """Add a new material to the materials.json database.
+
+    Check the parameters for
+    specific units. If material already exists, parameters will be updated.
 
     TODO: check if material is already existing
 
@@ -590,7 +586,6 @@ def _add_material(
     fickian : (boolean)
         I have no idea what this means (unused)
     """
-
     # TODO: test then delete commented code
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
@@ -617,11 +612,10 @@ def _add_material(
 
 
 def quantile_df(file, q):
-    """
-    Calculate the quantile of each parameter at each location.
+    """Calculate the quantile of each parameter at each location.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file : (str)
         Filepath to h5 results file containing timeseries and location data.
     q : (float)
@@ -633,7 +627,6 @@ def quantile_df(file, q):
         dataframe containing location coordinates and quantile values of
         each parameter.
     """
-
     with Outputs(file, mode="r") as out:
         res = out["meta"][["latitude", "longitude"]]
         for key in out.attrs.keys():
@@ -645,22 +638,20 @@ def quantile_df(file, q):
 
 
 def ts_gid_df(file, gid):
-    """
-    Extract the time series of each parameter for given location.
+    """Extract the time series of each parameter for given location.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     file : (str)
         Filepath to h5 results file containing timeseries and location data.
     gid : (int)
         geographical id of location
 
-    Returns:
-    --------
+    Returns
+    -------
     res : (pd.DataFrame)
         dataframe containing time series data for given location.
     """
-
     with Outputs(file, mode="r") as out:
         res = pd.DataFrame(index=out["time_index"])
         meta = out["meta"][["latitude", "longitude"]]
@@ -676,8 +667,9 @@ def ts_gid_df(file, gid):
 def tilt_azimuth_scan(
     weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
 ):
-    """
-    Calculate a minimum standoff distance for roof mounded PV systems as a function of tilt and azimuth.
+    """Calculate minimum standoff distance for roof-mounted PV systems.
+
+    Standoff calculated as a function of tilt and azimuth.
 
     Parameters
     ----------
@@ -686,17 +678,19 @@ def tilt_azimuth_scan(
     meta : pd.DataFrame
         Meta data for a single location.
     tilt_step : integer
-        Step in degrees of change in tilt angle of PV system between calculations. Will scan from 0 to 90 degrees.
+        Step in degrees of change in tilt angle of PV system between calculations.
+        Will scan from 0 to 90 degrees.
     azimuth_step : integer
-        Step in degrees of change in Azimuth angle of PV system relative to north. Will scan from 0 to 180 degrees.
+        Step in degrees of change in Azimuth angle of PV system relative to north.
+        Will scan from 0 to 180 degrees.
     kwarg : dict
         All the keywords in a dictionary form that are needed to run the function.
     calc_function : string
         The name of the function that will be calculated.
     Returns
-        standoff_series : 2-D array with each row consiting of tilt, azimuth, then standoff
+        standoff_series : 2-D array with each row consiting of tilt, azimuth, then
+        standoff
     """
-
     total_count = (np.ceil(360 / azimuth_step) + 1) * (np.ceil(90 / tilt_step) + 1)
     tilt_azimuth_series = np.zeros((int(total_count), 3))
     count = 0
@@ -727,17 +721,21 @@ def tilt_azimuth_scan(
 
 def _meta_df_from_csv(file_paths: list[str]):
     """
-    Helper Function: Create csv dataframe from list of files in string form [Or Directory (not functional yet)]
+    Create csv dataframe from list of files in string form, helper function.
+
+    Also warns if d.irectory not functional yet.
 
     Parameters
     ----------
     file_paths : list[str]
-        List of local weather csv files to strip metadata from. For example: download a collection of weather files from the NSRDB web viewer.
+        List of local weather csv files to strip metadata from.
+        For example: download a collection of weather files from the NSRDB web viewer.
 
     Returns
     -------
     metadata_df : pandas.DataFrame
-        Dataframe of stripped metadata from csv. Columns represent attribute names while rows represent a unique file.
+        Dataframe of stripped metadata from csv.
+        Columns represent attribute names while rows represent a unique file.
     """
     # TODO: functionality
     # list[path] instead of just string
@@ -776,15 +774,7 @@ def _weather_ds_from_csv(
     year: int,
     # select year, should be able to provide single year, or list of years
 ):
-    """
-    Helper Function: Create a geospatial xarray dataset from local csv files.
-
-    Parameters
-    ----------
-
-    Returns
-    ----------
-    """
+    """Create a geospatial xarray dataset from local csv files, helper function."""
     #  ds = xr.open_dataset(
     #             fp,
     #             engine="h5netcdf",
@@ -796,8 +786,9 @@ def _weather_ds_from_csv(
     #         )
 
     # PROBLEM: all csv do not contain all years but these all appear to have 2004
-    # when missing years, xarray will see mismatched coordinates and populate all these values with nan
-    # this is wrong we are using tmy so we ignore the year as it represents a typical meteorological year
+    # when missing years, xarray will see mismatched coordinates and populate all these
+    # values with nan this is wrong we are using tmy so we ignore the year as it
+    # represents a typical meteorological year
 
     # Prepare a list to hold the DataFrames
     dataframes = []
@@ -819,10 +810,12 @@ def _weather_ds_from_csv(
         # make allow this to take list of years
         df = df[df["time"].dt.year == year]
 
-        # add generic approach, dont manually do this, could change based on user selections
+        # add generic approach, dont manually do this, could change based on user
+        # selections
 
         # Select relevant columns and append to the list
-        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo', 'Wind Direction', 'Wind Speed']]
+        # df = df[['gid', 'time', 'GHI', 'Temperature', 'DHI', 'DNI', 'Surface Albedo',
+        # 'Wind Direction', 'Wind Speed']]
         df = df[
             [
                 "gid",
@@ -868,10 +861,12 @@ def _weather_ds_from_csv(
 
 # not functional
 def geospatial_from_csv(
-    file_path: list[str], year: int  # should be able to take a range of years
+    file_path: list[str],
+    year: int,  # should be able to take a range of years
 ):
-    """
-    Create an xarray dataset contaning aeospatial weather data and a pandas dataframe
+    """Create an xarray dataset contaning aeospatial and geospatial weather/meta data.
+
+    Creates an xarray dataset contaning aeospatial weather data and a pandas dataframe
     containing geospatial metadata from a list of local csv files.
 
     Useful for importing data from NSRDB api viewer https://nsrdb.nrel.gov/data-viewer
@@ -884,9 +879,9 @@ def geospatial_from_csv(
     year : int
         Single year of data to use from local csv files.
     """
-
-    weather_ds, meta_df = _weather_ds_from_csv(file_path, year), _meta_df_from_csv(
-        file_path
+    weather_ds, meta_df = (
+        _weather_ds_from_csv(file_path, year),
+        _meta_df_from_csv(file_path),
     )
 
     # only want to keep meta from given file using GIDs from DS
@@ -906,12 +901,14 @@ def geospatial_from_csv(
 
 
 def strip_normalize_tmy(df, start_time, end_time):
-    """
-    Normalize the DataFrame to start at 00:00 and extract the data between the
-    specified start and end times. Then shift back to the original indexes.
+    """Normalize the DataFrame, extract data between start and end times.
 
-    Parameters:
-    -----------
+    Dataframe is noramlized to start at 00:00 and the data between the
+    specified start and end times is extracted. Data are then shifted back to the
+    original indexes.
+
+    Parameters
+    ----------
     df : pd.Dataframe
         dataframe with a datetime index and tmy data
     start_time : datetime.datetime
@@ -919,12 +916,11 @@ def strip_normalize_tmy(df, start_time, end_time):
     end_time : datetime.datetime
         end time
 
-    Returns:
-    --------
+    Returns
+    -------
     sub_results : pd.DataFrame
         extracted subset of tmy data
     """
-
     tz = df.index.tz
     start_time = start_time.replace(tzinfo=tz)
     end_time = end_time.replace(tzinfo=tz)
@@ -950,11 +946,10 @@ def strip_normalize_tmy(df, start_time, end_time):
 
 
 def new_id(collection):
-    """
-    Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
+    """Generate a 5 uppercase letter string unqiue from all keys in a dictionary.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
     Collection : dict, ordereddict
         dictionary with keys as strings
 
@@ -976,27 +971,27 @@ def new_id(collection):
 def restore_gids(
     original_meta_df: pd.DataFrame, analysis_result_ds: xr.Dataset
 ) -> xr.Dataset:
-    """
-    Restore gids to results dataset. For desired behavior output data must
-    have identical ordering to input data, otherwise will fail silently by
-    misassigning gids to lat-long coordinates in returned dataset.
+    """Restore gids to results dataset.
 
-    Parameters:
-    -----------
+    For desired behavior output data must have
+    identical ordering to input data, otherwise will fail silently by misassigning gids
+    to lat-long coordinates in returned dataset.
+
+    Parameters
+    ----------
     original_meta_df : pd.DataFrame
         Metadata dataframe as returned by geospatial ``pvdeg.weather.get``
     analysis_result_ds : xr.Dataset
         geospatial result data as returned by ``pvdeg.geospatial.analysis``
 
-    Returns:
-    --------
+    Returns
+    -------
     restored_gids_ds : xr.Dataset
         dataset like ``analysis_result_ds`` with new datavariable, ``gid``
         holding the original gids of each result from the input metadata.
         Warning: if meta order is different than result ordering gids will
         be assigned incorrectly.
     """
-
     flattened = analysis_result_ds.stack(points=("latitude", "longitude"))
 
     gids = original_meta_df.index.values
@@ -1013,9 +1008,10 @@ def restore_gids(
 
 
 def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
-    """
-    find the min and max latitude and longitude values from 2 lists
-    or a tall numpy array of the shape [[lat, long], ...]
+    """Find min/max latitude and longitude.
+
+       Find min and max latitude and longitude coordinates from two lists or a tall
+       numpy array of the shape [[lat, long], ...]
 
     Parameters:
     -----------
@@ -1054,13 +1050,12 @@ def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
 
 
 def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
-    """
-    Set matplotlib axis limits to the values from a bounding box.
+    """Set matplotlib axis limits to the values from a bounding box.
+
     See Also:
     --------
     pvdeg.utilities._find_bbox_corners for more information
     """
-
     lats, longs = _find_bbox_corners(coord_1, coord_2, coords)
 
     ax.set_xlim([longs[0], longs[1]])
@@ -1069,32 +1064,26 @@ def _plot_bbox_corners(ax, coord_1=None, coord_2=None, coords=None):
 
 
 def _add_cartopy_features(
-        ax, 
-        features = [
-            cfeature.BORDERS,
-            cfeature.COASTLINE,
-            cfeature.LAND,
-            cfeature.OCEAN,
-            cfeature.LAKES,
-            cfeature.RIVERS,
-        ],
-    ):
-    """
-    Add cartopy features to an existing matplotlib.pyplot axis.
-    """
-   
-
+    ax,
+    features=[
+        cfeature.BORDERS,
+        cfeature.COASTLINE,
+        cfeature.LAND,
+        cfeature.OCEAN,
+        cfeature.LAKES,
+        cfeature.RIVERS,
+    ],
+):
+    """Add cartopy features to an existing matplotlib.pyplot axis."""
     for i in features:
         if i == cfeature.BORDERS:
             ax.add_feature(i, linestyle=":")
         else:
             ax.add_feature(i)
 
-def linear_normalize(array: np.ndarray)->np.ndarray:
-    """
-    Normalize a non-negative input array.
-    """
 
+def linear_normalize(array: np.ndarray) -> np.ndarray:
+    """Normalize a non-negative input array."""
     return np.divide(
         np.subtract(array, np.min(array)),
         np.subtract(np.max(array), np.min(array)),
@@ -1109,12 +1098,13 @@ def _calc_elevation_weights(
     normalization: str,
     kdtree,
 ) -> np.array:
-    """
-    utility function. caluclate a weight for each point in a dataset
-    to use for probabalistic downselection.
+    """Calculate elevation weights, utility function.
 
-    Parameters:
-    -----------
+    Caluclate a weight for each point in a dataset to use for probabalistic
+    downselection.
+
+    Parameters
+    ----------
     elevations : np.ndarray
         one dimensional numpy array of elevations at each gid in the metadata
     coords : np.ndarray
@@ -1132,8 +1122,8 @@ def _calc_elevation_weights(
         Generate using ``pvdeg.geospatial.meta_KDTree``. Can take a pickled
         kdtree as a path to the .pkl file.
 
-    Returns:
-    --------
+    Returns
+    -------
     gids : np.array
         1d numpy array of weights corresponding to each lat-long pair
         in coordinates and respectively in metadata.
@@ -1167,10 +1157,11 @@ def _calc_elevation_weights(
 
     elif normalization == "log":
         # add 1 to shift the domain right so results of log will be positive
-        # there may be a better way to do this, the value wont be properly normalized between 0 and 1
-        return linear_normalize(np.log(linear_weights + 1)) 
+        # may be a better way, value wont be properly normalized between 0 and 1
+        return linear_normalize(np.log(linear_weights + 1))
 
-    raise ValueError(f"""
+    raise ValueError(
+        f"""
         normalization method: {normalization} does not exist.
         must be: "linear", "exp", "log"
         """
@@ -1178,9 +1169,9 @@ def _calc_elevation_weights(
 
 
 def fix_metadata(meta):
-    """
-    meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
-    remove each subdict and replace with value for each key
+    """Meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
+
+    remove each subdict and replace with value for each key.
 
     Parameters:
     -----------
@@ -1198,21 +1189,20 @@ def fix_metadata(meta):
 # we want this to only exist for things that can be run on kestrel
 # moving away from hpc tools so this may not be useful in the future
 def nrel_kestrel_check():
-    """
-    Check if the user is on Kestrel HPC environment.
-    Passes silently or raises a ConnectionError if not running on Kestrel.
-    This will fail on AWS
+    """Check if the user is on Kestrel HPC environment.
 
-    Returns:
-    --------
+    Passes silently or raises a
+    ConnectionError if not running on Kestrel. This will fail on AWS.
+
+    Returns
+    -------
     None
 
-    See Also:
-    ---------
+    See Also
+    --------
     NREL HPC : https://www.nrel.gov/hpc/
     Kestrel Documentation : https://nrel.github.io/HPC/Documentation/
     """
-
     kestrel_hostname = "kestrel.hpc.nrel.gov"
 
     host = run(args=["hostname", "-f"], shell=False, capture_output=True, text=True)
@@ -1228,8 +1218,8 @@ def nrel_kestrel_check():
 
 
 def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
-    """
-    Move `cwd` to fp and remove all scenario file trees from fp directory.
+    """Move `cwd` to fp and remove all scenario file trees from fp directory.
+
     Permanently deletes all scenario file trees. USE WITH CAUTION.
 
     Parameters:
@@ -1257,8 +1247,9 @@ def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
 
 def _update_pipeline_task(task):
     """
-    Convert qualified name to callable function reference
-    and matain odict items ordering. Use to restore scenario from json.
+    Convert qualified name to callable function reference, mantain odict items ordering.
+
+    Use to restore scenario from json.
     """
     from importlib import import_module
 
@@ -1275,8 +1266,7 @@ def _update_pipeline_task(task):
 def compare_templates(
     ds1: xr.Dataset, ds2: xr.Dataset, atol=1e-10, consider_nan_equal=True
 ) -> bool:
-    """Compare loaded datasets with "empty-like" values"""
-
+    """Compare loaded datasets with "empty-like" values."""
     if ds1.dims != ds2.dims:
         return False
 
@@ -1307,72 +1297,76 @@ def compare_templates(
 
     return True
 
-def add_time_columns_tmy(weather_df, coerce_year=1979):
-    """
-    Add time columns to a tmy weather dataframe.
 
-    Parameters:
-    -----------
+def add_time_columns_tmy(weather_df, coerce_year=1979):
+    """Add time columns to a tmy weather dataframe.
+
+    Parameters
+    ----------
     weather_df: pd.DataFrame
         tmy weather dataframe containing 8760 rows.
     coerce_year: int
         year to set the dataframe to.
 
-    Returns:
-    --------
+    Returns
+    -------
     weather_df: pd.DataFrame
-        dataframe with columns added new columns will be 
+        dataframe with columns added new columns will be
 
         ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
     """
-
-    weather_df = weather_df.reset_index(drop=True)    
+    weather_df = weather_df.reset_index(drop=True)
 
     if len(weather_df) == 8760:
-        freq = 'h'
+        freq = "h"
     elif len(weather_df) == 17520:
-        freq = '30min'
+        freq = "30min"
     else:
         raise ValueError("weather df must be in 1 hour or 30 minute intervals")
 
     date_range = pd.date_range(
-        start=f'{coerce_year}-01-01 00:00:00', 
-        end=f'{coerce_year}-12-31 23:45:00', # 15 minute internval is highest granularity
-        freq=freq
+        start=f"{coerce_year}-01-01 00:00:00",
+        end=f"{coerce_year}-12-31 23:45:00",  # 15 min internval is highest resolution
+        freq=freq,
     )
 
-    df = pd.DataFrame({
-        'Year': date_range.year,
-        'Month': date_range.month,
-        'Day': date_range.day,
-        'Hour': date_range.hour,
-        'Minute': date_range.minute
-    })
+    df = pd.DataFrame(
+        {
+            "Year": date_range.year,
+            "Month": date_range.month,
+            "Day": date_range.day,
+            "Hour": date_range.hour,
+            "Minute": date_range.minute,
+        }
+    )
 
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
 
-def merge_sparse(files: list[str])->xr.Dataset:
-    """
-    Merge an arbitrary number of geospatial analysis results. 
-    Creates monotonically increasing indicies.
 
-    Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to netcdf files.
+def merge_sparse(files: list[str]) -> xr.Dataset:
+    """Merge an arbitrary number of geospatial analysis results.
+
+    Creates monotonically
+    increasing indicies.
+
+    Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to
+    netcdf files.
 
     Parameters
     -----------
     files: list[str]
         A list of strings representing filepaths to netcdf (.nc) files.
-        Each file must have the same coordinates, `['latitude','longitude']` and identical datavariables.
+        Each file must have the same coordinates, `['latitude','longitude']` and
+        identical datavariables.
 
     Returns
     -------
     merged_ds: xr.Dataset
-        Dataset (in memory) with `coordinates = ['latitude','longitude']` and datavariables matching files in 
-        filepaths list.
+        Dataset (in memory) with `coordinates = ['latitude','longitude']` and
+        datavariables matching files in filepaths list.
     """
-
-    datasets = [xr.open_dataset(fp, engine='h5netcdf').compute() for fp in files]
+    datasets = [xr.open_dataset(fp, engine="h5netcdf").compute() for fp in files]
 
     latitudes = np.concatenate([ds.latitude.values for ds in datasets])
     longitudes = np.concatenate([ds.longitude.values for ds in datasets])
@@ -1382,11 +1376,14 @@ def merge_sparse(files: list[str])->xr.Dataset:
     data_vars = datasets[0].data_vars
 
     merged_ds = xr.Dataset(
-        {var: (['latitude', 'longitude'], np.full((len(unique_latitudes), len(unique_longitudes)), np.nan)) for var in data_vars},
-        coords={
-            'latitude': unique_latitudes,
-            'longitude': unique_longitudes
-        }
+        {
+            var: (
+                ["latitude", "longitude"],
+                np.full((len(unique_latitudes), len(unique_longitudes)), np.nan),
+            )
+            for var in data_vars
+        },
+        coords={"latitude": unique_latitudes, "longitude": unique_longitudes},
     )
 
     for ds in datasets:
@@ -1398,12 +1395,12 @@ def merge_sparse(files: list[str])->xr.Dataset:
 
     return merged_ds
 
+
 def display_json(
-    pvdeg_file: str = None, 
-    fp: str = None, 
-    ) -> None:
-    """
-    Interactively view a 2 level JSON file in a JupyterNotebook
+    pvdeg_file: str = None,
+    fp: str = None,
+) -> None:
+    """Interactively view a 2 level JSON file in a JupyterNotebook.
 
     Parameters:
     ------------
@@ -1411,7 +1408,9 @@ def display_json(
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation", "DegradationDatabase"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are provided.
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are
+        provided.
     """
     from IPython.display import display, HTML
 
@@ -1419,82 +1418,95 @@ def display_json(
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
-            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are \
+                    {pvdeg_datafiles.keys()}"
+            )
 
-    with open(fp, 'r') as file:
+    with open(fp, "r") as file:
         data = json.load(file)
 
     def json_to_html(data):
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
-            json_str = json_str.replace(f'"{key}":', f'<span style="color: plum;">"{key}":</span>')
-        
-        indented_html = '<br>'.join([' ' * 4 + line for line in json_str.splitlines()])
+            json_str = json_str.replace(
+                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'
+            )
+
+        indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
         return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
 
     html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
     for key, value in data.items():
         html += (
-            f'<div>'
+            f"<div>"
             f'<strong style="color: white;">{key}:</strong> '
-            f'<span onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === \'none\' ? \'block\' : \'none\'" style="cursor: pointer; color: white;">&#9660;</span>'
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"
             f'<div style="display: none;">{json_to_html(value)}</div>'
-            f'</div>'
+            f"</div>"
         )
-    html += '</div>'
+    html += "</div>"
 
     # Display the HTML
     display(HTML(html))
 
 
 def search_json(
-    pvdeg_file: str = None, 
-    fp: str = None, 
+    pvdeg_file: str = None,
+    fp: str = None,
     name_or_alias: str = None,
-    )-> str:
-    """
-    Search through a 2 level JSON with arbitrary key names for subkeys with matching attributes of name or alias.
+) -> str:
+    """Search through 2 level JSON.
+
+       Search through 2 level JSON with arbitrary key names for subkeys with matching
+       attributes of name or alias.
 
     Parameters
-    ------------
+    ----------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are
+        provided.
     name_or_alias: str
-        searches for matching subkey value in either `name` or `alias` attributes. exits on the first matching instance.
+        searches for matching subkey value in either `name` or `alias` attributes.
+        Exits on the first matching instance.
 
     Returns
-    ---------
+    -------
     jsonkey: str
-        arbitrary key from json that owns the matching subattribute of `name` or `alias`.
+        arbitrary key from json that owns the matching subattribute of `name` or
+        `alias`.
     """
-
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
-            raise KeyError(rf"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(
+                rf"{pvdeg_file} does not exist in pvdeg/data. Options are \
+                    {pvdeg_datafiles.keys()}"
+            )
 
     with open(fp, "r") as file:
         data = json.load(file)
 
     for key, subdict in data.items():
         if "name" in subdict and "alias" in subdict:
-            if (subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias):
+            if subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias:
                 return key
 
     raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}")
 
+
 def read_material(
-    pvdeg_file: str = None, 
-    fp: str = None, 
+    pvdeg_file: str = None,
+    fp: str = None,
     key: str = None,
     parameters: list[str] = None,
-)-> dict:
-    """
-    Read material parameters from a `pvdeg/data` file or JSON file path.
+) -> dict:
+    """Read material parameters from a `pvdeg/data` file or JSON file path.
 
     Parameters
     -----------
@@ -1502,33 +1514,41 @@ def read_material(
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
-        file path to material parameters json with same schema as material parameters json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are provided.
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are
+        provided.
     key: str
-        key corresponding to specific material in the file. In the pvdeg files these have arbitrary names. Inspect the files or use `display_json` or `search_json` to identify the key for desired material.
+        key corresponding to specific material in the file. In the pvdeg files these
+        have arbitrary names. Inspect the files or use `display_json` or `search_json`
+        to identify the key for desired material.
     parameters: list[str]
-        parameters to grab from the file at index key. If none, will grab all items at index key. the elements in parameters must match the keys in the json exactly or the output value for the specific key/parameter in the retunred dict will be `None`.
+        parameters to grab from the file at index key. If none, will grab all items
+        at index key. the elements in parameters must match the keys in the json exactly
+        or the output value for the specific key/parameter in the retunred dict will be
+        `None`.
 
     Returns
     --------
     material: dict
         dictionary of material parameters from the seleted file at the index key.
     """
-
     # these live in the `pvdeg/data` folder
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
-            raise KeyError(f"{pvdeg_file} does not exist in pvdeg/data. Options are {pvdeg_datafiles.keys()}")
+            raise KeyError(
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are\
+                {pvdeg_datafiles.keys()}"
+            )
 
     with open(fp, "r") as file:
         data = json.load(file)
 
     # take subdict from file
-    material_dict = data[key] 
-    
+    material_dict = data[key]
+
     if parameters:
-        material_dict = {k: material_dict.get(k, None) for k in parameters} 
+        material_dict = {k: material_dict.get(k, None) for k in parameters}
 
     return material_dict
-

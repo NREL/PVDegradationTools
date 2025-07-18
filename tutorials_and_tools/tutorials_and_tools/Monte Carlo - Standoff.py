@@ -28,7 +28,8 @@ import matplotlib.pyplot as plt
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -112,8 +113,6 @@ print(samples)
 
 # In[28]:
 
-
-import pdb
 
 # defining arguments to pass to the target function, standoff() in this case
 function_kwargs = {

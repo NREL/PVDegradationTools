@@ -1,6 +1,4 @@
-"""
-Scenario objects and methods for accelerated analysis
-"""
+"""Scenario objects and methods for accelerated analysis."""
 
 import pvdeg
 from pvdeg import utilities
@@ -24,13 +22,16 @@ from typing import List, Union, Optional, Tuple, Callable
 from functools import partial
 import pprint
 from IPython.display import display, HTML
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+from dask.distributed import Client
 
 
 class Scenario:
-    """
-    The scenario object contains all necessary parameters and criteria for a given scenario.
-    Generally speaking, this will be information such as:
-    Scenario Name, Path, Geographic Location, Module Type, Racking Type
+    """Scenario object, contains all parameters and criteria for a given scenario.
+
+    Generally speaking, this will be information such as: Scenario Name, Path,
+    Geographic Location, Module Type, Racking Type
     """
 
     def __init__(
@@ -47,29 +48,32 @@ class Scenario:
         email: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
-        """
-        Initialize the degradation scenario object.
+        """Initialize the degradation scenario object.
 
         Parameters:
         -----------
         name : (str)
-            custom name for deg. scenario. If none given, will use date of initialization (DDMMYY)
+            custom name for deg. scenario. If none given, will use date of
+            initialization (DDMMYY)
         path : (str, pathObj)
-            File path to operate within and store results. If none given, new folder "name" will be
+            File path to operate within and store results. If none given, new folder
+            "name" will be
             created in the working directory.
         gids : (str, pathObj)
-            Spatial area to perform calculation for. This can be Country or Country and State.
+            Spatial area to perform calculation for. This can be Country or Country and
+            State.
         modules : (list, str)
             List of module names to include in calculations.
         pipeline : (list, str)
             List of function names to run in job pipeline
         file : (path)
-            Full file path to a pre-generated Scenario object. If specified, all other parameters
+            Full file path to a pre-generated Scenario object. If specified, all other
+            parameters
             will be ignored and taken from the .json file.
         results : (pd.Series)
-            Full collection of outputs from pipeline execution. Populated by ``scenario.runPipeline()``
+            Full collection of outputs from pipeline execution. Populated by
+            ``scenario.runPipeline()``
         """
-
         self.name = name
         self.path = path
         self.modules = modules
@@ -98,8 +102,8 @@ class Scenario:
             self.load_json(file_path=file, email=email, api_key=api_key)
 
     def __eq__(self, other):
-        """
-        Define the behavior of the `==` operator between two Scenario instances.
+        """Define the behavior of the `==` operator between two Scenario instances.
+
         Does not check credentials.
         """
         if not isinstance(other, Scenario):
@@ -130,13 +134,13 @@ class Scenario:
         )
 
     def clean(self):
-        """
-        Wipe the Scenario object filetree. This is useful because the Scenario
-        object stores its data in local files outside of the python script.
-        This causes issues when two unique scenario instances are created in
-        the same directory, they appear to be seperate instances to python but
-        share the same data (if no path is provided).
-        Changes made to one are reflected in both.
+        """Wipe the Scenario object filetree.
+
+        This is useful because the Scenario object
+        stores its data in local files outside of the python script. This causes issues
+        when two unique scenario instances are created in the same directory, they
+        appear to be seperate instances to python but share the same data (if no path is
+        provided). Changes made to one are reflected in both.
 
         Parameters:
         -----------
@@ -159,8 +163,7 @@ class Scenario:
         weather_db: str = "PSM3",
         see_added: bool = False,
     ):
-        """
-        Add a location to the scenario using a latitude-longitude pair.
+        """Add a location to the scenario using a latitude-longitude pair.
 
         The scenario object instance must already be populated with
         credentials when making a call to the NSRBD. Provide credentials
@@ -244,21 +247,25 @@ class Scenario:
         irradiance_kwarg: dict = {},
         see_added: bool = False,
     ):
-        """
-        Add a module to the Scenario. Multiple modules can be added. Each module will be tested in
-        the given scenario.
+        """Add a module to the Scenario.
+
+        Multiple modules can be added. Each module will
+        be tested in the given scenario.
 
         Parameters
         -----------
         module_name : str
-            unique name for the module. adding multiple modules of the same name will replace the
+            unique name for the module. adding multiple modules of the same name will
+            replace the
             existing entry.
         racking : str
-            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed entries:
+            temperature model racking type as per PVLIB (see pvlib.temperature). Allowed
+            entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
         material : str
-            Key of the material desired. For a complete list, see pvdeg/data/O2permeation.json
+            Key of the material desired. For a complete list,
+            see pvdeg/data/O2permeation.json
             or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
             To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
         material_file : str
@@ -266,7 +273,8 @@ class Scenario:
             Use material json file in `pvdeg/data`. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
         temp_model : str
-            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for more.
+            select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
+            more.
             Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
         model_kwarg : dict, (optional)
             provide a dictionary of temperature model coefficents to be used
@@ -275,13 +283,12 @@ class Scenario:
             temperature (``noct``). This is where other values such as noct
             should be provided.
             Pvlib temp models:
-            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html #noqa
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         see_added : (bool), optional
         """
-
         try:
             mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
         except KeyError:
@@ -323,9 +330,7 @@ class Scenario:
         fickian=True,
         fname="O2permeation.json",
     ):
-        """
-        add a new material type to main list
-        """
+        """Add a new material type to main list."""
         utilities._add_material(
             name=name,
             alias=alias,
@@ -342,8 +347,8 @@ class Scenario:
         print("To add the material as a module in your current scene, run .addModule()")
 
     def viewScenario(self):
-        """
-        Print all scenario information currently stored in the scenario instance.
+        """Print all scenario information currently stored in the scenario instance.
+
         Does not implement ipython.display. If available, use this.
         """
         pp = pprint.PrettyPrinter(indent=4, sort_dicts=False)
@@ -386,21 +391,20 @@ class Scenario:
         func_kwarg={},
         see_added=False,
     ):
-        """
-        Add a pvdeg function to the scenario pipeline
+        """Add a pvdeg function to the scenario pipeline.
 
         Parameters:
         -----------
         func : function
             pvdeg function to use for single point calculation.
-            All regular pvdeg functions will work at a single point when ``Scenario.geospatial == False``
+            All regular pvdeg functions will work at a single point when
+            ``Scenario.geospatial == False``
         func_params : dict
             job specific keyword argument dictionary to provide to the function
         see_added : bool
             set flag to get a userWarning notifying the user of the job added
            to the pipeline in method call. ``default = False``
         """
-
         if func is None or not callable(func):
             print(f'FAILED: Requested function "{func}" not found')
             print("Function has not been added to pipeline.")
@@ -418,6 +422,7 @@ class Scenario:
     def run(self):
         """
         Run all jobs in pipeline on scenario object for each module in the scenario.
+
         Note: if a pipeline job contains a function not adhering to package
         wide pv parameter naming scheme, the job will raise a fatal error.
 
@@ -528,9 +533,7 @@ class Scenario:
         email: Optional[str] = None,
         api_key: Optional[str] = None,
     ):
-        """
-        Import scenario dictionaries from an existing 'scenario.json' file
-        """
+        """Import scenario dictionaries from an existing 'scenario.json' file."""
         with open(file_path, "r") as f:
             data = json.load(f)
         name = data["name"]
@@ -564,8 +567,8 @@ class Scenario:
 
     @classmethod
     def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
-        """
-        Move `cwd` to fp and remove all scenario file trees from fp directory.
+        """Move `cwd` to fp and remove all scenario file trees from fp directory.
+
         Permanently deletes all scenario file trees. USE WITH CAUTION.
 
         Parameters:
@@ -576,23 +579,23 @@ class Scenario:
             pattern to search for using glob. Default value of `pvd_job_` is
             equvilent to `pvd_job_*` in bash.
 
-        Returns:
-        --------
+        Returns
+        -------
         None
 
-        See Also:
-        ---------
+        See Also
+        --------
         `pvdeg.utilities.remove_scenario_filetrees`
         """
-
         utilities.remove_scenario_filetrees(fp=fp, pattern=pattern)
 
         return
 
     def _verify_function(func_name: str) -> Tuple[Callable, List]:
-        """
-        Check all classes in pvdeg for a function of the name "func_name". Returns a callable function
-        and list of all function parameters with no default values.
+        """Check all classes in pvdeg for a function of the name "func_name".
+
+        Returns a
+        callable function and list of all function parameters with no default values.
 
         Parameters:
         -----------
@@ -610,12 +613,11 @@ class Scenario:
 
         # find the function in pvdeg
         class_list = [c for c in dir(pvdeg) if not c.startswith("_")]
-        func_list = []
         for c in class_list:
             _class = getattr(pvdeg, c)
             if func_name in dir(_class):
                 _func = getattr(_class, func_name)
-        if _func == None:
+        if _func is None:
             return (None, None)
 
         # check if necessary parameters given
@@ -628,7 +630,7 @@ class Scenario:
         return (_func, reqs)
 
     def _to_dict(self, api_key=False):
-        # pipeline is a special case, we need to remove the 'job' function reference at every entry
+        # pipeline is special case, must remove 'job' function reference at every entry
         modified_pipeline = deepcopy(self.pipeline)
         for task in modified_pipeline.values():
             function_ref = task["job"]
@@ -653,10 +655,11 @@ class Scenario:
         return attributes
 
     def dump(self, api_key: bool = False, path: Optional[str] = None) -> None:
-        """
-        Serialize the scenario instance as a json. No dataframes will be saved
-        but some attributes like weather_df and results will be stored in
-        nested file trees as csvs.
+        """Serialize the scenario instance as a json.
+
+        No dataframes will be saved but
+        some attributes like weather_df and results will be stored in nested file trees
+        as csvs.
 
         Parameters:
         -----------
@@ -666,7 +669,6 @@ class Scenario:
         path : str
             location to save. If no path provided save to scenario directory.
         """
-
         if path is None:
             path = self.path
         target = os.path.join(path, f"{self.name}.json")
@@ -684,12 +686,13 @@ class Scenario:
         email: str,
         api_key: str,
     ) -> None:
-        """
-        Restore email and api key to scenario. Use after importing
-        scenario if json does not contain email and api key.
+        """Restore email and api key to scenario.
 
-        Parameters:
-        -----------
+        Use after importing scenario if json
+        does not contain email and api key.
+
+        Parameters
+        ----------
         email : str
             email associated with nsrdb developer account
         api_key : str
@@ -707,19 +710,18 @@ class Scenario:
         start_time: Optional[dt] = None,
         end_time: Optional[dt] = None,
     ) -> pd.DataFrame:
-        """
-        Extract scenario results along an axis.
+        """Extract scenario results along an axis.
 
-        Note:
-        --------
-        only works if results are of the same shape.
+        Note
+        ----
+        Only works if results are of the same shape.
         Ex) running 5 different temperature calculations on the same module.
         Counter Ex) running a standoff and tempeature calc on the same module.
 
         Ex: ('function' : 'AKWMC)
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         dim_target : tuple of str
             Define a tuple of `(dimension, name)` to select results.
             The dimension is either 'function' or 'module', and the name
@@ -730,7 +732,6 @@ class Scenario:
             Dimension options: `'function'`, `'module'`
 
             Examples:
-
             To grab 'standoff' result from all modules in the scenario:
             Determine the name of the standoff job using `display(Scenario)`.
             If the job is called `AJCWL`, the result would be:
@@ -810,8 +811,7 @@ class Scenario:
         end_time: Optional[dt] = None,
         title: str = "",
     ) -> tuple:
-        """
-        Plot scenario results along an axis using `Scenario.extract`
+        """Plot scenario results along an axis using `Scenario.extract`.
 
         Note:
         --------
@@ -833,7 +833,6 @@ class Scenario:
             Dimension options: `'function'`, `'module'`
 
             Examples:
-
             To grab 'standoff' result from all modules in the scenario:
             Determine the name of the standoff job using `display(Scenario)`.
             If the job is called `AJCWL`, the result would be:
@@ -870,7 +869,6 @@ class Scenario:
         To have more control over a plot simply extract the data and then use
         more specific plotting logic
         """
-
         df = self.extract(
             dim_target=dim_target,
             col_name=col_name,
@@ -892,9 +890,9 @@ class Scenario:
             file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
 
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;"> #noqa
             <h2>self.name: {self.name}</h2>
-            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p> #noqa
             <p><strong>self.gids:</strong> {self.gids}</p>
             <p><strong>self.email:</strong> {self.email}</p>
             <p><strong>self.api_key:</strong> {self.api_key}</p>
@@ -950,15 +948,15 @@ class Scenario:
             )
 
             module_content = f"""
-            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span>
-                    {module['module_name']}
+                    {module["module_name"]}
                 </h4>
             </div>
-            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-                <p><strong>Racking:</strong> {module['racking']}</p>
-                <p><strong>Temperature Model:</strong> {module['temp_model']}</p>
+            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+                <p><strong>Racking:</strong> {module["racking"]}</p>
+                <p><strong>Temperature Model:</strong> {module["temp_model"]}</p>
                 <p><strong>Material Parameters:</strong></p>
                 <div style="margin-left: 20px;">
                     {material_params_html}
@@ -982,25 +980,25 @@ class Scenario:
         for module_name, functions in sorted(self.results.items()):
             module_id = f"result_module_{module_name}"
             module_content = f"""
-            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span>
                     {module_name}
                 </h4>
             </div>
-            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
             """
             for function_name, output in functions.items():
                 function_id = f"{module_id}_{function_name}"
                 formatted_output = self.format_output(output)
                 module_content += f"""
-                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                     <h5 style="font-family: monospace; margin: 0;">
                         <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span>
                         {function_name}
                     </h5>
                 </div>
-                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                     {formatted_output}
                 </div>
                 """
@@ -1054,13 +1052,13 @@ class Scenario:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>
                     Weather Data
                 </h4>
             </div>
-            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
                 {display_data.to_html()}
             </div>
             """
@@ -1078,14 +1076,14 @@ class Scenario:
                 params_html = "<pre>Unserializable data type</pre>"
 
             step_content = f"""
-            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>
-                    {step['job'].__name__}, <span style="color: #b676c2;">#{step_name}</span>
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> #noqa
+                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span> #noqa
                 </h4>
             </div>
-            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">
-                <p>Job: {step['job'].__name__}</p>
+            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+                <p>Job: {step["job"].__name__}</p>
                 <p>Parameters:</p>
                 <div style="margin-left: 20px;">
                     {params_html}

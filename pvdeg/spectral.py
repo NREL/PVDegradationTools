@@ -1,6 +1,4 @@
-"""
-Collection of classes and functions to obtain spectral parameters.
-"""
+"""Collection of classes and functions to obtain spectral parameters."""
 
 import pvlib
 import pandas as pd
@@ -21,9 +19,10 @@ from pvdeg import decorators
     ],
 )
 def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
-    """
-    Calculate solar position using pvlib based on weather data from the
-    National Solar Radiation Database (NSRDB) for a given location (gid).
+    """Calculate solar position.
+
+    Calculate solar position using pvlib based on weather data from the National
+    Solar Radiation Database (NSRDB) for a given location (gid).
 
     Parameters
     ----------
@@ -37,7 +36,6 @@ def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
     solar_position : pandas.DataFrame
         Solar position like zenith and azimuth.
     """
-
     # location = pvlib.location.Location(
     #     latitude=meta['latitude'],
     #     longitude=meta['longitude'],
@@ -79,8 +77,10 @@ def poa_irradiance(
     model_perez="allsitescomposite1990",
     **kwargs_mount,
 ) -> pd.DataFrame:
-    """
-    Calculate plane-of-array (POA) irradiance using `pvlib.irradiance.get_total_irradiance` for different module mounts
+    """Calculate plane-of-array (POA) irradiance.
+
+    Calculate plane-of-array (POA) irradiance using
+    `pvlib.irradiance.get_total_irradiance` for different module mounts
      as fixed tilt systems or tracked systems.
 
     Parameters
@@ -93,7 +93,8 @@ def poa_irradiance(
         Module mounting configuration. Can either be `fixed` for fixed tilt systems or
         `single_axis` for single-axis tracker systems.
     sol_position : pd.DataFrame, optional
-        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
+        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be
+        calculated.
     dni_extra : pd.Series, optional
         Extra-terrestrial direct normal irradiance. If None, it will be calculated.
     airmass : pd.Series, optional
