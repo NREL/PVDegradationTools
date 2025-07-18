@@ -354,7 +354,7 @@ def arrhenius_deg(
 
     AvgOfDenominator = arrheniusDenominator.mean()
 
-# rate of degradation of the simulated chamber
+    # rate of degradation of the simulated chamber
     arrheniusNumerator = (
         (I_chamber ** p)
         * (rh_chamber ** n)
