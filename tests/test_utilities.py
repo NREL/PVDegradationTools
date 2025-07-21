@@ -85,11 +85,9 @@ def test_read_material_bad():
     with open(fpath) as f:
         data = json.load(f)
 
-    material_list = data.keys()
-
     res = pvdeg.utilities._read_material(name=None)
 
-    assert res == [*material_list]
+    assert res == data
 
 
 def test_add_material():
