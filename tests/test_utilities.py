@@ -81,7 +81,7 @@ def test_get_kinetics_bad():
 ### DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
 def test_read_material_bad():
     # no name case
-    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
