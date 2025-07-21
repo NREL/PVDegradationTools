@@ -129,7 +129,7 @@ def test_degradation():
     # requires spectral irradiance data
 
     data = pd.read_csv(INPUT_SPECTRA)
-    wavelengths = np.array(range(280, 420, 20))
+    wavelengths = np.array([300, 325, 350, 375, 400])  # Fixed: added square brackets
     degradation = pvdeg.degradation.degradation_spectral(
         spectra=data["Spectra: [ 300, 325, 350, 375, 400 ]"],
         rh=data["RH"],
