@@ -135,6 +135,7 @@ def test_degradation():
         rh=data["RH"],
         temp=data["Temperature"],
         wavelengths=wavelengths,
+        time=None
     )
     assert degradation == pytest.approx(4.4969e-38, abs=0.02e-38)
 
