@@ -132,8 +132,8 @@ def test_degradation():
     wavelengths = np.array(range(280, 420, 20))
     degradation = pvdeg.degradation.degradation_spectral(
         spectra=data["Spectra: [ 300, 325, 350, 375, 400 ]"],
-        rh_module=data["RH"],
-        temp_module=data["Temperature"],
+        rh=data["RH"],
+        temp=data["Temperature"],
         wavelengths=wavelengths,
     )
     assert degradation == pytest.approx(4.4969e-38, abs=0.02e-38)
