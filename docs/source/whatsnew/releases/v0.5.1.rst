@@ -19,6 +19,10 @@ Bug Fixes
 ---------
 ``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to ``pvdeg/geospatialscenario.py``. Completed the move.
 
+Dependencies
+------------
+- Update aiohttp from 3.10.11 to 3.12.14 for improved security and performance
+  (:pull:`185`)
 
 Contributors
 -----------

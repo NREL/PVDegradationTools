@@ -1,7 +1,6 @@
 # TODO:
 # correlation list is empty AND correlation list is populated with r = 0's
 
-import pytest
 import os
 import json
 import pandas as pd
@@ -36,8 +35,7 @@ ARRHENIUS_RESULT = pd.read_csv(
 
 
 def test_generateCorrelatedSamples():
-    """
-    test pvdeg.montecarlo.generateCorrelatedSamples
+    """Test pvdeg.montecarlo.generateCorrelatedSamples.
 
     Requires:
     ---------
@@ -93,8 +91,7 @@ def test_generateCorrelatedSamples():
 
 
 def test_simulate():
-    """
-    test pvdeg.montecarlo.simulate
+    """Test pvdeg.montecarlo.simulate.
 
     Requires:
     ---------
