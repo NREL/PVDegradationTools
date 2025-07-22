@@ -24,6 +24,12 @@ Dependencies
 - Update aiohttp from 3.10.11 to 3.12.14 for improved security and performance
   (:pull:`185`)
 
+
+Testing
+-------
+- Added nbval-based notebook testing workflow to CI for validating tutorial and example
+  notebooks (:issue:`179`, :pull:`184`)
+
 Contributors
 -----------
 - Tobin Ford (:ghuser:`tobin-ford`)
