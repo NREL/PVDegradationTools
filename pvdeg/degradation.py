@@ -2,17 +2,12 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit
-from rex import NSRDBX
-from rex import Outputs
-from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from numba import njit
 from typing import Union
 
 from . import (
     temperature,
     spectral,
-    weather,
     decorators,
 )
 
@@ -20,11 +15,12 @@ from . import (
 
 
 def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
-    """
-    Helper function. Find the rate of degradation kenetics using the Fischer model.
-    Degradation kentics model interpolated 50 coatings with respect to
-    color shift, cracking, gloss loss, fluorescense loss,
-    retroreflectance loss, adhesive transfer, and shrinkage.
+    """Find degradation rate, helper function.
+
+    Find the rate of degradation kenetics using the Fischer model.
+    Degradation kentics model interpolated 50 coatings with respect to color shift,
+    cracking, gloss loss, fluorescense loss, retroreflectance loss, adhesive transfer,
+    and shrinkage.
 
     (ADD IEEE reference)
 
@@ -46,9 +42,7 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
     -------/
     degradationrate : float
         rate of Degradation (NEED TO ADD METRIC)
-
     """
-
     # poa_global ** (p) * Tf ** ((temp - temp_chamber) / 10)
     return np.multiply(
         np.power(poa_global, p),
@@ -57,9 +51,11 @@ def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
 
 
 def _deg_rate_chamber(I_chamber, p):
-    """
-    Helper function. Find the rate of degradation kenetics of a simulated chamber. Mike Kempe's
-    calculation of the rate of degradation inside a accelerated degradation chamber.
+    """Calculate simulated chamber degredation rate, helper function.
+
+    Find the rate of degradation kenetics of a simulated chamber.
+    Mike Kempe's calculation of the rate of degradation inside a accelerated degradation
+    chamber.
 
     (ADD IEEE reference)
 
@@ -71,7 +67,7 @@ def _deg_rate_chamber(I_chamber, p):
         Fit parameter
 
     Returns
-    --------
+    -------
     chamberdegradationrate : float
         Degradation rate of chamber
     """
@@ -82,8 +78,9 @@ def _deg_rate_chamber(I_chamber, p):
 
 
 def _acceleration_factor(numerator, denominator):
-    """
-    Helper Function. Find the acceleration factor
+    """Calculate the acceleration factor, helper Function.
+
+    Find the acceleration factor.
 
     (ADD IEEE reference)
 
@@ -99,7 +96,6 @@ def _acceleration_factor(numerator, denominator):
     chamberAccelerationFactor : float
         Acceleration Factor of chamber (NEED TO ADD METRIC)
     """
-
     chamberAccelerationFactor = np.divide(numerator, denominator)
     # chamberAccelerationFactor = numerator / denominator
 
@@ -121,11 +117,10 @@ def vantHoff_deg(
     irradiance_kwarg={},
     model_kwarg={},
 ):
-    """
-    Van't Hoff Irradiance Degradation
+    """Van't Hoff Irradiance Degradation.
 
     Parameters
-    -----------
+    ----------
     weather_df : pd.dataframe
         Dataframe containing at least dni, dhi, ghi, temperature, wind_speed
     meta : dict
@@ -137,8 +132,9 @@ def vantHoff_deg(
     poa : series or data frame, optional
         dataframe containing 'poa_global', Global Plane of Array Irradiance [W/m²]
     temp : pandas series, optional
-        Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
-        be generated using the default paramters of pvdeg.temperature.cell
+        Solar module temperature or Cell temperature [°C]. If no cell temperature is
+        given, it will be generated using the default parameters of
+        pvdeg.temperature.cell
     p : float
         fit parameter
     Tf : float
@@ -157,27 +153,28 @@ def vantHoff_deg(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the tempeature model
+        (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10m
+        height.
+        It is recommended that a power-law relationship between height and wind speed
+        of 0.33 be used*. This results in a wind speed that is 1.7 times higher. It is
+        acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance caluation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``.
+        See ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
-
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
+        or more.
 
     Returns
     -------
     accelerationFactor : float or series
         Degradation acceleration factor
-
     """
-
     if poa is None:
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
@@ -211,13 +208,13 @@ def vantHoff_deg(
 
 
 def _to_eq_vantHoff(temp, Tf=1.41):
-    """
-    Function to obtain the Vant Hoff temperature equivalent [°C]
+    """Obtain the Vant Hoff temperature equivalent [°C].
 
     Parameters
     ----------
     Tf : float
-        Multiplier for the increase in degradation for every 10[°C] temperature increase. Default value of 1.41.
+        Multiplier for the increase in degradation for every 10[°C] temperature
+        increase. Default value of 1.41.
     temp : pandas series
         Solar module surface or Cell temperature [°C]
 
@@ -225,9 +222,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     -------
     Toeq : float
         Vant Hoff temperature equivalent [°C]
-
     """
-
     # toSum = Tf ** (temp / 10)
     toSum = np.power(Tf, np.divide(temp, 10))
     summation = toSum.sum(axis=0, skipna=True)
@@ -237,7 +232,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-@decorators.geospatial_quick_shape('numeric', ["Iwa"])
+@decorators.geospatial_quick_shape("numeric", ["Iwa"])
 def IwaVantHoff(
     weather_df,
     meta,
@@ -253,7 +248,10 @@ def IwaVantHoff(
     irradiance_kwarg={},
 ):
     """
-    IWa : Environment Characterization [W/m²]
+    Environment characterization function.
+
+    IWa : Environment Characterization [W/m²].
+
     For one year of degredation the controlled environmnet lamp settings will
     need to be set to IWa.
 
@@ -264,7 +262,8 @@ def IwaVantHoff(
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
     poa : float series or dataframe
-        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance W/m²
+        Series or dataframe containing 'poa_global', Global Plane of Array Irradiance
+        [W/m²]
     temp : float series
         Solar module temperature or Cell temperature [°C]
     Teq : series
@@ -287,25 +286,27 @@ def IwaVantHoff(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the tempeature model
+        (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10m
+        height.
+        It is recommended that a power-law relationship between height and wind speed of
+        0.33 be used*. This results in a wind speed that is 1.7 times higher. It is
+        acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance caluation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``.
+        ee ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
-
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
+        for more.
 
     Returns
     --------
     Iwa : float
-        Environment Characterization [W/m²[]
-
+        Environment Characterization [W/m²]
     """
     if poa is None:
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
@@ -345,8 +346,9 @@ def IwaVantHoff(
 
 
 def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
-    """
-    Helper function. Calculates the rate of degredation of the Environmnet
+    """Calculate environment degradation rate, helper function.
+
+    Calculates the rate of degredation of the Environmnet.
 
     Parameters
     ----------
@@ -370,7 +372,6 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
     environmentDegradationRate : pandas series
         Degradation rate of environment
     """
-
     # environmentDegradationRate = (
     #     poa_global ** (p)
     #     * rh_outdoor ** (n)
@@ -390,8 +391,9 @@ def _arrhenius_denominator(poa_global, rh_outdoor, temp, Ea, p, n):
 
 
 def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
-    """
-    Helper function. Find the rate of degradation of a simulated chamber.
+    """Calculate degradation rate, helper function.
+
+    Find the rate of degradation of a simulated chamber.
 
     Parameters
     ----------
@@ -414,7 +416,6 @@ def _arrhenius_numerator(I_chamber, rh_chamber, temp_chamber, Ea, p, n):
     arrheniusNumerator : float
         Degradation rate of the chamber
     """
-
     # arrheniusNumerator = (
     #     I_chamber ** (p)
     #     * rh_chamber ** (n)
@@ -453,10 +454,10 @@ def arrhenius_deg(
     model_kwarg={},
     irradiance_kwarg={},
 ):
-    """
-    Calculate the Acceleration Factor between the rate of degredation of a
-    modeled environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1 year
-    of Controlled Environment exposure is equal to 25 years in the field"
+    """Calculate the Acceleration Factor between the rate of degredation of a modeled.
+
+    environmnet versus a modeled controlled environmnet. Example: "If the AF=25 then 1
+    year of Controlled Environment exposure is equal to 25 years in the field".
 
     Parameters
     ----------
@@ -478,15 +479,21 @@ def arrhenius_deg(
         Reference temperature [°C] "Chamber Temperature"
     Ea : float
         Degredation Activation Energy [kJ/mol]
-        if Ea=0 is used there will be not dependence on temperature and degradation will proceed according to the amount of light and humidity.
+        if Ea=0 is used there will be not dependence on temperature and degradation will
+        proceed according to the amount of light and humidity.
     poa : pd.dataframe, optional
         Global Plane of Array Irradiance [W/m²]
     temp : pd.series, optional
-        Solar module temperature or Cell temperature [°C]. If no cell temperature is given, it will
-        be generated using the default parameters from pvdeg.temperature.cell
+        Solar module temperature or Cell temperature [°C]. If no cell temperature is
+        given, it will be generated using the default parameters from
+        pvdeg.temperature.cell
     p : float
         Fit parameter
-        When p=0 the dependence on light will be ignored and degradation will happen both day an night. As a caution or a feature, a very small value of p (e.g. p=0.0001) will provide very little degradation dependence on irradiance, but degradation will only be accounted for during daylight. i.e. averages will be computed over half of the time only.
+        When p=0 the dependence on light will be ignored and degradation will happen
+        both day an night. As a caution or a feature, a very small value of p
+        (e.g. p=0.0001) will provide very little degradation dependence on irradiance,
+        but degradation will only be accounted for during daylight. i.e. averages will
+        be computed over half of the time only.
     n : float
         Fit parameter for relative humidity
         When n=0 the degradation rate will not be dependent on humidity.
@@ -504,26 +511,28 @@ def arrhenius_deg(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the tempeature model
+        (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10m
+        height.
+        It is recommended that a power-law relationship between height and wind speed of
+        0.33 be used*. This results in a wind speed that is 1.7 times higher. It is
+        acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance caluation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
+        for more.
 
     Returns
     --------
     accelerationFactor : pandas series
         Degradation acceleration factor
-
     """
-
     if poa is None:
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
 
@@ -566,12 +575,14 @@ def arrhenius_deg(
 
 
 def _T_eq_arrhenius(temp, Ea):
-    """
-    Get the Temperature equivalent required for the settings of the controlled environment
-    Calculation is used in determining Arrhenius Environmental Characterization
+    """Calculate temperature for Arrhenius Environmental Characterization.
+
+    Calculate temperature equivalent required for the settings of the controlled
+    environment Calculation is used in determining Arrhenius Environmental
+    Characterization.
 
     Parameters
-    -----------
+    ----------
     temp : pandas series
         Solar module temperature or Cell temperature [°C]
     Ea : float
@@ -582,9 +593,7 @@ def _T_eq_arrhenius(temp, Ea):
     Teq : float
         Temperature equivalent (Celsius) required
         for the settings of the controlled environment
-
     """
-
     summationFrame = np.exp(-(Ea / (0.00831446261815324 * (temp + 273.15))))
     sumForTeq = summationFrame.sum(axis=0, skipna=True)
     Teq = -((Ea) / (0.00831446261815324 * np.log(sumForTeq / len(temp))))
@@ -595,14 +604,13 @@ def _T_eq_arrhenius(temp, Ea):
 
 
 def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
-    """
-    NOTE
+    """NOTE.
 
     Get the Relative Humidity Weighted Average.
     Calculation is used in determining Arrhenius Environmental Characterization
 
     Parameters
-    -----------
+    ----------
     rh_outdoor : pandas series
         Relative Humidity of material of interest. Acceptable relative
         humiditys can be calculated from the below functions:
@@ -617,12 +625,10 @@ def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
         Fit parameter for relative humidity
 
     Returns
-    --------
+    -------
     RHwa : float
         Relative Humidity Weighted Average [%]
-
     """
-
     if Teq is None:
         Teq = _T_eq_arrhenius(temp, Ea)
 
@@ -657,10 +663,10 @@ def IwaArrhenius(
     model_kwarg={},
     irradiance_kwarg={},
 ) -> float:
-    """
-    Function to calculate IWa, the Environment Characterization [W/m²].
-    For one year of degredation the controlled environmnet lamp settings will
-    need to be set at IWa.
+    """Calculate IWa, the Environment Characterization [W/m²].
+
+    For one year
+    of degredation the controlled environmnet lamp settings will need to be set at IWa.
 
     Parameters
     ----------
@@ -670,8 +676,8 @@ def IwaArrhenius(
         Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.series
         Relative Humidity of material of interest
-        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(), rh_front_encap(),
-        rh_surface_outside()
+        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(),
+        rh_front_encap(), rh_surface_outside()
     Ea : float
         Degradation Activation Energy [kJ/mol]
     poa : pd.dataframe, optional
@@ -701,20 +707,20 @@ def IwaArrhenius(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the tempeature model
+        (e.g. SAPM). The NSRDB provides calculations at 2 m (i.e module height) but SAPM
+        uses a 10m height. It is recommended that a power-law relationship between
+        height and wind speed of 0.33 be used*. This results in a wind speed that is
+        1.7 times higher. It is acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance caluation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
-
-
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html # noqa
+        for more.
 
     Returns
     --------
@@ -772,8 +778,9 @@ def IwaArrhenius(
 
 
 def _rh_Above85(rh):
-    """
-    Helper function. Determines if the relative humidity is above 85%.
+    """Calculate whether RH>85%, helper function.
+
+    Determines if the relative humidity is above 85%.
 
     Parameters
     ----------
@@ -781,13 +788,11 @@ def _rh_Above85(rh):
         Relative Humidity %
 
     Returns
-    --------
+    -------
     rhabove85 : boolean
         True if the relative humidity is above 85% or False if the relative
         humidity is below 85%
-
     """
-
     if rh > 85:
         rhabove85 = True
 
@@ -798,8 +803,9 @@ def _rh_Above85(rh):
 
 
 def _hoursRH_Above85(df):
-    """
-    Helper Function. Count the number of hours relative humidity is above 85%.
+    """Count hours RH>85%, helper Function.
+
+    Count the number of hours relative humidity is above 85%.
 
     Parameters
     ----------
@@ -810,7 +816,6 @@ def _hoursRH_Above85(df):
     -------
     numhoursabove85 : int
         Number of hours relative humidity is above 85%
-
     """
     booleanDf = df.apply(lambda x: _rh_Above85(x))
     numhoursabove85 = booleanDf.sum()
@@ -820,12 +825,12 @@ def _hoursRH_Above85(df):
 
 def _whToGJ(wh):
     """
-    NOTE: unused, remove?
+    NOTE: unused, remove(?).
 
     Helper Function to convert Wh/m² to GJ/m²
 
     Parameters
-    -----------
+    ----------
     wh : float
         Input Value in Wh/m²
 
@@ -833,9 +838,7 @@ def _whToGJ(wh):
     -------
     gj : float
         Value in GJ/m²
-
     """
-
     gj = 0.0000036 * wh
 
     return gj
@@ -843,12 +846,12 @@ def _whToGJ(wh):
 
 def _gJtoMJ(gJ):
     """
-    NOTE: unused, remove?
+    NOTE: unused, remove(?).
 
     Helper Function to convert GJ/m² to MJ/y
 
     Parameters
-    -----------
+    ----------
     gJ : float
         Value in GJ/m^-2
 
@@ -856,7 +859,6 @@ def _gJtoMJ(gJ):
     -------
     MJ : float
         Value in MJ/m^-2
-
     """
     MJ = gJ * 1000
 
@@ -874,10 +876,10 @@ def degradation(
     C2: float = 0.07,
     C: float = 1.0,
 ) -> float:
-    """
-    Compute degredation as double integral of Arrhenius (Activation
-    Energy, RH, Temperature) and spectral (wavelength, irradiance)
-    functions over wavelength and time.
+    """Compute degredation as double integral of Arrhenius (Activation Energy, RH,.
+
+    Temperature) and spectral (wavelength, irradiance) functions over wavelength and
+    time.
 
     Parameters
     ----------
@@ -908,7 +910,6 @@ def degradation(
     -------
     degradation : float
         Total degredation factor over time and wavelength.
-
     """
     # --- TO DO ---
     # unpack input-dataframe
@@ -929,7 +930,8 @@ def degradation(
     except:
         # TODO: Fix this except it works on some cases, veto it by cases
         print("Removing brackets from spectral irradiance data")
-        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        # irr =
+        # data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
         irr.columns = wavelengths
 
@@ -958,8 +960,7 @@ def degradation(
 def vecArrhenius(
     poa_global: np.ndarray, module_temp: np.ndarray, ea: float, x: float, lnr0: float
 ) -> float:
-    """
-    Calculates degradation using :math:`R_D = R_0 * I^X * e^{\\frac{-Ea}{kT}}`
+    """Calculate degradation using :math:`R_D = R_0 * I^X * e^{\frac{-Ea}{kT}}`.
 
     Parameters
     ----------
@@ -979,12 +980,10 @@ def vecArrhenius(
         prefactor [ln(%/h)]
 
     Returns
-    ----------
+    -------
     degredation : float
         Degradation Rate [%/h]
-
     """
-
     mask = poa_global >= 25
     poa_global = poa_global[mask]
     module_temp = module_temp[mask]

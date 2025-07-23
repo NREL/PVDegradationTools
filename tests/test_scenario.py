@@ -2,7 +2,6 @@ from pvdeg.scenario import Scenario
 from pvdeg.standards import standoff
 from pvdeg import TEST_DATA_DIR
 from pvdeg import weather
-import json
 import pandas as pd
 import pytest
 import os
@@ -15,8 +14,9 @@ API_KEY = "DEMO_KEY"
 
 
 def monkeypatch_addLocation(self, *args, **kwargs) -> None:
-    """
-    mocker function to be monkey patched at runtime for Scenario.addLocation to avoid psm3 api calls and use local weather files instead.
+    """Mocker function to be monkey patched at runtime for Scenario.addLocation to avoid.
+
+    psm3 api calls and use local weather files instead.
     """
 
     PSM_FILE = os.path.join(TEST_DATA_DIR, r"psm3_pytest.csv")
@@ -31,17 +31,15 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
 
 
 def test_Scenario_add(monkeypatch):
-
     ### monkey patch to bypass psm3 api calls in addLocation ###
     monkeypatch.setattr(
-        target=Scenario,
-        name="addLocation",
-        value=monkeypatch_addLocation
+        target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
 
     a = Scenario(name="test")
 
     EMAIL = "placeholder@email.xxx"
+
     API_KEY = "fake_key"
 
     a.clean()
@@ -61,14 +59,10 @@ def test_Scenario_add(monkeypatch):
     assert len(a.modules) == len(restored.modules)
     assert len(a.pipeline) == len(restored.pipeline)
 
-
 def test_Scenario_run(monkeypatch):
-
     ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
     monkeypatch.setattr(
-        target=Scenario,
-        name="addLocation",
-        value=monkeypatch_addLocation
+        target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
 
     a = Scenario.load_json(
@@ -81,7 +75,6 @@ def test_Scenario_run(monkeypatch):
     res_df = a.results["test-module"]["GLUSE"]
     known_df = pd.DataFrame(
         {
-		
             "x": {0: 2.008636},
             "T98_0": {0: 77.038644},
             "T98_inf": {0: 50.561112},
@@ -118,6 +111,7 @@ def test_addLocation_pvgis():
 #         name="addLocation",
 #         value=monkeypatch_addLocation
 #     )
+
 
 #     a = Scenario.load_json(
 #         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
