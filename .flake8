@@ -16,3 +16,4 @@ exclude =
     docs
     .eggs
     build
+    tutorials_and_tools/tutorials_and_tools/*.py

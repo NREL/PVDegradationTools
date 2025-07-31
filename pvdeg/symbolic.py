@@ -1,12 +1,11 @@
-"""
-Collections of functions to enable arbitrary symbolic expression evaluation for simple models
-"""
+"""Functions to enable arbitrary symbolic expression evaluation for simple models."""
 
 import sympy as sp
 import pandas as pd
 import numpy as np
 
-# from latex2sympy2 import latex2sympy # this potentially useful but if someone has to use this then they proboably wont be able to figure out the rest
+# from latex2sympy2 import latex2sympy # this potentially useful but if someone has
+# to use this then they proboably wont be able to figure out the rest
 # parse: latex -> sympy using latex2sympy2 if nessesscary
 
 
@@ -14,8 +13,7 @@ def calc_kwarg_floats(
     expr: sp.core.mul.Mul,
     kwarg: dict,
 ) -> float:
-    """
-    Calculate a symbolic sympy expression using a dictionary of values
+    """Calculate a symbolic sympy expression using a dictionary of values.
 
     Parameters:
     ----------
@@ -38,8 +36,7 @@ def calc_df_symbolic(
     expr: sp.core.mul.Mul,
     df: pd.DataFrame,
 ) -> pd.Series:
-    """
-    Calculate the expression over the entire dataframe.
+    """Calculate the expression over the entire dataframe.
 
     Parameters:
     ----------
@@ -50,11 +47,13 @@ def calc_df_symbolic(
     """
     variables = set(map(str, list(expr.free_symbols)))
     if not variables.issubset(df.columns.values):
-        raise ValueError(f"""
+        raise ValueError(
+            f"""
                                  all expression variables need to be in dataframe cols
                                  expr symbols   : {expr.free_symbols}")
                                  dataframe cols : {df.columns.values}
-                                 """)
+                                 """
+        )
 
     res = df.apply(lambda row: calc_kwarg_floats(expr, row.to_dict()), axis=1)
     return res
@@ -87,7 +86,8 @@ def calc_kwarg_timeseries(
     expr,
     kwarg,
 ):
-    # check for equal length among timeseries. no nesting loops allowed, no functions can be dependent on their previous results values
+    # check for equal length among timeseries. no nesting loops allowed, no functions
+    # can be dependent on their previous results values
     numerics, timeseries, series_length = {}, {}, 0
     for key, val in kwarg.items():
         if isinstance(val, (pd.Series, np.ndarray)):
@@ -96,14 +96,17 @@ def calc_kwarg_timeseries(
         elif isinstance(val, (int, float)):
             numerics[key] = val
         else:
-            raise ValueError(f"only simple numerics or timeseries allowed")
+            raise ValueError("only simple numerics or timeseries allowed")
 
     if not _have_same_length(list(timeseries.values())):
         raise NotImplementedError(
-            f"arrays/series are different lengths. fix mismatched length. otherwise arbitrary symbolic solution is too complex for solver. nested loops or loops dependent on previous results not supported."
+            "arrays/series are different lengths. fix mismatched length. "
+            "otherwise arbitrary symbolic solution is too complex for solver. "
+            "nested loops or loops dependent on previous results not supported."
         )
 
-    # calculate the expression. we will seperately calculate all values and store then in a timeseries of the same shape. if a user wants to sum the values then they can
+    # calculate the expression. we will seperately calculate all values and store then
+    # in a timeseries of the same shape. if a user wants to sum the values then they can
     if _have_same_indices(list(timeseries.values())):
         index = list(timeseries.values())[0].index
     else:

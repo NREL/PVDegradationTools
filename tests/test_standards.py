@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -10,10 +9,12 @@ import json
 import pytest
 import pandas as pd
 import pvdeg
-from pvdeg import TEST_DATA_DIR, DATA_DIR, TEST_DIR
+from pvdeg import TEST_DATA_DIR
 
 """
-TODO: during conversion from pkl to csv, a few fields dropped from float64 to float32. This appears
+TODO: during conversion from pkl to csv, a few fields dropped from float64 to float32.
+
+This appears
 to have altered the outcome for L2 results by roughly 1e-5. Is it worth correcting?
 More specifically, the difference is of order:
 x:       1e-7
