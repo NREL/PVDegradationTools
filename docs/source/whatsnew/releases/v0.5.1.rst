@@ -7,6 +7,8 @@ Enhancements
 - Changed ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use ``GeospatialScenario.coords``
 - Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
   (:pull:`182`)
+- Updated pytest workflow to cancel in-progress runs for the same branch in favour of
+  running on the latest commit. (:pull:`191`)
 
 Deprecations
 -------------
