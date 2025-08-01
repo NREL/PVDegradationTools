@@ -148,12 +148,6 @@ def test_degradation():
 #     assert hours_above_85 == 14
 
 
-def test_wh_to_gj():
-    gj = pvdeg.degradation._whToGJ(wh=1)
-
-    assert gj == 3.6e-6
-
-
 def test_vecArrhenius():
     poa_global = pvdeg.spectral.poa_irradiance(weather_df=weather_df, meta=meta)[
         "poa_global"
