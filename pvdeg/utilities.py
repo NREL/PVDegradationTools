@@ -73,9 +73,8 @@ def meta_as_dict(rec):
     return {name: rec[name].item() for name in rec.dtype.names}
 
 
-def get_kinetics(name=None, fname="kinetic_parameters.json"): #This should be combined into the Degradation Database file.
-    """
-    Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
+def get_kinetics(name=None, fname="kinetic_parameters.json"):
+    """Return a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json.
 
     Parameters
     ----------
@@ -492,10 +491,17 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-### DEPRECATE ###
-def _read_material(name, fname="O2permeation.json"):
+<<<<<<<<< Temporary merge branch 1
+def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     """
-    read a material from materials.json and return the parameter dictionary
+    read a material from materials.json and return the parameter dictionary. By default it will look at water permeation, but any database can be used.
+    e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
+    If name=None it will return the Json file if item=None, or a list of specific fields in each Json entry identified by item.
+=========
+# DEPRECATE
+def _read_material(name, fname="O2permeation.json"):
+    """Read a material from materials.json and return the parameter dictionary.
+>>>>>>>>> Temporary merge branch 2
 
     Parameters
     ----------
@@ -514,7 +520,7 @@ def _read_material(name, fname="O2permeation.json"):
     mat_dict : (dict)
         dictionary of material parameters, or "not found" message, or a summary of all entries with specific item entries.
     """
-    
+
     if fp == None:
         with open(pvdeg_datafiles[fname]) as f:
             data = json.load(f)
@@ -526,11 +532,23 @@ def _read_material(name, fname="O2permeation.json"):
         f.close()
 
     if name is None:
+<<<<<<<<< Temporary merge branch 1
+        if item is None:
+            mat_dict = data
+        else:
+            mat_dict = {keys: {keyss: data[keys][keyss] for keyss in data[keys] if keyss in item} for keys in data 
+                    if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})!={}  }
+    else:
+        try:
+            mat_dict = data[name]
+        except:
+            mat_dict = ("Data for", name, "was not found in", fname + ".")
+=========
         return list(data.keys())
 
         # Mike Added
         # broke test
-        # =========== 
+        # ===========
         # material_list = ''
         # print('working')
         # for key in data:
@@ -540,12 +558,11 @@ def _read_material(name, fname="O2permeation.json"):
         # return [*material_list]
 
     mat_dict = data[name]
+>>>>>>>>> Temporary merge branch 2
     return mat_dict
 
 
- 
-
-#currently this is only designed for Oxygen Permeation. It could easily be adapted for all permeation data.
+# currently this is only designed for Oxygen Permeation. It could easily be adapted for all permeation data.
 def _add_material(
     name,
     alias,

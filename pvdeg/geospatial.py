@@ -974,10 +974,7 @@ def elevation_stochastic_downselect(
 
 
 def interpolate_analysis(
-    result: xr.Dataset,
-    data_var: str,
-    method="nearest",
-    resolution=100j,
+    result: xr.Dataset, data_var: str, method="nearest", resolution=100j
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Interpolate sparse spatial result data against DataArray coordinates.
 
@@ -1030,17 +1027,10 @@ def plot_sparse_analysis(
         fig = plt.figure()
         ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
         ax.patch.set_visible(False)
-
-    # These lines came up as a formatting error upon a merge attempt. I just commented it out. Kempe
-    #    show = True
-    #else:
-    #    fig = None
-    #    show = False
-
-    #    show = True
-    #else:
-    #    fig = None
-    #    show = False
+        show = True
+    else:
+        fig = None
+        show = False
 
     extent = [lon.min(), lon.max(), lat.min(), lat.max()]
     ax.set_extent(extent)

@@ -2,6 +2,7 @@
 
 import numpy as np
 import pandas as pd
+<<<<<<<<< Temporary merge branch 1
 import pvlib
 from numba import jit
 from rex import NSRDBX
@@ -16,6 +17,11 @@ from pvdeg import (
     utilities,
     decorators
 )
+=========
+from numba import njit
+
+from pvdeg import temperature, spectral, decorators
+>>>>>>>>> Temporary merge branch 2
 
 
 def _ambient(weather_df):
@@ -292,9 +298,14 @@ def _diffusivity_weighted_water(
     return diffuse_water
 
 
+<<<<<<<<< Temporary merge branch 1
 def front_encap(rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant='W001'):
     """
     Function returns a diffusivity weighted average Relative Humidity of the module surface.
+=========
+def front_encap(rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729):
+    """Return a diffusivity weighted average Relative Humidity of the module surface.
+>>>>>>>>> Temporary merge branch 2
 
     Parameters
     ----------
@@ -310,10 +321,7 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encaps
         Will default to 1.81390702(g/cm3) which is the suggested value for EVA 001 if not specified.
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
-        Will default to Eas = 16.729(kJ/mol) is the suggested value for EVA 001 if not specified.
-    encapsulant : str
-        This is the code number for the encapsulant. 
-        The default is EVA 001.
+        Eas = 16.729(kJ/mol) is the suggested value for EVA.
 
     Return
     ------
@@ -322,8 +330,12 @@ def front_encap(rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encaps
     """
 
     if So is None or Eas is None:
-        So = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['So']
-        Eas = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['Eas']
+        So = utilities._read_material(
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]
+        Eas = utilities._read_material(
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]
 
     diffuse_water = _diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
@@ -404,10 +416,11 @@ def Ce(
     So_e=None,
     Ea_s_e=None,
     l=None,
-    backsheet = 'W017',
-    encapsulant = 'W001',
+    backsheet="W017",
+    encapsulant="W001",
     output="rh",
 ):
+<<<<<<<<< Temporary merge branch 1
     """
     This calculation is used in determining the concentration or relative humidity of water in the backside 
     encapsulant at every time step. 
@@ -415,6 +428,13 @@ def Ce(
     This calculation uses a quasi-steady state approximation of the diffusion equation to calculate the 
     concentration of water in the encapsulant. For this, it is assumed that the diffusion in the encapsulant is
     much larger than the diffusion in the backsheet, and it ignores the transients in the backsheet.
+=========
+    """Return water concentration in encapsulant.
+
+    Calculation is used in determining Relative Humidity of Backside Solar Module
+    Encapsulant. This function returns a numpy array of the Concentration of water in
+    the encapsulant at every time step.
+>>>>>>>>> Temporary merge branch 2
 
     Numba was used to isolate recursion requiring a for loop
     Numba Functions are very fast because they compile and run in machine code but can not use pandas dataframes.
@@ -449,10 +469,10 @@ def Ce(
         Thickness of the backside encapsulant [mm].
         The suggested value for encapsulat is EVA l=0.46 [mm]
     backsheet : str
-        This is the code number for the backsheet. 
+        This is the code number for the backsheet.
         The default is PET 'W017'.
     encapsulant : str
-        This is the code number for the encapsulant. 
+        This is the code number for the encapsulant.
         The default is EVA 'W001'.
     output : str
         The default is "rh" which is the relative humidity in the encapsulant in [%],
@@ -475,19 +495,35 @@ def Ce(
         rh_surface = rh_surface.to_numpy()
 
     if Po_b is None or Ea_p_b is None:
-        Po_b = utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None)['Po']
-        Ea_p_b = utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None)['Eap']
+        Po_b = utilities._read_material(
+            name=backsheet, fname="H2Opermeation", item=None, fp=None
+        )["Po"]
+        Ea_p_b = utilities._read_material(
+            name=backsheet, fname="H2Opermeation", item=None, fp=None
+        )["Eap"]
         if t is None:
-            if 't' in utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None):
-                t = utilities._read_material(name=backsheet, fname="H2Opermeation", item=None, fp=None)['t']
+            if "t" in utilities._read_material(
+                name=backsheet, fname="H2Opermeation", item=None, fp=None
+            ):
+                t = utilities._read_material(
+                    name=backsheet, fname="H2Opermeation", item=None, fp=None
+                )["t"]
             else:
                 t = 0.3
     if So_e is None or Ea_s_e is None:
-        So_e = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['So']
-        Ea_s_e = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['Eas']
+        So_e = utilities._read_material(
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]
+        Ea_s_e = utilities._read_material(
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]
         if l is None:
-            if 't' in utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None):
-                l = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['t']
+            if "t" in utilities._read_material(
+                name=encapsulant, fname="H2Opermeation", item=None, fp=None
+            ):
+                l = utilities._read_material(
+                    name=encapsulant, fname="H2Opermeation", item=None, fp=None
+                )["t"]
             else:
                 l = 0.46
     # Convert the parameters to the correct and convenient units
@@ -495,37 +531,39 @@ def Ce(
     EaWVTR = Ea_p_b / 0.00831446261815324
     So = So_e * l / 10
     Eas = Ea_s_e / 0.00831446261815324
-    #Ce is the initial start of concentration of water
+    # Ce is the initial start of concentration of water
     if start is None:
-        Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100/2
+        Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15))) * rh_surface[0] / 100 / 2
     else:
         Ce = start
- #   for i in range(0, len(rh_surface)):
- #       if i == 0:
- #           # Ce = Initial start of concentration of water
- #           if start is None:
- #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100
- #           else:
- #               Ce = start
- #       else:
- #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
- #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
- #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
+        #   for i in range(0, len(rh_surface)):
+        #       if i == 0:
+        #           # Ce = Initial start of concentration of water
+        #           if start is None:
+        #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100
+        #           else:
+        #               Ce = start
+        #       else:
+        #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
+        #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
+        #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
 
         Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce, rh_surface)
 
     if output == "rh":
         # Convert the concentration to relative humidity
         Ce_list = 100 * (Ce_list / (So * np.exp(-(Eas / (temp_module + 273.15)))))
-        Ce_list = pd.Series(Ce_list, name="RH_back_encapsulant")     
+        Ce_list = pd.Series(Ce_list, name="RH_back_encapsulant")
     else:
         Ce_list = pd.Series(Ce_list, name="Ce_back_encapsulant")
-    
+
     Ce_list.index = Ce_out.index
     return Ce_list
 
+
 @jit
 def _Ce(
+    start,
     WVTRo,
     EaWVTR,
     temp_module,
@@ -544,9 +582,10 @@ def _Ce(
 
     """
     for i in range(1, len(rh_surface)):
-        Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
-                ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
-        
+        Ce = Ce + (WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))) / (
+            So * np.exp(-Eas / (temp_module[i] + 273.15))
+        ) * (rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15)) - Ce)
+
     return Ce
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
@@ -584,11 +623,11 @@ def backsheet(
     So_e=None,
     Ea_s_e=None,
     l=None,
-    backsheet = 'W017',
-    encapsulant = 'W001'):
-    
+    backsheet="W017",
+    encapsulant="W001",
+):
     """
-    Function to calculate the relative humidity in a solar module backsheet as timeseries.
+    Calculate the relative humidity in a solar module backsheet as timeseries.
     It assume a value that is the average of the RH of the backside encapsulant and the outside surface of the module.
 
     Parameters
@@ -623,10 +662,10 @@ def backsheet(
         Thickness of the backside encapsulant [mm].
         The suggested value for encapsulat is EVA l=0.46 [mm]
     backsheet : str
-        This is the code number for the backsheet. 
+        This is the code number for the backsheet.
         The default is PET 'W017'.
     encapsulant : str
-        This is the code number for the encapsulant. 
+        This is the code number for the encapsulant.
         The default is EVA 'W001'.
 
     Returns
@@ -636,7 +675,9 @@ def backsheet(
     """
 
     # Get the relative humidity of the surface
-    surface = surface_outside(rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module)
+    surface = surface_outside(
+        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
+    )
 
     # Get the relative humidity of the back encapsulant
     RHback_series = Ce(
@@ -650,9 +691,10 @@ def backsheet(
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         l=l,
-        backsheet = backsheet,
-        encapsulant = encapsulant,
-        output="rh")
+        backsheet=backsheet,
+        encapsulant=encapsulant,
+        output="rh",
+    )
 
     return (RHback_series + surface) / 2
 
@@ -763,15 +805,19 @@ def module(
         Eas=Eas,
     )
 
-    rh_back_encap = back_encap(
-        rh_ambient=weather_df["relative_humidity"],
-        temp_ambient=weather_df["temp_air"],
-        temp_module=temp_module,
-        WVTRo=WVTRo,
-        EaWVTR=EaWVTR,
-        So=So,
-        l=l,
-        Eas=Eas,
+    rh_back_encap = Ce(
+            temp_module = temp_module,
+            rh_surface = rh_surface_outside,
+            start=None,
+            Po_b=1319534666.90318,
+            Ea_p_b=55.4064573018373,
+            t=0.3,
+            So_e=So,
+            Ea_s_e=Eas,
+            l=l,
+            backsheet="W017",
+            encapsulant="W001",
+            output="rh",
     )
 
     rh_backsheet = backsheet_from_encap(

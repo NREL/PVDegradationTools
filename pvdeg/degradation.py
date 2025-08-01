@@ -14,6 +14,7 @@ from . import (
 
 # TODO: Clean up all those functions and add gaps functionality
 
+
 def arrhenius(
     weather_df=None,
     temperature=None,
@@ -24,52 +25,51 @@ def arrhenius(
     p=None,
     n=None,
     C2=None,
-    parameters=None
-    ):
-
+    parameters=None,
+):
     """
     Calculate the degradation rate using an Arrhenius function with power law functions for
-    the humidity dependence and irradiance dependence. 
+    the humidity dependence and irradiance dependence.
     D=R_0 ∫[RH(t)]^n·e^[-E_a/RT(t) ] {∫[e^(-C_2∙ λ)∙G(λ,t)]^p dλ}dt
 
     Parameters
     ----------
     weather_df : pd.dataframe
-        Dataframe containing a the temperature, humidity, and irradiance data as an alternate source. 
+        Dataframe containing a the temperature, humidity, and irradiance data as an alternate source.
         If used, it will default to the module surface temperature, the module surface humidity,
         and the POA global irradiance.
     temperature: pd.DataFrame,
-        This is the temperature data that will be used for the Arrhenius degradation calculation. 
+        This is the temperature data that will be used for the Arrhenius degradation calculation.
         If it isn't specified, the module surface temperature will be used as supplied in weather_df.
         if Ea=0 then temperature data will not be necessary.
     RH: pd.DataFrame,
-        This is the relative humidity data that will be used for the Arrhenius degradation calculation. 
+        This is the relative humidity data that will be used for the Arrhenius degradation calculation.
         If it isn't specified, the module surface relative humidity will be used as determined using weather_df.
         The module temperature is not in weather_df by default and must therfore be added prior to this function call
         If the humidity power law factor n is not provided, n will be assumed to be equal to zero and humidity
         data is not needed.
     irradiance: pd.DataFrame,
-        This is the irradiance data that will be used for the Arrhenius degradation calculation. 
+        This is the irradiance data that will be used for the Arrhenius degradation calculation.
         If it isn't specified, the module POA irradiance will be used as supplied in weather_df.
-        If the irradiance power law factor (Schwarchild coefficient) p is not provided, p will be assumed 
-        to be equal to zero and irradiance data is not needed. 
+        If the irradiance power law factor (Schwarchild coefficient) p is not provided, p will be assumed
+        to be equal to zero and irradiance data is not needed.
 
-        If C2 is provided, then the wavelength spectral intensity data must be provided. Here the header 
-        is a list with the first element starting with the word "spectra", and the rest of the elements 
+        If C2 is provided, then the wavelength spectral intensity data must be provided. Here the header
+        is a list with the first element starting with the word "spectra", and the rest of the elements
         being the wavelength irradiance intensity points. Then each element in the dataframe is a list
-        of light intensity values at the corresponding wavelength in units of W/m²/nm, or similar.  
+        of light intensity values at the corresponding wavelength in units of W/m²/nm, or similar.
     Ro : float
         This is the degradation rate prefactor with units determined by the user [e.g. %/h/%RH/(1000 W/m²)]
         if not provided direction or through parameters, a value of 1 [%/h/(%^(1/n)/(w^(1/p)))] will be used.
     Ea : float
         Degredation Activation Energy [kJ/mol]
-        if Ea=0 is used there will be not dependence on temperature and degradation will proceed according 
+        if Ea=0 is used there will be not dependence on temperature and degradation will proceed according
         to the amount of light and humidity.
     p : float
         Schwartchild coefficient for power law dependence on irradiance.
-        When p=0 the dependence on light will be ignored and degradation will happen both day an night. 
-        As a caution or a feature, a very small value of p (e.g. p=0.0001) will provide very little degradation 
-        dependence on irradiance, but degradation will only be accounted for during daylight. i.e. averages will 
+        When p=0 the dependence on light will be ignored and degradation will happen both day an night.
+        As a caution or a feature, a very small value of p (e.g. p=0.0001) will provide very little degradation
+        dependence on irradiance, but degradation will only be accounted for during daylight. i.e. averages will
         be computed over half of the time only.
     n : float
         Parameter for relative humidity power law dependence on degradation.
@@ -80,14 +80,14 @@ def arrhenius(
     parameters : json
         This is a json file that contains the parameters for the Arrhenius degradation calculation.
         If Ea, n or p are not provided for the calculation, they will be taken from this json file.
-    
+
     Returns
     --------
     degradation : float
         Total degradation with units as determined by Ro
     """
 
-    if Ro==None:
+    if Ro == None:
         if parameters is not None:
             if "R_0.value" in parameters:
                 Ro = parameters["R_0.value"]
@@ -95,109 +95,380 @@ def arrhenius(
                 Ro = 1
         else:
             Ro = 1
-    if Ea==None:
+    if Ea == None:
         if parameters is not None:
             if "Ea.value" in parameters:
                 Ea = parameters["Ea.value"]
             else:
-                Ea=0
+                Ea = 0
         else:
-            Ea=0
-    if n==None:
+            Ea = 0
+    if n == None:
         if parameters is not None:
             if "n.value" in parameters:
                 n = parameters["n.value"]
             else:
-                n=0
+                n = 0
         else:
-            n=0
-    if p==None:
+            n = 0
+    if p == None:
         if parameters is not None:
             if "p.value" in parameters:
                 p = parameters["p.value"]
             else:
-                p=0
+                p = 0
         else:
-            p=0
+            p = 0
     if temperature is None:
         temperature = weather_df["temp"]
-    if RH==None and "relative_humidity" in weather_df and "temp_air" in weather_df and "temp_module" in weather_df:
-        RH = humidity.surface_outside(weather_df["relative_humidity"], weather_df["temp_air"], weather_df["temp_module"])
+    if (
+        RH == None
+        and "relative_humidity" in weather_df
+        and "temp_air" in weather_df
+        and "temp_module" in weather_df
+    ):
+        RH = humidity.surface_outside(
+            weather_df["relative_humidity"],
+            weather_df["temp_air"],
+            weather_df["temp_module"],
+        )
 
-    if C2==None:
+    if C2 == None:
         if parameters is not None:
             if "C_2.value" in parameters:
                 C2 = parameters["C_2.value"]
             else:
                 C2 = 0
         else:
-            C2 = 0  
+            C2 = 0
     if irradiance is None:
-        if C2 !=0 or p !=0:
+        if C2 != 0 or p != 0:
             if weather_df is not None:
                 for col in weather_df.columns:
                     if "SPECTRA" in (col[:7]).upper():
                         irradiance = weather_df[col].copy
                         irradiance.columns = [col]
-                        break  
+                        break
                 if "poa_global" in weather_df:
                     irradiance = weather_df["poa_global"]
-                    print("Using poa_global from weather_df for irradiance.")   
+                    print("Using poa_global from weather_df for irradiance.")
 
-    if C2 !=0:
-        wavelengths = [float(i) for i in irradiance.columns[0].split("[")[1].split("]")[0].split(",")]
+    if C2 != 0:
+        wavelengths = [
+            float(i)
+            for i in irradiance.columns[0].split("[")[1].split("]")[0].split(",")
+        ]
         wavelengths = np.array(wavelengths)
-        bin_widths = (np.append(wavelengths,[0,0])- np.append([0,0],wavelengths))/2
+        bin_widths = (
+            np.append(wavelengths, [0, 0]) - np.append([0, 0], wavelengths)
+        ) / 2
         bin_widths = bin_widths[1:]
         bin_widths = bin_widths[:-1]
-        #assumes the first and last bin widths are the width of that between the next or previous bin, respectively.
+        # assumes the first and last bin widths are the width of that between the next or previous bin, respectively.
         bin_widths[0] = bin_widths[1]
         bin_widths[-1] = bin_widths[-2]
-        
-        if p==0:
-            if Ea!=0:
-                if n==0:
-                    degradation = Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
-                else: 
-                    degradation = Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15)))) * (RH**n)
-            else:   
-                if n==0:
+
+        if p == 0:
+            if Ea != 0:
+                if n == 0:
+                    degradation = Ro * np.exp(
+                        -(Ea / (0.00831446261815324 * (temperature + 273.15)))
+                    )
+                else:
+                    degradation = (
+                        Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                        * (RH**n)
+                    )
+            else:
+                if n == 0:
                     degradation = Ro
-                else: 
+                else:
                     degradation = Ro * (RH**n)
         else:
-            degradation = bin_widths * ((np.exp(-C2*wavelengths)*irradiance)**p) 
-            if Ea!=0:
-                if n==0:
-                    degradation = degradation * Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))  
+            degradation = bin_widths * ((np.exp(-C2 * wavelengths) * irradiance) ** p)
+            if Ea != 0:
+                if n == 0:
+                    degradation = (
+                        degradation
+                        * Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                    )
                 else:
-                    degradation = degradation * Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15)))) * (RH**n)    
-            else:   
-                if n==0:
-                    degradation = degradation * Ro 
+                    degradation = (
+                        degradation
+                        * Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                        * (RH**n)
+                    )
+            else:
+                if n == 0:
+                    degradation = degradation * Ro
                 else:
-                    degradation = degradation * Ro * (RH**n) 
-    elif Ea!=0:
-        if n==0 and p==0:
-            degradation = Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
-        elif n==0 and p!=0:
-            degradation = Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15)))) * (irradiance**p) 
-        elif n!=0 and p==0: 
-            degradation = Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15)))) * (RH**n)
+                    degradation = degradation * Ro * (RH**n)
+    elif Ea != 0:
+        if n == 0 and p == 0:
+            degradation = Ro * np.exp(
+                -(Ea / (0.00831446261815324 * (temperature + 273.15)))
+            )
+        elif n == 0 and p != 0:
+            degradation = (
+                Ro
+                * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                * (irradiance**p)
+            )
+        elif n != 0 and p == 0:
+            degradation = (
+                Ro
+                * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                * (RH**n)
+            )
         else:
-            degradation = Ro * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15)))) * (RH**n) * (irradiance**p)   
-    else:   
-        if n==0 and p==0:
+            degradation = (
+                Ro
+                * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                * (RH**n)
+                * (irradiance**p)
+            )
+    else:
+        if n == 0 and p == 0:
             degradation = Ro
-        elif n==0 and p!=0:
-            degradation = Ro * (irradiance**p) 
-        elif n!=0 and p==0: 
+        elif n == 0 and p != 0:
+            degradation = Ro * (irradiance**p)
+        elif n != 0 and p == 0:
             degradation = Ro * (RH**n)
         else:
             degradation = Ro * (RH**n) * (irradiance**p)
 
     return degradation.sum(axis=0, skipna=True)
 
+
+def arrhenius(
+    weather_df=None,
+    temperature=None,
+    RH=None,
+    irradiance=None,
+    Ro=None,
+    Ea=None,
+    p=None,
+    n=None,
+    C2=None,
+    parameters=None,
+):
+    """
+    Calculate the degradation rate using an Arrhenius function with power law functions for
+    the humidity dependence and irradiance dependence.
+    D=R_0 ∫[RH(t)]^n·e^[-E_a/RT(t) ] {∫[e^(-C_2∙ λ)∙G(λ,t)]^p dλ}dt
+
+    Parameters
+    ----------
+    weather_df : pd.dataframe
+        Dataframe containing a the temperature, humidity, and irradiance data as an alternate source.
+        If used, it will default to the module surface temperature, the module surface humidity,
+        and the POA global irradiance.
+    temperature: pd.DataFrame,
+        This is the temperature data that will be used for the Arrhenius degradation calculation.
+        If it isn't specified, the module surface temperature will be used as supplied in weather_df.
+        if Ea=0 then temperature data will not be necessary.
+    RH: pd.DataFrame,
+        This is the relative humidity data that will be used for the Arrhenius degradation calculation.
+        If it isn't specified, the module surface relative humidity will be used as determined using weather_df.
+        The module temperature is not in weather_df by default and must therfore be added prior to this function call
+        If the humidity power law factor n is not provided, n will be assumed to be equal to zero and humidity
+        data is not needed.
+    irradiance: pd.DataFrame,
+        This is the irradiance data that will be used for the Arrhenius degradation calculation.
+        If it isn't specified, the module POA irradiance will be used as supplied in weather_df.
+        If the irradiance power law factor (Schwarchild coefficient) p is not provided, p will be assumed
+        to be equal to zero and irradiance data is not needed.
+
+        If C2 is provided, then the wavelength spectral intensity data must be provided. Here the header
+        is a list with the first element starting with the word "spectra", and the rest of the elements
+        being the wavelength irradiance intensity points. Then each element in the dataframe is a list
+        of light intensity values at the corresponding wavelength in units of W/m²/nm, or similar.
+    Ro : float
+        This is the degradation rate prefactor with units determined by the user [e.g. %/h/%RH/(1000 W/m²)]
+        if not provided direction or through parameters, a value of 1 [%/h/(%^(1/n)/(w^(1/p)))] will be used.
+    Ea : float
+        Degredation Activation Energy [kJ/mol]
+        if Ea=0 is used there will be not dependence on temperature and degradation will proceed according
+        to the amount of light and humidity.
+    p : float
+        Schwartchild coefficient for power law dependence on irradiance.
+        When p=0 the dependence on light will be ignored and degradation will happen both day an night.
+        As a caution or a feature, a very small value of p (e.g. p=0.0001) will provide very little degradation
+        dependence on irradiance, but degradation will only be accounted for during daylight. i.e. averages will
+        be computed over half of the time only.
+    n : float
+        Parameter for relative humidity power law dependence on degradation.
+        When n=0 the degradation rate will not be dependent on humidity.
+    C2 : float
+        Parameter for describing the spectral response of the module using a power law relationship of irradiance
+        to photon wavelength.
+    parameters : json
+        This is a json file that contains the parameters for the Arrhenius degradation calculation.
+        If Ea, n or p are not provided for the calculation, they will be taken from this json file.
+
+    Returns
+    --------
+    degradation : float
+        Total degradation with units as determined by Ro
+    """
+
+    if Ro == None:
+        if parameters is not None:
+            if "R_0.value" in parameters:
+                Ro = parameters["R_0.value"]
+            else:
+                Ro = 1
+        else:
+            Ro = 1
+    if Ea == None:
+        if parameters is not None:
+            if "Ea.value" in parameters:
+                Ea = parameters["Ea.value"]
+            else:
+                Ea = 0
+        else:
+            Ea = 0
+    if n == None:
+        if parameters is not None:
+            if "n.value" in parameters:
+                n = parameters["n.value"]
+            else:
+                n = 0
+        else:
+            n = 0
+    if p == None:
+        if parameters is not None:
+            if "p.value" in parameters:
+                p = parameters["p.value"]
+            else:
+                p = 0
+        else:
+            p = 0
+    if temperature is None:
+        temperature = weather_df["temp"]
+    if (
+        RH == None
+        and "relative_humidity" in weather_df
+        and "temp_air" in weather_df
+        and "temp_module" in weather_df
+    ):
+        RH = humidity.surface_outside(
+            weather_df["relative_humidity"],
+            weather_df["temp_air"],
+            weather_df["temp_module"],
+        )
+
+    if C2 == None:
+        if parameters is not None:
+            if "C_2.value" in parameters:
+                C2 = parameters["C_2.value"]
+            else:
+                C2 = 0
+        else:
+            C2 = 0
+    if irradiance is None:
+        if C2 != 0 or p != 0:
+            if weather_df is not None:
+                for col in weather_df.columns:
+                    if "SPECTRA" in (col[:7]).upper():
+                        irradiance = weather_df[col].copy
+                        irradiance.columns = [col]
+                        break
+                if "poa_global" in weather_df:
+                    irradiance = weather_df["poa_global"]
+                    print("Using poa_global from weather_df for irradiance.")
+
+    if C2 != 0:
+        wavelengths = [
+            float(i)
+            for i in irradiance.columns[0].split("[")[1].split("]")[0].split(",")
+        ]
+        wavelengths = np.array(wavelengths)
+        bin_widths = (
+            np.append(wavelengths, [0, 0]) - np.append([0, 0], wavelengths)
+        ) / 2
+        bin_widths = bin_widths[1:]
+        bin_widths = bin_widths[:-1]
+        # assumes the first and last bin widths are the width of that between the next or previous bin, respectively.
+        bin_widths[0] = bin_widths[1]
+        bin_widths[-1] = bin_widths[-2]
+
+        if p == 0:
+            if Ea != 0:
+                if n == 0:
+                    degradation = Ro * np.exp(
+                        -(Ea / (0.00831446261815324 * (temperature + 273.15)))
+                    )
+                else:
+                    degradation = (
+                        Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                        * (RH**n)
+                    )
+            else:
+                if n == 0:
+                    degradation = Ro
+                else:
+                    degradation = Ro * (RH**n)
+        else:
+            degradation = bin_widths * ((np.exp(-C2 * wavelengths) * irradiance) ** p)
+            if Ea != 0:
+                if n == 0:
+                    degradation = (
+                        degradation
+                        * Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                    )
+                else:
+                    degradation = (
+                        degradation
+                        * Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                        * (RH**n)
+                    )
+            else:
+                if n == 0:
+                    degradation = degradation * Ro
+                else:
+                    degradation = degradation * Ro * (RH**n)
+    elif Ea != 0:
+        if n == 0 and p == 0:
+            degradation = Ro * np.exp(
+                -(Ea / (0.00831446261815324 * (temperature + 273.15)))
+            )
+        elif n == 0 and p != 0:
+            degradation = (
+                Ro
+                * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                * (irradiance**p)
+            )
+        elif n != 0 and p == 0:
+            degradation = (
+                Ro
+                * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                * (RH**n)
+            )
+        else:
+            degradation = (
+                Ro
+                * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                * (RH**n)
+                * (irradiance**p)
+            )
+    else:
+        if n == 0 and p == 0:
+            degradation = Ro
+        elif n == 0 and p != 0:
+            degradation = Ro * (irradiance**p)
+        elif n != 0 and p == 0:
+            degradation = Ro * (RH**n)
+        else:
+            degradation = Ro * (RH**n) * (irradiance**p)
+
+    return degradation.sum(axis=0, skipna=True)
 
 
 def _deg_rate_env(poa_global, temp, temp_chamber, p, Tf):
@@ -1082,7 +1353,7 @@ def degradation_spectral(
     time : time indicator in [h]
         if not included it will assume 1 h for each dataframe entry.
     Ea : float [kJ/mol]
-        Arrhenius activation energy. The default is 0 ofr no dependence 
+        Arrhenius activation energy. The default is 0 ofr no dependence
     n : float
         Power law fit paramter for RH sensitivity. The default is 0 for no dependence.
     p : float

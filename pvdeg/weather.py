@@ -77,8 +77,7 @@ ENTRIES_PERIODICITY_MAP = {
 }
 
 
-
-def get(database: str, id=None, geospatial=False, find_meta: bool=None , **kwargs):
+def get(database: str, id=None, geospatial=False, find_meta: bool = None, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function.
@@ -96,7 +95,7 @@ def get(database: str, id=None, geospatial=False, find_meta: bool=None , **kwarg
         distributed compute systems. Geospaital analyses are only supported for
         NSRDB data and locally stored h5 files that follow pvlib conventions.
     find_meta : (bool)
-        if true, this instructs the code to look up additional meta data. 
+        if true, this instructs the code to look up additional meta data.
         The default is True if geospatial is False.
     **kwargs :
         Additional keyword arguments to pass to the get_weather function
@@ -214,7 +213,7 @@ def get(database: str, id=None, geospatial=False, find_meta: bool=None , **kwarg
         map_weather(weather_df)
         map_meta(meta)
         if find_meta:
-            meta=find_metadata(meta)
+            meta = find_metadata(meta)
 
         if "relative_humidity" not in weather_df.columns:
             print(
@@ -288,7 +287,7 @@ def read(file_in, file_type, map_variables=True, find_meta=True, **kwargs):
         map_weather(weather_df)
         map_meta(meta)
     if find_meta:
-        meta=find_metadata(meta)
+        meta = find_metadata(meta)
 
     if weather_df.index.tzinfo is None:
         tz = "Etc/GMT%+d" % -meta["tz"]
@@ -387,15 +386,15 @@ def map_meta(meta):
         "Local Time Zone": "tz",
         "Time Zone": "tz",
         "timezone": "tz",
-        "TZ":"tz",
+        "TZ": "tz",
         "Dew Point": "dew_point",
         "Longitude": "longitude",
         "Latitude": "latitude",
         "state": "State",
         "county": "County",
         "country": "Country",
-        "Neighborhood": "neighbourhood" ,
-        "country_code": "Country Code" ,
+        "Neighborhood": "neighbourhood",
+        "country_code": "Country Code",
         "postcode": "Zipcode",
         "road": "Street",
         "village": "City",
@@ -408,7 +407,7 @@ def map_meta(meta):
         if key in META_MAP.keys():
             meta[META_MAP[key]] = meta.pop(key)
     if "Country Code" in meta.keys():
-        meta["Country Code"]=meta["Country Code"].upper()
+        meta["Country Code"] = meta["Country Code"].upper()
 
     return meta
 
@@ -1449,75 +1448,79 @@ def weather_distributed(
 
     return weather_ds, meta_df, indexes_failed
 
+
 def find_metadata(meta):
-     """
-     Fills in missing meta data for a geographic location. 
-     The meta dictionary must have longitude and latitude information.
-     Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
-     It will only replace empty keys and those with one character of length.
- 
-     Parameters:
-     -----------
-     meta : (dict)
-         Dictionary of metadata for the weather data
- 
-     Returns:
-     --------
-     meta : (dict)
-         Dictionary of metadata for the weather data
-     """
-     geolocator = Nominatim(user_agent="geoapiexercises")
-     location = geolocator.reverse(str(meta['latitude']) + ',' + str(meta['longitude'])).raw['address']
-     map_meta(location)
- 
-     for key in [*location.keys()]:
-         if key in meta.keys():
-             if len(meta[key])<2:
-                 meta[key] = location[key]
-         else:
-             meta[key] = location[key]
- 
-     return meta
+    """
+    Fills in missing meta data for a geographic location.
+    The meta dictionary must have longitude and latitude information.
+    Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
+    It will only replace empty keys and those with one character of length.
+
+    Parameters:
+    -----------
+    meta : (dict)
+        Dictionary of metadata for the weather data
+
+    Returns:
+    --------
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
+    geolocator = Nominatim(user_agent="geoapiexercises")
+    location = geolocator.reverse(
+        str(meta["latitude"]) + "," + str(meta["longitude"])
+    ).raw["address"]
+    map_meta(location)
+
+    for key in [*location.keys()]:
+        if key in meta.keys():
+            if len(meta[key]) < 2:
+                meta[key] = location[key]
+        else:
+            meta[key] = location[key]
+
+    return meta
+
 
 # def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
-    #     map_weather(weather_df=weather_df)
-    #     map_meta(meta)
+#     map_weather(weather_df=weather_df)
+#     map_meta(meta)
 
-    # check if weather is localized, convert to GMT (like pvgis)
-    # check if time index is on the hour or 30 minutes
-    # weather_df.index - pd.Timedelta("30m")
+# check if weather is localized, convert to GMT (like pvgis)
+# check if time index is on the hour or 30 minutes
+# weather_df.index - pd.Timedelta("30m")
 
-    # NSRDB datavars
-    # Year  Month  Day  Hour  Minute  dew_point  dhi
-    # dni  ghi  albedo  pressure  temp_air
-    # wind_direction  wind_speed  relative_humidity
+# NSRDB datavars
+# Year  Month  Day  Hour  Minute  dew_point  dhi
+# dni  ghi  albedo  pressure  temp_air
+# wind_direction  wind_speed  relative_humidity
 
-    # weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
-    # meta_dropables = [...]
+# weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
+# meta_dropables = [...]
 
-    # NSRDB meta
-    # {'Source': 'NSRDB',
-    #  'Location ID': '145809',
-    #  'City': '-',
-    #  'State': '-',
-    #  'Country': '-',
-    #  'Dew Point Units': 'c',
-    #  'DHI Units': 'w/m2',
-    #  'DNI Units': 'w/m2',
-    #  'GHI Units': 'w/m2',
-    #  'Temperature Units': 'c',
-    #  'Pressure Units': 'mbar',
-    #  'Wind Direction Units': 'Degrees',
-    #  'Wind Speed Units': 'm/s',
-    #  'Surface Albedo Units': 'N/A',
-    #  'Version': '3.2.0',
-    #  'latitude': 39.73,
-    #  'longitude': -105.18,
-    #  'altitude': 1820,
-    #  'tz': -7,
-    #  'wind_height': 2}
-    # ...
+# NSRDB meta
+# {'Source': 'NSRDB',
+#  'Location ID': '145809',
+#  'City': '-',
+#  'State': '-',
+#  'Country': '-',
+#  'Dew Point Units': 'c',
+#  'DHI Units': 'w/m2',
+#  'DNI Units': 'w/m2',
+#  'GHI Units': 'w/m2',
+#  'Temperature Units': 'c',
+#  'Pressure Units': 'mbar',
+#  'Wind Direction Units': 'Degrees',
+#  'Wind Speed Units': 'm/s',
+#  'Surface Albedo Units': 'N/A',
+#  'Version': '3.2.0',
+#  'latitude': 39.73,
+#  'longitude': -105.18,
+#  'altitude': 1820,
+#  'tz': -7,
+#  'wind_height': 2}
+# ...
 
 
 # def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
