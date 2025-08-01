@@ -7,6 +7,8 @@ Enhancements
 - Changed ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use ``GeospatialScenario.coords``
 - Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
   (:pull:`182`)
+- Updated pytest workflow to cancel in-progress runs for the same branch in favour of
+  running on the latest commit. (:pull:`191`)
 
 Deprecations
 -------------
@@ -17,7 +19,15 @@ Deprecations
 
 Bug Fixes
 ---------
-``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to ``pvdeg/geospatialscenario.py``. Completed the move.
+- ``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to
+  ``pvdeg/geospatialscenario.py``. Completed the move.
+- Code cleanup and standardization in :py:mod:`pvdeg.degradation` module:
+  - Improve readability of mathematical expressions
+  - Refactor redundant helper functions
+  - Update docstrings
+  - Remove unused functions and variables
+  - Improve code consistency
+  (:issue:`177`, :pull:`178`)
 
 Dependencies
 ------------
