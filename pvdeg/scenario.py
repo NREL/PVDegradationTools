@@ -234,7 +234,7 @@ class Scenario:
 
         if see_added and weather_db == "PSM3":
             message = f"Gids Added - {self.gids}"
-            warnings.warn(message, UserWarning)
+            print(message)
 
     def addModule(
         self,
@@ -417,7 +417,7 @@ class Scenario:
 
         if see_added:
             message = f"{func.__name__} added to pipeline as \n {job_dict}"
-            warnings.warn(message, UserWarning)
+            print(message)
 
     def run(self):
         """
