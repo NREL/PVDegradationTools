@@ -314,7 +314,8 @@ class Scenario:
         )
 
         if see_added:
-            print(f'Module "{module_name}" added.')
+            message = f"Module {module_name} added."
+            print(message)
 
     # add testing
     def add_material(
