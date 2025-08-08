@@ -388,6 +388,7 @@ def map_meta(meta):
     else:
         raise TypeError(f"Input must be dict or pandas.DataFrame, got {type(meta)}")
 
+
 def map_weather(weather_df):
     """
 
