@@ -372,7 +372,7 @@ def map_meta(meta):
     meta : dict or pandas.DataFrame
         Metadata with standardized keys/column names.
     """
-    
+
     META_MAP = {
         "elevation": "altitude",
         "Elevation": "altitude",
@@ -389,18 +389,16 @@ def map_meta(meta):
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
-
         return meta
+    
     # Rename columns in DataFrame
     elif isinstance(meta, pd.DataFrame):
         rename_map = {k: v for k, v in META_MAP.items() if k in meta.columns}
-        meta = meta.rename(columns=rename_map)
-        return meta
+        return meta.rename(columns=rename_map)
 
     else:
         raise TypeError(f"Input must be dict or pandas.DataFrame, got {type(meta)}")
     
-
 def map_weather(weather_df):
     """
 
