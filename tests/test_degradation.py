@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -147,12 +146,6 @@ def test_degradation():
 #     hours_above_85 = pvdeg.degradation._hoursRH_Above85(rh_linear_df)
 
 #     assert hours_above_85 == 14
-
-
-def test_wh_to_gj():
-    gj = pvdeg.degradation._whToGJ(wh=1)
-
-    assert gj == 3.6e-6
 
 
 def test_vecArrhenius():

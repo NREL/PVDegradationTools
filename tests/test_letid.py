@@ -3,13 +3,11 @@ from pvdeg import weather, letid, utilities, collection, DATA_DIR, TEST_DATA_DIR
 
 import os
 import pandas as pd
-import numpy as np
 import json
-from pvlib.pvsystem import retrieve_sam
 from scipy.constants import convert_temperature
 
 import pvlib
-from pvlib.pvsystem import PVSystem, FixedMount
+from pvlib.pvsystem import PVSystem
 from pvlib.location import Location
 from pvlib.modelchain import ModelChain
 from pvlib.temperature import TEMPERATURE_MODEL_PARAMETERS
@@ -277,7 +275,9 @@ def test_calc_injection_outdoors():
     sandia_module = sandia_modules["Canadian_Solar_CS5P_220M___2009_"]
     cec_inverter = cec_inverters["ABB__MICRO_0_25_I_OUTD_US_208__208V_"]
 
-    location = Location(latitude=META["latitude"], longitude=META["longitude"])
+    location = Location(
+        latitude=META["latitude"], longitude=META["longitude"], altitude=0
+    )
 
     system = PVSystem(
         surface_tilt=20,
@@ -287,7 +287,7 @@ def test_calc_injection_outdoors():
         temperature_model_parameters=temperature_model_parameters,
     )
 
-    mc = ModelChain(system, location)
+    mc = ModelChain(system, location, spectral_model="sapm")
 
     mc.run_model(WEATHER)
     mc.complete_irradiance(WEATHER)
@@ -330,7 +330,7 @@ def test_calc_letid_outdoors():
         generation_df,
     )
     print("here it is", META)
-    pd.testing.assert_frame_equal(result, LETID_OUTDOORS)
+    pd.testing.assert_frame_equal(result, LETID_OUTDOORS, rtol=1e-5, atol=1e-8)
 
 
 def test_calc_letid_lab():

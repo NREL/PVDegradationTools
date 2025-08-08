@@ -1,15 +1,14 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import pytest
 import os
 import pandas as pd
 import numpy as np
-from pvdeg import collection, TEST_DIR, DATA_DIR
+from pvdeg import collection, DATA_DIR
 
 fgen = os.path.join(DATA_DIR, "PVL_GenProfile.xlsx")
 generation_df = pd.read_excel(fgen, header=0, engine="openpyxl")

@@ -1,13 +1,12 @@
-"""
-Collection of classes and functions to obtain spectral parameters.
-"""
+"""Collection of classes and functions to obtain spectral parameters."""
 
 import pvlib
 import pandas as pd
 from pvdeg import decorators
 
+
 @decorators.geospatial_quick_shape(
-    'timeseries',
+    "timeseries",
     [
         "apparent_zenith",
         "zenith",
@@ -18,9 +17,10 @@ from pvdeg import decorators
     ],
 )
 def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
-    """
-    Calculate solar position using pvlib based on weather data from the
-    National Solar Radiation Database (NSRDB) for a given location (gid).
+    """Calculate solar position.
+
+    Calculate solar position using pvlib based on weather data from the National
+    Solar Radiation Database (NSRDB) for a given location (gid).
 
     Parameters
     ----------
@@ -34,7 +34,6 @@ def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
     solar_position : pandas.DataFrame
         Solar position like zenith and azimuth.
     """
-
     # location = pvlib.location.Location(
     #     latitude=meta['latitude'],
     #     longitude=meta['longitude'],
@@ -54,7 +53,7 @@ def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
 
 
 @decorators.geospatial_quick_shape(
-    'timeseries',
+    "timeseries",
     [
         "poa_global",
         "poa_direct",
@@ -71,9 +70,10 @@ def poa_irradiance(
     azimuth=None,
     sky_model="isotropic",
 ) -> pd.DataFrame:
-    """
-    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
-    National Solar Radiation Database (NSRDB) for a given location (gid).
+    """Calculate plane-of-array (POA) irradiance.
+
+    Calculate plane-of-array (POA) irradiance using pvlib based on weather data from
+    the National Solar Radiation Database (NSRDB) for a given location (gid).
 
     Parameters
     ----------
@@ -82,7 +82,8 @@ def poa_irradiance(
     meta : dict
         The geographical location ID in the NSRDB file.
     sol_position : pd.DataFrame, optional
-        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
+        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be
+        calculated.
     tilt : float, optional
         The tilt angle of the PV panels in degrees, if None, the latitude of the
         location is used.
@@ -97,7 +98,6 @@ def poa_irradiance(
          Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
          'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
     """
-
     # TODO: change for handling HSAT tracking passed or requested
     if tilt is None:
         try:
@@ -105,7 +105,8 @@ def poa_irradiance(
         except:
             tilt = float(meta["latitude"])
             print(
-                f"The array tilt angle was not provided, therefore the latitude tilt of {tilt:.1f} was used."
+                f"The array tilt angle was not provided, therefore the latitude tilt \
+                    of {tilt:.1f} was used."
             )
     if azimuth is None:  # Sets the default orientation to equator facing.
         try:
@@ -116,7 +117,8 @@ def poa_irradiance(
             else:
                 azimuth = 180
                 print(
-                    f"The array azimuth was not provided, therefore an azimuth of {azimuth:.1f} was used."
+                    f"The array azimuth was not provided, therefore an azimuth of \
+                        {azimuth:.1f} was used."
                 )
 
     if sol_position is None:

@@ -7,6 +7,9 @@ on:
     - development
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -16,6 +19,7 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12"]
         env: [
+          '.[test]',
           '--upgrade --upgrade-strategy=eager .[test]'
         ]
 
@@ -31,7 +35,7 @@ jobs:
         python -m pip install --progress-bar off ${{ matrix.env }}
     - name: Test with pytest ${{ matrix.env }}
       run: |
-        python -m pytest --cov=./ --cov-report=xml
+        python -m pytest --maxfail=0 --cov=./ --cov-report=xml
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4
       env:
