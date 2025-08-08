@@ -373,17 +373,6 @@ def map_meta(meta):
         Metadata with standardized keys/column names.
     """
 
-    META_MAP = {
-        "elevation": "altitude",
-        "Elevation": "altitude",
-        "Local Time Zone": "tz",
-        "Time Zone": "tz",
-        "timezone": "tz",
-        "Dew Point": "dew_point",
-        "Longitude": "longitude",
-        "Latitude": "latitude",
-    }
-
     # Rename keys in dict
     if isinstance(meta, dict):
         for key in [*meta.keys()]:
