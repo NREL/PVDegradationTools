@@ -1264,12 +1264,10 @@ def compare_templates(
         if ds1.coords[coord].dtype.kind in {"i", "f"}:
             if not np.allclose(
                 ds1.coords[coord], ds2.coords[coord], atol=atol
-            ):  # Use np.allclose for numeric coordinates
+            ):
                 return False
-        elif ds1.coords[coord].dtype.kind == "M":  # datetime64
-            if not np.array_equal(
-                ds1.coords[coord], ds2.coords[coord]
-            ):  # Use array equality for datetime coordinates
+        elif ds1.coords[coord].dtype.kind == "M":
+            if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
                 return False
         else:
             if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
@@ -1421,14 +1419,14 @@ def display_json(
             )
 
         indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
-        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
+        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'  # noqa
 
     html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
     for key, value in data.items():
         html += (
             f"<div>"
             f'<strong style="color: white;">{key}:</strong> '
-            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa
             f'<div style="display: none;">{json_to_html(value)}</div>'
             f"</div>"
         )
@@ -1484,7 +1482,9 @@ def search_json(
             if subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias:
                 return key
 
-    raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}")
+    raise ValueError(
+        rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}"
+    )
 
 
 def read_material(
