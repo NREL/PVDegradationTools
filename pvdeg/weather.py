@@ -379,7 +379,7 @@ def map_meta(meta):
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
         return meta
-    
+
     # Rename columns in DataFrame
     elif isinstance(meta, pd.DataFrame):
         rename_map = {k: v for k, v in META_MAP.items() if k in meta.columns}
@@ -387,7 +387,7 @@ def map_meta(meta):
 
     else:
         raise TypeError(f"Input must be dict or pandas.DataFrame, got {type(meta)}")
-    
+
 def map_weather(weather_df):
     """
 

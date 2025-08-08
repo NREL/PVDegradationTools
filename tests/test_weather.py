@@ -162,6 +162,7 @@ def test_empty_weather_ds_invalid_database():
     ):
         pvdeg.weather.empty_weather_ds(gids_size, periodicity, invalid_database)
 
+
 def test_map_meta_dict():
     meta = {
         "Elevation": 150,
@@ -176,6 +177,7 @@ def test_map_meta_dict():
     assert "longitude" in mapped and mapped["longitude"] == -120.5
     assert "latitude" in mapped and mapped["latitude"] == 38.5
     assert "SomeKey" in mapped  # unchanged keys remain
+
 
 def test_map_meta_dataframe():
     df = pd.DataFrame({
@@ -196,6 +198,7 @@ def test_map_meta_dataframe():
     assert "Time Zone" not in mapped_df.columns
     assert "Longitude" not in mapped_df.columns
     assert "Latitude" not in mapped_df.columns
+
 
 def test_map_meta_invalid_input():
     with pytest.raises(TypeError):
