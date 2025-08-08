@@ -1,5 +1,4 @@
-"""Collection of functions related to calculating current collection in solar cells
-"""
+"""Collection of functions related to calculating current collection in solar cells."""
 
 import numpy as np
 from scipy.integrate import simpson
@@ -10,8 +9,10 @@ import photovoltaic as pv
 
 def collection_probability(x, thickness, s, l, d):
     """
-    Returns the collection probability (unit 0 to 1) at a distance x (cm) from the junction.
-    See [1]_.
+    Return the collection probability.
+
+    Returns the collection probability (unit 0 to 1) at a distance x (cm) from the
+    junction. See [1]_.
 
     Parameters
     ----------
@@ -37,9 +38,9 @@ def collection_probability(x, thickness, s, l, d):
 
     References
     ----------
-    .. [1] https://www.pveducation.org/pvcdrom/solar-cell-operation/collection-probability
+    .. [1] Solar cell operation
+    https://www.pveducation.org/pvcdrom/solar-cell-operation/collection-probability
     """
-
     cosh_xl = np.cosh(x / l)
     cosh_wl = np.cosh(thickness / l)
     sinh_xl = np.sinh(x / l)
@@ -66,12 +67,11 @@ def calculate_jsc_from_tau_cp(
     s_emitter=1e4,
     xp=0.00000024,
 ):
-    """
-    Returns cell Jsc given lifetime and cell parameters
+    """Return cell Jsc given lifetime and cell parameters.
 
-    Jsc is calculated via integrating collection probability and optical generation profiles
-    through the wafer depth. Includes contribution of the emitter, depletion region (assumes
-    CP = 1 in the depletion region), and base.
+    Jsc is calculated via integrating collection probability and optical generation
+    profiles through the wafer depth. Includes contribution of the emitter, depletion
+    region (assumes CP = 1 in the depletion region), and base.
 
     Parameters
     ----------
@@ -106,8 +106,9 @@ def calculate_jsc_from_tau_cp(
         Front surface recombination velocity [cm/s].
 
     xp : numeric, default 0.00000024
-        width of the depletion region [m]. Treated as fixed width, as it is very small compared
-        to the bulk, so injection-dependent variations will have very small effects.
+        width of the depletion region [m]. Treated as fixed width, as it is very small
+        compared to the bulk, so injection-dependent variations will have very small
+        effects.
 
     Returns
     -------
@@ -116,9 +117,9 @@ def calculate_jsc_from_tau_cp(
 
     Notes
     -----
-    Default emitter parameters w, l, d, and s are supplied, but users may wish to experiment to
-    find the most suitable parameters to model different cell types. Default values are adapted
-    from [2]_ and [3]_.
+    Default emitter parameters w, l, d, and s are supplied, but users may wish to
+    experiment to find the most suitable parameters to model different cell types.
+    Default values are adapted from [2]_ and [3]_.
 
     Pros of this approach
         can account for e.g. lighttrapping via the generation profile
@@ -131,18 +132,18 @@ def calculate_jsc_from_tau_cp(
 
     References
     ----------
-    .. [1] K. R. McIntosh and S. C. Baker-Finch, “OPAL 2: Rapid optical simulation of silicon solar
-    cells,” in 2012 38th IEEE Photovoltaic Specialists Conference, IEEE, 2012, pp. 000265–000271.
+    .. [1] K. R. McIntosh and S. C. Baker-Finch, “OPAL 2: Rapid optical simulation of
+    silicon solar cells,” in 2012 38th IEEE Photovoltaic Specialists Conference, IEEE,
+    2012, pp. 000265–000271.
     doi: 10.1109/PVSC.2012.6317616.
 
-    .. [2] A. Fell et al., “Input Parameters for the Simulation of Silicon Solar Cells in 2014,”
-    IEEE Journal of Photovoltaics, vol. 5, no. 4, pp. 1250–1263, Jul. 2015, doi:
-    10.1109/JPHOTOV.2015.2430016.
+    .. [2] A. Fell et al., “Input Parameters for the Simulation of Silicon Solar Cells
+    in 2014,” IEEE Journal of Photovoltaics, vol. 5, no. 4, pp. 1250–1263, Jul. 2015,
+    doi: 10.1109/JPHOTOV.2015.2430016.
 
-    .. [3] W. J. Yang, Z. Q. Ma, X. Tang, C. B. Feng, W. G. Zhao, and P. P. Shi, “Internal quantum
-    efficiency for solar cells,” Solar Energy, vol. 82, no. 2, pp. 106–110, Feb. 2008, doi:
-    10.1016/j.solener.2007.07.010.
-
+    .. [3] W. J. Yang, Z. Q. Ma, X. Tang, C. B. Feng, W. G. Zhao, and P. P. Shi,
+    “Internal quantum efficiency for solar cells,” Solar Energy, vol. 82, no. 2, pp.
+    106–110, Feb. 2008, doi: 10.1016/j.solener.2007.07.010.
     """
     q = elementary_charge
 
@@ -210,10 +211,10 @@ def calculate_jsc_from_tau_iqe(
     s_emitter=1e4,
     xp=0.00000024,
 ):
-    """
-    Returns cell Jsc given lifetime and cell parameters
+    """Return cell Jsc given lifetime and cell parameters.
 
-    Calculates Jsc via calculating cell internal quantum efficiency (IQE) and absorption for Si
+    Calculates Jsc via calculating cell internal quantum efficiency (IQE) and absorption
+    for Si
 
     Parameters
     ----------
@@ -251,8 +252,9 @@ def calculate_jsc_from_tau_iqe(
         Front surface recombination velocity [cm/s].
 
     xp : numeric, default 0.00000024
-        width of the depletion region [m]. Treated as fixed width, as it is very small compared
-        to the bulk, so injection-dependent variations will have very small effects.
+        width of the depletion region [m]. Treated as fixed width, as it is very small
+        compared to the bulk, so injection-dependent variations will have very small
+        effects.
 
     Returns
     -------
@@ -261,9 +263,9 @@ def calculate_jsc_from_tau_iqe(
 
     Notes
     -----
-    Default emitter parameters w, l, d, and s are supplied, but users may wish to experiment to
-    find the most suitable parameters to model different cell types. Default values are adapted
-    from [2]_ and [3]_.
+    Default emitter parameters w, l, d, and s are supplied, but users may wish to
+    experiment to find the most suitable parameters to model different cell types.
+    Default values are adapted from [2]_ and [3]_.
 
     Pros of this approach:
         requires only fundamental inputs: Si absorption and spectrum
@@ -272,19 +274,20 @@ def calculate_jsc_from_tau_iqe(
         does not account for any anti-reflection or light trapping
 
     To do:
-        accept user inputs for spectrum and absorption, otherwise use photovoltaic library
+        accept user inputs for spectrum and absorption, otherwise use photovoltaic
+        library
 
     References
     ----------
     .. [1] “photovoltaic.” https://github.com/pvedu/photovoltaic
 
-    .. [2] A. Fell et al., “Input Parameters for the Simulation of Silicon Solar Cells in 2014,”
-    IEEE Journal of Photovoltaics, vol. 5, no. 4, pp. 1250–1263, Jul. 2015, doi:
-    10.1109/JPHOTOV.2015.2430016.
+    .. [2] A. Fell et al., “Input Parameters for the Simulation of Silicon Solar Cells
+    in 2014,” IEEE Journal of Photovoltaics, vol. 5, no. 4, pp. 1250–1263, Jul. 2015
+    doi: 10.1109/JPHOTOV.2015.2430016.
 
-    .. [3] W. J. Yang, Z. Q. Ma, X. Tang, C. B. Feng, W. G. Zhao, and P. P. Shi, “Internal quantum
-    efficiency for solar cells,” Solar Energy, vol. 82, no. 2, pp. 106–110, Feb. 2008, doi:
-    10.1016/j.solener.2007.07.010.
+    .. [3] W. J. Yang, Z. Q. Ma, X. Tang, C. B. Feng, W. G. Zhao, and P. P. Shi,
+    “Internal quantum efficiency for solar cells,” Solar Energy, vol. 82, no. 2,
+    pp. 106–110, Feb. 2008, doi: 10.1016/j.solener.2007.07.010.
     """
     # Unit conversions:
     w_depletion = xp * 100  # depletion region width, m to cm
@@ -319,8 +322,7 @@ def calculate_jsc_from_tau_iqe(
 
 
 def generation_current(generation, depth):
-    """
-    Returns cell generation current given generation profile
+    """Return cell generation current given generation profile.
 
     Parameters
     ----------

@@ -48,7 +48,6 @@ import pandas as pd
 from pvdeg import DATA_DIR
 import dask
 import matplotlib.pyplot as plt
-import numpy as np
 import seaborn as sns
 import math
 
@@ -57,7 +56,8 @@ import math
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -296,7 +296,7 @@ standoff_series_df = pd.DataFrame(
 )
 x_fig = plt.figure(figsize=(16, 4))
 plt.title(
-    "Plot of $\it{Xₘᵢₙ}$ for all orientations for $\it{T₉₈}$="
+    r"Plot of $\it{Xₘᵢₙ}$ for all orientations for $\it{T₉₈}$="
     + "%.0f" % kwarg_x["T98"]
     + "°C.",
     fontsize=15,
@@ -330,7 +330,7 @@ x_fig.set_yticklabels(y_labels, rotation=0)
 
 x_fig.set_xlabel("Azimuth [°]", fontsize=15, labelpad=10)
 x_fig.set_ylabel("Tilt [°]", fontsize=15)
-x_fig.figure.axes[-1].set_ylabel("$\it{Xₘᵢₙ}$ [cm]", size=15)
+x_fig.figure.axes[-1].set_ylabel(r"$\it{Xₘᵢₙ}$ [cm]", size=15)
 x_fig.invert_yaxis()
 
 output_folder = os.path.join(
@@ -342,7 +342,7 @@ except OSError as error:
     print(error)
 
 plt.savefig(
-    output_folder + "\Standoff_Scan.png", bbox_inches="tight"
+    output_folder + r"\Standoff_Scan.png", bbox_inches="tight"
 )  # Creates an image file of the standoff plot
 plt.show()
 
@@ -398,13 +398,13 @@ T98_series_df = pd.DataFrame(
 T98_fig = plt.figure(figsize=(16, 4))
 if kwarg_T["x_eff"] == None:
     plt.title(
-        "Plot of $\it{T₉₈}$ for all orientations for an open-rack mounting.",
+        r"Plot of $\it{T₉₈}$ for all orientations for an open-rack mounting.",
         fontsize=15,
         y=1.08,
     )
 else:
     plt.title(
-        "Plot of $\it{T₉₈}$ for all orientations for $X_{eff}$="
+        r"Plot of $\it{T₉₈}$ for all orientations for $X_{eff}$="
         + "%.0f" % kwarg_T["x_eff"]
         + " cm.",
         fontsize=15,
@@ -438,7 +438,7 @@ T98_fig.set_yticklabels(y_labels, rotation=0)
 
 T98_fig.set_xlabel("Azimuth [°]", fontsize=15, labelpad=10)
 T98_fig.set_ylabel("Tilt [°]", fontsize=15)
-T98_fig.figure.axes[-1].set_ylabel("$\it{T₉₈}$ [°C]", size=15)
+T98_fig.figure.axes[-1].set_ylabel(r"$\it{T₉₈}$ [°C]", size=15)
 T98_fig.invert_yaxis()
 
 plt.savefig(

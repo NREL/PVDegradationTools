@@ -147,7 +147,9 @@ html_theme_options = {
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = "./_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg"  # logo should work at this path
+html_logo = (
+    "./_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg"  # logo should work at this path
+)
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
@@ -226,10 +228,10 @@ warnings.filterwarnings(
 
 
 def get_obj_module(qualname):
-    """
-    Get a module/class/attribute and its original module by qualname.
-    Useful for looking up the original location when a function is imported
-    into an __init__.py
+    """Get a module/class/attribute and its original module by qualname.
+
+    Useful for
+    looking up the original location when a function is imported into an __init__.py.
 
     Examples
     --------
