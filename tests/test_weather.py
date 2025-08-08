@@ -194,6 +194,8 @@ def test_map_meta_dataframe():
     # Original column names should not exist
     assert "Elevation" not in mapped_df.columns
     assert "Time Zone" not in mapped_df.columns
+    assert "Longitude" not in mapped_df.columns
+    assert "Latitude" not in mapped_df.columns
 
 def test_map_meta_invalid_input():
     with pytest.raises(TypeError):
