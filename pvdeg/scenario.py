@@ -462,7 +462,7 @@ class Scenario:
                     func_params = signature(func).parameters
                     func_args = {
                         k: v for k, v in combined.items() if k in func_params.keys()
-                    }  # downselect func args
+                    }
 
                     res = func(**params, **func_args)
 
