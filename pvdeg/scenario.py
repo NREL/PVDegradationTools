@@ -23,8 +23,6 @@ from functools import partial
 import pprint
 from IPython.display import display, HTML
 import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from dask.distributed import Client
 
 
 class Scenario:
@@ -435,7 +433,6 @@ class Scenario:
         None
         """
         results_series = pd.Series(dtype="object")
-
         results_dict = {}
 
         if self.modules:
@@ -455,9 +452,7 @@ class Scenario:
                         "model_kwarg": module["model_kwarg"],
                         "irradiance_kwarg": module["irradiance_kwarg"],
                         "conf": module["racking"],
-                        **module[
-                            "irradiance_kwarg"
-                        ],  # overwrite existing irradiance kwarg
+                        **module["irradiance_kwarg"],
                     }
 
                     combined = (
@@ -476,7 +471,7 @@ class Scenario:
 
                 results_dict[module["module_name"]] = module_result
 
-            self.results = results_dict  # 2d dictionary array
+            self.results = results_dict
 
             for module, pipeline_result in self.results.items():
                 module_dir = f"./pipeline_results/{module}_pipeline_results"
@@ -498,30 +493,21 @@ class Scenario:
                     func = partial(
                         func, weather_df=self.weather_data, meta=self.meta_data
                     )
-                except:
+                except Exception:
                     pass
 
                 result = func(**params) if params else func()
 
-                # if id not in module_result.keys():
-                # results_dict[id] = result
-                # pipeline_results = results_dict
-                # pipeline_results[id] = result
-
                 results_dict[id] = result
-                pipeline_results = results_dict  # this is weird
+                pipeline_results = results_dict
 
             for key in pipeline_results.keys():
-                # print(f"results_dict dtype : {type(results_dict[key])}")
-                # print(results_dict)
-
                 if isinstance(results_dict[key], pd.DataFrame):
                     results_series[key] = results_dict[key]
-
                 elif isinstance(results_dict[key], (float, int)):
                     results_series[key] = pd.DataFrame(
-                        [results_dict[key]],  # convert the single numeric to a list
-                        columns=[key],  # name the single column entry in list form
+                        [results_dict[key]],
+                        columns=[key],
                     )
 
                 self.results = results_series
@@ -588,7 +574,6 @@ class Scenario:
         `pvdeg.utilities.remove_scenario_filetrees`
         """
         utilities.remove_scenario_filetrees(fp=fp, pattern=pattern)
-
         return
 
     def _verify_function(func_name: str) -> Tuple[Callable, List]:
@@ -611,7 +596,6 @@ class Scenario:
         """
         from inspect import signature
 
-        # find the function in pvdeg
         class_list = [c for c in dir(pvdeg) if not c.startswith("_")]
         for c in class_list:
             _class = getattr(pvdeg, c)
@@ -649,7 +633,6 @@ class Scenario:
 
         if api_key:
             protected = {"email": self.email, "api_key": self.api_key}
-
             attributes.update(protected)
 
         return attributes
@@ -883,6 +866,7 @@ class Scenario:
         plt.show()
 
         return fig, ax
+
 
     def _ipython_display_(self):
         file_url = "no file provided"
