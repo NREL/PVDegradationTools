@@ -40,6 +40,12 @@ def vantHoff_deg(
     In this calculation, the rate of degradation kinetics is calculated using
     the Van't Hoff model.
 
+    THIS IS A REALLY LONG LINE THAT SHOULD RAISE A FALKE8 LINTER ERROR AND THE ERROR SHOULD SHOW BELOW THIS LINE UNDER THE FILES CHANGED TAB
+    
+    THIS IS ALSO A REALLY LONG LINE THAT SHOULD RAISE AN ERROR BUT YOU SHOULD NOT HAVE TO GO TO THE CHECKS TAB TO FIND IT
+
+    THIS LINE IS SHORTER BUT HAS A TRAILING WHITE SPACE SO IT SHOULD ALSO RAISE AN ERROR
+    
     Parameters
     ----------
     weather_df : pd.DataFrame

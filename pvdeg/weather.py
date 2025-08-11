@@ -359,22 +359,34 @@ def csv_read(filename):
 
 def map_meta(meta):
     """
-    Update the headings for meterological data to standard forms.
+    Update meteorological metadata keys/columns to standard forms as outlined in
+    https://github.com/DuraMAT/pv-terms.
 
-    Updated forms outlined in https://github.com/DuraMAT/pv-terms.
+    Parameters
+    ----------
+    meta : dict or pandas.DataFrame
+        Single-site metadata (dict) or multi-site geospatial metadata (DataFrame).
 
     Returns
     -------
-    meta : dictionary
-        DataFrame of weather data with modified column headers.
+    meta : dict or pandas.DataFrame
+        Metadata with standardized keys/column names.
     """
 
-    # map meta-names as needed
-    for key in [*meta.keys()]:
-        if key in META_MAP.keys():
-            meta[META_MAP[key]] = meta.pop(key)
+    # Rename keys in dict
+    if isinstance(meta, dict):
+        for key in [*meta.keys()]:
+            if key in META_MAP.keys():
+                meta[META_MAP[key]] = meta.pop(key)
+        return meta
 
-    return meta
+    # Rename columns in DataFrame
+    elif isinstance(meta, pd.DataFrame):
+        rename_map = {k: v for k, v in META_MAP.items() if k in meta.columns}
+        return meta.rename(columns=rename_map)
+
+    else:
+        raise TypeError(f"Input must be dict or pandas.DataFrame, got {type(meta)}")
 
 
 def map_weather(weather_df):
