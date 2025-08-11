@@ -1096,16 +1096,16 @@ class GeospatialScenario(pvdeg.Scenario):
     def format_dask_link(self):
         if self.dask_client:
             return f"""
-                <a href="{self.dask_client.dashboard_link}" target="_blank">{self.dask_client.dashboard_link}</a></p> #noqa
+                <a href="{self.dask_client.dashboard_link}" target="_blank">{self.dask_client.dashboard_link}</a></p>  # noqa
             """
         return ""
 
     def _ipython_display_(self):
         file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;"> #noqa
+        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">  # noqa
             <h2>self.name: {self.name}</h2>
-            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p> #noqa
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>  # noqa
             <p><strong>self.hpc:</strong> {self.hpc}</p>
             <p><strong>self.gids:</strong> {self.gids}</p>
             <div>
@@ -1161,13 +1161,13 @@ class GeospatialScenario(pvdeg.Scenario):
             result_id = "geospatial_result"
             formatted_output = self.format_output(result)
             result_content = f"""
-            <div id="{result_id}" onclick="toggleVisibility('content_{result_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="{result_id}" onclick="toggleVisibility('content_{result_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span> #noqa
+                    <span id="arrow_content_{result_id}" style="color: #b676c2;">►</span>  # noqa
                     Geospatial Result
                 </h4>
             </div>
-            <div id="content_{result_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="content_{result_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 {formatted_output}
             </div>
             """
@@ -1181,13 +1181,13 @@ class GeospatialScenario(pvdeg.Scenario):
         if self.meta_data is not None:
 
             meta_data_html = f"""
-            <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="meta_data" onclick="toggleVisibility('content_meta_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_content_meta_data" style="color: #b676c2;">►</span>
                     Meta Data
                 </h4>
             </div>
-            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px;"> #noqa
+            <div id="content_meta_data" style="display:none; margin-left: 20px; padding: 5px;">  # noqa
                 {self.meta_data._repr_html_()}
             </div>
             """
@@ -1200,13 +1200,13 @@ class GeospatialScenario(pvdeg.Scenario):
         if self.meta_data is not None:
 
             template_html = f"""
-            <div id="template" onclick="toggleVisibility('content_template')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="template" onclick="toggleVisibility('content_template')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_content_template" style="color: #b676c2;">►</span>
                     Template
                 </h4>
             </div>
-            <div id="content_template" style="display:none; margin-left: 20px; padding: 5px;"> #noqa
+            <div id="content_template" style="display:none; margin-left: 20px; padding: 5px;">  # noqa
                 {self.template._repr_html_()}
             </div>
             """
@@ -1219,14 +1219,14 @@ class GeospatialScenario(pvdeg.Scenario):
         if self.weather_data is not None:
 
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_weather_data" style="color: #b676c2;">►</span> #noqa
+                    <span id="arrow_content_weather_data" style="color: #b676c2;">►</span>  # noqa
                     Weather Data
                 </h4>
             </div>
             <div>
-            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px> #noqa
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px>  # noqa
                 {self.weather_data._repr_html_()}
             </div>
             """
