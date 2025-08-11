@@ -200,16 +200,16 @@ class GeospatialScenario(pvdeg.Scenario):
         # ======================================================
 
         # string to list whole word list or keep list
-        def toList(s):
+        def to_list(s):
             return s if isinstance(s, list) else [s]
 
         if country:
-            countries = toList(country)
+            countries = to_list(country)
             self._check_set(countries, set(geo_meta["country"]))
             geo_meta = geo_meta[geo_meta["country"].isin(countries)]
 
         if state:
-            states = toList(state)
+            states = to_list(state)
             states = [
                 pvdeg.utilities._get_state(entry) if len(entry) == 2 else entry
                 for entry in states
@@ -220,7 +220,7 @@ class GeospatialScenario(pvdeg.Scenario):
 
         if county:
             if isinstance(county, str):
-                county = toList(county)
+                county = to_list(county)
 
             self._check_set(county, set(geo_meta["county"]))
             geo_meta = geo_meta[geo_meta["county"].isin(county)]
