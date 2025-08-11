@@ -255,6 +255,12 @@ def vantHoff_deg(
     In this calculation, the rate of degradation kinetics is calculated using
     the Van't Hoff model.
 
+    THIS IS A REALLY LONG LINE THAT SHOULD RAISE A FALKE8 LINTER ERROR AND THE ERROR SHOULD SHOW BELOW THIS LINE UNDER THE FILES CHANGED TAB
+
+    THIS IS ALSO A REALLY LONG LINE THAT SHOULD RAISE AN ERROR BUT YOU SHOULD NOT HAVE TO GO TO THE CHECKS TAB TO FIND IT
+
+    THIS LINE IS SHORTER BUT HAS A TRAILING WHITE SPACE SO IT SHOULD ALSO RAISE AN ERROR
+
     Parameters
     ----------
     weather_df : pd.DataFrame
@@ -329,14 +335,14 @@ def vantHoff_deg(
             model_kwarg=model_kwarg,
         )
 
-    rateOfDegEnv = (poa_global ** p) * (Tf ** ((temp - temp_chamber) / 10))
+    rateOfDegEnv = (poa_global**p) * (Tf ** ((temp - temp_chamber) / 10))
     avgOfDegEnv = rateOfDegEnv.mean()
-    rateOfDegChamber = I_chamber ** p
+    rateOfDegChamber = I_chamber**p
     accelerationFactor = rateOfDegChamber / avgOfDegEnv
     return accelerationFactor
 
 
-@decorators.geospatial_quick_shape('numeric', ["Iwa"])
+@decorators.geospatial_quick_shape("numeric", ["Iwa"])
 def IwaVantHoff(
     weather_df,
     meta,
@@ -560,8 +566,8 @@ def arrhenius_deg(
 
     # rate of degradation of the environment
     arrheniusDenominator = (
-        (poa_global ** p)
-        * (rh_outdoor ** n)
+        (poa_global**p)
+        * (rh_outdoor**n)
         * np.exp(-Ea / (0.00831446261815324 * (temp + 273.15)))
     )
 
@@ -569,8 +575,8 @@ def arrhenius_deg(
 
     # rate of degradation of the simulated chamber
     arrheniusNumerator = (
-        (I_chamber ** p)
-        * (rh_chamber ** n)
+        (I_chamber**p)
+        * (rh_chamber**n)
         * np.exp(-Ea / (0.00831446261815324 * (temp_chamber + 273.15)))
     )
 
