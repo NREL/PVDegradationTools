@@ -278,7 +278,7 @@ class Scenario:
             temperature (``noct``). This is where other values such as noct
             should be provided.
             Pvlib temp models:
-            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html #noqa
+            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
