@@ -221,16 +221,16 @@ def test_coords(monkeypatch):
     # coords is a property so we should test it, not just an attribute
     coords_res = geo_scenario.coords
 
-    coords_correct = np.array([[  39.89, -106.42],
-       [39.89, -106.3 ],
-       [39.69, -106.26],
-       [39.81, -106.18],
-       [39.81, -106.14],
-       [39.41, -106.14],
-       [39.45, -106.1 ],
-       [39.41, -106.06],
-       [39.65, -105.98],
-       [39.53, -105.94],
-       [39.57, -105.86]])
+    coords_correct = np.array([[39.89, -106.42],
+                               [39.89, -106.3],
+                               [39.69, -106.26],
+                               [39.81, -106.18],
+                               [39.81, -106.14],
+                               [39.41, -106.14],
+                               [39.45, -106.1],
+                               [39.41, -106.06],
+                               [39.65, -105.98],
+                               [39.53, -105.94],
+                               [39.57, -105.86]])
 
     np.testing.assert_array_equal(coords_res, coords_correct)
