@@ -3,8 +3,6 @@
 import pvdeg
 from pvdeg import utilities
 
-import matplotlib
-import matplotlib.figure
 import matplotlib.pyplot as plt
 from datetime import date
 from datetime import datetime as dt
@@ -22,7 +20,6 @@ from typing import List, Union, Optional, Tuple, Callable
 from functools import partial
 import pprint
 from IPython.display import display, HTML
-import cartopy.crs as ccrs
 
 
 class Scenario:
@@ -867,7 +864,6 @@ class Scenario:
 
         return fig, ax
 
-
     def _ipython_display_(self):
         file_url = "no file provided"
         if self.path:
@@ -1036,13 +1032,13 @@ class Scenario:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  #noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>
+                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>  #noqa
                     Weather Data
                 </h4>
             </div>
-            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  #noqa
                 {display_data.to_html()}
             </div>
             """
@@ -1060,13 +1056,13 @@ class Scenario:
                 params_html = "<pre>Unserializable data type</pre>"
 
             step_content = f"""
-            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  #noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> #noqa
                     {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span> #noqa
                 </h4>
             </div>
-            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  #noqa
                 <p>Job: {step["job"].__name__}</p>
                 <p>Parameters:</p>
                 <div style="margin-left: 20px;">
