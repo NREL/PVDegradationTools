@@ -830,7 +830,7 @@ def backsheet(
     # Get the relative humidity of the back encapsulant
     RHback_series = Ce(
         rh_surface=surface,
-        temp_ambient=temp_ambient,
+        # temp_ambient=temp_ambient,
         temp_module=temp_module,
         start=start,
         Po_b=Po_b,
