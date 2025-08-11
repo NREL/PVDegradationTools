@@ -506,9 +506,11 @@ def Ce(
     Eas = Ea_s_e / 0.00831446261815324
     # Ce is the initial start of concentration of water
     if start is None:
-        Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15))) * rh_surface[0] / 100 / 2
+        Ce_start = (
+            So * np.exp(-(Eas / (temp_module[0] + 273.15))) * rh_surface[0] / 100 / 2
+        )
     else:
-        Ce = start
+        Ce_start = start
         #   for i in range(0, len(rh_surface)):
         #       if i == 0:
         #           # Ce = Initial start of concentration of water
@@ -521,7 +523,7 @@ def Ce(
         #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
         #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
 
-        Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce, rh_surface)
+        Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce_start, rh_surface)
 
     if output == "rh":
         # Convert the concentration to relative humidity
@@ -536,13 +538,12 @@ def Ce(
 
 @jit
 def _Ce(
-    start,
     WVTRo,
     EaWVTR,
     temp_module,
     So,
     Eas,
-    Ce,
+    Ce_start,
     rh_surface,
 ):
     """
@@ -554,6 +555,7 @@ def _Ce(
         Concentration of water in the encapsulant at every time step in [g/cm³].
 
     """
+    Ce = Ce_start
     for i in range(1, len(rh_surface)):
         Ce = Ce + (WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))) / (
             So * np.exp(-Eas / (temp_module[i] + 273.15))
