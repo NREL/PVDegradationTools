@@ -314,7 +314,7 @@ def csv_read(filename):
     ) in meta:  # converts everything to a float that is possible to convert to a float
         try:
             meta[key] = float(meta[key])
-        except:
+        except Exception:
             pass
     # get the column headers
     columns = file1.readline().split(",")
@@ -338,12 +338,12 @@ def csv_read(filename):
         dtidx = pd.to_datetime(
             weather_df[["Year", "Month", "Day", "Hour", "Minute", "Second"]]
         )
-    except:
+    except Exception:
         try:
             dtidx = pd.to_datetime(
                 weather_df[["Year", "Month", "Day", "Hour", "Minute"]]
             )
-        except:
+        except Exception:
             try:
                 dtidx = pd.to_datetime(weather_df[["Year", "Month", "Day", "Hour"]])
             finally:
@@ -800,7 +800,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01" :],
+                        this_year[str(year) + "-03-01":],
                     ]
                 )
                 new_time_series = this_year
@@ -832,7 +832,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01" :],
+                        this_year[str(year) + "-03-01":],
                     ]
                 )
                 new_time_series = pd.concat([new_time_series, this_year])
@@ -1304,7 +1304,8 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
 
 
 # TODO: implement rate throttling so we do not make too many requests.
-# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
+# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means
+# twice the speed ;)
 # TODO: this overwrites NSRDB GIDS when database == "PSM3"
 
 
@@ -1421,48 +1422,49 @@ def weather_distributed(
 
     return weather_ds, meta_df, indexes_failed
 
-    # def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _nsrdb_to_uniform(
+# weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
-    #     map_weather(weather_df=weather_df)
-    #     map_meta(meta)
+#     map_weather(weather_df=weather_df)
+#     map_meta(meta)
 
-    # check if weather is localized, convert to GMT (like pvgis)
-    # check if time index is on the hour or 30 minutes
-    # weather_df.index - pd.Timedelta("30m")
+# check if weather is localized, convert to GMT (like pvgis)
+# check if time index is on the hour or 30 minutes
+# weather_df.index - pd.Timedelta("30m")
 
-    # NSRDB datavars
-    # Year  Month  Day  Hour  Minute  dew_point  dhi
-    # dni  ghi  albedo  pressure  temp_air
-    # wind_direction  wind_speed  relative_humidity
+# NSRDB datavars
+# Year  Month  Day  Hour  Minute  dew_point  dhi
+# dni  ghi  albedo  pressure  temp_air
+# wind_direction  wind_speed  relative_humidity
 
-    # weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
-    # meta_dropables = [...]
+# weather_dropables = ['Year',  'Month',  'Day',  'Hour',  'Minute',  'dew_point']
+# meta_dropables = [...]
 
-    # NSRDB meta
-    # {'Source': 'NSRDB',
-    #  'Location ID': '145809',
-    #  'City': '-',
-    #  'State': '-',
-    #  'Country': '-',
-    #  'Dew Point Units': 'c',
-    #  'DHI Units': 'w/m2',
-    #  'DNI Units': 'w/m2',
-    #  'GHI Units': 'w/m2',
-    #  'Temperature Units': 'c',
-    #  'Pressure Units': 'mbar',
-    #  'Wind Direction Units': 'Degrees',
-    #  'Wind Speed Units': 'm/s',
-    #  'Surface Albedo Units': 'N/A',
-    #  'Version': '3.2.0',
-    #  'latitude': 39.73,
-    #  'longitude': -105.18,
-    #  'altitude': 1820,
-    #  'tz': -7,
-    #  'wind_height': 2}
-    ...
+# NSRDB meta
+# {'Source': 'NSRDB',
+#  'Location ID': '145809',
+#  'City': '-',
+#  'State': '-',
+#  'Country': '-',
+#  'Dew Point Units': 'c',
+#  'DHI Units': 'w/m2',
+#  'DNI Units': 'w/m2',
+#  'GHI Units': 'w/m2',
+#  'Temperature Units': 'c',
+#  'Pressure Units': 'mbar',
+#  'Wind Direction Units': 'Degrees',
+#  'Wind Speed Units': 'm/s',
+#  'Surface Albedo Units': 'N/A',
+#  'Version': '3.2.0',
+#  'latitude': 39.73,
+#  'longitude': -105.18,
+#  'altitude': 1820,
+#  'tz': -7,
+#  'wind_height': 2}
+# ...
 
-
-# def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _pvgis_to_uniform(
+# weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
 # map_weather(weather_df=weather_df)
 # map_meta(meta)
