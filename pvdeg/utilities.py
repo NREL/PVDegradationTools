@@ -947,7 +947,8 @@ def new_id(collection):
     if not isinstance(collection, (dict, OrderedDict)):
         raise TypeError(f"{collection.__name__} type {type(collection)} expected dict")
 
-    gen = lambda: "".join(choices(ascii_uppercase, k=5))
+    def gen():
+        return "".join(choices(ascii_uppercase, k=5))
     id = gen()
     while id in collection.keys():
         id = gen()

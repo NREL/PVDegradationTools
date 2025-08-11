@@ -200,7 +200,8 @@ class GeospatialScenario(pvdeg.Scenario):
         # ======================================================
 
         # string to list whole word list or keep list
-        toList = lambda s: s if isinstance(s, list) else [s]
+        def toList(s):
+            return s if isinstance(s, list) else [s]
 
         if country:
             countries = toList(country)
