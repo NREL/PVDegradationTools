@@ -44,8 +44,8 @@ def gid_downsampling(meta, n):
         gids_sub = meta.index.values
         return meta, gids_sub
 
-    lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
-    lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
+    lon_sub = sorted(meta["longitude"].unique())[0: -1: max(1, 2 * n)]
+    lat_sub = sorted(meta["latitude"].unique())[0: -1: max(1, 2 * n)]
 
     gids_sub = meta[
         (meta["longitude"].isin(lon_sub)) & (meta["latitude"].isin(lat_sub))
