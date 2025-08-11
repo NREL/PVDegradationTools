@@ -81,7 +81,7 @@ def vantHoff_deg(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  #noqa
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
 
@@ -180,7 +180,7 @@ def IwaVantHoff(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  #noqa
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
 
@@ -312,7 +312,7 @@ def arrhenius_deg(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  #noqa
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
     Returns
@@ -511,7 +511,7 @@ def IwaArrhenius(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  #noqa
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
 
