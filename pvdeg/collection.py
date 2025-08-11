@@ -7,7 +7,7 @@ from scipy.constants import elementary_charge
 import photovoltaic as pv
 
 
-def collection_probability(x, thickness, s, l, d):
+def collection_probability(x, thickness, s, diffusion_length, d):
     """
     Return the collection probability.
 
@@ -25,7 +25,7 @@ def collection_probability(x, thickness, s, l, d):
     s : numeric
         Surface recombination velocity [cm/s].
 
-    l : numeric
+    diffusion_length : numeric
         Minority carrier diffusion length [cm].
 
     d : numeric
@@ -41,13 +41,13 @@ def collection_probability(x, thickness, s, l, d):
     .. [1] Solar cell operation
     https://www.pveducation.org/pvcdrom/solar-cell-operation/collection-probability
     """
-    cosh_xl = np.cosh(x / l)
-    cosh_wl = np.cosh(thickness / l)
-    sinh_xl = np.sinh(x / l)
-    sinh_wl = np.sinh(thickness / l)
+    cosh_xl = np.cosh(x / diffusion_length)
+    cosh_wl = np.cosh(thickness / diffusion_length)
+    sinh_xl = np.sinh(x / diffusion_length)
+    sinh_wl = np.sinh(thickness / diffusion_length)
 
-    num = s * l / d * cosh_wl + sinh_wl
-    den = s * l / d * sinh_wl + cosh_wl
+    num = s * diffusion_length / d * cosh_wl + sinh_wl
+    den = s * diffusion_length / d * sinh_wl + cosh_wl
 
     cp = cosh_xl - (num / den) * sinh_xl
 
