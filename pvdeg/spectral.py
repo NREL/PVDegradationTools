@@ -102,7 +102,7 @@ def poa_irradiance(
     if tilt is None:
         try:
             tilt = float(meta["tilt"])
-        except:
+        except Exception:
             tilt = float(meta["latitude"])
             print(
                 f"The array tilt angle was not provided, therefore the latitude tilt \
@@ -111,7 +111,7 @@ def poa_irradiance(
     if azimuth is None:  # Sets the default orientation to equator facing.
         try:
             azimuth = float(meta["azimuth"])
-        except:
+        except Exception:
             if float(meta["latitude"]) < 0:
                 azimuth = 0
             else:
