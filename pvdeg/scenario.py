@@ -868,11 +868,10 @@ class Scenario:
         file_url = "no file provided"
         if self.path:
             file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
-
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;"> #noqa
+        <div style="border: 1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">  # noqa
             <h2>self.name: {self.name}</h2>
-            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p> #noqa
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>  # noqa
             <p><strong>self.gids:</strong> {self.gids}</p>
             <p><strong>self.email:</strong> {self.email}</p>
             <p><strong>self.api_key:</strong> {self.api_key}</p>
@@ -928,13 +927,13 @@ class Scenario:
             )
 
             module_content = f"""
-            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span>
                     {module["module_name"]}
                 </h4>
             </div>
-            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="module_{i}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 <p><strong>Racking:</strong> {module["racking"]}</p>
                 <p><strong>Temperature Model:</strong> {module["temp_model"]}</p>
                 <p><strong>Material Parameters:</strong></p>
@@ -960,25 +959,25 @@ class Scenario:
         for module_name, functions in sorted(self.results.items()):
             module_id = f"result_module_{module_name}"
             module_content = f"""
-            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span>
                     {module_name}
                 </h4>
             </div>
-            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="{module_id}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
             """
             for function_name, output in functions.items():
                 function_id = f"{module_id}_{function_name}"
                 formatted_output = self.format_output(output)
                 module_content += f"""
-                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                     <h5 style="font-family: monospace; margin: 0;">
                         <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span>
                         {function_name}
                     </h5>
                 </div>
-                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+                <div id="{function_id}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                     {formatted_output}
                 </div>
                 """
@@ -1032,13 +1031,13 @@ class Scenario:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  #noqa
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>  #noqa
+                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>  # noqa
                     Weather Data
                 </h4>
             </div>
-            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  #noqa
+            <div id="content_weather_data" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 {display_data.to_html()}
             </div>
             """
@@ -1056,13 +1055,13 @@ class Scenario:
                 params_html = "<pre>Unserializable data type</pre>"
 
             step_content = f"""
-            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  #noqa
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> #noqa
-                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span> #noqa
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>  # noqa
+                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span>  # noqa
                 </h4>
             </div>
-            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  #noqa
+            <div id="pipeline_{step_name}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 <p>Job: {step["job"].__name__}</p>
                 <p>Parameters:</p>
                 <div style="margin-left: 20px;">
@@ -1072,4 +1071,5 @@ class Scenario:
             """
             pipeline_html += step_content
         pipeline_html += "</div>"
+        return pipeline_html
         return pipeline_html
