@@ -1416,17 +1416,17 @@ def display_json(
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
             json_str = json_str.replace(
-                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'  # noqa: E702,E231
+                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'  # noqa: E702,E231, E501
             )
         indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
-        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'  # noqa: E702,E231
+        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'  # noqa: E702,E231, E501
 
     html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
     for key, value in data.items():
         html += (
             f"<div>"
             f'<strong style="color: white;">{key}:</strong> '
-            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231, E501
             f'<div style="display: none;">{json_to_html(value)}</div>'
             f"</div>"
         )
