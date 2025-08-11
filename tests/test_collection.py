@@ -65,3 +65,15 @@ def test_generation_current():
     jgen = collection.generation_current(generation, depth)
     assert jgen == pytest.approx(42.36089737, abs=5e-2)
     # assert jgen == pytest.approx(42.36324575251117, abs=0.00005)
+
+
+# Additional tests for edge cases and parameter validation
+def test_collection_probability_array():
+    s = 1000
+    l = 100 * 1e-4
+    d = 27
+    thickness = 180 * 1e-4
+    x = np.array([0, thickness / 2, thickness])
+    cp = collection.collection_probability(x, thickness, s, l, d)
+    assert isinstance(cp, np.ndarray)
+    assert cp[0] > cp[1] > cp[2]  # Should decrease with distance from junction
