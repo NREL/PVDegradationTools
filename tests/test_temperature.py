@@ -227,7 +227,7 @@ def test_temperature():
         check_like=False,
     )
 
-    # check pvdeg.temperature.temperature results against pvlib directly calculated results
+    # check pvdeg.temperature.temperature results against pvlib calculated results
     pd.testing.assert_frame_equal(
         result_df, pvlib_df, check_dtype=False, check_names=False, check_like=False
     )
