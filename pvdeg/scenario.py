@@ -613,9 +613,11 @@ class Scenario:
     def _to_dict(self, api_key=False):
         # pipeline is special case, must remove 'job' function reference at every entry
         modified_pipeline = deepcopy(self.pipeline)
+
+        def get_qualified(x):
+            return f"{x.__module__}.{x.__name__}"
         for task in modified_pipeline.values():
             function_ref = task["job"]
-            get_qualified = lambda x: f"{x.__module__}.{x.__name__}"
             task["qualified_function"] = get_qualified(function_ref)
             task.pop("job")
 
