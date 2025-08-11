@@ -509,8 +509,8 @@ class GeospatialScenario(pvdeg.Scenario):
         Notes
         --------
         This method takes a random choice of points using a weighting for bias.
-        This weighting is deterministic but the choice is random. To guarantee the same output each time,
-        seed the numpy random number generator with a constant value.
+        This weighting is deterministic but the choice is random. To guarantee the same
+        output each time, seed the numpy random number generator with a constant value.
 
         ``np.random.seed(value)``
 
