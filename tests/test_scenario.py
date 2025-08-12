@@ -124,8 +124,8 @@ def test_addModule_existingmod():
 def test_addJob_noncallable():
     a = Scenario(name="non-callable-pipeline-func")
 
-    with pytest.raises(ValueError, match='FAILED: Requested function' \
-    ' "str_not_callable" not found'):
+    with pytest.raises(ValueError, match='FAILED: Requested function'
+                       ' "str_not_callable" not found'):
         a.addJob(func="str_not_callable")
 
 
