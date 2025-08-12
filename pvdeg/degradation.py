@@ -2,18 +2,20 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit
+from numba import njit
+from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Union
 from pvdeg import humidity
 
 from . import (
     temperature,
     spectral,
+    weather,
     decorators,
 )
 
 # TODO: Clean up all those functions and add gaps functionality
-
 
 def arrhenius(
     weather_df=None,
@@ -25,8 +27,9 @@ def arrhenius(
     p=None,
     n=None,
     C2=None,
-    parameters=None,
-):
+    parameters=None
+    ):
+
     """
     Calculate the degradation rate using an Arrhenius function with power law
     functions for humidity and irradiance dependence.
@@ -250,16 +253,7 @@ def vantHoff_deg(
     model_kwarg={},
 ):
     """
-    Calculate Van't Hoff Irradiance Degradation acceleration factor.
-
-    In this calculation, the rate of degradation kinetics is calculated using
-    the Van't Hoff model.
-
-    THIS IS A REALLY LONG LINE THAT SHOULD RAISE A FALKE8 LINTER ERROR AND THE ERROR SHOULD SHOW BELOW THIS LINE UNDER THE FILES CHANGED TAB
-
-    THIS IS ALSO A REALLY LONG LINE THAT SHOULD RAISE AN ERROR BUT YOU SHOULD NOT HAVE TO GO TO THE CHECKS TAB TO FIND IT
-
-    THIS LINE IS SHORTER BUT HAS A TRAILING WHITE SPACE SO IT SHOULD ALSO RAISE AN ERROR
+    Van't Hoff Temperature with Irradiance Degradation
 
     Parameters
     ----------
@@ -315,6 +309,7 @@ def vantHoff_deg(
     -------
     accelerationFactor : float or pd.Series
         Degradation acceleration factor
+
     """
 
     if poa is None:
@@ -342,7 +337,34 @@ def vantHoff_deg(
     return accelerationFactor
 
 
-@decorators.geospatial_quick_shape("numeric", ["Iwa"])
+def _to_eq_vantHoff(temp, Tf=1.41):
+    """
+    Function to obtain the Vant Hoff temperature equivalent [°C]
+
+    Parameters
+    ----------
+    Tf : float
+        Multiplier for the increase in degradation for every 10[°C] temperature increase. Default value of 1.41.
+    temp : pandas series
+        Solar module surface or Cell temperature [°C]
+
+    Returns
+    -------
+    Toeq : float
+        Vant Hoff temperature equivalent [°C]
+
+    """
+
+    # toSum = Tf ** (temp / 10)
+    toSum = np.power(Tf, np.divide(temp, 10))
+    summation = toSum.sum(axis=0, skipna=True)
+
+    Toeq = (10 / np.log(Tf)) * np.log(summation / len(temp))
+
+    return Toeq
+
+
+@decorators.geospatial_quick_shape('numeric', ["Iwa"])
 def IwaVantHoff(
     weather_df,
     meta,
@@ -412,7 +434,8 @@ def IwaVantHoff(
     Returns
     -------
     Iwa : float
-        Environment Characterization [W/m²]
+        Environment Characterization [W/m²[]
+
     """
     if poa is None:
         poa = spectral.poa_irradiance(weather_df, meta, **irradiance_kwarg)
@@ -542,6 +565,7 @@ def arrhenius_deg(
     -------
     accelerationFactor : float or pd.Series
         Degradation acceleration factor
+
     """
 
     if poa is None:
@@ -690,8 +714,8 @@ def IwaArrhenius(
         Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.Series
         Relative Humidity of material of interest
-        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(),
-        rh_front_encap(), rh_surface_outside()
+        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(), rh_front_encap(),
+        rh_surface_outside()
     Ea : float
         Degradation Activation Energy [kJ/mol]
     poa : pd.DataFrame, optional
@@ -787,6 +811,103 @@ def IwaArrhenius(
     return IWa
 
 
+############
+# Misc. Functions for Energy Calcs
+############
+
+
+def _rh_Above85(rh):
+    """
+    Helper function. Determines if the relative humidity is above 85%.
+
+    Parameters
+    ----------
+    rh : float
+        Relative Humidity %
+
+    Returns
+    --------
+    rhabove85 : boolean
+        True if the relative humidity is above 85% or False if the relative
+        humidity is below 85%
+
+    """
+
+    if rh > 85:
+        rhabove85 = True
+
+    else:
+        rhabove85 = False
+
+    return rhabove85
+
+
+def _hoursRH_Above85(df):
+    """
+    Helper Function. Count the number of hours relative humidity is above 85%.
+
+    Parameters
+    ----------
+    df : dataframe
+        DataFrame, dataframe containing Relative Humidity %
+
+    Returns
+    -------
+    numhoursabove85 : int
+        Number of hours relative humidity is above 85%
+
+    """
+    booleanDf = df.apply(lambda x: _rh_Above85(x))
+    numhoursabove85 = booleanDf.sum()
+
+    return numhoursabove85
+
+
+def _whToGJ(wh):
+    """
+    NOTE: unused, remove?
+
+    Helper Function to convert Wh/m² to GJ/m²
+
+    Parameters
+    -----------
+    wh : float
+        Input Value in Wh/m²
+
+    Returns
+    -------
+    gj : float
+        Value in GJ/m²
+
+    """
+
+    gj = 0.0000036 * wh
+
+    return gj
+
+
+def _gJtoMJ(gJ):
+    """
+    NOTE: unused, remove?
+
+    Helper Function to convert GJ/m² to MJ/y
+
+    Parameters
+    -----------
+    gJ : float
+        Value in GJ/m^-2
+
+    Returns
+    -------
+    MJ : float
+        Value in MJ/m^-2
+
+    """
+    MJ = gJ * 1000
+
+    return MJ
+
+
 def degradation_spectral(
     spectra: pd.Series,
     rh: pd.Series,
@@ -818,7 +939,7 @@ def degradation_spectral(
     time : time indicator in [h]
         if not included it will assume 1 h for each dataframe entry.
     Ea : float [kJ/mol]
-        Arrhenius activation energy. The default is 0 ofr no dependence
+        Arrhenius activation energy. The default is 0 ofr no dependence 
     n : float
         Power law fit paramter for RH sensitivity. The default is 0 for no dependence.
     p : float
