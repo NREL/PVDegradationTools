@@ -20,7 +20,6 @@ pvdeg_datafiles = {
     "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
-    "DegradationDatabase": os.path.join(DATA_DIR, "DegradationDatabase.json"),
 }
 
 
@@ -491,59 +490,30 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-<<<<<<<<< Temporary merge branch 1
-def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
-    """
-    read a material from materials.json and return the parameter dictionary. By default it will look at water permeation, but any database can be used.
-    e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
-    If name=None it will return the Json file if item=None, or a list of specific fields in each Json entry identified by item.
-=========
 # DEPRECATE
 def _read_material(name, fname="O2permeation.json"):
     """Read a material from materials.json and return the parameter dictionary.
->>>>>>>>> Temporary merge branch 2
 
     Parameters
     ----------
     name : (str)
-        unique name of material in a given database
-    fname : (str)
-        this can be any custom file identified by this name and the filepath (fp), or the just the shorthand defined in pvdeg_datafiles, i.e.
-        "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
-    item : (list)
-        this is a list of fields to return from a Json file if a specific record was not searched for.
-    fp :(str)
-        this is the file path to find the particular file, e.g "DATA_DIR". It must be specified if a predefined file is not used.
+        unique name of material
 
     Returns:
     --------
     mat_dict : (dict)
-        dictionary of material parameters, or "not found" message, or a summary of all entries with specific item entries.
+        dictionary of material parameters
     """
-
-    if fp == None:
-        with open(pvdeg_datafiles[fname]) as f:
-            data = json.load(f)
-        f.close()
-    else:
-        fpath = os.path.join(fp, fname)
-        with open(fpath) as f:
-            data = json.load(f)
-        f.close()
+    # TODO: test then delete commented code
+    # root = os.path.realpath(__file__)
+    # root = root.split(r'/')[:-1]
+    # file = os.path.join('/', *root, 'data', 'materials.json')
+    fpath = os.path.join(DATA_DIR, fname)
+    with open(fpath) as f:
+        data = json.load(f)
+    f.close()
 
     if name is None:
-<<<<<<<<< Temporary merge branch 1
-        if item is None:
-            mat_dict = data
-        else:
-            mat_dict = {keys: {keyss: data[keys][keyss] for keyss in data[keys] if keyss in item} for keys in data 
-                    if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})!={}  }
-    else:
-        try:
-            mat_dict = data[name]
-        except:
-            mat_dict = ("Data for", name, "was not found in", fname + ".")
-=========
         return list(data.keys())
 
         # Mike Added
@@ -558,11 +528,11 @@ def _read_material(name, fname="O2permeation.json"):
         # return [*material_list]
 
     mat_dict = data[name]
->>>>>>>>> Temporary merge branch 2
     return mat_dict
 
 
-# currently this is only designed for Oxygen Permeation. It could easily be adapted for all permeation data.
+# previously: fname="materials.json"
+# add control over what parameters (O2, H2, AA)?
 def _add_material(
     name,
     alias,
@@ -1423,7 +1393,7 @@ def display_json(
     ------------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
-        >>> "AApermeation", "H2Opermeation", "O2permeation", "DegradationDatabase"
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
         file path to material parameters json with same schema as material parameters
         json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are
