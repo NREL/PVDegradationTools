@@ -55,7 +55,12 @@ def test_poa_irradiance():
     weather dataframe, meta dictionary, and solar_position dataframe
     """
     result = pvdeg.spectral.poa_irradiance(
-        WEATHER, META, solpos_expected, tilt=None, azimuth=180, sky_model="isotropic"
+        WEATHER,
+        META,
+        sol_position=solpos_expected,
+        tilt=None,
+        azimuth=180,
+        sky_model="isotropic",
     )
 
     pd.testing.assert_frame_equal(result, poa_expected, check_dtype=False)

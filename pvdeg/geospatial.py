@@ -83,7 +83,7 @@ def start_dask(hpc=None):
 
     client = Client(cluster)
     print("Dashboard:", client.dashboard_link)
-    client.wait_for_workers(n_workers=1)
+    # client.wait_for_workers(n_workers=1)
 
     return client
 
@@ -974,10 +974,7 @@ def elevation_stochastic_downselect(
 
 
 def interpolate_analysis(
-    result: xr.Dataset,
-    data_var: str,
-    method="nearest",
-    resolution=100j,
+    result: xr.Dataset, data_var: str, method="nearest", resolution=100j
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Interpolate sparse spatial result data against DataArray coordinates.
 
@@ -1032,7 +1029,6 @@ def plot_sparse_analysis(
             [0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False
         )
         ax.patch.set_visible(False)
-
         show = True
     else:
         fig = None
