@@ -53,12 +53,11 @@ class Scenario:
         Parameters:
         -----------
         name : (str)
-            custom name for deg. scenario. If none given, will use date of
-            initialization (DDMMYY)
+            custom name for deg. scenario. If none given, will use datetime of
+            initialization (DDMMYY_HHMMSS)
         path : (str, pathObj)
             File path to operate within and store results. If none given, new folder
-            "name" will be
-            created in the working directory.
+            "name" will be created in the working directory.
         gids : (str, pathObj)
             Spatial area to perform calculation for. This can be Country or Country and
             State.
@@ -86,7 +85,7 @@ class Scenario:
         self.api_key = api_key
         self.email = email
 
-        filedate = dt.strftime(date.today(), "%d%m%y")
+        filedate = dt.now().strftime("%d%m%y_%H%M%S")
 
         if name is None:
             name = filedate
@@ -94,8 +93,11 @@ class Scenario:
 
         if path is None:
             self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
+        else:
+            self.path = os.path.join(self.path, self.name)
+
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         os.chdir(self.path)
 
         if file:

@@ -1,12 +1,12 @@
 {
     "name": "test",
-    "path": "/home/tford/dev/PVDegradationTools/tests/pvd_job_test/pvd_job_100624/pvd_job_100624/pvd_job_100624/pvd_job_test",
+    "path": "./",
     "modules": [
         {
             "module_name": "test-module",
             "racking": "open_rack_glass_polymer",
             "material_params": {
-                
+
                 "name": "EVA",
                 "alias": "EVA-1",
                 "contributor": "Michael Kempe",

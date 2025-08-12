@@ -18,7 +18,7 @@ FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
     "psm3": os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),
     "epw": os.path.join(TEST_DATA_DIR, "epw_pytest.epw"),
-    "h5": os.path.join(TEST_DATA_DIR, "h5_pytest.h5"),
+    "h5": os.path.join(TEST_DATA_DIR, "dynamic", "h5_pytest.h5"),
 }
 
 DSETS = [

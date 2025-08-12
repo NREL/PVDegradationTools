@@ -32,10 +32,14 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
 def test_Scenario_add(monkeypatch):
     ### monkey patch to bypass psm3 api calls in addLocation ###
     monkeypatch.setattr(
-        target=Scenario, name="addLocation", value=monkeypatch_addLocation
+        target=Scenario,
+        name="addLocation",
+        value=monkeypatch_addLocation,
     )
 
-    a = Scenario(name="test")
+    a = Scenario(
+        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+    )
 
     EMAIL = ("placeholder@email.xxx",)
     API_KEY = "fake_key"
@@ -50,6 +54,7 @@ def test_Scenario_add(monkeypatch):
         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json")
     )
 
+    a.name, restored.name = None, None
     a.path, restored.path = None, None
     a.file, restored.file = None, None
 
@@ -67,6 +72,7 @@ def test_Scenario_run(monkeypatch):
         email=EMAIL,
         api_key=API_KEY,
     )
+    a.path = os.path.join(TEST_DATA_DIR, "dynamic")
     a.run()
 
     res_df = a.results["test-module"]["GLUSE"]
@@ -93,7 +99,10 @@ def test_Scenario_run(monkeypatch):
 
 
 def test_addLocation_pvgis():
-    a = Scenario(name="location-test")
+    a = Scenario(
+        name="location-test",
+        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+    )
     with pytest.raises(ValueError):
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
 
@@ -109,7 +118,7 @@ def test_addModule_badmat(capsys, monkeypatch):
         email=EMAIL,
         api_key=API_KEY,
     )
-
+    a.path = os.path.join(TEST_DATA_DIR, "dynamic")
     a.addModule(module_name="fail", material="fake-material")
 
     captured = capsys.readouterr()
@@ -137,7 +146,10 @@ def test_addModule_badmat(capsys, monkeypatch):
 
 
 def test_addJob_bad(capsys):
-    a = Scenario(name="non-callable-pipeline-func")
+    a = Scenario(
+        name="non-callable-pipeline-func",
+        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+    )
 
     a.addJob(func="str_not_callable")
 
