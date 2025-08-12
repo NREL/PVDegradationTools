@@ -1025,7 +1025,9 @@ def plot_sparse_analysis(
 
     if ax is None:
         fig = plt.figure()
-        ax = fig.add_axes([0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False)
+        ax = fig.add_axes(
+            [0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False
+        )
         ax.patch.set_visible(False)
         show = True
     else:
