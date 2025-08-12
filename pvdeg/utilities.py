@@ -652,7 +652,7 @@ def ts_gid_df(file, gid):
 
 
 def tilt_azimuth_scan(
-    weather_df=None, meta=None, tilt_step=5, azimuth_step=5, func=Callable, **kwarg
+    weather_df=None, meta=None, func=None, tilt_step=5, azimuth_step=5, **kwarg
 ):
     """Calculate minimum standoff distance for roof-mounted PV systems.
 
@@ -670,11 +670,13 @@ def tilt_azimuth_scan(
     azimuth_step : integer
         Step in degrees of change in Azimuth angle of PV system relative to north.
         Will scan from 0 to 180 degrees.
+    func : string
+        The name of the function that will be calculated.
     kwarg : dict
         All the keywords in a dictionary form that are needed to run the function.
-    calc_function : string
-        The name of the function that will be calculated.
+
     Returns
+    -------
         standoff_series : 2-D array with each row consiting of tilt, azimuth, then
         standoff
     """
