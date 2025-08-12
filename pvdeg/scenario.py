@@ -305,7 +305,6 @@ class Scenario:
         except Exception as e:
             warnings.warn(f"Failed to add module '{module_name}': {e}")
 
-    # add testing
     def add_material(
         self,
         name,
@@ -390,10 +389,10 @@ class Scenario:
         func_params : dict
             job specific keyword argument dictionary to provide to the function
         """
-        try:
-            if func is None or not callable(func):
-                raise ValueError(f'FAILED: Requested function "{func}" not found')
+        if func is None or not callable(func):
+            raise ValueError(f'FAILED: Requested function "{func}" not found')
 
+        try:
             job_id = utilities.new_id(self.pipeline)
             job_dict = {"job": func, "params": func_kwarg}
             self.pipeline[job_id] = job_dict
