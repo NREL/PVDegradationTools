@@ -1102,7 +1102,7 @@ class GeospatialScenario(pvdeg.Scenario):
         return ""
 
     def _ipython_display_(self):
-        file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
+        file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"  # noqa
         html_content = f"""
         <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">  # noqa
             <h2>self.name: {self.name}</h2>
