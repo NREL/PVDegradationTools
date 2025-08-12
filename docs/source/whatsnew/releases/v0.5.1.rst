@@ -9,6 +9,10 @@ Enhancements
   (:pull:`182`)
 - Updated pytest workflow to cancel in-progress runs for the same branch in favour of
   running on the latest commit. (:pull:`191`)
+- Add a new GitHub Actions workflow to automatically run flake8 for linting on pull
+  requests (:issue:`164`, :pull:`165`)
+- Lint codebase for PEP8 compliance (:pull:`166`, :pull:`175`, :pull:`196`)
+
 
 Deprecations
 -------------
