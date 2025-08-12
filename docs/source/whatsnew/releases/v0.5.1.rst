@@ -9,6 +9,8 @@ Enhancements
   (:pull:`182`)
 - Updated pytest workflow to cancel in-progress runs for the same branch in favour of
   running on the latest commit. (:pull:`191`)
+- Replace print messages for failure or succesful addition of objects (location, job...)
+  with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
 
 Deprecations
 -------------
@@ -16,6 +18,9 @@ Deprecations
 - ``GeospatialScenario.getValidRegions()``
 - ``GeospatialScenario.gids_tonumpy()``
 - ``GeospatialScenario.gids_tolist()``
+- Deprecate `see_added` argument, and associated UserWarning for succesful addition of
+  objects, in several :py:mod:`~pvdeg.scenario` functions. (:pull:`192`)
+
 
 Bug Fixes
 ---------
@@ -29,10 +34,17 @@ Bug Fixes
   - Improve code consistency
   (:issue:`177`, :pull:`178`)
 
+
 Dependencies
 ------------
 - Update aiohttp from 3.10.11 to 3.12.14 for improved security and performance
   (:pull:`185`)
+
+
+Testing
+-------
+- Increase test coverage of :py:mod:`~pvdeg.scenario`. (:pull:`192`)
+
 
 Contributors
 -----------
