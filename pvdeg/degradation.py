@@ -280,8 +280,8 @@ def arrhenius_deg(
         When p=0 the dependence on light will be ignored and degradation will happen
         both day and night. As a caution or a feature, a very small value of p
         (e.g. p=0.0001) will provide very little degradation dependence on irradiance,
-        but degradation willonly be accounted for during daylight. i.e. averages will be
-        computed over half of the time only.
+        but degradation will only be accounted for during daylight. i.e. averages will
+        be computed over half of the time only.
     n : float
         Fit parameter for relative humidity
         When n=0 the degradation rate will not be dependent on humidity.

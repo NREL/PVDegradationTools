@@ -1483,7 +1483,7 @@ def search_json(
                 return key
 
     raise ValueError(
-        rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}"
+        rf"name_or_alias: {name_or_alias} not in JSON at {fp}"
     )
 
 
