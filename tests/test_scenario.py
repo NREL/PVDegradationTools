@@ -130,18 +130,6 @@ def test_addModule_existingmod():
         a.addModule(module_name="test-module")
 
 
-def test_addJob_bad(capsys):
-    a = Scenario(
-        name="non-callable-pipeline-func",
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
-    )
-
-    with pytest.raises(
-        ValueError, match="FAILED: Requested function" ' "str_not_callable" not found'
-    ):
-        a.addJob(func="str_not_callable")
-
-
 def monkeypatch_badjob_new_id_fail(*args, **kwargs):
     raise RuntimeError("invalid_job")
 

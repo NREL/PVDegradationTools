@@ -1,4 +1,3 @@
-import pytest
 import warnings
 from pvdeg import decorators
 

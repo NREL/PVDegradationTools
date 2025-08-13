@@ -1437,7 +1437,7 @@ def display_json(
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
             json_str = json_str.replace(
-                f'"{key}":',
+                f'"{key}":',  # noqa: E702,E231, E501
                 f'<span style="color: plum;">"{key}":</span>',  # noqa: E702,E231, E501
             )
         indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])

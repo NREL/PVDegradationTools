@@ -4,7 +4,6 @@ import pvdeg
 from pvdeg import utilities
 
 import matplotlib.pyplot as plt
-from datetime import date
 from datetime import datetime as dt
 import os
 from shutil import rmtree

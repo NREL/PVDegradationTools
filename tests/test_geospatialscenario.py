@@ -1,6 +1,5 @@
 from pvdeg import TEST_DATA_DIR
 import pvdeg
-import pytest
 import pandas as pd
 import xarray as xr
 import numpy as np
@@ -41,7 +40,7 @@ def test_standoff_autotemplate(monkeypatch):
         value=monkeypatch_addLocation,
     )
 
-    ### create a scenario, add locations, run analysis using an autotemplated function ###
+    # Create a scenario, add locations, run analysis using an autotemplated function
     geo_scenario = pvdeg.GeospatialScenario(
         path=os.path.join(TEST_DATA_DIR, "dynamic"),
     )
