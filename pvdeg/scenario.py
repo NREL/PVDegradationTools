@@ -302,6 +302,10 @@ class Scenario:
                     "irradiance_kwarg": irradiance_kwarg,
                 }
             )
+        except KeyError:
+            warnings.warn("Material Not Found - No module added to scenario.")
+            warnings.warn("If you need to add a custom material, use .add_material()")
+            return
         except Exception as e:
             warnings.warn(f"Failed to add module '{module_name}': {e}")
 
