@@ -10,6 +10,9 @@ Breaking Changes
   (:issue:`103`, :pull:`163`)
 - Remove deprecated `vertical_poa` function from `pysam.py` and related (incorrect)
   reference to `standards.vertical_poa` in `geospatial.py`. (:issue:`167`, :pull:`174`)
+- Replaced ambiguous variable name `l` in
+  :py:func`pvdeg.collection.collection_probability` with `diffusion_length` to enhance
+  code readability and maintainability. (:issue:`198`, :pull:`199`)
 
 
 Enhancements
