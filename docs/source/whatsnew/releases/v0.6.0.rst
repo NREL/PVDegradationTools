@@ -13,7 +13,8 @@ Breaking Changes
 - Replaced ambiguous variable name `l` in
   :py:func`pvdeg.collection.collection_probability` with `diffusion_length` to enhance
   code readability and maintainability. (:issue:`198`, :pull:`199`)
-
+- Replace print messages for failure or succesful addition of objects (location, job...)
+  with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
 
 Enhancements
 ------------
@@ -31,6 +32,8 @@ Deprecations
 - ``GeospatialScenario.getValidRegions()``
 - ``GeospatialScenario.gids_tonumpy()``
 - ``GeospatialScenario.gids_tolist()``
+- Deprecate `see_added` argument, and associated UserWarning for succesful addition of
+  objects, in several :py:mod:`~pvdeg.scenario` functions. (:pull:`192`)
 
 
 Bug Fixes
