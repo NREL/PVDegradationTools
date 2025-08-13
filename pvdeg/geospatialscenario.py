@@ -1087,8 +1087,8 @@ class GeospatialScenario(pvdeg.Scenario):
     def format_geospatial_work(self):
         if self.func:
             return f"""
-                <p><strong>self.func:</strong> {self.func.__name__}</p>
-                <p><strong>self.template:</strong> {self.format_template()}</p>
+                <p><strong>self.func:</strong> {self.func.__name__}</p>  # noqa
+                <p><strong>self.template:</strong> {self.format_template()}</p> # noqa
             """
 
         return ""
