@@ -13,7 +13,7 @@ API_KEY = "DEMO_KEY"
 
 
 def monkeypatch_addLocation(self, *args, **kwargs) -> None:
-    """Mocker function to be monkey patched at runtime for Scenario.addLocation to avoid.
+    """Mocker function to be monkey patched at runtime for Scenario.addLocation to avoid
 
     psm3 api calls and use local weather files instead.
     """
@@ -30,7 +30,7 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
 
 
 def test_Scenario_add(monkeypatch):
-    ### monkey patch to bypass psm3 api calls in addLocation ###
+    # monkey patch to bypass psm3 api calls in addLocation
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
@@ -57,7 +57,7 @@ def test_Scenario_add(monkeypatch):
 
 
 def test_Scenario_run(monkeypatch):
-    ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
+    # monkey patch to bypass psm3 api calls in addLocation called by load_json
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )

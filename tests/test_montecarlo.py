@@ -39,7 +39,9 @@ def test_generateCorrelatedSamples():
 
     Requires:
     ---------
-    list of correlations, stats dictionary (mean and standard deviation for each variable), number of iterations, seed, DataFrame to check against
+    list of correlations, stats dictionary
+    (mean and standard deviation for each variable), number of iterations, seed,
+    DataFrame to check against
     """
     # standard case
     result_1 = pvdeg.montecarlo.generateCorrelatedSamples(

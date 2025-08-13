@@ -78,18 +78,16 @@ def test_get_kinetics_bad():
     assert res == desired_output
 
 
-### DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
+# DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
 def test_read_material_bad():
     # no name case
-    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
-    material_list = data.keys()
-
     res = pvdeg.utilities._read_material(name=None)
 
-    assert res == [*material_list]
+    assert res == data
 
 
 def test_add_material():
@@ -113,7 +111,8 @@ def test_add_material():
     with open(fpath) as f:
         data = json.load(f)
 
-    # rename key, because we are comparing to original dictionary and func params do not align with the json keys
+    # rename key, because we are comparing to original dictionary and func params do not
+    # align with the json keys
     new_mat["Fickian"] = new_mat["fickian"]
     new_mat.pop("fickian")
 

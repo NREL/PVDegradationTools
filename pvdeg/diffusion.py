@@ -131,7 +131,7 @@ def esdiffusion(
         try:
             print("The edge seal is", esp.get("name"), ".")
             print("The encapsulant is", encp.get("name"), ".")
-        except:
+        except Exception:
             print("Unknown material selected.")
 
     # These are the edge seal oxygen or water permeation parameters
