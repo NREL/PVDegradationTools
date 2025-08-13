@@ -20,6 +20,7 @@ Enhancements
   (:pull:`182`)
 - Updated pytest workflow to cancel in-progress runs for the same branch in favour of
   running on the latest commit. (:pull:`191`)
+- Added support for pandas dataframes to :py:mod:`pvdeg.weather.map_meta()` (:pull:`193`)
 
 Deprecations
 -------------
@@ -56,5 +57,6 @@ Contributors
 ------------
 - Rajiv Daxini (:ghuser:`RDaxini`)
 - Tobin Ford (:ghuser:`tobin-ford`)
+- Maxx Millstein (:ghuser:`maxx-mill`)
 - Mike Kempe (:ghuser:`MDKempe`)
 - Martin Springer (:ghuser:`martin-springer`)
