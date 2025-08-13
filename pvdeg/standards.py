@@ -18,7 +18,6 @@ from pvdeg import (
 
 
 @decorators.geospatial_quick_shape("timeseries", ["T_0", "T_inf", "poa"])
-@decorators.geospatial_quick_shape("timeseries", ["T_0", "T_inf", "poa"])
 def eff_gap_parameters(
     weather_df=None,
     meta=None,
