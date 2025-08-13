@@ -395,7 +395,7 @@ def Ce(
     t=None,
     So_e=None,
     Ea_s_e=None,
-    l=None,
+    back_encap_thickness=None,
     backsheet="W017",
     encapsulant="W001",
     output="rh",
@@ -441,9 +441,9 @@ backsheet, and it ignores the transients in the backsheet.
     Ea_s_e : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
-    l : float
+    back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.46 [mm]
+        The suggested value for encapsulat is EVA 0.46 mm
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
@@ -497,11 +497,11 @@ backsheet, and it ignores the transients in the backsheet.
             if "t" in utilities._read_material(
                 name=encapsulant, fname="H2Opermeation", item=None, fp=None
             ):
-                l = utilities._read_material(
+                back_encap_thickness = utilities._read_material(
                     name=encapsulant, fname="H2Opermeation", item=None, fp=None
                 )["t"]
             else:
-                l = 0.46
+                back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / t
     EaWVTR = Ea_p_b / 0.00831446261815324
@@ -576,7 +576,7 @@ def Ce_numba(
     WVTRo=7970633554,
     EaWVTR=55.0255,
     So=1.81390702,
-    l=0.5,
+    back_encap_thickness=0.5,
     Eas=16.729,
 ):
     """Return water concentration in encapsulant.
@@ -611,9 +611,9 @@ def Ce_numba(
     So : float
         Encapsulant solubility prefactor in [g/cm3]
         So = 1.81390702(g/cm3) is the suggested value for EVA.
-    l : float
+    back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.5(mm)
+        The suggested value for encapsulat is EVA 0.5 mm
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729[kJ/mol] is the suggested value for EVA.
@@ -670,7 +670,7 @@ def back_encap(
     WVTRo=7970633554,
     EaWVTR=55.0255,
     So=1.81390702,
-    l=0.5,
+    back_encap_thickness=0.5,
     Eas=16.729,
 ):
     """Return RH of backside module encapsulant.
@@ -698,9 +698,9 @@ def back_encap(
     So : float
         Encapsulant solubility prefactor in [g/cm3]
         So = 1.81390702[g/cm3] is the suggested value for EVA.
-    l : float
+    back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.5[mm]
+        The suggested value for EVA encapsulant is 0.5 mm.
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729[kJ/mol] is the suggested value for EVA.
@@ -729,7 +729,7 @@ def back_encap(
         WVTRo=WVTRo,
         EaWVTR=EaWVTR,
         So=So,
-        l=l,
+        back_encap_thickness=back_encap_thickness,
         Eas=Eas,
     )
 
@@ -774,7 +774,7 @@ def backsheet(
     t=None,
     So_e=None,
     Ea_s_e=None,
-    l=None,
+    back_encap_thickness=None,
     backsheet="W017",
     encapsulant="W001",
 ):
@@ -811,9 +811,9 @@ def backsheet(
     Ea_s_e : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
-    l : float
+    back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA l=0.46 [mm]
+        The suggested value for EVA encapsulant  is 0.46 mm.
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
@@ -843,7 +843,7 @@ def backsheet(
         t=t,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
-        l=l,
+        back_encap_thickness=back_encap_thickness,
         backsheet=backsheet,
         encapsulant=encapsulant,
         output="rh",
@@ -867,7 +867,7 @@ def module(
     WVTRo=7970633554,
     EaWVTR=55.0255,
     So=1.81390702,
-    l=0.5,
+    back_encap_thickness=0.5,
     Eas=16.729,
     wind_factor=0.33,
 ):
@@ -902,9 +902,9 @@ def module(
     So : float
         Encapsulant solubility prefactor in [g/cm3]
         So = 1.81390702(g/cm3) is the suggested value for EVA.
-    l : float
+    back_encap_thickness : float
         Thickness of the backside encapsulant (mm).
-        The suggested value for encapsulat is EVA l=0.5(mm)
+        The suggested value for EVA encapsulant is 0.5
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729(kJ/mol) is the suggested value for EVA.
@@ -965,7 +965,7 @@ def module(
         WVTRo=WVTRo,
         EaWVTR=EaWVTR,
         So=So,
-        l=l,
+        back_encap_thickness=back_encap_thickness,
         Eas=Eas,
     )
 
@@ -999,7 +999,7 @@ def module(
 #     WVTRo=7970633554,
 #     EaWVTR=55.0255,
 #     So=1.81390702,
-#     l=0.5,
+#     back_encap_thickness=0.5,
 #     Eas=16.729,
 #     wind_factor=1
 # ):
