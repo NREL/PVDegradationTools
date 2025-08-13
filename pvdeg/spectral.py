@@ -110,8 +110,8 @@ def poa_irradiance(
         Perez model to use for diffuse irradiance. Default is `allsitescomposite1990`.
         Only used when sky_model is 'perez'.
     **kwargs_mount : dict
-        Additional keyword arguments for the POA model based on mounting configuration. See
-        `poa_irradiance_fixed` or `poa_irradiance_tracker` for details.
+        Additional keyword arguments for the POA model based on mounting configuration.
+        See `poa_irradiance_fixed` or `poa_irradiance_tracker` for details.
 
         - For `module_mount='fixed'`:
             - surface_tilt : float
@@ -140,8 +140,9 @@ def poa_irradiance(
 
     Notes
     -----
-    This function uses pvlib to calculate the plane-of-array irradiance based on the provided weather data and
-    mounting configuration. See the pvlib documentation for further information on the parameters.
+    This function uses pvlib to calculate the plane-of-array irradiance based on the
+    provided weather data and mounting configuration. See the pvlib documentation for
+    further information on the parameters.
     """
 
     # Allow legacy keys for tilt and azimuth
@@ -155,7 +156,8 @@ def poa_irradiance(
         for key in extra_keys:
             dictionary.pop(key)
             warnings.warn(
-                f"Key '{extra_keys}' cannot be used for the selected `module_mount` and are ignored."
+                "Key '{extra_keys}' cannot be used for the selected `module_mount` "
+                "and are ignored."
             )
 
     if sol_position is None:
@@ -226,7 +228,8 @@ def poa_irradiance_fixed(
     model_perez="allsitescomposite1990",
 ) -> pd.DataFrame:
     """
-    Calculate plane-of-array (POA) irradiance using `pvlib.irradiance.get_total_irradiance` for a fixed tilt system.
+    Calculate plane-of-array (POA) irradiance using
+    `pvlib.irradiance.get_total_irradiance` for a fixed tilt system.
 
     Parameters
     ----------
@@ -235,7 +238,8 @@ def poa_irradiance_fixed(
     meta : dict
         The geographical location ID in the NSRDB file.
     sol_position : pd.DataFrame, optional
-        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
+        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be
+        calculated.
     dni_extra : pd.Series, optional
         Extra-terrestrial direct normal irradiance. If None, it will be calculated.
     airmass : pd.Series, optional
@@ -258,14 +262,17 @@ def poa_irradiance_fixed(
     Returns
     -------
     poa : pd.DataFrame
-        DataFrame containing the calculated plane-of-array irradiance components with columns:
-        'poa_global', 'poa_direct', 'poa_diffuse', 'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
+        DataFrame containing the calculated plane-of-array irradiance components with
+        columns:
+        'poa_global', 'poa_direct', 'poa_diffuse', 'poa_sky_diffuse',
+        'poa_ground_diffuse'. [W/m2]
 
 
     Notes
     -----
-    This function uses pvlib to calculate the plane-of-array irradiance based on the provided weather data and
-    mounting configuration for fixed tilt systems. See the pvlib documentation for further information on the parameters.
+    This function uses pvlib to calculate the plane-of-array irradiance based on the
+    provided weather data and mounting configuration for fixed tilt systems. See the
+    pvlib documentation for further information on the parameters.
     """
 
     if surface_tilt is None:
@@ -274,7 +281,8 @@ def poa_irradiance_fixed(
         except Exception:
             surface_tilt = float(abs(meta["latitude"]))
             print(
-                f"The array surface_tilt angle was not provided, therefore the latitude tilt of {surface_tilt:.1f} was used."
+                "The array surface_tilt angle was not provided, therefore the latitude "
+                tilt f"of {surface_tilt:.1f} was used."
             )
 
     if surface_azimuth is None:  # Sets the default orientation to equator facing.
@@ -286,7 +294,8 @@ def poa_irradiance_fixed(
             else:
                 surface_azimuth = 180
                 print(
-                    f"The array azimuth was not provided, therefore an azimuth of {surface_azimuth:.1f} was used."
+                    "The array azimuth was not provided, therefore an azimuth of "
+                    f"{surface_azimuth:.1f} was used."
                 )
 
     if sol_position is None:
@@ -339,7 +348,8 @@ def poa_irradiance_tracker(
     model_perez="allsitescomposite1990",
 ) -> pd.DataFrame:
     """
-    Calculate plane-of-array (POA) irradiance using pvlib based on supplied weather data.
+    Calculate plane-of-array (POA) irradiance using pvlib based on supplied weather
+    data.
 
     Parameters
     ----------
@@ -348,23 +358,27 @@ def poa_irradiance_tracker(
     meta : dict
         The geographical location information.
     sol_position : pd.DataFrame, optional
-        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be calculated.
+        pvlib.solarposition.get_solarposition Dataframe. If none is given, it will be
+        calculated.
     axis_tilt : float, optional
-        The tilt angle of the array along the long axis of a single axis tracker [degrees].
+        The tilt angle of the array along the long axis of a single axis tracker
+        [degrees].
         If None, horizontal is used.
     axis_azimuth : float, optional
         The azimuth angle of the long, non-rotating axis of the array panels [degrees].
         North-south orientation by default.
     max_angle : float
-        This is the maximum angle of the rotating axis achievable relative to the horizon.
+        This is the maximum angle of the rotating axis achievable relative to the
+        horizon.
     backtrack : boolean
         If true, the tilt will backtrack to avoid row to row shading.
     gcr : float
-        Ground coverage ratio (GCR). The ratio of the width of the PV array to the distance between rows.
-        This affects the backtracking funciton.
+        Ground coverage ratio (GCR). The ratio of the width of the PV array to the
+        distance between rows. This affects the backtracking function.
     cross_axis_tilt : float
-        angle, relative to horizontal, of the line formed by the intersection between the slope containing
-        the tracker axes and a plane perpendicular to the tracker axes [degrees]
+        angle, relative to horizontal, of the line formed by the intersection between
+        the slope containing the tracker axes and a plane perpendicular to the tracker
+        axes [degrees]
         Fixes backtracking for a slope not parallel with the axis azimuth.
     dni_extra : pd.Series, optional
         Extra-terrestrial direct normal irradiance. If None, it will be calculated.
@@ -399,8 +413,9 @@ def poa_irradiance_tracker(
 
     Notes
     -----
-    This function uses pvlib to calculate the plane-of-array irradiance based on the provided weather data and
-    mounting configuration for single-axis tracker systems. See the pvlib documentation for further information on the parameters.
+    This function uses pvlib to calculate the plane-of-array irradiance based on the
+    provided weather data and mounting configuration for single-axis tracker systems.
+    See the pvlib documentation for further information on the parameters.
     """
 
     if axis_azimuth is None:  # Sets the default orientation to north-south.
@@ -412,7 +427,8 @@ def poa_irradiance_tracker(
             else:
                 axis_azimuth = 180
                 print(
-                    f"The array axis_azimuth was not provided, therefore an azimuth of {axis_azimuth:.1f} was used."
+                    "The array axis_azimuth was not provided, therefore an azimuth of "
+                    f"{axis_azimuth:.1f} was used."
                 )
 
     if axis_tilt is None:  # Sets the default orientation to horizontal.
@@ -421,7 +437,8 @@ def poa_irradiance_tracker(
         except:
             axis_tilt = 0
             print(
-                f"The array axis_tilt was not provided, therefore an axis tilt of 0° was used."
+                "The array axis_tilt was not provided, therefore an axis tilt of 0° "
+                "was used."
             )
 
     if sol_position is None:
