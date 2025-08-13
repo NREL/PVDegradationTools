@@ -98,15 +98,15 @@ def test_addLocation_pvgis():
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
 
 
-def test_addModule_badmat():
+def test_addModule_badkey():
     a = Scenario.load_json(
         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
         email=EMAIL,
         api_key=API_KEY,
     )
 
-    with pytest.warns(UserWarning, match="Failed to add module"):
-        a.addModule(module_name="fail", material="fake-material")
+    with pytest.warns(UserWarning, match="Material Not Found"):
+        a.addModule(module_name="test-invalid-key", material="invalid-key")
 
 
 def test_addModule_existingmod():
