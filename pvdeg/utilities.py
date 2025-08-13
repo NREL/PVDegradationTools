@@ -1331,8 +1331,8 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
         raise ValueError("weather df must be in 1 hour or 30 minute intervals")
 
     date_range = pd.date_range(
-        start=f"{coerce_year}-01-01 00:00:00",
-        end=f"{coerce_year}-12-31 23:45:00",  # 15 min internval is highest resolution
+        start=f"{coerce_year}-01-01 00:00:00",  # noqa: E231
+        end=f"{coerce_year}-12-31 23:45:00",  # noqa: E231
         freq=freq,
     )
 
@@ -1425,8 +1425,8 @@ def display_json(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                f"{pvdeg_file} does not exist in pvdeg/data. Options are \
-                    {pvdeg_datafiles.keys()}"
+                f"{pvdeg_file} does not exist in pvdeg/data. Options are "
+                f"{pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r") as file:
