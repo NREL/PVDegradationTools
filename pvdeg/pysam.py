@@ -3,19 +3,18 @@
 Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
 """
 
-import dask.dataframe as dd
 import dask.array as da
 import pandas as pd
 import xarray as xr
 import numpy as np
 import json
-import os
 
 
-from pvdeg import weather, utilities, decorators, DATA_DIR
+from pvdeg import weather, utilities
 
 
-# TODO: add grid_default, cashloan_default, utilityrate_defaults for expanded pysam simulation capabilities
+# TODO: add grid_default, cashloan_default, utilityrate_defaults for expanded pysam
+# simulation capabilities
 def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -108,7 +107,7 @@ def pysam(
     cashloan_default: str
 
         pysam default config for cashloan model.
-        [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)
+        [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)  # noqa
         - "FlatPlatePVCommercial"
         - "FlatPlatePVResidential"
         - "PVBatteryCommercial"
@@ -121,7 +120,7 @@ def pysam(
     utiltityrate_default: str
 
         pysam default config for utilityrate5 model.
-        [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())
+        [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())  # noqa
 
     config_files: dict
         SAM configuration files. A dictionary containing a mapping to filepaths.
@@ -161,12 +160,8 @@ def pysam(
         from the model.
     """
     try:
-        import PySAM
         import PySAM.Pvsamv1 as pv1
         import PySAM.Pvwattsv8 as pv8
-        import PySAM.Grid as Grid
-        import PySAM.Utilityrate5 as UtilityRate
-        import PySAM.Cashloan as Cashloan
     except ModuleNotFoundError:
         print(
             "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM \

@@ -86,7 +86,7 @@ for i in range(0, geo_meta.shape[0], step):
         template=slice_template,
         func=pvdeg.pysam.inspire_ground_irradiance,
         config_files={
-            "pv": f"/home/tford/dev/InSPIRE/Studies/USMap_Doubleday_2024/SAM/{conf}/{conf}_pvsamv1.json"
+            "pv": f"/home/tford/dev/InSPIRE/Studies/USMap_Doubleday_2024/SAM/{conf}/{conf}_pvsamv1.json"  # noqa
         },
     )
 

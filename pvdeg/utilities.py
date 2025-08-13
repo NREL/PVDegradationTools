@@ -45,8 +45,8 @@ def gid_downsampling(meta, n):
         gids_sub = meta.index.values
         return meta, gids_sub
 
-    lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
-    lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
+    lon_sub = sorted(meta["longitude"].unique())[0: -1: max(1, 2 * n)]
+    lat_sub = sorted(meta["latitude"].unique())[0: -1: max(1, 2 * n)]
 
     gids_sub = meta[
         (meta["longitude"].isin(lon_sub)) & (meta["latitude"].isin(lat_sub))
@@ -493,29 +493,35 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 
 def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     """
-    read a material from materials.json and return the parameter dictionary. By default it will look at water permeation, but any database can be used.
+    read a material from materials.json and return the parameter dictionary. By default
+    it will look at water permeation, but any database can be used.
     e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
-    If name=None it will return the Json file if item=None, or a list of specific fields in each Json entry identified by item.
+    If name=None it will return the Json file if item=None, or a list of specific fields
+    in each Json entry identified by item.
 
     Parameters:
     -----------
     name : (str)
         unique name of material in a given database
     fname : (str)
-        this can be any custom file identified by this name and the filepath (fp), or the just the shorthand defined in pvdeg_datafiles, i.e.
+        this can be any custom file identified by this name and the filepath (fp), or
+        the just the shorthand defined in pvdeg_datafiles, i.e.
         "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
     item : (list)
-        this is a list of fields to return from a Json file if a specific record was not searched for.
+        this is a list of fields to return from a Json file if a specific record was not
+        searched for.
     fp :(str)
-        this is the file path to find the particular file, e.g "DATA_DIR". It must be specified if a predefined file is not used.
+        this is the file path to find the particular file, e.g "DATA_DIR". It must be
+        specified if a predefined file is not used.
 
     Returns:
     --------
     mat_dict : (dict)
-        dictionary of material parameters, or "not found" message, or a summary of all entries with specific item entries.
+        dictionary of material parameters, or "not found" message, or a summary of all
+        entries with specific item entries.
     """
-    
-    if fp == None:
+
+    if fp is None:
         with open(pvdeg_datafiles[fname]) as f:
             data = json.load(f)
         f.close()
@@ -534,14 +540,13 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     else:
         try:
             mat_dict = data[name]
-        except:
+        except Exception:
             mat_dict = ("Data for", name, "was not found in", fname + ".")
     return mat_dict
 
 
-
-# previously: fname="materials.json"
-# add control over what parameters (O2, H2, AA)?
+# currently this is only designed for Oxygen Permeation. It could easily be adapted for
+# all permeation data.
 def _add_material(
     name,
     alias,
@@ -956,7 +961,8 @@ def new_id(collection):
     if not isinstance(collection, (dict, OrderedDict)):
         raise TypeError(f"{collection.__name__} type {type(collection)} expected dict")
 
-    gen = lambda: "".join(choices(ascii_uppercase, k=5))
+    def gen():
+        return "".join(choices(ascii_uppercase, k=5))
     id = gen()
     while id in collection.keys():
         id = gen()
@@ -1273,12 +1279,10 @@ def compare_templates(
         if ds1.coords[coord].dtype.kind in {"i", "f"}:
             if not np.allclose(
                 ds1.coords[coord], ds2.coords[coord], atol=atol
-            ):  # Use np.allclose for numeric coordinates
+            ):
                 return False
-        elif ds1.coords[coord].dtype.kind == "M":  # datetime64
-            if not np.array_equal(
-                ds1.coords[coord], ds2.coords[coord]
-            ):  # Use array equality for datetime coordinates
+        elif ds1.coords[coord].dtype.kind == "M":
+            if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
                 return False
         else:
             if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
@@ -1426,19 +1430,18 @@ def display_json(
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
             json_str = json_str.replace(
-                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'
+                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'  # noqa: E702,E231, E501
             )
-
         indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
-        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
+        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'  # noqa: E702,E231, E501
 
-    html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
+    html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'  # noqa
     for key, value in data.items():
         html += (
             f"<div>"
-            f'<strong style="color: white;">{key}:</strong> '
-            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"
-            f'<div style="display: none;">{json_to_html(value)}</div>'
+            f'<strong style="color: white;">{key}:</strong> '  # noqa
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231, E501
+            f'<div style="display: none;">{json_to_html(value)}</div>'  # noqa
             f"</div>"
         )
     html += "</div>"
@@ -1493,7 +1496,9 @@ def search_json(
             if subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias:
                 return key
 
-    raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}")
+    raise ValueError(
+        rf"name_or_alias: {name_or_alias} not in JSON at {fp}"
+    )
 
 
 def read_material(

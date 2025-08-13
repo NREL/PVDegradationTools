@@ -1,4 +1,4 @@
-﻿{
+{
     "A000": {
     "comments": "The wavelength is in units of [nm] and the albedo is in units of [%]. For consistency, the data should contain wavelengths from at least 280 nm to 400 nm."
   },
@@ -193,7 +193,7 @@
     "comments": "Data is emperically extrapolated from 280 nm to 290 nm. Data extracted from Turner et al. Figure 1 as a reference to Diffey et al Earth-dark brown soil. Diffey B., Green A.T., Loftus M.J., Johnson G.J., Lee P.S. A Portable Instrument for Measuring Ground Reflectance in the Ultraviolet. Photochem. Photobiol. 1995;61:68-70. doi: 10.1111/j.1751-1097.1995.tb09244.x.",
     "wavelength": "280, 289.65994, 295.9479, 302.86716, 303.76108, 305.84424, 307.9282, 312.02142, 313.9551, 317.67758, 321.13834, 322.92453, 325.60376, 329.4363, 334.3851, 336.98978, 339.89206, 342.23627, 345.06415, 347.66885, 350.4223, 352.80353, 355.55685, 357.52872, 360.57968, 363.14694, 365.677, 368.39307, 370.92303, 373.56476, 376.05753, 378.84808, 381.4153, 384.243, 386.2522, 389.41473, 391.16342, 394.6981, 397.37692, 400",
     "albedo": "3.5, 3.8857589, 3.9979324, 4.444744, 4.2032003, 4.35831, 4.290372, 4.241228, 4.557413, 4.1426797, 4.0686874, 4.0255013, 3.988603, 3.988999, 4.0019016, 3.9959748, 4.00247, 3.9965165, 4.0030046, 3.9908817, 4.0035577, 4.047174, 4.090829, 4.1529903, 4.209068, 4.258899, 4.302531, 4.3585734, 4.4269886, 4.4706316, 4.532847, 4.5765057, 4.632533, 4.688587, 4.719774, 4.788254, 4.825609, 4.8879323, 4.9439707, 4.999998"
-  }, 
+  },
   "A017": {
     "data_entry_person": "Michael Kempe",
     "date_entered": "7/28/2025",
@@ -251,7 +251,7 @@
     "reference": "Turner J, Parisi AV. Ultraviolet Radiation Albedo and Reflectance in Review: The Influence to Ultraviolet Exposure in Occupational Settings. Int J Environ Res Public Health. 2018 Jul 17;15(7):1507.",
     "keywords": "concrete",
     "comments": "Data is emperically extrapolated from 280 nm to 290 nm. Data extracted from Turner et al. Figure 2 as a reference to Diffey et al - concrete. Diffey B., Green A.T., Loftus M.J., Johnson G.J., Lee P.S. A Portable Instrument for Measuring Ground Reflectance in the Ultraviolet. Photochem. Photobiol. 1995;61:68-70. doi: 10.1111/j.1751-1097.1995.tb09244.x.",
-    "wavelength": "280, 289.73746, 300.09546, 308.68735, 319.3795, 328.49643, 338.47256, 348.40094, 352.36276, 358.66348, 365.15512, 373.93796, 380.52505, 387.49402, 393.50836, 400", 
+    "wavelength": "280, 289.73746, 300.09546, 308.68735, 319.3795, 328.49643, 338.47256, 348.40094, 352.36276, 358.66348, 365.15512, 373.93796, 380.52505, 387.49402, 393.50836, 400",
     "albedo": "6.85, 7.1843886, 7.7339706, 7.7578654, 8.3154125, 8.641975, 9.143767, 9.62963, 9.844684, 10.075667, 10.314615, 10.728793, 11.039427, 11.5173235, 12.066906, 12.735962"
   },
   "A022": {
