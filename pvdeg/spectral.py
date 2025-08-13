@@ -282,7 +282,7 @@ def poa_irradiance_fixed(
             surface_tilt = float(abs(meta["latitude"]))
             print(
                 "The array surface_tilt angle was not provided, therefore the latitude "
-                tilt f"of {surface_tilt:.1f} was used."
+                f"of {surface_tilt:.1f} was used."
             )
 
     if surface_azimuth is None:  # Sets the default orientation to equator facing.
