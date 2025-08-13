@@ -249,8 +249,7 @@ class GeospatialScenario(pvdeg.Scenario):
 
         geo_weather, geo_meta = self.weather_data, self.meta_data
 
-        geo_meta = geo_meta[geo_meta["state"] != "Alaska"]
-        geo_meta = geo_meta[geo_meta["state"] != "Hawaii"]
+        geo_meta = geo_meta[~geo_meta["state"].isin(["Alaska", "Hawaii"])]
         geo_weather = geo_weather.sel(gid=geo_meta.index)
 
         self.weather_data = geo_weather
