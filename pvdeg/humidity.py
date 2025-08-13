@@ -493,7 +493,7 @@ backsheet, and it ignores the transients in the backsheet.
         Ea_s_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
         )["Eas"]
-        if l is None:
+        if back_encap_thickness is None:
             if "t" in utilities._read_material(
                 name=encapsulant, fname="H2Opermeation", item=None, fp=None
             ):
@@ -505,7 +505,7 @@ backsheet, and it ignores the transients in the backsheet.
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / t
     EaWVTR = Ea_p_b / 0.00831446261815324
-    So = So_e * l / 10
+    So = So_e * back_encap_thickness / 10
     Eas = Ea_s_e / 0.00831446261815324
     # Ce is the initial start of concentration of water
     if start is None:
@@ -645,7 +645,7 @@ def Ce_numba(
             )
             / (
                 So
-                * l
+                * back_encap_thickness
                 / 10
                 * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
             )
@@ -1085,4 +1085,5 @@ def module(
 #                 for dset, data in result.items():
 #                     out[dset, :, ind] = data.values
 
+#     return out_fp.as_posix()
 #     return out_fp.as_posix()
