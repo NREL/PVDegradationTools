@@ -514,17 +514,6 @@ backsheet, and it ignores the transients in the backsheet.
         )
     else:
         Ce_start = start
-        #   for i in range(0, len(rh_surface)):
-        #       if i == 0:
-        #           # Ce = Initial start of concentration of water
-        #           if start is None:
-        #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100  # noqa
-        #           else:
-        #               Ce = start
-        #       else:
-        #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
-        #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
-        #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )  # noqa
 
         Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce_start, rh_surface)
 
