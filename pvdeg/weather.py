@@ -1461,8 +1461,9 @@ def find_metadata(meta):
     """
     Fills in missing meta data for a geographic location.
     The meta dictionary must have longitude and latitude information.
-    Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
-    It will only replace empty keys and those with one character of length.
+    Make sure meta_map has been run first to eliminate the creation of duplicate entries
+    with different names. It will only replace empty keys and those with one character
+    of length.
 
     Parameters:
     -----------
@@ -1490,7 +1491,7 @@ def find_metadata(meta):
     return meta
 
 
-# def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:  # noqa
 
 #     map_weather(weather_df=weather_df)
 #     map_meta(meta)
