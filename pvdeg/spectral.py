@@ -421,7 +421,7 @@ def poa_irradiance_tracker(
     if axis_azimuth is None:  # Sets the default orientation to north-south.
         try:
             axis_azimuth = float(meta["axis_azimuth"])
-        except:
+        except Exception:
             if float(meta["latitude"]) < 0:
                 axis_azimuth = 0
             else:
@@ -434,7 +434,7 @@ def poa_irradiance_tracker(
     if axis_tilt is None:  # Sets the default orientation to horizontal.
         try:
             axis_tilt = float(meta["axis_tilt"])
-        except:
+        except Exception:
             axis_tilt = 0
             print(
                 "The array axis_tilt was not provided, therefore an axis tilt of 0° "
