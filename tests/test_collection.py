@@ -40,7 +40,6 @@ def test_calculate_jsc_from_tau_cp():
     )
 
     assert jsc == pytest.approx(39.79670015, abs=5e-2)
-    # assert jsc == pytest.approx(39.796733327595729, abs=0.00005)
 
 
 def test_calculate_jsc_from_tau_iqe():
