@@ -674,8 +674,8 @@ def x_eff_temperature_estimate(
 ):
     """
     Estimate the temperature for the module at the given tilt, azimuth, and x_eff.
-    If any of these factors are not supplied, it default to latitide tilt, equatorial facing, and
-    open rack mounted, respectively.
+    If any of these factors are not supplied, it default to latitude tilt, equatorial
+    facing, and open rack mounted, respectively.
 
     Parameters
     ----------
@@ -705,24 +705,26 @@ def x_eff_temperature_estimate(
         Model for the lowest temperature module on the exponential decay curve.
         Default: 'open_rack_glass_polymer'
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the temperature model
+        (e.g. SAPM). The NSRDB provides calculations at 2 m (i.e module height) but SAPM
+        uses a 10 m height. It is recommended that a power-law relationship between
+        height and wind speed of 0.33
+        be used*. This results in a wind speed that is 1.7 times higher. It is
+        acknowledged that this can vary significantly.
     model_kwarg : dict, optional
         keyword argument dictionary to provide other arguments to the temperature model.
         See temperature.temperature for more information.
 
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
-        estimation, analysis of wind characteristics and energy potential assessment for selected
-        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for
+    wind energy estimation, analysis of wind characteristics and energy potential
+    assessment for selected sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
     Returns
     -------
     T_x_eff: Pandas Dataframe
-        This is the estimate for the module temperature at the given tilt, azimuth, and x_eff.
+        This is the estimate for the module temperature at the given tilt, azimuth, and
+        x_eff.
 
     """
 
@@ -757,7 +759,7 @@ def x_eff_temperature_estimate(
         model_kwarg=model_kwarg,
     )
 
-    if x_eff == None:
+    if x_eff is None:
         return T_inf
     else:
         T_0 = temperature.temperature(
