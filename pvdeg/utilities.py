@@ -20,6 +20,7 @@ pvdeg_datafiles = {
     "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
+    "DegradationDatabase": os.path.join(DATA_DIR, "DegradationDatabase.json"),
 }
 
 
@@ -490,45 +491,53 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-# DEPRECATE
-def _read_material(name, fname="O2permeation.json"):
-    """Read a material from materials.json and return the parameter dictionary.
+def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
+    """
+    read a material from materials.json and return the parameter dictionary. By default it will look at water permeation, but any database can be used.
+    e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
+    If name=None it will return the Json file if item=None, or a list of specific fields in each Json entry identified by item.
 
-    Parameters
-    ----------
+    Parameters:
+    -----------
     name : (str)
-        unique name of material
+        unique name of material in a given database
+    fname : (str)
+        this can be any custom file identified by this name and the filepath (fp), or the just the shorthand defined in pvdeg_datafiles, i.e.
+        "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
+    item : (list)
+        this is a list of fields to return from a Json file if a specific record was not searched for.
+    fp :(str)
+        this is the file path to find the particular file, e.g "DATA_DIR". It must be specified if a predefined file is not used.
 
     Returns:
     --------
     mat_dict : (dict)
-        dictionary of material parameters
+        dictionary of material parameters, or "not found" message, or a summary of all entries with specific item entries.
     """
-    # TODO: test then delete commented code
-    # root = os.path.realpath(__file__)
-    # root = root.split(r'/')[:-1]
-    # file = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_DIR, fname)
-    with open(fpath) as f:
-        data = json.load(f)
-    f.close()
+    
+    if fp == None:
+        with open(pvdeg_datafiles[fname]) as f:
+            data = json.load(f)
+        f.close()
+    else:
+        fpath = os.path.join(fp, fname)
+        with open(fpath) as f:
+            data = json.load(f)
+        f.close()
 
     if name is None:
-        return list(data.keys())
-
-        # Mike Added
-        # broke test
-        # ===========
-        # material_list = ''
-        # print('working')
-        # for key in data:
-        #     if 'name' in data[key].keys():
-        #         material_list = material_list + key + "=" + data[key]['name'] + '\n'
-        # material_list = material_list[0:len(material_list)-1]
-        # return [*material_list]
-
-    mat_dict = data[name]
+        if item is None:
+            mat_dict = data
+        else:
+            mat_dict = {keys: {keyss: data[keys][keyss] for keyss in data[keys] if keyss in item} for keys in data 
+                    if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})!={}  }
+    else:
+        try:
+            mat_dict = data[name]
+        except:
+            mat_dict = ("Data for", name, "was not found in", fname + ".")
     return mat_dict
+
 
 
 # previously: fname="materials.json"
