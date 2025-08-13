@@ -493,29 +493,35 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 
 def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     """
-    read a material from materials.json and return the parameter dictionary. By default it will look at water permeation, but any database can be used.
+    read a material from materials.json and return the parameter dictionary. By default
+    it will look at water permeation, but any database can be used.
     e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
-    If name=None it will return the Json file if item=None, or a list of specific fields in each Json entry identified by item.
+    If name=None it will return the Json file if item=None, or a list of specific fields
+    in each Json entry identified by item.
 
     Parameters
     ----------
     name : (str)
         unique name of material in a given database
     fname : (str)
-        this can be any custom file identified by this name and the filepath (fp), or the just the shorthand defined in pvdeg_datafiles, i.e.
+        this can be any custom file identified by this name and the filepath (fp), or
+        the just the shorthand defined in pvdeg_datafiles, i.e.
         "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
     item : (list)
-        this is a list of fields to return from a Json file if a specific record was not searched for.
+        this is a list of fields to return from a Json file if a specific record was not
+        searched for.
     fp :(str)
-        this is the file path to find the particular file, e.g "DATA_DIR". It must be specified if a predefined file is not used.
+        this is the file path to find the particular file, e.g "DATA_DIR". It must be
+        specified if a predefined file is not used.
 
     Returns:
     --------
     mat_dict : (dict)
-        dictionary of material parameters, or "not found" message, or a summary of all entries with specific item entries.
+        dictionary of material parameters, or "not found" message, or a summary of all
+        entries with specific item entries.
     """
 
-    if fp == None:
+    if fp is None:
         with open(pvdeg_datafiles[fname]) as f:
             data = json.load(f)
         f.close()
@@ -540,12 +546,13 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     else:
         try:
             mat_dict = data[name]
-        except:
+        except Exception:
             mat_dict = ("Data for", name, "was not found in", fname + ".")
     return mat_dict
 
 
-# currently this is only designed for Oxygen Permeation. It could easily be adapted for all permeation data.
+# currently this is only designed for Oxygen Permeation. It could easily be adapted for
+# all permeation data.
 def _add_material(
     name,
     alias,
