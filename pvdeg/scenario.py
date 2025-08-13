@@ -156,7 +156,6 @@ class Scenario:
         self,
         lat_long: tuple = None,
         weather_db: str = "PSM3",
-        see_added: bool = False,
     ):
         """Add a location to the scenario using a latitude-longitude pair.
 
@@ -173,8 +172,6 @@ class Scenario:
             source of data for provided location.
             - For NSRDB data use `weather_db = 'PSM3'`
             - For PVGIS data use `weather_db = 'PVGIS'`
-        see_added : bool
-            flag true if you want to see a runtime notification for added location/gids
         """
         if isinstance(lat_long, list):  # is a list when reading from json
             lat_long = tuple(lat_long)
@@ -213,23 +210,22 @@ class Scenario:
                 """
             )
 
-        point_weather, point_meta = pvdeg.weather.get(
-            weather_db, id=weather_id, **weather_arg
-        )
-
         try:
+            point_weather, point_meta = pvdeg.weather.get(
+                weather_db, id=weather_id, **weather_arg
+            )
+
             if weather_db == "PSM3":
                 gid = point_meta["Location ID"]
                 self.gids = [int(gid)]
-        except KeyError:
-            return UserWarning("metadata missing location ID")
 
-        self.meta_data = point_meta
-        self.weather_data = point_weather
+            self.meta_data = point_meta
+            self.weather_data = point_weather
 
-        if see_added and weather_db == "PSM3":
-            message = f"Gids Added - {self.gids}"
-            warnings.warn(message, UserWarning)
+        except KeyError as e:
+            warnings.warn(f"Metadata missing location ID: {e}")
+        except Exception as e:
+            warnings.warn(f"Failed to add location: {e}")
 
     def addModule(
         self,
@@ -240,7 +236,6 @@ class Scenario:
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
-        see_added: bool = False,
     ):
         """Add a module to the Scenario.
 
@@ -282,36 +277,33 @@ class Scenario:
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
-        see_added : (bool), optional
         """
         try:
             mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
+
+            old_modules = [mod["module_name"] for mod in self.modules]
+            if module_name in old_modules:
+                warnings.warn(f'WARNING - Module already found by name "{module_name}"')
+                warnings.warn("Module will be replaced with new instance.")
+                self.modules.pop(old_modules.index(module_name))
+
+            self.modules.append(
+                {
+                    "module_name": module_name,
+                    "racking": racking,
+                    "material_params": mat_params,
+                    "temp_model": temperature_model,
+                    "model_kwarg": model_kwarg,
+                    "irradiance_kwarg": irradiance_kwarg,
+                }
+            )
         except KeyError:
-            print("Material Not Found - No module added to scenario.")
-            print("If you need to add a custom material, use .add_material()")
+            warnings.warn("Material Not Found - No module added to scenario.")
+            warnings.warn("If you need to add a custom material, use .add_material()")
             return
+        except Exception as e:
+            warnings.warn(f"Failed to add module '{module_name}': {e}")
 
-        old_modules = [mod["module_name"] for mod in self.modules]
-        if module_name in old_modules:
-            print(f'WARNING - Module already found by name "{module_name}"')
-            print("Module will be replaced with new instance.")
-            self.modules.pop(old_modules.index(module_name))
-
-        self.modules.append(
-            {
-                "module_name": module_name,
-                "racking": racking,
-                "material_params": mat_params,
-                "temp_model": temperature_model,
-                "model_kwarg": model_kwarg,
-                "irradiance_kwarg": irradiance_kwarg,
-            }
-        )
-
-        if see_added:
-            print(f'Module "{module_name}" added.')
-
-    # add testing
     def add_material(
         self,
         name,
@@ -384,7 +376,6 @@ class Scenario:
         self,
         func=None,
         func_kwarg={},
-        see_added=False,
     ):
         """Add a pvdeg function to the scenario pipeline.
 
@@ -396,23 +387,16 @@ class Scenario:
             ``Scenario.geospatial == False``
         func_params : dict
             job specific keyword argument dictionary to provide to the function
-        see_added : bool
-            set flag to get a userWarning notifying the user of the job added
-           to the pipeline in method call. ``default = False``
         """
         if func is None or not callable(func):
-            print(f'FAILED: Requested function "{func}" not found')
-            print("Function has not been added to pipeline.")
-            return
+            raise ValueError(f'FAILED: Requested function "{func}" not found')
 
-        job_id = utilities.new_id(self.pipeline)
-
-        job_dict = {"job": func, "params": func_kwarg}
-        self.pipeline[job_id] = job_dict
-
-        if see_added:
-            message = f"{func.__name__} added to pipeline as \n {job_dict}"
-            warnings.warn(message, UserWarning)
+        try:
+            job_id = utilities.new_id(self.pipeline)
+            job_dict = {"job": func, "params": func_kwarg}
+            self.pipeline[job_id] = job_dict
+        except Exception as e:
+            warnings.warn(f"Failed to add job: {e}")
 
     def run(self):
         """
