@@ -2,7 +2,6 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit
 from typing import Union
 from pvdeg import humidity
 
@@ -155,7 +154,8 @@ def arrhenius(
         ) / 2
         bin_widths = bin_widths[1:]
         bin_widths = bin_widths[:-1]
-        # assumes the first and last bin widths are the width of that between the next or previous bin, respectively.
+        # assumes the first and last bin widths are the width of that between the next
+        # or previous bin, respectively.
         bin_widths[0] = bin_widths[1]
         bin_widths[-1] = bin_widths[-2]
 
@@ -290,7 +290,8 @@ def vantHoff_deg(
 
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement
-        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        heights between weather database (e.g. NSRDB) and the temperature model
+        (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
         height. It is recommended that a power-law relationship between height and wind
         speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
@@ -301,7 +302,7 @@ def vantHoff_deg(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
 
@@ -388,7 +389,8 @@ def IwaVantHoff(
 
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement
-        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        heights between weather database (e.g. NSRDB) and the temperature model
+        (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
         height. It is recommended that a power-law relationship between height and wind
         speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
@@ -399,7 +401,7 @@ def IwaVantHoff(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
 
@@ -492,14 +494,15 @@ def arrhenius_deg(
         Global Plane of Array Irradiance [W/m²]
     temp : pd.Series, optional
         Solar module temperature or Cell temperature [°C]. If no cell temperature is
-        given, it will be generated using the default parameters from pvdeg.temperature.cell
+        given, it will be generated using the default parameters from
+        pvdeg.temperature.cell
     p : float
         Fit parameter
-        When p=0 the dependence on light will be ignored and degradation will happen both
-        day an night. As a caution or a feature, a very small value of p (e.g. p=0.0001)
-        will provide very little degradation dependence on irradiance, but degradation will
-        only be accounted for during daylight. i.e. averages will be computed over half of
-        the time only.
+        When p=0 the dependence on light will be ignored and degradation will happen
+        both day and night. As a caution or a feature, a very small value of p
+        (e.g. p=0.0001) will provide very little degradation dependence on irradiance,
+        but degradation will only be accounted for during daylight. i.e. averages will
+        be computed over half of the time only.
     n : float
         Fit parameter for relative humidity
         When n=0 the degradation rate will not be dependent on humidity.
@@ -518,7 +521,8 @@ def arrhenius_deg(
 
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement
-        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        heights between weather database (e.g. NSRDB) and the temperature model
+        (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
         height. It is recommended that a power-law relationship between height and wind
         speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
@@ -529,7 +533,7 @@ def arrhenius_deg(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
     Returns
@@ -581,7 +585,7 @@ def arrhenius_deg(
 
 def _T_eq_arrhenius(temp, Ea):
     """
-    Get the Temperature equivalent required for the settings of the controlled environment.
+    Get Temperature equivalent required for the settings of the controlled environment.
     Calculation is used in determining Arrhenius Environmental Characterization
 
     Parameters
@@ -716,7 +720,8 @@ def IwaArrhenius(
 
     wind_factor : float, optional
         Wind speed correction exponent to account for different wind speed measurement
-        heights between weather database (e.g. NSRDB) and the temperature model (e.g. SAPM)
+        heights between weather database (e.g. NSRDB) and the temperature model
+        (e.g. SAPM)
         The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m
         height. It is recommended that a power-law relationship between height and wind
         speed of 0.33 be used*. This results in a wind speed that is 1.7 times higher.
@@ -727,7 +732,7 @@ def IwaArrhenius(
         ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         for more.
 
 
@@ -849,10 +854,10 @@ def degradation_spectral(
     try:
         irr = pd.DataFrame(spectra.tolist(), index=spectra.index)
         irr.columns = wavelengths
-    except:
+    except Exception:
         # TODO: Fix this except it works on some cases, veto it by cases
         print("Removing brackets from spectral irradiance data")
-        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+    # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
         irr.columns = wavelengths
 
@@ -877,7 +882,6 @@ def degradation_spectral(
 
 
 # change it to take pd.DataFrame? instead of np.ndarray
-@njit
 def vecArrhenius(
     poa_global: np.ndarray, module_temp: np.ndarray, ea: float, x: float, lnr0: float
 ) -> float:

@@ -271,7 +271,7 @@ def generateCorrelatedSamples(
 
 # monte carlo function
 # model after -
-# https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb #noqa
+# https://github.com/NREL/PVDegradationTools/blob/main/pvdeg_tutorials/tutorials/LETID%20-%20Outdoor%20Geospatial%20Demo.ipynb  # noqa
 
 
 def simulate(

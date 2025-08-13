@@ -156,7 +156,7 @@ def test_weather_distributed_pvgis():
 
     assert (
         len(common_cols) > 0
-    ), f"No common columns. Actual: {list(meta.columns)}, expected: {list(expected_meta.columns)}"
+    ), f"No common columns. Actual: {list(meta.columns)}, expected: {list(expected_meta.columns)}"  # noqa
 
     # Compare the common columns
     pd.testing.assert_frame_equal(meta[common_cols], expected_meta[common_cols])

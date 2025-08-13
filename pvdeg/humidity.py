@@ -297,7 +297,8 @@ def front_encap(
         "module temperature [°C]"
     So : float
         Encapsulant solubility prefactor in [g/cm3]
-        Will default to 1.81390702(g/cm3) which is the suggested value for EVA 001 if not specified.
+        Will default to 1.81390702(g/cm3) which is the suggested value for EVA 001 if
+        not specified.
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729(kJ/mol) is the suggested value for EVA.
@@ -405,12 +406,14 @@ def Ce(
     Encapsulant. This function returns a numpy array of the Concentration of water in
     the encapsulant at every time step.
 
-    This calculation uses a quasi-steady state approximation of the diffusion equation to calculate the
-    concentration of water in the encapsulant. For this, it is assumed that the diffusion in the encapsulant is
-    much larger than the diffusion in the backsheet, and it ignores the transients in the backsheet.
+    This calculation uses a quasi-steady state approximation of the diffusion equation
+    to calculate the concentration of water in the encapsulant. For this, it is assumed
+    that the diffusion in the encapsulant is much larger than the diffusion in the
+backsheet, and it ignores the transients in the backsheet.
 
     Numba was used to isolate recursion requiring a for loop
-    Numba Functions are very fast because they compile and run in machine code but can not use pandas dataframes.
+    Numba Functions are very fast because they compile and run in machine code but can
+    not use pandas dataframes.
 
     Parameters
     -----------
@@ -515,13 +518,13 @@ def Ce(
         #       if i == 0:
         #           # Ce = Initial start of concentration of water
         #           if start is None:
-        #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100
+        #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100  # noqa
         #           else:
         #               Ce = start
         #       else:
         #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
         #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
-        #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )
+        #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )  # noqa
 
         Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce_start, rh_surface)
 
@@ -547,7 +550,8 @@ def _Ce(
     rh_surface,
 ):
     """
-    This This is a helper function for the Ce function that is used to calculate the concentration of water in the encapsulant.
+    This is a helper function for the Ce function that is used to calculate the
+    concentration of water in the encapsulant.
 
     Returns
     --------
@@ -659,7 +663,7 @@ def Ce_numba(
     return Ce_list
 
 
-def back_encap(  # Martin: I brough this function back - Should it be deprecated? The CE calculation is currently  not working.
+def back_encap(
     rh_ambient,
     temp_ambient,
     temp_module,
@@ -776,7 +780,8 @@ def backsheet(
 ):
     """
     Calculate the relative humidity in a solar module backsheet as timeseries.
-    It assume a value that is the average of the RH of the backside encapsulant and the outside surface of the module.
+    It assume a value that is the average of the RH of the backside encapsulant and the
+    outside surface of the module.
 
     Parameters
     ----------

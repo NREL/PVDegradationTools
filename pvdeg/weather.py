@@ -11,7 +11,6 @@ from rex import NSRDBX, Outputs
 import datetime
 import numpy as np
 import h5py
-import dask.dataframe as dd
 from dask.delayed import delayed
 import xarray as xr
 from geopy.geocoders import Nominatim
@@ -335,7 +334,7 @@ def csv_read(filename):
     ) in meta:  # converts everything to a float that is possible to convert to a float
         try:
             meta[key] = float(meta[key])
-        except:
+        except Exception:
             pass
     # get the column headers
     columns = file1.readline().split(",")
@@ -359,12 +358,12 @@ def csv_read(filename):
         dtidx = pd.to_datetime(
             weather_df[["Year", "Month", "Day", "Hour", "Minute", "Second"]]
         )
-    except:
+    except Exception:
         try:
             dtidx = pd.to_datetime(
                 weather_df[["Year", "Month", "Day", "Hour", "Minute"]]
             )
-        except:
+        except Exception:
             try:
                 dtidx = pd.to_datetime(weather_df[["Year", "Month", "Day", "Hour"]])
             finally:
@@ -835,7 +834,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01" :],
+                        this_year[str(year) + "-03-01":],
                     ]
                 )
                 new_time_series = this_year
@@ -867,7 +866,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01" :],
+                        this_year[str(year) + "-03-01":],
                     ]
                 )
                 new_time_series = pd.concat([new_time_series, this_year])
@@ -1002,8 +1001,9 @@ def write(data_df, metadata, savefile="WeatherFile.csv"):
 
 def get_anywhere(database="PSM3", id=None, **kwargs):
     """
-    Load weather data directly from  NSRDB or through any other PVLIB i/o
-    tools function. Only works for a single location look-up, not for geospatial analysis.
+    Load weather data directly from NSRDB or through any other PVLIB i/o tools.
+
+    Only works for a single location look-up, not for geospatial analysis.
 
     Parameters:
     -----------
@@ -1014,7 +1014,8 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
         The gid or tuple with latitude and longitude for the desired location.
         Using a gid is not recommended because it is specific to one database.
     API_KEY : (str)
-        This is used to access the NSRDB without limitation if a custom key is supplied.
+        This is used to access the NSRDB without limitation if a custom key
+        is supplied.
     **kwargs :
         Additional keyword arguments to pass to the get_weather function
         (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
@@ -1040,12 +1041,12 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
     if database == "PSM3":
         try:
             weather_db, meta = get(database="PSM3", id=id, **weather_arg)
-        except:
+        except Exception:
             try:
                 weather_db, meta = get(
                     database="PVGIS", id=id, **{"map_variables": True}
                 )
-            except:
+            except Exception:
                 meta = {
                     "result": "This location was not found in either the NSRDB or PVGIS"
                 }
@@ -1053,10 +1054,10 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
     else:
         try:
             weather_db, meta = get(database="PVGIS", id=id, **{"map_variables": True})
-        except:
+        except Exception:
             try:
                 weather_db, meta = get(database="PSM3", id=id, **weather_arg)
-            except:
+            except Exception:
                 meta = {
                     "result": "This location was not found in either the NSRDB or PVGIS"
                 }
@@ -1066,28 +1067,31 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
 
 
 def roll_tmy(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
-    """Wrap ends of TMY UTC DataFrame to align with local time based on timezone offset.
+    """Wrap ends of TMY UTC DataFrame to align with local time.
+
+    Aligns with local time based on timezone offset.
 
     Parameters:
     ----------
     weather_df : pd.DataFrame
         The input DataFrame containing TMY data with a UTC datetime index.
     meta : dict
-        Metadata dictionary containing at least the 'tz' key, representing timezone
-        offset in hours (e.g., -8 for UTC-8).
+        Metadata dictionary containing at least the 'tz' key, representing
+        timezone offset in hours (e.g., -8 for UTC-8).
 
     Returns:
     -------
     pd.DataFrame
-        The rolled DataFrame aligned to local times with a new datetime index spanning a
-        typical year.
+        The rolled DataFrame aligned to local times with a new datetime index
+        spanning a typical year.
 
     Raises:
     ------
     ValueError
-        If the timezone offset is not a multiple of the data frequency or if the
-        frequency cannot be inferred.
+        If the timezone offset is not a multiple of the data frequency or if
+        the frequency cannot be inferred.
     """
+
     # Extract timezone offset in hours
     tz_offset = meta.get("tz", 0)  # Default to UTC if not specified
 
@@ -1258,8 +1262,9 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
     Returns
     -------
     weather_ds: xarray.Dataset
-        Weather dataset of the same format/shapes given by a `pvdeg.weather.get`
-        geospatial call or `pvdeg.weather.weather_distributed` call or
+        Weather dataset of the same format/shapes given by a
+        `pvdeg.weather.get` geospatial call or
+        `pvdeg.weather.weather_distributed` call or
         GeosptialScenario.get_geospatial_data`.
     """
     import dask.array as da
@@ -1297,7 +1302,6 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
     attrs = {}
     global_attrs = {}
 
-    dims = {"gid", "time"}
     dims_size = {"time": TIME_PERIODICITY_MAP[periodicity], "gid": gids_size}
 
     if database == "NSRDB" or database == "PSM3":
@@ -1334,7 +1338,8 @@ def empty_weather_ds(gids_size, periodicity, database) -> xr.Dataset:
 
 
 # TODO: implement rate throttling so we do not make too many requests.
-# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means twice the speed ;)
+# TODO: multiple API keys to get around NSRDB key rate limit. 2 key, email pairs means
+# twice the speed ;)
 # TODO: this overwrites NSRDB GIDS when database == "PSM3"
 
 
@@ -1345,11 +1350,13 @@ def weather_distributed(
     email: str = "",
 ):
     """
-    Grab weather using pvgis for all of the following locations using dask for parallelization.
-    You must create a dask client with multiple processes before calling this function, otherwise results will not be properly calculated.
+    Grab weather using pvgis for all locations using dask for parallelization.
 
-    PVGIS supports up to 30 requests per second so your dask client should not have more than $x$ workers/threads
-    that would put you over this limit.
+    You must create a dask client with multiple processes before calling this
+    function, otherwise results will not be properly calculated.
+
+    PVGIS supports up to 30 requests per second so your dask client should not
+    have more than $x$ workers/threads that would put you over this limit.
 
     NSRDB (including `database="PSM3"`) is rate limited and your key will face
     restrictions after making too many requests.
@@ -1377,19 +1384,21 @@ def weather_distributed(
 
     email: str
         Only required when making NSRDB requests using "PSM3".
-        [NSRDB developer account email associated with `api_key`](https://developer.nrel.gov/signup/)
+        [NSRDB developer account email associated with
+        `api_key`](https://developer.nrel.gov/signup/)
 
     Returns
     -------
     weather_ds : xr.Dataset
-        Weather data for all locations requested in an xarray.Dataset using a dask array
-        backend.
+        Weather data for all locations requested in an xarray.Dataset using a
+        dask array backend.
     meta_df : pd.DataFrame
-        Pandas DataFrame containing metadata for all requested locations. Each row maps
-        to a single entry in the weather_ds.
+        Pandas DataFrame containing metadata for all requested locations. Each
+        row maps to a single entry in the weather_ds.
     gids_failed: list
         list of index failed coordinates in input `coords`
     """
+
     import dask.delayed
     import dask.distributed
 
@@ -1452,8 +1461,9 @@ def find_metadata(meta):
     """
     Fills in missing meta data for a geographic location.
     The meta dictionary must have longitude and latitude information.
-    Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
-    It will only replace empty keys and those with one character of length.
+    Make sure meta_map has been run first to eliminate the creation of duplicate entries
+    with different names. It will only replace empty keys and those with one character
+    of length.
 
     Parameters:
     -----------
@@ -1481,7 +1491,7 @@ def find_metadata(meta):
     return meta
 
 
-# def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:  # noqa
 
 #     map_weather(weather_df=weather_df)
 #     map_meta(meta)
@@ -1521,8 +1531,8 @@ def find_metadata(meta):
 #  'wind_height': 2}
 # ...
 
-
-# def _pvgis_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+# def _pvgis_to_uniform(
+# weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
 # map_weather(weather_df=weather_df)
 # map_meta(meta)
