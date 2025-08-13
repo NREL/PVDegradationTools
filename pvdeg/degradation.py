@@ -253,7 +253,10 @@ def vantHoff_deg(
     model_kwarg={},
 ):
     """
-    Van't Hoff Temperature with Irradiance Degradation
+    Calculate Van't Hoff Irradiance Degradation acceleration factor.
+
+    In this calculation, the rate of degradation kinetics is calculated using
+    the Van't Hoff model.
 
     Parameters
     ----------
