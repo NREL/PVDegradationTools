@@ -443,7 +443,7 @@ backsheet, and it ignores the transients in the backsheet.
         Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
     back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA 0.46 mm
+        The suggested value for EVA encapsulant is 0.46 mm
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
@@ -613,7 +613,7 @@ def Ce_numba(
         So = 1.81390702(g/cm3) is the suggested value for EVA.
     back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for encapsulat is EVA 0.5 mm
+        The suggested value for EVA encapsulant is 0.5 mm
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729[kJ/mol] is the suggested value for EVA.
