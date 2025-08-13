@@ -225,7 +225,6 @@ def get(database: str, id=None, geospatial=False, find_meta: bool=None , **kwarg
         map_weather(weather_df)
         map_meta(meta)
         if find_meta:
-            print("Finding additional metadata...")
             meta=find_metadata(meta)
 
         if "relative_humidity" not in weather_df.columns:
@@ -300,7 +299,6 @@ def read(file_in, file_type, map_variables=True, find_meta=True, **kwargs):
         map_weather(weather_df)
         map_meta(meta)
     if find_meta:
-        print("Finding additional metadata...")
         meta=find_metadata(meta)
 
     if weather_df.index.tzinfo is None:
