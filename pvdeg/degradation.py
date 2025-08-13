@@ -154,7 +154,8 @@ def arrhenius(
         ) / 2
         bin_widths = bin_widths[1:]
         bin_widths = bin_widths[:-1]
-        # assumes the first and last bin widths are the width of that between the next or previous bin, respectively.
+        # assumes the first and last bin widths are the width of that between the next
+        # or previous bin, respectively.
         bin_widths[0] = bin_widths[1]
         bin_widths[-1] = bin_widths[-2]
 
