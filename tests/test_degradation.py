@@ -140,6 +140,7 @@ def test_degradation():
     # Update expected value based on actual calculation
     assert degradation == pytest.approx(0.008835, abs=0.001)
 
+
 def test_vecArrhenius():
     poa_global = pvdeg.spectral.poa_irradiance(weather_df=weather_df, meta=meta)[
         "poa_global"
