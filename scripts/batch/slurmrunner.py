@@ -1,6 +1,16 @@
 #       replaces Dask.jobqueue.SLURMRunner        #
 ###################################################
 ###################################################
+
+import os
+import getpass
+import logging
+
+from dask_jobqueue import SLURMCluster as SLURMRunner
+from dask.distributed import Client as distributed_Client
+
+logger = logging.getLogger(__name__)
+
 logger.info("Getting dask cluster from SLURM.")
 user_name = getpass.getuser()
 

@@ -1,23 +1,63 @@
-v0.6.0 (2025-XX-XX)
+v0.6.0 (2025-08-13)
 ===================
 
 Breaking Changes
 ----------------
-* Update dependency requirements:
+- Update dependency requirements:
   - pvlib-python: was ==0.10.3, now >=0.12.0
   - numpy: was ==1.26.4, now >1.19.3
   - scipy: was <1.14.0, now >1.6.0
   (:issue:`103`, :pull:`163`)
-* Remove deprecated `vertical_poa` function from `pysam.py` and related (incorrect)
+- Remove deprecated `vertical_poa` function from `pysam.py` and related (incorrect)
   reference to `standards.vertical_poa` in `geospatial.py`. (:issue:`167`, :pull:`174`)
-
+- Replaced ambiguous variable name `l` in
+  :py:func`pvdeg.collection.collection_probability` with `diffusion_length` to enhance
+  code readability and maintainability. (:issue:`198`, :pull:`199`)
+- Replace print messages for failure or succesful addition of objects (location, job...)
+  with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
 
 Enhancements
 ------------
+- Change ``GeospatialScenario.get_geospatial_data()`` to a ``@property``, now use
+``GeospatialScenario.geospatial_data``
+- Change ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use
+``GeospatialScenario.coords``
+- Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
+  (:pull:`182`)
+- Update pytest workflow to cancel in-progress runs for the same branch in favour of
+  running on the latest commit. (:pull:`191`)
+- Add support for pandas dataframes to :py:mod:`pvdeg.weather.map_meta()` (:pull:`193`)
+- Add a new GitHub Actions workflow to automatically run flake8 for linting on pull
+  requests (:issue:`164`, :pull:`165`)
+- Lint codebase for PEP8 compliance (:pull:`166`, :pull:`175`, :pull:`196`)
+
+Deprecations
+-------------
+- ``GeospatialScenario._get_geospatial_data()``
+- ``GeospatialScenario.getValidRegions()``
+- ``GeospatialScenario.gids_tonumpy()``
+- ``GeospatialScenario.gids_tolist()``
+- Deprecate `see_added` argument, and associated UserWarning for succesful addition of
+  objects, in several :py:mod:`~pvdeg.scenario` functions. (:pull:`192`)
 
 
 Bug Fixes
 ---------
+- ``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to
+  ``pvdeg/geospatialscenario.py``. Completed the move.
+- Code cleanup and standardization in :py:mod:`pvdeg.degradation` module:
+  - Improve readability of mathematical expressions
+  - Refactor redundant helper functions
+  - Update docstrings
+  - Remove unused functions and variables
+  - Improve code consistency
+  (:issue:`177`, :pull:`178`)
+
+
+Dependencies
+------------
+- Update aiohttp from 3.10.11 to 3.12.14 for improved security and performance
+  (:pull:`185`)
 
 
 Testing
@@ -26,5 +66,8 @@ Testing
 
 Contributors
 ------------
-* Rajiv Daxini (:ghuser:`RDaxini`)
-
+- Rajiv Daxini (:ghuser:`RDaxini`)
+- Tobin Ford (:ghuser:`tobin-ford`)
+- Maxx Millstein (:ghuser:`maxx-mill`)
+- Mike Kempe (:ghuser:`MDKempe`)
+- Martin Springer (:ghuser:`martin-springer`)

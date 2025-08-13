@@ -18,13 +18,13 @@ depth = generation_df["Depth (um)"]
 
 def test_collection_probability():
     s = 1000
-    l = 100 * 1e-4
+    diffusion_length = 100 * 1e-4
     d = 27
 
     thickness = 180 * 1e-4
     x = thickness
 
-    cp = collection.collection_probability(x, thickness, s, l, d)
+    cp = collection.collection_probability(x, thickness, s, diffusion_length, d)
 
     assert cp == pytest.approx(0.23825592713379518, abs=0.000005)
 

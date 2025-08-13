@@ -20,6 +20,7 @@ pvdeg_datafiles = {
     "AApermeation": os.path.join(DATA_DIR, "AApermeation.json"),
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
+    "DegradationDatabase": os.path.join(DATA_DIR, "DegradationDatabase.json"),
 }
 
 
@@ -490,49 +491,68 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-# DEPRECATE
-def _read_material(name, fname="O2permeation.json"):
-    """Read a material from materials.json and return the parameter dictionary.
+def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
+    """
+    read a material from materials.json and return the parameter dictionary. By default
+    it will look at water permeation, but any database can be used.
+    e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
+    If name=None it will return the Json file if item=None, or a list of specific fields
+    in each Json entry identified by item.
 
     Parameters
     ----------
     name : (str)
-        unique name of material
+        unique name of material in a given database
+    fname : (str)
+        this can be any custom file identified by this name and the filepath (fp), or
+        the just the shorthand defined in pvdeg_datafiles, i.e.
+        "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
+    item : (list)
+        this is a list of fields to return from a Json file if a specific record was not
+        searched for.
+    fp :(str)
+        this is the file path to find the particular file, e.g "DATA_DIR". It must be
+        specified if a predefined file is not used.
 
     Returns:
     --------
     mat_dict : (dict)
-        dictionary of material parameters
+        dictionary of material parameters, or "not found" message, or a summary of all
+        entries with specific item entries.
     """
-    # TODO: test then delete commented code
-    # root = os.path.realpath(__file__)
-    # root = root.split(r'/')[:-1]
-    # file = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_DIR, fname)
-    with open(fpath) as f:
-        data = json.load(f)
-    f.close()
+
+    if fp is None:
+        with open(pvdeg_datafiles[fname]) as f:
+            data = json.load(f)
+        f.close()
+    else:
+        fpath = os.path.join(fp, fname)
+        with open(fpath) as f:
+            data = json.load(f)
+        f.close()
 
     if name is None:
-        return list(data.keys())
-
-        # Mike Added
-        # broke test
-        # ===========
-        # material_list = ''
-        # print('working')
-        # for key in data:
-        #     if 'name' in data[key].keys():
-        #         material_list = material_list + key + "=" + data[key]['name'] + '\n'
-        # material_list = material_list[0:len(material_list)-1]
-        # return [*material_list]
-
-    mat_dict = data[name]
+        if item is None:
+            mat_dict = data
+        else:
+            mat_dict = {
+                keys: {
+                    keyss: data[keys][keyss] for keyss in data[keys] if keyss in item
+                }
+                for keys in data
+                if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})
+                != {}
+            }
+    else:
+        try:
+            mat_dict = data[name]
+        except Exception:
+            mat_dict = ("Data for", name, "was not found in", fname + ".")
     return mat_dict
 
 
-# previously: fname="materials.json"
-# add control over what parameters (O2, H2, AA)?
+# currently this is only designed for Oxygen Permeation. It could easily be adapted for
+# all permeation data.
 def _add_material(
     name,
     alias,
@@ -949,7 +969,9 @@ def new_id(collection):
     if not isinstance(collection, (dict, OrderedDict)):
         raise TypeError(f"{collection.__name__} type {type(collection)} expected dict")
 
-    gen = lambda: "".join(choices(ascii_uppercase, k=5))
+    def gen():
+        return "".join(choices(ascii_uppercase, k=5))
+
     id = gen()
     while id in collection.keys():
         id = gen()
@@ -1264,14 +1286,10 @@ def compare_templates(
 
     for coord in ds1.coords:
         if ds1.coords[coord].dtype.kind in {"i", "f"}:
-            if not np.allclose(
-                ds1.coords[coord], ds2.coords[coord], atol=atol
-            ):  # Use np.allclose for numeric coordinates
+            if not np.allclose(ds1.coords[coord], ds2.coords[coord], atol=atol):
                 return False
-        elif ds1.coords[coord].dtype.kind == "M":  # datetime64
-            if not np.array_equal(
-                ds1.coords[coord], ds2.coords[coord]
-            ):  # Use array equality for datetime coordinates
+        elif ds1.coords[coord].dtype.kind == "M":
+            if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
                 return False
         else:
             if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
@@ -1395,7 +1413,7 @@ def display_json(
     ------------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
-        >>> "AApermeation", "H2Opermeation", "O2permeation"
+        >>> "AApermeation", "H2Opermeation", "O2permeation", "DegradationDatabase"
     fp: str
         file path to material parameters json with same schema as material parameters
         json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are
@@ -1419,19 +1437,19 @@ def display_json(
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
             json_str = json_str.replace(
-                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'
+                f'"{key}":',
+                f'<span style="color: plum;">"{key}":</span>',  # noqa: E702,E231, E501
             )
-
         indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
-        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'
+        return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'  # noqa: E702,E231, E501
 
-    html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'
+    html = f'<h2 style="color: white;">JSON Output at fp: {fp}</h2><div>'  # noqa
     for key, value in data.items():
         html += (
             f"<div>"
-            f'<strong style="color: white;">{key}:</strong> '
-            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"
-            f'<div style="display: none;">{json_to_html(value)}</div>'
+            f'<strong style="color: white;">{key}:</strong> '  # noqa
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231, E501
+            f'<div style="display: none;">{json_to_html(value)}</div>'  # noqa
             f"</div>"
         )
     html += "</div>"
@@ -1486,7 +1504,7 @@ def search_json(
             if subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias:
                 return key
 
-    raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {os.path(fp)}")
+    raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {fp}")
 
 
 def read_material(

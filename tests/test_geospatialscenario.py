@@ -9,11 +9,19 @@ import os
 
 def monkeypatch_addLocation(self, *args, **kwargs) -> None:
     """
-    mocker function to be monkey patched at runtime for Scenario.addLocation to avoid psm3 api calls and use local weather files instead.
+    Mocker function to be monkey patched at runtime for Scenario.addLocation.
+
+    Avoids psm3 api calls and uses local weather files instead.
     """
 
     self.gids, self.weather_data, self.meta_data = None, None, None
 
+    GEO_META = pd.read_csv(
+        os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0
+    )
+    GEO_WEATHER = xr.load_dataset(
+        os.path.join(pvdeg.TEST_DATA_DIR, "summit-weather.nc")
+    )
     GEO_META = pd.read_csv(
         os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0
     )
@@ -44,11 +52,11 @@ def test_standoff_autotemplate(monkeypatch):
     )
 
     geo_scenario.run()
-    ### end scenario run
+    # End scenario run
 
     data_var = geo_scenario.results["x"]
     # Stack the latitude and longitude coordinates into a single dimension
-    # convert to dataframe, this can be done with xr.dataset.to_dataframe as well
+    # convert to dataframe, this can be done with xr.dataset.to_dataframe
     stacked = data_var.stack(z=("latitude", "longitude"))
     latitudes = stacked["latitude"].values
     longitudes = stacked["longitude"].values
@@ -169,6 +177,10 @@ def test_gid_downsample(monkeypatch):
         geo_scenario.meta_data, original_meta.loc[remaining_gids]
     )
 
+    pd.testing.assert_frame_equal(
+        geo_scenario.meta_data, original_meta.loc[remaining_gids]
+    )
+
 
 def test_downselect_CONUS(monkeypatch):
     monkeypatch.setattr(
@@ -186,6 +198,8 @@ def test_downselect_CONUS(monkeypatch):
 
     ak_hi_df = pd.DataFrame(
         data=[
+            [-99, -99, -1, "+100", "United States", "Alaska", "filler", 2],
+            [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2],
             [-99, -99, -1, "+100", "United States", "Alaska", "filler", 2],
             [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2],
         ],
