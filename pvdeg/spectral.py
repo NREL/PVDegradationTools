@@ -282,7 +282,7 @@ def poa_irradiance_fixed(
             surface_tilt = float(abs(meta["latitude"]))
             print(
                 "The array surface_tilt angle was not provided, therefore the latitude "
-                f"of {surface_tilt:.1f} was used."
+                f"of {surface_tilt: .1f} was used."
             )
 
     if surface_azimuth is None:  # Sets the default orientation to equator facing.
@@ -295,7 +295,7 @@ def poa_irradiance_fixed(
                 surface_azimuth = 180
                 print(
                     "The array azimuth was not provided, therefore an azimuth of "
-                    f"{surface_azimuth:.1f} was used."
+                    f"{surface_azimuth: .1f} was used."
                 )
 
     if sol_position is None:
@@ -428,7 +428,7 @@ def poa_irradiance_tracker(
                 axis_azimuth = 180
                 print(
                     "The array axis_azimuth was not provided, therefore an azimuth of "
-                    f"{axis_azimuth:.1f} was used."
+                    f"{axis_azimuth: .1f} was used."
                 )
 
     if axis_tilt is None:  # Sets the default orientation to horizontal.
