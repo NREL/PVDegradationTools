@@ -1,6 +1,6 @@
 {
     "W000": {
-	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm^2/s]. So is in [g/cm^3/atm]. Po is in[g*mm/m^2/day/atm]."
+	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm^2/s]. So is in [g/cm^3/atm]. Po is in[g*mm/m^2/day/atm]. t is in [mm]."
     },	
     "W001": {
 		"name": "Ethylene Vinyl Acetate",
@@ -14,6 +14,7 @@
 		"So": 1.81390701967487,
 		"Eap": 55.1578532714609,
 		"Po": 40728267519.3687
+
     },
     "W002": {
 		"name": "AAA polyamide",
@@ -22,11 +23,12 @@
 		"source": "unpublished measurements",
 		"Fickian": true,
 		"Ead": 61.4781422330562,
-		"Do": 25790.6020262449,
+		"Do": 257.906020262449,
 		"Eas": 5.88752263485353,
-		"So": 0.00982242435416737,
-		"Eap": 67.3656648679097,
-		"Po": 5559396276.60964
+		"So": 0.0982242435416737,
+		"Eap": 66.9611315410624,
+		"Po": 189338932521.637,
+		"t": 0.032
     },
     "W003": {
 		"name": "Coveme",

@@ -13,6 +13,7 @@ import numpy as np
 import h5py
 from dask.delayed import delayed
 import xarray as xr
+from geopy.geocoders import Nominatim
 
 
 # Global dataset mapping for standardizing weather variable names across different
@@ -23,9 +24,18 @@ META_MAP = {
     "Local Time Zone": "tz",
     "Time Zone": "tz",
     "timezone": "tz",
-    "Dew Point": "dew_point",
     "Longitude": "longitude",
     "Latitude": "latitude",
+    "state": "State",
+    "county": "County",
+    "country": "Country",
+    "Neighborhood": "neighbourhood",
+    "country_code": "Country Code",
+    "postcode": "Zipcode",
+    "road": "Street",
+    "village": "City",
+    "city": "City",
+    "town": "City",
 }
 
 DSET_MAP = {
@@ -75,7 +85,7 @@ ENTRIES_PERIODICITY_MAP = {
 }
 
 
-def get(database: str, id=None, geospatial=False, **kwargs):
+def get(database: str, id=None, geospatial=False, find_meta: bool = None, **kwargs):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function.
@@ -92,9 +102,12 @@ def get(database: str, id=None, geospatial=False, **kwargs):
         dask dataframe. This is useful for large scale geospatial analyses on
         distributed compute systems. Geospaital analyses are only supported for
         NSRDB data and locally stored h5 files that follow pvlib conventions.
+    find_meta : (bool)
+        if true, this instructs the code to look up additional meta data.
+        The default is True if geospatial is False.
     **kwargs :
         Additional keyword arguments to pass to the get_weather function
-        (see pvlib.iotools.get_psm3 for PVGIS, and get_NSRDB for NSRDB)
+        (see pvlib.iotools.get_psm3 for NSRDB)
 
     Returns
     -------
@@ -171,6 +184,8 @@ def get(database: str, id=None, geospatial=False, **kwargs):
             )
 
     if not geospatial:
+        if find_meta is None:
+            find_meta = True
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
@@ -205,6 +220,8 @@ def get(database: str, id=None, geospatial=False, **kwargs):
         # switch weather data headers and metadata to pvlib standard
         map_weather(weather_df)
         map_meta(meta)
+        if find_meta:
+            meta = find_metadata(meta)
 
         if "relative_humidity" not in weather_df.columns:
             print(
@@ -237,8 +254,9 @@ def get(database: str, id=None, geospatial=False, **kwargs):
         return weather_ds, meta_df
 
 
-def read(file_in, file_type, map_variables=True, **kwargs):
-    """Read a locally stored weather file of any PVLIB compatible type.
+def read(file_in, file_type, map_variables=True, find_meta=True, **kwargs):
+    """
+    Read a locally stored weather file of any PVLIB compatible type
 
     #TODO: add error handling
 
@@ -276,6 +294,8 @@ def read(file_in, file_type, map_variables=True, **kwargs):
     if map_variables is True:
         map_weather(weather_df)
         map_meta(meta)
+    if find_meta:
+        meta = find_metadata(meta)
 
     if weather_df.index.tzinfo is None:
         tz = "Etc/GMT%+d" % -meta["tz"]
@@ -369,7 +389,7 @@ def map_meta(meta):
     Returns
     -------
     meta : dict or pandas.DataFrame
-        Metadata with standardized keys/column names.
+         Metadata with standardized keys/column names.
     """
 
     # Rename keys in dict
@@ -377,6 +397,8 @@ def map_meta(meta):
         for key in [*meta.keys()]:
             if key in META_MAP.keys():
                 meta[META_MAP[key]] = meta.pop(key)
+        if "Country Code" in meta.keys():
+            meta["Country Code"] = meta["Country Code"].upper()
         return meta
 
     # Rename columns in DataFrame
@@ -1434,8 +1456,41 @@ def weather_distributed(
 
     return weather_ds, meta_df, indexes_failed
 
-# def _nsrdb_to_uniform(
-# weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
+
+def find_metadata(meta):
+    """
+    Fills in missing meta data for a geographic location.
+    The meta dictionary must have longitude and latitude information.
+    Make sure meta_map has been run first to eliminate the creation of duplicate entries with different names.
+    It will only replace empty keys and those with one character of length.
+
+    Parameters:
+    -----------
+    meta : (dict)
+        Dictionary of metadata for the weather data
+
+    Returns:
+    --------
+    meta : (dict)
+        Dictionary of metadata for the weather data
+    """
+    geolocator = Nominatim(user_agent="geoapiexercises")
+    location = geolocator.reverse(
+        str(meta["latitude"]) + "," + str(meta["longitude"])
+    ).raw["address"]
+    map_meta(location)
+
+    for key in [*location.keys()]:
+        if key in meta.keys():
+            if len(meta[key]) < 2:
+                meta[key] = location[key]
+        else:
+            meta[key] = location[key]
+
+    return meta
+
+
+# def _nsrdb_to_uniform(weather_df: pd.DataFrame, meta: dict) -> tuple[pd.DataFrame, dict]:
 
 #     map_weather(weather_df=weather_df)
 #     map_meta(meta)
