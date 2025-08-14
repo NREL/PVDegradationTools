@@ -45,8 +45,8 @@ def gid_downsampling(meta, n):
         gids_sub = meta.index.values
         return meta, gids_sub
 
-    lon_sub = sorted(meta["longitude"].unique())[0: -1: max(1, 2 * n)]
-    lat_sub = sorted(meta["latitude"].unique())[0: -1: max(1, 2 * n)]
+    lon_sub = sorted(meta["longitude"].unique())[0 : -1 : max(1, 2 * n)]
+    lat_sub = sorted(meta["latitude"].unique())[0 : -1 : max(1, 2 * n)]
 
     gids_sub = meta[
         (meta["longitude"].isin(lon_sub)) & (meta["latitude"].isin(lat_sub))
@@ -969,6 +969,7 @@ def new_id(collection):
 
     def gen():
         return "".join(choices(ascii_uppercase, k=5))
+
     id = gen()
     while id in collection.keys():
         id = gen()
@@ -1282,9 +1283,7 @@ def compare_templates(
 
     for coord in ds1.coords:
         if ds1.coords[coord].dtype.kind in {"i", "f"}:
-            if not np.allclose(
-                ds1.coords[coord], ds2.coords[coord], atol=atol
-            ):
+            if not np.allclose(ds1.coords[coord], ds2.coords[coord], atol=atol):
                 return False
         elif ds1.coords[coord].dtype.kind == "M":
             if not np.array_equal(ds1.coords[coord], ds2.coords[coord]):
@@ -1435,7 +1434,8 @@ def display_json(
         json_str = json.dumps(data, indent=2)
         for key in data.keys():
             json_str = json_str.replace(
-                f'"{key}":', f'<span style="color: plum;">"{key}":</span>'  # noqa: E702,E231, E501
+                f'"{key}":',
+                f'<span style="color: plum;">"{key}":</span>',  # noqa: E702,E231, E501
             )
         indented_html = "<br>".join([" " * 4 + line for line in json_str.splitlines()])
         return f'<pre style="color: white; background-color: black; padding: 10px; border-radius: 5px;">{indented_html}</pre>'  # noqa: E702,E231, E501
@@ -1489,7 +1489,7 @@ def search_json(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                rf"{pvdeg_file} is not exist in pvdeg/data. Options are:"
+                rf"{pvdeg_file} is not exist in pvdeg/data. Options are: "
                 " {pvdeg_datafiles.keys()}"
             )
 
@@ -1501,9 +1501,7 @@ def search_json(
             if subdict["name"] == name_or_alias or subdict["alias"] == name_or_alias:
                 return key
 
-    raise ValueError(
-        rf"name_or_alias: {name_or_alias} not in JSON at {fp}"
-    )
+    raise ValueError(rf"name_or_alias: {name_or_alias} not in JSON at {fp}")
 
 
 def read_material(
@@ -1544,7 +1542,7 @@ def read_material(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                f"{pvdeg_file} is not in pvdeg/data. Options are:"
+                f"{pvdeg_file} is not in pvdeg/data. Options are: "
                 " {pvdeg_datafiles.keys()}"
             )
 
