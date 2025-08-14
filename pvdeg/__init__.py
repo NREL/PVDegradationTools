@@ -1,7 +1,9 @@
+"""init.py."""
+
 from importlib.metadata import version
 import logging
 
-from .config import *
+from .config import *  # noqa: F403
 
 # from . import cli
 from . import collection

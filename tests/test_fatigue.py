@@ -1,13 +1,11 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
 import pytest
-import pandas as pd
 from pvdeg import fatigue, weather, TEST_DATA_DIR
 
 PSM_FILE = os.path.join(TEST_DATA_DIR, "psm3_pytest.csv")

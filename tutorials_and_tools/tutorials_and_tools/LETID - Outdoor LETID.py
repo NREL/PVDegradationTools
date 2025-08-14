@@ -44,7 +44,8 @@ import matplotlib.pyplot as plt
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -77,7 +78,7 @@ weather
 
 
 # if our weather file doesn't have precipitable water, calculate it with pvlib
-if not "precipitable_water" in weather.columns:
+if "precipitable_water" not in weather.columns:
     weather["precipitable_water"] = pvlib.atmosphere.gueymard94_pw(
         weather["temp_air"], weather["relative_humidity"]
     )
@@ -258,9 +259,7 @@ nC_0 = 0
 
 mechanism_params = utilities.get_kinetics("repins")
 
-timesteps[
-    ["NA", "NB", "NC", "tau"]
-] = (
+timesteps[["NA", "NB", "NC", "tau"]] = (
     np.nan
 )  # create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below
 
@@ -437,7 +436,7 @@ ax2.plot(
 ax2.legend(loc="upper right")
 ax2.set_ylabel("Normalized STC $P_{MP}$")
 
-ax.set_title("Outdoor LETID \n" f"{location.name}")
+ax.set_title(f"Outdoor LETID \n{location.name}")
 
 plt.show()
 

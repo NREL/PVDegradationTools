@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -28,8 +27,7 @@ rh_expected = rh_expected[rh_cols]
 
 
 def test_module():
-    """
-    test pvdeg.humidity.calc_rel_humidity
+    """Test pvdeg.humidity.calc_rel_humidity.
 
     Requires:
     ---------
@@ -46,8 +44,7 @@ def test_module():
 
 
 def test_psat():
-    """
-    test pvdeg.humidity.psat
+    """Test pvdeg.humidity.psat.
 
     Requires:
     ---------
@@ -72,9 +69,10 @@ def test_rh_front_encap():
     # test calculation for RH of module fronside encapsulant
     # requires PSM3 weather file
 
-    rh_front_encap = pvdeg.StressFactors.rh_front_encap(rh_ambient=PSM['Relative Humidity'],
-                                                    temp_ambient=PSM['Temperature'],
-                                                    temp_module=PSM['temp_module'])
+    rh_front_encap = pvdeg.StressFactors.rh_front_encap(
+        rh_ambient=PSM['Relative Humidity'],
+        temp_ambient=PSM['Temperature'],
+        temp_module=PSM['temp_module'])
     assert rh_front_encap.__len__() == PSM.__len__()
     assert rh_front_encap.iloc[17] == pytest.approx(50.289, abs=.001)
 
@@ -82,9 +80,10 @@ def test_rh_back_encap():
     # test calculation for RH of module backside encapsulant
     # requires PSM3 weather file
 
-    rh_back_encap = pvdeg.StressFactors.rh_back_encap(rh_ambient=PSM['Relative Humidity'],
-                                                    temp_ambient=PSM['Temperature'],
-                                                    temp_module=PSM['temp_module'])
+    rh_back_encap = pvdeg.StressFactors.rh_back_encap(
+        rh_ambient=PSM['Relative Humidity'],
+        temp_ambient=PSM['Temperature'],
+        temp_module=PSM['temp_module'])
     assert rh_back_encap.__len__() == PSM.__len__()
     assert rh_back_encap[17] == pytest.approx(80.4576, abs=0.001)
 
@@ -92,19 +91,22 @@ def test_rh_backsheet_from_encap():
     # test the calculation for backsheet relative humidity
     # requires PSM3 weather file
 
-    rh_back_encap = pvdeg.StressFactors.rh_back_encap(rh_ambient=PSM['Relative Humidity'],
-                                                    temp_ambient=PSM['Temperature'],
-                                                    temp_module=PSM['temp_module'])
-    rh_surface = pvdeg.StressFactors.rh_surface_outside(rh_ambient=PSM['Relative Humidity'],
-                                                        temp_ambient=PSM['Temperature'],
-                                                        temp_module=PSM['temp_module'])
-    rh_backsheet = pvdeg.StressFactors.rh_backsheet_from_encap(rh_back_encap=rh_back_encap,
-                                                            rh_surface_outside=rh_surface)
+    rh_back_encap = pvdeg.StressFactors.rh_back_encap(
+        rh_ambient=PSM['Relative Humidity'],
+        temp_ambient=PSM['Temperature'],
+        temp_module=PSM['temp_module'])
+    rh_surface = pvdeg.StressFactors.rh_surface_outside(
+        rh_ambient=PSM['Relative Humidity'],
+        temp_ambient=PSM['Temperature'],
+        temp_module=PSM['temp_module'])
+    rh_backsheet = pvdeg.StressFactors.rh_backsheet_from_encap(
+        rh_back_encap=rh_back_encap,
+        rh_surface_outside=rh_surface)
     assert rh_backsheet.__len__() == PSM.__len__()
     assert rh_backsheet[17] == pytest.approx(81.2238, abs=0.001)
 
 def test_rh_backsheet():
-    # test the calculation for backsheet relative humidity directly from weather variables
+    # test calculation for backsheet relative humidity directly from weather variables
     # requires PSM3 weather file
 
     rh_backsheet = pvdeg.StressFactors.rh_backsheet(rh_ambient=PSM['Relative Humidity'],
