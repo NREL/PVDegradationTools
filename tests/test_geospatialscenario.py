@@ -1,4 +1,3 @@
-from pvdeg import TEST_DATA_DIR
 import pvdeg
 import pandas as pd
 import xarray as xr
