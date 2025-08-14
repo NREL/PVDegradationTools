@@ -29,7 +29,7 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
     self.gids = np.asanyarray([1245357])
 
 
-def test_Scenario_add(monkeypatch):
+def test_Scenario_add(monkeypatch, tmp_path):
     # monkey patch to bypass psm3 api calls in addLocation
     monkeypatch.setattr(
         target=Scenario,
@@ -37,9 +37,7 @@ def test_Scenario_add(monkeypatch):
         value=monkeypatch_addLocation,
     )
 
-    a = Scenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
-    )
+    a = Scenario(path=tmp_path)
 
     EMAIL = ("placeholder@email.xxx",)
     API_KEY = "fake_key"
@@ -61,7 +59,7 @@ def test_Scenario_add(monkeypatch):
     assert a == restored
 
 
-def test_Scenario_run(monkeypatch):
+def test_Scenario_run(monkeypatch, tmp_path):
     # monkey patch to bypass psm3 api calls in addLocation called by load_json
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation
@@ -72,7 +70,7 @@ def test_Scenario_run(monkeypatch):
         email=EMAIL,
         api_key=API_KEY,
     )
-    a.path = os.path.join(TEST_DATA_DIR, "dynamic")
+    a.path = tmp_path
     a.run()
 
     res_df = a.results["test-module"]["GLUSE"]
@@ -98,10 +96,10 @@ def test_Scenario_run(monkeypatch):
 #         b.clean()
 
 
-def test_addLocation_pvgis():
+def test_addLocation_pvgis(tmp_path):
     a = Scenario(
         name="location-test",
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     with pytest.raises(ValueError):
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
