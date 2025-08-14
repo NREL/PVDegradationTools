@@ -20,7 +20,6 @@ FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
     "psm3": os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),
     "epw": os.path.join(TEST_DATA_DIR, "epw_pytest.epw"),
-    "h5": os.path.join(TEST_DATA_DIR, "dynamic", "h5_pytest.h5"),
 }
 
 DSETS = [
@@ -41,15 +40,16 @@ DSETS = [
 #     pass
 
 
-def test_convert_tmy():
+def test_convert_tmy(tmp_path):
     """Test pvdeg.utilites.convert_tmy.
 
     Requires:
     ---------
     tmy3 or tmy-like .csv weather file (WEATHERFILES['tmy3'])
     """
-    pvdeg.utilities.convert_tmy(file_in=FILES["tmy3"], file_out=FILES["h5"])
-    with Outputs(FILES["h5"], "r") as f:
+    fp_h5 = os.path.join(tmp_path, "h5_pytest.h5")
+    pvdeg.utilities.convert_tmy(file_in=FILES["tmy3"], file_out=fp_h5)
+    with Outputs(fp_h5, "r") as f:
         datasets = f.dsets
     assert datasets.sort() == DSETS.sort()
 
@@ -92,7 +92,7 @@ def test_read_material_bad():
     assert res == data
 
 
-def test_add_material():
+def test_add_material(tmp_path):
     # new material parameters
     new_mat = {
         "alias": "test_material",
@@ -106,19 +106,17 @@ def test_add_material():
     }
 
     # Ensure the test file exists
-    fpath = os.path.join(TEST_DATA_DIR, "dynamic", "O2permeation.json")
-    if not os.path.exists(fpath):
-        os.makedirs(os.path.dirname(fpath), exist_ok=True)
-        src_file = os.path.join(DATA_DIR, "O2permeation.json")
-        shutil.copy(src_file, fpath)
+    src_file = os.path.join(DATA_DIR, "O2permeation.json")
+    test_file = os.path.join(tmp_path, "O2permeation.json")
+    shutil.copy(src_file, test_file)
 
     # add new material to file
     pvdeg.utilities._add_material(
-        name="tmat", fp=TEST_DATA_DIR, fname="dynamic/O2permeation.json", **new_mat
+        name="tmat", fp=tmp_path, fname="O2permeation.json", **new_mat
     )
 
     # read updated file
-    with open(fpath) as f:
+    with open(test_file) as f:
         data = json.load(f)
 
     # rename key, because we are comparing to original dictionary and func params do not
@@ -128,14 +126,6 @@ def test_add_material():
 
     # check
     assert data["tmat"] == new_mat
-
-    # restore file to original state
-    with open(fpath) as f:
-        data = json.load(f)
-    data.pop("tmat")  # reset to default state
-
-    with open(fpath, "w") as f:  # write default state
-        json.dump(data, f, indent=4)
 
 
 # this only works because we are not running on kestrel
