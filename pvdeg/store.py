@@ -6,7 +6,7 @@ import numpy as np
 import dask.array as da
 import os
 
-from pvdeg import METOROLOGICAL_DOWNLOAD_PATH
+from pvdeg import METOROLOGICAL_DOWNLOAD_PATH, weather
 
 
 def my_path():
@@ -132,7 +132,8 @@ def _create_sample_sheet(
 
     meta_df = pd.DataFrame(meta_dict, index=[0])
 
-    sheet_ds = pvgis_hourly_empty_weather_ds(gids_size=1)
+    # sheet_ds = pvgis_hourly_empty_weather_ds(gids_size=1)
+    sheet_ds = weather.empty_weather_ds(gids_size=1, periodicity="1h", database="PVGIS")
 
     dummy_da = da.full(shape=(1, sheet_ds.sizes["time"]), fill_value=fill_value)
 
