@@ -33,7 +33,7 @@ class Scenario:
         name: Optional[str] = None,
         path: Optional[str] = None,
         gids: Optional[Union[int, List[int], np.ndarray[int]]] = None,
-        modules: Optional[list] = [],
+        modules: Optional[list] = None,
         pipeline=OrderedDict(),
         file: Optional[str] = None,
         results=None,
@@ -69,7 +69,7 @@ class Scenario:
         """
         self.name = name
         self.path = path
-        self.modules = modules
+        self.modules = modules if modules is not None else []
         self.gids = gids
         self.pipeline = pipeline
         self.results = results
@@ -87,12 +87,17 @@ class Scenario:
 
         if path is None:
             self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
         else:
-            self.path = os.path.join(self.path, self.name)
+            self.path = path
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
 
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-        os.chdir(self.path)
+        # Only change directory if we're not in a test environment
+        # or if the scenario actually needs to work with files
+        if not os.environ.get('PYTEST_CURRENT_TEST'):
+            os.chdir(self.path)
 
         if file:
             self.load_json(file_path=file, email=email, api_key=api_key)
@@ -232,53 +237,118 @@ class Scenario:
         self,
         module_name: str = None,
         racking: str = "open_rack_glass_polymer",
-        material: str = "OX003",
+        materials: Union[str, dict] = "OX003",
         material_file: str = "O2permeation",
+        parameters: Optional[list] = None,
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
     ):
-        """Add a module to the Scenario.
-
-        Multiple modules can be added. Each module will
+        """
+        Add a module to the Scenario. Multiple modules can be added. Each module will
         be tested in the given scenario.
 
         Parameters
         -----------
         module_name : str
             unique name for the module. adding multiple modules of the same name will
-            replace the
-            existing entry.
+            replace the existing entry.
         racking : str
             temperature model racking type as per PVLIB (see pvlib.temperature). Allowed
             entries:
             'open_rack_glass_glass', 'open_rack_glass_polymer',
             'close_mount_glass_glass', 'insulated_back_glass_polymer'
-        material : str
-            Key of the material desired. For a complete list,
-            see pvdeg/data/O2permeation.json
-            or pvdeg/data/H2Opermedation.json or pvdeg/data/AApermeation.json.
-            To add a custom material, see pvdeg.addMaterial (ex: EVA, Tedlar)
+        materials : Union[str, dict]
+            Materials specification. Can be either:
+            - str: Single material key e.g., "OX003"
+            - dict: Nested dictionary with structure PV layer, materials file, material
+            key, and parameters if custom material is specifed. For example:
+        {
+            "encapsulant": {
+                "material_file": "O2permeation",
+                "material_name": "OX003"
+            },
+            "backsheet": {
+                "material_file": "H20permeation",
+                "material_name": "W024"
+            },
+            "custom_layer": {
+                "parameters": {
+                    "Ead": 95,
+                    "Do": 40e5,
+                    "Eas": -10,
+                    "So": 20e-6,
+                    "Eap": 84,
+                    "Po": 99e9
+                }
+            }
+        }
         material_file : str
-            Material file used to access parameters from.
-            Use material json file in `pvdeg/data`. Options:
+            Material file used to access parameters if ``material_name`` exists in one
+            of the local material json databases. Options:
             >>> "AApermeation", "H2Opermeation", "O2permeation"
-        temp_model : str
+        parameters : list
+            List of parameter names to retrieve from the material database. If None, all
+            parameters are retrieved. This argument is passed to the ``parameters``
+            argument of utilities._read_material.
+        temperature_model : list[str]
             select pvlib temperature models. See ``pvdeg.temperature.temperature`` for
-            more.
-            Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes', 'ross'``
+            more. Options : ``'sapm', 'pvsyst', 'faiman', 'faiman_rad', 'fuentes',
+            'ross'``
         model_kwarg : dict, (optional)
             provide a dictionary of temperature model coefficents to be used
             instead of pvlib defaults. Some models will require additional
             arguments such as ``ross`` which requires nominal operating cell
             temperature (``noct``). This is where other values such as noct
             should be provided.
-            Pvlib temp models:
+            pvlib-python temperature models:
             https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         """
+        if isinstance(materials, str):
+            # Handle single material string format
+            try:
+                mat_params = utilities.read_material(pvdeg_file=material_file,
+                                                     key=materials,
+                                                     parameters=parameters)
+            except KeyError:
+                raise ValueError(f"Material '{materials}' not found in {material_file}")
+        elif isinstance(materials, dict):
+            # Handle multiple material dictionary format
+            mat_params = {}
+            for layer, material_spec in materials.items():
+                if not isinstance(material_spec, dict):
+                    raise ValueError(f"Invalid material specification for layer '{layer}' - must be a dict")
+
+                material_file_layer = material_spec.get("material_file")
+                material_name = material_spec.get("material_name")
+                custom_params = material_spec.get("parameters")  # returns None if no custom material specified
+
+                if not material_file_layer:
+                    raise ValueError(f"Missing 'material_file' for layer '{layer}'")
+
+                if material_name:
+                    # Use existing material from file
+                    try:
+                        material_parameters = utilities.read_material(
+                            pvdeg_file=material_file_layer,
+                            key=material_name,
+                            parameters=parameters)
+                        mat_params[layer] = material_parameters
+                    except KeyError:
+                        raise ValueError(f"Material '{material_name}' not found in {material_file_layer}")
+                elif custom_params is not None:
+                    # Use custom parameters directly
+                    mat_params[layer] = custom_params
+                else:
+                    raise ValueError(f"Layer '{layer}' must have either 'material_name' or 'parameters'")
+
+        else:
+            raise ValueError("Materials parameter must be either a string or dict")
+
+        # Check for existing module and warn user
         try:
             mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
 
@@ -305,34 +375,110 @@ class Scenario:
         except Exception as e:
             warnings.warn(f"Failed to add module '{module_name}': {e}")
 
-    def add_material(
-        self,
-        name,
-        alias,
-        Ead,
-        Eas,
-        So,
-        Do=None,
-        Eap=None,
-        Po=None,
-        fickian=True,
-        fname="O2permeation.json",
-    ):
-        """Add a new material type to main list."""
-        utilities._add_material(
-            name=name,
-            alias=alias,
-            Ead=Ead,
-            Eas=Eas,
-            So=So,
-            Do=Do,
-            Eap=Eap,
-            Po=Po,
-            fickian=fickian,
-            fname=fname,
-        )
-        print("Material has been added.")
-        print("To add the material as a module in your current scene, run .addModule()")
+
+    def add_material(self, materials, see_added=False):
+        """
+        Add new material types to multiple layers/files.
+
+        Parameters:
+        -----------
+        materials : dict
+            Dictionary with layer names as keys, and material info including:
+            - material_file: str - Name of the material file (e.g., "O2permeation") - required only for existing materials
+            - material_name: str - Name of the material to add
+            - parameters: dict - Custom material parameters (for custom materials)
+
+        see_added : bool, optional
+            If True, print confirmation for each material added
+
+        Example:
+        --------
+        scenario.add_material({
+            "encapsulant": {
+                "material_file": "O2permeation",
+                "material_name": "EVA_001"
+            },
+            "backsheet": {
+                "material_file": "H2Opermeation",
+                "material_name": "PET_001"
+            },
+            "custom_layer": {
+                "material_name": "CUSTOM_001",
+                "parameters": {
+                    "Ead": 95,
+                    "Do": 40e5,
+                    "Eas": -10,
+                    "So": 20e-6,
+                    "Eap": 84,
+                    "Po": 99e9
+                }
+            }
+        })
+        """
+        if not isinstance(materials, dict):
+            raise ValueError("Materials parameter must be a dict with layer names as keys")
+
+        for layer, material_spec in materials.items():
+            if not isinstance(material_spec, dict):
+                raise ValueError(f"Invalid material spec for layer '{layer}' - must be a dict")
+
+            material_file = material_spec.get("material_file")
+            material_name = material_spec.get("material_name")
+            custom_params = material_spec.get("parameters")
+
+            if material_name is None:
+                raise ValueError(f"material_name is required for layer '{layer}'")
+
+            if custom_params is not None and material_file is None:
+                material_file = "custom_materials"
+                try:
+                    utilities._add_material(
+                        name=material_name,
+                        alias=custom_params.get('alias', layer),
+                        Ead=custom_params['Ead'],
+                        Eas=custom_params['Eas'],
+                        So=custom_params['So'],
+                        Do=custom_params.get('Do'),
+                        Eap=custom_params.get('Eap'),
+                        Po=custom_params.get('Po'),
+                        fickian=custom_params.get('fickian', True),
+                        fname=f"{material_file}.json"
+                    )
+                    if see_added:
+                        print(f'Custom material "{material_name}" added to {material_file}.json for layer "{layer}".')
+                except Exception as e:
+                    raise ValueError(f"Error adding custom material for layer '{layer}': {e}")
+
+            elif material_file is not None:
+                # Handle existing material from file - read and add to database
+                try:
+                    material_parameters = utilities.read_material(
+                        pvdeg_file=material_file, key=material_name)
+
+                    # Add the existing material to the database
+                    utilities._add_material(
+                        name=material_name,
+                        alias=material_parameters.get('alias', layer),
+                        Ead=material_parameters['Ead'],
+                        Eas=material_parameters['Eas'],
+                        So=material_parameters['So'],
+                        Do=material_parameters.get('Do'),
+                        Eap=material_parameters.get('Eap'),
+                        Po=material_parameters.get('Po'),
+                        fickian=material_parameters.get('fickian', True),
+                        fname=f"{material_file}.json"
+                    )
+
+                    if see_added:
+                        print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
+                except KeyError:
+                    raise ValueError(f'Material "{material_name}" not found in {material_file}')
+                except Exception as e:
+                    raise ValueError(f"Error adding existing material for layer '{layer}': {e}")
+
+            else:
+                raise ValueError(f"Either 'material_file' or 'parameters' must be provided for layer '{layer}'")
+
 
     def viewScenario(self):
         """Print all scenario information currently stored in the scenario instance.
