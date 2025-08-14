@@ -349,11 +349,14 @@ class Scenario:
             raise ValueError("Materials parameter must be either a string or dict")
 
         # Check for existing module and warn user
-        old_modules = [mod["module_name"] for mod in self.modules]
-        if module_name in old_modules:
-            print(f'WARNING - Module already found by name "{module_name}"')
-            print("Module will be replaced with new instance.")
-            self.modules.pop(old_modules.index(module_name))
+        try:
+            mat_params = utilities.read_material(pvdeg_file=material_file, key=material)
+
+            old_modules = [mod["module_name"] for mod in self.modules]
+            if module_name in old_modules:
+                warnings.warn(f'WARNING - Module already found by name "{module_name}"')
+                warnings.warn("Module will be replaced with new instance.")
+                self.modules.pop(old_modules.index(module_name))
 
             self.modules.append(
                 {
