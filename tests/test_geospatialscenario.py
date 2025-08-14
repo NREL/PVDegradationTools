@@ -27,7 +27,7 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
     self.gids = GEO_WEATHER.gid.values
 
 
-def test_standoff_autotemplate(monkeypatch):
+def test_standoff_autotemplate(monkeypatch, tmp_path):
     monkeypatch.setattr(
         target=pvdeg.GeospatialScenario,
         name="addLocation",
@@ -36,7 +36,7 @@ def test_standoff_autotemplate(monkeypatch):
 
     # Create a scenario, add locations, run analysis using an autotemplated function
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
@@ -65,7 +65,7 @@ def test_standoff_autotemplate(monkeypatch):
     pd.testing.assert_frame_equal(res, ans)
 
 
-def test_geospatial_data(monkeypatch):
+def test_geospatial_data(monkeypatch, tmp_path):
     GEO_META = pd.read_csv(
         os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0
     )
@@ -80,7 +80,7 @@ def test_geospatial_data(monkeypatch):
     )
 
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
@@ -90,7 +90,7 @@ def test_geospatial_data(monkeypatch):
     pd.testing.assert_frame_equal(GEO_META, scenario_meta)
 
 
-def test_downselect_elevation_stochastic_no_kdtree(monkeypatch):
+def test_downselect_elevation_stochastic_no_kdtree(monkeypatch, tmp_path):
     monkeypatch.setattr(
         target=pvdeg.GeospatialScenario,
         name="addLocation",
@@ -100,7 +100,7 @@ def test_downselect_elevation_stochastic_no_kdtree(monkeypatch):
     np.random.seed(0)
 
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
@@ -118,7 +118,7 @@ def test_downselect_elevation_stochastic_no_kdtree(monkeypatch):
     assert geo_scenario.kdtree is not None
 
 
-def test_downselect_elevation_stochastic_kdtree(monkeypatch):
+def test_downselect_elevation_stochastic_kdtree(monkeypatch, tmp_path):
     monkeypatch.setattr(
         target=pvdeg.GeospatialScenario,
         name="addLocation",
@@ -128,7 +128,7 @@ def test_downselect_elevation_stochastic_kdtree(monkeypatch):
     np.random.seed(0)
 
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
@@ -148,7 +148,7 @@ def test_downselect_elevation_stochastic_kdtree(monkeypatch):
     assert geo_scenario.kdtree == tree
 
 
-def test_gid_downsample(monkeypatch):
+def test_gid_downsample(monkeypatch, tmp_path):
     monkeypatch.setattr(
         target=pvdeg.GeospatialScenario,
         name="addLocation",
@@ -156,7 +156,7 @@ def test_gid_downsample(monkeypatch):
     )
 
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
@@ -175,7 +175,7 @@ def test_gid_downsample(monkeypatch):
     )
 
 
-def test_downselect_CONUS(monkeypatch):
+def test_downselect_CONUS(monkeypatch, tmp_path):
     monkeypatch.setattr(
         target=pvdeg.GeospatialScenario,
         name="addLocation",
@@ -183,7 +183,7 @@ def test_downselect_CONUS(monkeypatch):
     )
 
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
@@ -192,7 +192,7 @@ def test_downselect_CONUS(monkeypatch):
     ak_hi_df = pd.DataFrame(
         data=[
             [-99, -99, -1, "+100", "United States", "Alaska", "filler", 2],
-            [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2]
+            [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2],
         ],
         columns=[
             "latitude",
@@ -215,7 +215,7 @@ def test_downselect_CONUS(monkeypatch):
     np.testing.assert_array_equal(geo_scenario.gids, co_df.index.values)
 
 
-def test_coords(monkeypatch):
+def test_coords(monkeypatch, tmp_path):
     monkeypatch.setattr(
         target=pvdeg.GeospatialScenario,
         name="addLocation",
@@ -223,7 +223,7 @@ def test_coords(monkeypatch):
     )
 
     geo_scenario = pvdeg.GeospatialScenario(
-        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+        path=tmp_path,
     )
     geo_scenario.addLocation()
 
