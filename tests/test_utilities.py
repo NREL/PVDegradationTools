@@ -105,10 +105,12 @@ def test_add_material():
     }
 
     # add new material to file
-    pvdeg.utilities._add_material(name="tmat", **new_mat)
+    pvdeg.utilities._add_material(
+        name="tmat", fp=TEST_DATA_DIR, fname="dynamic/O2permeation.json", **new_mat
+    )
 
     # read updated file
-    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    fpath = os.path.join(TEST_DATA_DIR, "dynamic", "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
@@ -121,7 +123,7 @@ def test_add_material():
     assert data["tmat"] == new_mat
 
     # restore file to original state
-    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    fpath = os.path.join(TEST_DATA_DIR, "dynamic", "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
     data.pop("tmat")  # reset to default state
