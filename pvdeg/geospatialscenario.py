@@ -1081,7 +1081,7 @@ class GeospatialScenario(pvdeg.Scenario):
 
         if not iterable.issubset(to_check):
             raise ValueError(
-                f"All of iterable: {iterable} does not exist in {to_check}"
+                f"All of iterable: {iterable} is not in {to_check}"
             )
 
     def format_geospatial_work(self):
