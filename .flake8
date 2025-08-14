@@ -15,5 +15,7 @@ per-file-ignores =
 exclude =
     docs
     .eggs
+    .git
+    .venv
     build
     tutorials_and_tools/tutorials_and_tools/*.py

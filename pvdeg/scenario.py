@@ -3,10 +3,7 @@
 import pvdeg
 from pvdeg import utilities
 
-import matplotlib
-import matplotlib.figure
 import matplotlib.pyplot as plt
-from datetime import date
 from datetime import datetime as dt
 import os
 from shutil import rmtree
@@ -22,9 +19,6 @@ from typing import List, Union, Optional, Tuple, Callable
 from functools import partial
 import pprint
 from IPython.display import display, HTML
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
-from dask.distributed import Client
 
 
 class Scenario:
@@ -53,12 +47,11 @@ class Scenario:
         Parameters:
         -----------
         name : (str)
-            custom name for deg. scenario. If none given, will use date of
-            initialization (DDMMYY)
+            custom name for deg. scenario. If none given, will use datetime of
+            initialization (DDMMYY_HHMMSS)
         path : (str, pathObj)
             File path to operate within and store results. If none given, new folder
-            "name" will be
-            created in the working directory.
+            "name" will be created in the working directory.
         gids : (str, pathObj)
             Spatial area to perform calculation for. This can be Country or Country and
             State.
@@ -86,7 +79,7 @@ class Scenario:
         self.api_key = api_key
         self.email = email
 
-        filedate = dt.strftime(date.today(), "%d%m%y")
+        filedate = dt.now().strftime("%d%m%y_%H%M%S")
 
         if name is None:
             name = filedate
@@ -100,7 +93,7 @@ class Scenario:
             self.path = path
             if not os.path.exists(self.path):
                 os.makedirs(self.path)
-        
+
         # Only change directory if we're not in a test environment
         # or if the scenario actually needs to work with files
         if not os.environ.get('PYTEST_CURRENT_TEST'):
@@ -169,7 +162,6 @@ class Scenario:
         self,
         lat_long: tuple = None,
         weather_db: str = "PSM3",
-        see_added: bool = False,
     ):
         """Add a location to the scenario using a latitude-longitude pair.
 
@@ -186,8 +178,6 @@ class Scenario:
             source of data for provided location.
             - For NSRDB data use `weather_db = 'PSM3'`
             - For PVGIS data use `weather_db = 'PVGIS'`
-        see_added : bool
-            flag true if you want to see a runtime notification for added location/gids
         """
         if isinstance(lat_long, list):  # is a list when reading from json
             lat_long = tuple(lat_long)
@@ -226,23 +216,22 @@ class Scenario:
                 """
             )
 
-        point_weather, point_meta = pvdeg.weather.get(
-            weather_db, id=weather_id, **weather_arg
-        )
-
         try:
+            point_weather, point_meta = pvdeg.weather.get(
+                weather_db, id=weather_id, **weather_arg
+            )
+
             if weather_db == "PSM3":
                 gid = point_meta["Location ID"]
                 self.gids = [int(gid)]
-        except KeyError:
-            return UserWarning("metadata missing location ID")
 
-        self.meta_data = point_meta
-        self.weather_data = point_weather
+            self.meta_data = point_meta
+            self.weather_data = point_weather
 
-        if see_added and weather_db == "PSM3":
-            message = f"Gids Added - {self.gids}"
-            warnings.warn(message, UserWarning)
+        except KeyError as e:
+            warnings.warn(f"Metadata missing location ID: {e}")
+        except Exception as e:
+            warnings.warn(f"Failed to add location: {e}")
 
     def addModule(
         self,
@@ -254,7 +243,6 @@ class Scenario:
         temperature_model: str = "sapm",
         model_kwarg: dict = {},
         irradiance_kwarg: dict = {},
-        see_added: bool = False,
     ):
         """
         Add a module to the Scenario. Multiple modules can be added. Each module will
@@ -314,22 +302,21 @@ class Scenario:
             temperature (``noct``). This is where other values such as noct
             should be provided.
             pvlib-python temperature models:
-            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  #noqa
+            https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
         irradiance_kwarg : dict, (optional)
             provide keyword arguments for poa irradiance calculations.
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
-        see_added : (bool), optional
         """
         if isinstance(materials, str):
-            # Handle single material string format 
+            # Handle single material string format
             try:
                 mat_params = utilities.read_material(pvdeg_file=material_file,
-                                                     key=materials, 
+                                                     key=materials,
                                                      parameters=parameters)
             except KeyError:
                 raise ValueError(f"Material '{materials}' not found in {material_file}")
         elif isinstance(materials, dict):
-            # Handle multiple material dictionary format 
+            # Handle multiple material dictionary format
             mat_params = {}
             for layer, material_spec in materials.items():
                 if not isinstance(material_spec, dict):
@@ -346,7 +333,7 @@ class Scenario:
                     # Use existing material from file
                     try:
                         material_parameters = utilities.read_material(
-                            pvdeg_file=material_file_layer, 
+                            pvdeg_file=material_file_layer,
                             key=material_name,
                             parameters=parameters)
                         mat_params[layer] = material_parameters
@@ -368,26 +355,28 @@ class Scenario:
             print("Module will be replaced with new instance.")
             self.modules.pop(old_modules.index(module_name))
 
-        # Add the module to the scenario
-        self.modules.append(
-            {
-                "module_name": module_name,
-                "racking": racking,
-                "material_params": mat_params,
-                "temp_model": temperature_model,
-                "model_kwarg": model_kwarg,
-                "irradiance_kwarg": irradiance_kwarg,
-            }
-        )
-
-        if see_added:
-            print(f'Module "{module_name}" added.')
+            self.modules.append(
+                {
+                    "module_name": module_name,
+                    "racking": racking,
+                    "material_params": mat_params,
+                    "temp_model": temperature_model,
+                    "model_kwarg": model_kwarg,
+                    "irradiance_kwarg": irradiance_kwarg,
+                }
+            )
+        except KeyError:
+            warnings.warn("Material Not Found - No module added to scenario.")
+            warnings.warn("If you need to add a custom material, use .add_material()")
+            return
+        except Exception as e:
+            warnings.warn(f"Failed to add module '{module_name}': {e}")
 
 
     def add_material(self, materials, see_added=False):
         """
         Add new material types to multiple layers/files.
-        
+
         Parameters:
         -----------
         materials : dict
@@ -395,10 +384,10 @@ class Scenario:
             - material_file: str - Name of the material file (e.g., "O2permeation") - required only for existing materials
             - material_name: str - Name of the material to add
             - parameters: dict - Custom material parameters (for custom materials)
-            
+
         see_added : bool, optional
             If True, print confirmation for each material added
-            
+
         Example:
         --------
         scenario.add_material({
@@ -407,7 +396,7 @@ class Scenario:
                 "material_name": "EVA_001"
             },
             "backsheet": {
-                "material_file": "H2Opermeation", 
+                "material_file": "H2Opermeation",
                 "material_name": "PET_001"
             },
             "custom_layer": {
@@ -462,7 +451,7 @@ class Scenario:
                 try:
                     material_parameters = utilities.read_material(
                         pvdeg_file=material_file, key=material_name)
-                    
+
                     # Add the existing material to the database
                     utilities._add_material(
                         name=material_name,
@@ -476,7 +465,7 @@ class Scenario:
                         fickian=material_parameters.get('fickian', True),
                         fname=f"{material_file}.json"
                     )
-                    
+
                     if see_added:
                         print(f'Material "{material_name}" added to {material_file}.json for layer "{layer}".')
                 except KeyError:
@@ -531,7 +520,6 @@ class Scenario:
         self,
         func=None,
         func_kwarg={},
-        see_added=False,
     ):
         """Add a pvdeg function to the scenario pipeline.
 
@@ -543,23 +531,16 @@ class Scenario:
             ``Scenario.geospatial == False``
         func_params : dict
             job specific keyword argument dictionary to provide to the function
-        see_added : bool
-            set flag to get a userWarning notifying the user of the job added
-           to the pipeline in method call. ``default = False``
         """
         if func is None or not callable(func):
-            print(f'FAILED: Requested function "{func}" not found')
-            print("Function has not been added to pipeline.")
-            return
+            raise ValueError(f'FAILED: Requested function "{func}" not found')
 
-        job_id = utilities.new_id(self.pipeline)
-
-        job_dict = {"job": func, "params": func_kwarg}
-        self.pipeline[job_id] = job_dict
-
-        if see_added:
-            message = f"{func.__name__} added to pipeline as \n {job_dict}"
-            warnings.warn(message, UserWarning)
+        try:
+            job_id = utilities.new_id(self.pipeline)
+            job_dict = {"job": func, "params": func_kwarg}
+            self.pipeline[job_id] = job_dict
+        except Exception as e:
+            warnings.warn(f"Failed to add job: {e}")
 
     def run(self):
         """
@@ -577,7 +558,6 @@ class Scenario:
         None
         """
         results_series = pd.Series(dtype="object")
-
         results_dict = {}
 
         if self.modules:
@@ -597,9 +577,7 @@ class Scenario:
                         "model_kwarg": module["model_kwarg"],
                         "irradiance_kwarg": module["irradiance_kwarg"],
                         "conf": module["racking"],
-                        **module[
-                            "irradiance_kwarg"
-                        ],  # overwrite existing irradiance kwarg
+                        **module["irradiance_kwarg"],
                     }
 
                     combined = (
@@ -609,7 +587,7 @@ class Scenario:
                     func_params = signature(func).parameters
                     func_args = {
                         k: v for k, v in combined.items() if k in func_params.keys()
-                    }  # downselect func args
+                    }
 
                     res = func(**params, **func_args)
 
@@ -618,7 +596,7 @@ class Scenario:
 
                 results_dict[module["module_name"]] = module_result
 
-            self.results = results_dict  # 2d dictionary array
+            self.results = results_dict
 
             for module, pipeline_result in self.results.items():
                 module_dir = f"./pipeline_results/{module}_pipeline_results"
@@ -640,30 +618,21 @@ class Scenario:
                     func = partial(
                         func, weather_df=self.weather_data, meta=self.meta_data
                     )
-                except:
+                except Exception:
                     pass
 
                 result = func(**params) if params else func()
 
-                # if id not in module_result.keys():
-                # results_dict[id] = result
-                # pipeline_results = results_dict
-                # pipeline_results[id] = result
-
                 results_dict[id] = result
-                pipeline_results = results_dict  # this is weird
+                pipeline_results = results_dict
 
             for key in pipeline_results.keys():
-                # print(f"results_dict dtype : {type(results_dict[key])}")
-                # print(results_dict)
-
                 if isinstance(results_dict[key], pd.DataFrame):
                     results_series[key] = results_dict[key]
-
                 elif isinstance(results_dict[key], (float, int)):
                     results_series[key] = pd.DataFrame(
-                        [results_dict[key]],  # convert the single numeric to a list
-                        columns=[key],  # name the single column entry in list form
+                        [results_dict[key]],
+                        columns=[key],
                     )
 
                 self.results = results_series
@@ -730,7 +699,6 @@ class Scenario:
         `pvdeg.utilities.remove_scenario_filetrees`
         """
         utilities.remove_scenario_filetrees(fp=fp, pattern=pattern)
-
         return
 
     def _verify_function(func_name: str) -> Tuple[Callable, List]:
@@ -753,7 +721,6 @@ class Scenario:
         """
         from inspect import signature
 
-        # find the function in pvdeg
         class_list = [c for c in dir(pvdeg) if not c.startswith("_")]
         for c in class_list:
             _class = getattr(pvdeg, c)
@@ -774,9 +741,12 @@ class Scenario:
     def _to_dict(self, api_key=False):
         # pipeline is special case, must remove 'job' function reference at every entry
         modified_pipeline = deepcopy(self.pipeline)
+
+        def get_qualified(x):
+            return f"{x.__module__}.{x.__name__}"
+
         for task in modified_pipeline.values():
             function_ref = task["job"]
-            get_qualified = lambda x: f"{x.__module__}.{x.__name__}"
             task["qualified_function"] = get_qualified(function_ref)
             task.pop("job")
 
@@ -791,7 +761,6 @@ class Scenario:
 
         if api_key:
             protected = {"email": self.email, "api_key": self.api_key}
-
             attributes.update(protected)
 
         return attributes
@@ -935,9 +904,11 @@ class Scenario:
                                 )
 
         if tmy:
-            results.index = results.index.map(
-                lambda dt: dt.replace(year=1970)
-            )  # placeholder year
+
+            def set_placeholder_year(dt):
+                return dt.replace(year=1970)
+
+            results.index = results.index.map(set_placeholder_year)  # placeholder year
 
             if start_time and end_time:
                 results = utilities.strip_normalize_tmy(results, start_time, end_time)
@@ -1029,12 +1000,13 @@ class Scenario:
     def _ipython_display_(self):
         file_url = "no file provided"
         if self.path:
-            file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"
-
+            file_url = (
+                f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"  # noqa
+            )
         html_content = f"""
-        <div style="border:1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;"> #noqa
+        <div style="border: 1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">  # noqa
             <h2>self.name: {self.name}</h2>
-            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p> #noqa
+            <p><strong>self.path:</strong> <a href="{file_url}" target="_blank">{self.path}</a></p>  # noqa
             <p><strong>self.gids:</strong> {self.gids}</p>
             <p><strong>self.email:</strong> {self.email}</p>
             <p><strong>self.api_key:</strong> {self.api_key}</p>
@@ -1090,13 +1062,13 @@ class Scenario:
             )
 
             module_content = f"""
-            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div onclick="toggleVisibility('module_{i}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_module_{i}" style="color: #E6E6FA;">►</span>
                     {module["module_name"]}
                 </h4>
             </div>
-            <div id="module_{i}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="module_{i}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 <p><strong>Racking:</strong> {module["racking"]}</p>
                 <p><strong>Temperature Model:</strong> {module["temp_model"]}</p>
                 <p><strong>Material Parameters:</strong></p>
@@ -1122,25 +1094,25 @@ class Scenario:
         for module_name, functions in sorted(self.results.items()):
             module_id = f"result_module_{module_name}"
             module_content = f"""
-            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div onclick="toggleVisibility('{module_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
                     <span id="arrow_{module_id}" style="color: #E6E6FA;">►</span>
                     {module_name}
                 </h4>
             </div>
-            <div id="{module_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="{module_id}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
             """
             for function_name, output in functions.items():
                 function_id = f"{module_id}_{function_name}"
                 formatted_output = self.format_output(output)
                 module_content += f"""
-                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+                <div onclick="toggleVisibility('{function_id}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                     <h5 style="font-family: monospace; margin: 0;">
                         <span id="arrow_{function_id}" style="color: #E6E6FA;">►</span>
                         {function_name}
                     </h5>
                 </div>
-                <div id="{function_id}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+                <div id="{function_id}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                     {formatted_output}
                 </div>
                 """
@@ -1194,13 +1166,13 @@ class Scenario:
                 display_data = self.weather_data
 
             weather_data_html = f"""
-            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="weather_data" onclick="toggleVisibility('content_weather_data')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>
+                    <span id="arrow_content_weather_data" style="color: #E6E6FA;">►</span>  # noqa
                     Weather Data
                 </h4>
             </div>
-            <div id="content_weather_data" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="content_weather_data" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 {display_data.to_html()}
             </div>
             """
@@ -1218,13 +1190,13 @@ class Scenario:
                 params_html = "<pre>Unserializable data type</pre>"
 
             step_content = f"""
-            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;"> #noqa
+            <div id="{step_name}" onclick="toggleVisibility('pipeline_{step_name}')" style="cursor: pointer; background-color: #000000; color: #FFFFFF; padding: 5px; border-radius: 3px; margin-bottom: 1px;">  # noqa
                 <h4 style="font-family: monospace; margin: 0;">
-                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span> #noqa
-                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span> #noqa
+                    <span id="arrow_pipeline_{step_name}" style="color: #b676c2;">►</span>  # noqa
+                    {step["job"].__name__}, <span style="color: #b676c2;">#{step_name}</span>  # noqa
                 </h4>
             </div>
-            <div id="pipeline_{step_name}" style="display:none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;"> #noqa
+            <div id="pipeline_{step_name}" style="display: none; margin-left: 20px; padding: 5px; background-color: #f0f0f0; color: #000;">  # noqa
                 <p>Job: {step["job"].__name__}</p>
                 <p>Parameters:</p>
                 <div style="margin-left: 20px;">
