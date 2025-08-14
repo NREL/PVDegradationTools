@@ -86,10 +86,10 @@ ENTRIES_PERIODICITY_MAP = {
 
 
 def get(
-    database: str,
-    id: int | tuple = None,
-    geospatial: bool = False,
-    find_meta: bool = False,
+    database,
+    id=None,
+    geospatial=False,
+    find_meta=False,
     **kwargs,
 ):
     """
