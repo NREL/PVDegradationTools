@@ -120,83 +120,6 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
     ###########
 
 
-def _diffusivity_numerator(
-    rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
-):
-    """Calculate weighted average module surface RH, helper function.
-
-    Calculation is used in determining a weighted average Relative Humidity of the
-    outside surface of a module. This funciton is used exclusively in the function
-    _diffusivity_weighted_water and could be combined.
-
-    Returns values needed for the numerator of the Diffusivity weighted water
-    content equation. Returns a pandas series prior to summation of the numerator.
-
-    Parameters
-    ----------
-    rh_ambient : pandas series (float)
-        The ambient outdoor environmnet relative humidity in [%]
-        EXAMPLE: "50 = 50% NOT .5 = 50%"
-    temp_ambient : pandas series (float)
-        The ambient outdoor environmnet temperature [C]
-    temp_module : pandas series (float)
-        The surface temperature of the solar panel module [C]
-    So : float
-        Float, Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
-    Eas : float
-        Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
-    Ead : float
-        Encapsulant diffusivity activation energy in [kJ/mol]
-        Ead = 38.14(kJ/mol) is the suggested value for EVA.
-
-    Returns
-    -------
-    diff_numerator : pandas series (float)
-        Nnumerator of the Sdw equation prior to summation
-    """
-    # Get the relative humidity of the surface
-    rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
-
-    # Generate a series of the numerator values "prior to summation"
-    diff_numerator = (
-        So
-        * np.exp(-(Eas / (R_GAS * (temp_module + 273.15))))
-        * rh_surface
-        * np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
-    )
-
-    return diff_numerator
-
-
-def _diffusivity_denominator(temp_module, Ead=38.14):
-    """Calculate weighted average module surface RH, helper function.
-
-    Calculation is used in determining a weighted average Relative Humidity of the
-    outside surface of a module. This funciton is used exclusively in the function
-    _diffusivity_weighted_water and could be combined.
-
-    The function returns values needed for the denominator of the Diffusivity
-    weighted water content equation(diffuse_water). This function will return a pandas
-    series prior to summation of the denominator
-
-    Parameters
-    ----------
-    Ead : float
-        Encapsulant diffusivity activation energy in [kJ/mol]
-        38.14(kJ/mol) is the suggested value for EVA.
-    temp_module : pandas series (float)
-        The surface temperature in Celsius of the solar panel module
-
-    Returns
-    -------
-    diff_denominator : pandas series (float)
-        Denominator of the diffuse_water equation prior to summation
-    """
-    diff_denominator = np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
-    return diff_denominator
-
 
 def _diffusivity_weighted_water(
     rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
@@ -233,13 +156,21 @@ def _diffusivity_weighted_water(
     diffuse_water : float
         Diffusivity weighted water content
     """
-    numerator = _diffusivity_numerator(
-        rh_ambient, temp_ambient, temp_module, So, Eas, Ead
+    # Get the relative humidity of the surface
+    rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
+
+    # Generate a series of the numerator values "prior to summation"
+    numerator = (
+        So
+        * np.exp(-(Eas / (R_GAS * (temp_module + 273.15))))
+        * rh_surface
+        * np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
     )
     # get the summation of the numerator
     numerator = numerator.sum(axis=0, skipna=True)
 
-    denominator = _diffusivity_denominator(temp_module, Ead)
+    denominator = np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
+
     # get the summation of the denominator
     denominator = denominator.sum(axis=0, skipna=True)
 
