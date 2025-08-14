@@ -115,11 +115,6 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
 
     return rh_Surface
 
-    ###########
-    # Front Encapsulant RH
-    ###########
-
-
 
 def _diffusivity_weighted_water(
     rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
@@ -225,10 +220,6 @@ def front_encap(
     ) * 100
 
     return RHfront_series
-
-    ###########
-    # Back Encapsulant Relative Humidity
-    ###########
 
 
 def _csat(temp_module, So=1.81390702, Eas=16.729):
