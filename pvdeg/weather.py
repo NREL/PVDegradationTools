@@ -285,7 +285,7 @@ def read(file_in, file_type, map_variables=True, find_meta=True, **kwargs):
     elif file_type == "CSV":
         weather_df, meta = csv_read(filename=file_in)
     else:
-        print(f"File-Type not recognized. supported types:\n{supported}")
+        print(f"File-Type not recognized. supported types: \n{supported}")
 
     if not isinstance(meta, dict):
         meta = meta.to_dict()
