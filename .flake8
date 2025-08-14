@@ -18,4 +18,4 @@ exclude =
     .git
     .venv
     build
-    tutorials_and_tools
+    tutorials_and_tools\tutorials_and_tools
