@@ -115,3 +115,8 @@ def test_calc_kwarg_timeseries_bad_mismatch_lengths():
                 ),
             },
         )
+
+
+def test_calc_kwarg_timeseries_no_index():
+    v1, v2 = sp.symbols("v1 v2")
+    expr = v1 * v2

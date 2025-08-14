@@ -1,6 +1,12 @@
 """Collection of classes and functions for geospatial analysis."""
 
-from pvdeg import utilities
+from pvdeg import (
+    standards,
+    humidity,
+    letid,
+    utilities,
+    decorators,
+)
 
 import xarray as xr
 import dask.array as da
@@ -77,7 +83,7 @@ def start_dask(hpc=None):
 
     client = Client(cluster)
     print("Dashboard:", client.dashboard_link)
-    # client.wait_for_workers(n_workers=1)
+    client.wait_for_workers(n_workers=1)
 
     return client
 
@@ -968,7 +974,10 @@ def elevation_stochastic_downselect(
 
 
 def interpolate_analysis(
-    result: xr.Dataset, data_var: str, method="nearest", resolution=100j
+    result: xr.Dataset,
+    data_var: str,
+    method="nearest",
+    resolution=100j,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Interpolate sparse spatial result data against DataArray coordinates.
 
@@ -995,8 +1004,8 @@ def interpolate_analysis(
     )  # probably a nicer way to do this
 
     grid_lat, grid_lon = np.mgrid[
-        df["latitude"].min(): df["latitude"].max(): resolution,
-        df["longitude"].min(): df["longitude"].max(): resolution,
+        df["latitude"].min() : df["latitude"].max() : resolution,
+        df["longitude"].min() : df["longitude"].max() : resolution,
     ]
 
     grid_z = griddata(data[:, 0:2], data[:, 2], xi=(grid_lat, grid_lon), method=method)
@@ -1023,6 +1032,7 @@ def plot_sparse_analysis(
             [0, 0, 1, 1], projection=ccrs.LambertConformal(), frameon=False
         )
         ax.patch.set_visible(False)
+
         show = True
     else:
         fig = None

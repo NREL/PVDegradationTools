@@ -47,6 +47,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# pvdeg scenario output files generated during testing
+tests/pvd_*
+
 # Translations
 *.mo
 *.pot
@@ -105,3 +108,7 @@ TEMP/
 
 # Slurm log files
 slurm-*.out
+
+# Run information
+tests\data\h5_pytest.h5
+tests/TEMP_test_addModule_materials.py

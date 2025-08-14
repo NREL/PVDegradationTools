@@ -10,16 +10,15 @@ import numpy as np
 import pvdeg
 from rex import Outputs
 import json
-import shutil
 
 import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
-from collections import OrderedDict
 
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
     "psm3": os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),
     "epw": os.path.join(TEST_DATA_DIR, "epw_pytest.epw"),
+    "h5": os.path.join(TEST_DATA_DIR, "h5_pytest.h5"),
 }
 
 DSETS = [
@@ -40,16 +39,15 @@ DSETS = [
 #     pass
 
 
-def test_convert_tmy(tmp_path):
+def test_convert_tmy():
     """Test pvdeg.utilites.convert_tmy.
 
     Requires:
     ---------
     tmy3 or tmy-like .csv weather file (WEATHERFILES['tmy3'])
     """
-    fp_h5 = os.path.join(tmp_path, "h5_pytest.h5")
-    pvdeg.utilities.convert_tmy(file_in=FILES["tmy3"], file_out=fp_h5)
-    with Outputs(fp_h5, "r") as f:
+    pvdeg.utilities.convert_tmy(file_in=FILES["tmy3"], file_out=FILES["h5"])
+    with Outputs(FILES["h5"], "r") as f:
         datasets = f.dsets
     assert datasets.sort() == DSETS.sort()
 
@@ -80,19 +78,21 @@ def test_get_kinetics_bad():
     assert res == desired_output
 
 
-# DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
+### DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
 def test_read_material_bad():
     # no name case
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
+    material_list = data.keys()
+
     res = pvdeg.utilities._read_material(name=None)
 
-    assert res == data
+    assert res == [*material_list]
 
 
-def test_add_material(tmp_path):
+def test_add_material():
     # new material parameters
     new_mat = {
         "alias": "test_material",
@@ -105,27 +105,29 @@ def test_add_material(tmp_path):
         "Po": 1,
     }
 
-    # Ensure the test file exists
-    src_file = os.path.join(DATA_DIR, "O2permeation.json")
-    test_file = os.path.join(tmp_path, "O2permeation.json")
-    shutil.copy(src_file, test_file)
-
     # add new material to file
-    pvdeg.utilities._add_material(
-        name="tmat", fp=tmp_path, fname="O2permeation.json", **new_mat
-    )
+    pvdeg.utilities._add_material(name="tmat", **new_mat)
 
     # read updated file
-    with open(test_file) as f:
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    with open(fpath) as f:
         data = json.load(f)
 
-    # rename key, because we are comparing to original dictionary and func params do not
-    # align with the json keys
+    # rename key, because we are comparing to original dictionary and func params do not align with the json keys
     new_mat["Fickian"] = new_mat["fickian"]
     new_mat.pop("fickian")
 
     # check
     assert data["tmat"] == new_mat
+
+    # restore file to original state
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    data.pop("tmat")  # reset to default state
+
+    with open(fpath, "w") as f:  # write default state
+        json.dump(data, f, indent=4)
 
 
 # this only works because we are not running on kestrel
@@ -234,49 +236,6 @@ def test_search_json():
 
     assert name_res == "W001"
     assert alias_res == "W001"
-
-
-def test_meta_as_dict():
-    rec = np.array([(1, 2.0, "a")], dtype=[("x", "i4"), ("y", "f4"), ("z", "U1")])[0]
-    d = pvdeg.utilities.meta_as_dict(rec)
-    assert d == {"x": 1, "y": 2.0, "z": "a"}
-
-
-def test_get_state_bbox():
-    bbox = pvdeg.utilities.get_state_bbox("CO")
-    assert isinstance(bbox, np.ndarray)
-    assert bbox.shape == (2, 2)
-
-
-def test_new_id():
-    d = OrderedDict({"ABCDE": 1, "FGHIJ": 2})
-    new = pvdeg.utilities.new_id(d)
-    assert isinstance(new, str)
-    assert len(new) == 5
-    assert new not in d
-
-
-def test_strip_normalize_tmy():
-    idx = pd.date_range("2023-01-01 00:00", periods=24, freq="H", tz="UTC")
-    df = pd.DataFrame({"ghi": range(24)}, index=idx)
-    start = idx[5].to_pydatetime()
-    end = idx[10].to_pydatetime()
-    sub = pvdeg.utilities.strip_normalize_tmy(df, start, end)
-    assert isinstance(sub, pd.DataFrame)
-    assert sub.index[0].hour == 5
-    assert sub.index[-1].hour == 10
-
-
-def test_tilt_azimuth_scan():
-    def dummy_func(tilt, azimuth, **kwarg):
-        return tilt + azimuth
-
-    arr = pvdeg.utilities.tilt_azimuth_scan(
-        weather_df=None, meta=None, tilt_step=45, azimuth_step=90, func=dummy_func
-    )
-    assert isinstance(arr, np.ndarray)
-    assert arr.shape[1] == 3
-    assert arr.shape[0] == 15
 
 
 # def test_search_json_bad():

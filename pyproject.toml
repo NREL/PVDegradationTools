@@ -37,7 +37,6 @@ dependencies = [
     "dask[dataframe]",
     "dask-jobqueue",
     "bokeh",
-    "geopy",
     "h5netcdf",
     "h5py",
     "jupyterlab",

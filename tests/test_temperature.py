@@ -109,8 +109,7 @@ def test_temperature():
         wind_factor=0,
     )
 
-    # pvsyst_parameters =
-    # pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['pvsyst']['freestanding']
+    # pvsyst_parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS['pvsyst']['freestanding']
     pvlib_df["pvsyst_cell"] = pvlib.temperature.pvsyst_cell(
         **weather_args,
     )
@@ -227,7 +226,7 @@ def test_temperature():
         check_like=False,
     )
 
-    # check pvdeg.temperature.temperature results against pvlib calculated results
+    # check pvdeg.temperature.temperature results against pvlib directly calculated results
     pd.testing.assert_frame_equal(
         result_df, pvlib_df, check_dtype=False, check_names=False, check_like=False
     )

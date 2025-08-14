@@ -138,8 +138,6 @@ def test_weather_distributed_client_bad_database(capsys):
 
 
 def test_weather_distributed_pvgis():
-    pvdeg.geospatial.start_dask()
-
     weather, meta, failed_gids = pvdeg.weather.weather_distributed(
         database="PVGIS",
         coords=[
@@ -149,18 +147,7 @@ def test_weather_distributed_pvgis():
     )
 
     assert DISTRIBUTED_PVGIS_WEATHER.equals(weather)
-
-    # Strict comparison - must have common columns to pass
-    expected_meta = DISTRIBUTED_PVGIS_META
-    common_cols = list(set(meta.columns) & set(expected_meta.columns))
-
-    assert (
-        len(common_cols) > 0
-    ), f"No common columns. Actual: {list(meta.columns)}, expected: {list(expected_meta.columns)}"  # noqa
-
-    # Compare the common columns
-    pd.testing.assert_frame_equal(meta[common_cols], expected_meta[common_cols])
-
+    assert DISTRIBUTED_PVGIS_META.equals(meta)
     assert failed_gids == []
 
 
@@ -182,7 +169,7 @@ def test_map_meta_dict():
         "Time Zone": "UTC-7",
         "Longitude": -120.5,
         "Latitude": 38.5,
-        "SomeKey": "value",
+        "SomeKey": "value"
     }
     mapped = map_meta(meta)
     assert "altitude" in mapped and mapped["altitude"] == 150
@@ -193,15 +180,13 @@ def test_map_meta_dict():
 
 
 def test_map_meta_dataframe():
-    df = pd.DataFrame(
-        {
-            "Elevation": [100, 200],
-            "Time Zone": ["UTC-5", "UTC-6"],
-            "Longitude": [-80, -81],
-            "Latitude": [35, 36],
-            "ExtraCol": [1, 2],
-        }
-    )
+    df = pd.DataFrame({
+        "Elevation": [100, 200],
+        "Time Zone": ["UTC-5", "UTC-6"],
+        "Longitude": [-80, -81],
+        "Latitude": [35, 36],
+        "ExtraCol": [1, 2]
+    })
     mapped_df = map_meta(df)
     assert "altitude" in mapped_df.columns
     assert "tz" in mapped_df.columns
