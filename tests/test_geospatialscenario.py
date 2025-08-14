@@ -192,9 +192,7 @@ def test_downselect_CONUS(monkeypatch):
     ak_hi_df = pd.DataFrame(
         data=[
             [-99, -99, -1, "+100", "United States", "Alaska", "filler", 2],
-            [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2],
-            [-99, -99, -1, "+100", "United States", "Alaska", "filler", 2],
-            [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2],
+            [-99, -99, -1, "+100", "United States", "Hawaii", "filler", 2]
         ],
         columns=[
             "latitude",
