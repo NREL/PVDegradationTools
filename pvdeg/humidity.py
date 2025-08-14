@@ -297,7 +297,8 @@ def Ce(
 
     This calculation uses a quasi-steady state approximation of the diffusion equation
     to calculate the concentration of water in the encapsulant. For this, it is assumed
-    that the diffusion in the encapsulant is much larger than the diffusion in the backsheet, and it ignores the transients in the backsheet.
+    that the diffusion in the encapsulant is much larger than the diffusion in the
+    backsheet, and it ignores the transients in the backsheet.
 
     Numba was used to isolate recursion requiring a for loop
     Numba Functions are very fast because they compile and run in machine code but can
