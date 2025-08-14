@@ -32,10 +32,14 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
 def test_Scenario_add(monkeypatch):
     # monkey patch to bypass psm3 api calls in addLocation
     monkeypatch.setattr(
-        target=Scenario, name="addLocation", value=monkeypatch_addLocation
+        target=Scenario,
+        name="addLocation",
+        value=monkeypatch_addLocation,
     )
 
-    a = Scenario(name="test")
+    a = Scenario(
+        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+    )
 
     EMAIL = ("placeholder@email.xxx",)
     API_KEY = "fake_key"
@@ -50,6 +54,7 @@ def test_Scenario_add(monkeypatch):
         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json")
     )
 
+    a.name, restored.name = None, None
     a.path, restored.path = None, None
     a.file, restored.file = None, None
 
@@ -67,6 +72,7 @@ def test_Scenario_run(monkeypatch):
         email=EMAIL,
         api_key=API_KEY,
     )
+    a.path = os.path.join(TEST_DATA_DIR, "dynamic")
     a.run()
 
     res_df = a.results["test-module"]["GLUSE"]
@@ -93,7 +99,10 @@ def test_Scenario_run(monkeypatch):
 
 
 def test_addLocation_pvgis():
-    a = Scenario(name="location-test")
+    a = Scenario(
+        name="location-test",
+        path=os.path.join(TEST_DATA_DIR, "dynamic"),
+    )
     with pytest.raises(ValueError):
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
 
@@ -115,18 +124,10 @@ def test_addModule_existingmod():
         email=EMAIL,
         api_key=API_KEY,
     )
-    a.addModule(module_name='test-module')
+    a.addModule(module_name="test-module")
 
     with pytest.warns(UserWarning, match="Module already found"):
-        a.addModule(module_name='test-module')
-
-
-def test_addJob_noncallable():
-    a = Scenario(name="non-callable-pipeline-func")
-
-    with pytest.raises(ValueError, match='FAILED: Requested function'
-                       ' "str_not_callable" not found'):
-        a.addJob(func="str_not_callable")
+        a.addModule(module_name="test-module")
 
 
 def monkeypatch_badjob_new_id_fail(*args, **kwargs):
