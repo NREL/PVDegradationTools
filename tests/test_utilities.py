@@ -13,12 +13,13 @@ import json
 
 import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
+from collections import OrderedDict
 
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
     "psm3": os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),
     "epw": os.path.join(TEST_DATA_DIR, "epw_pytest.epw"),
-    "h5": os.path.join(TEST_DATA_DIR, "h5_pytest.h5"),
+    "h5": os.path.join(TEST_DATA_DIR, "dynamic", "h5_pytest.h5"),
 }
 
 DSETS = [
@@ -235,6 +236,49 @@ def test_search_json():
 
     assert name_res == "W001"
     assert alias_res == "W001"
+
+
+def test_meta_as_dict():
+    rec = np.array([(1, 2.0, "a")], dtype=[("x", "i4"), ("y", "f4"), ("z", "U1")])[0]
+    d = pvdeg.utilities.meta_as_dict(rec)
+    assert d == {"x": 1, "y": 2.0, "z": "a"}
+
+
+def test_get_state_bbox():
+    bbox = pvdeg.utilities.get_state_bbox("CO")
+    assert isinstance(bbox, np.ndarray)
+    assert bbox.shape == (2, 2)
+
+
+def test_new_id():
+    d = OrderedDict({"ABCDE": 1, "FGHIJ": 2})
+    new = pvdeg.utilities.new_id(d)
+    assert isinstance(new, str)
+    assert len(new) == 5
+    assert new not in d
+
+
+def test_strip_normalize_tmy():
+    idx = pd.date_range("2023-01-01 00:00", periods=24, freq="H", tz="UTC")
+    df = pd.DataFrame({"ghi": range(24)}, index=idx)
+    start = idx[5].to_pydatetime()
+    end = idx[10].to_pydatetime()
+    sub = pvdeg.utilities.strip_normalize_tmy(df, start, end)
+    assert isinstance(sub, pd.DataFrame)
+    assert sub.index[0].hour == 5
+    assert sub.index[-1].hour == 10
+
+
+def test_tilt_azimuth_scan():
+    def dummy_func(tilt, azimuth, **kwarg):
+        return tilt + azimuth
+
+    arr = pvdeg.utilities.tilt_azimuth_scan(
+        weather_df=None, meta=None, tilt_step=45, azimuth_step=90, func=dummy_func
+    )
+    assert isinstance(arr, np.ndarray)
+    assert arr.shape[1] == 3
+    assert arr.shape[0] == 15
 
 
 # def test_search_json_bad():
