@@ -15,6 +15,7 @@ Breaking Changes
   code readability and maintainability. (:issue:`198`, :pull:`199`)
 - Replace print messages for failure or succesful addition of objects (location, job...)
   with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
+- Remove deprecated `pvdeg.store` module. (:issue:`168`, :pull:`180`)
 
 Enhancements
 ------------
