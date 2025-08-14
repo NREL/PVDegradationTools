@@ -69,7 +69,7 @@ def geospatial_quick_shape(numeric_or_timeseries: str, shape_names: list[str]) -
     return decorator
 
 
-# Taken from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically #noqa
+# Taken from: https://stackoverflow.com/questions/2536307/decorators-in-the-python-standard-lib-deprecated-specifically  # noqa
 # A future Python version (after 3.13) will include the warnings.deprecated decorator
 def deprecated(reason):
     """Warn user of deprecated functions.

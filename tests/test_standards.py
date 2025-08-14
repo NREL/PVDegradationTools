@@ -111,19 +111,6 @@ def test_T98_Xmin():
         os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"), "csv"
     )
     standoff = pvdeg.standards.standoff(weather_df=WEATHER_df, meta=META)
-    standoff_1 = pvdeg.standards.standoff(
-        weather_df=WEATHER_df,
-        meta=META,
-        T98=70,
-        tilt=META["latitude"],
-        azimuth=None,
-        sky_model="isotropic",
-        temp_model="sapm",
-        conf_0="insulated_back_glass_polymer",
-        conf_inf="open_rack_glass_polymer",
-        x_0=6.5,
-        wind_factor=0.33,
-    )
     assert standoff.x[0] == pytest.approx(2.008636)
     assert standoff.T98_0[0] == pytest.approx(77.038644)
     assert standoff.T98_inf[0] == pytest.approx(50.561112)
