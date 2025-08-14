@@ -1,10 +1,6 @@
 name: pytest
 
-on:
-  push:
-    branches:
-    - development
-  pull_request:
+on: [push]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
