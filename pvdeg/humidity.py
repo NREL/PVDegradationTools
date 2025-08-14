@@ -10,42 +10,6 @@ from pvdeg import temperature, spectral, decorators, utilities
 R_GAS = 0.00831446261815324  # Gas constant in kJ/(mol·K)
 
 
-def _ambient(weather_df):
-    """Calculate ambient relative humidity from dry bulb air temperature and dew point.
-
-    references:
-    Alduchov, O. A., and R. E. Eskridge, 1996: Improved Magnus' form approximation of
-    saturation vapor pressure. J. Appl. Meteor., 35, 601–609.
-    August, E. F., 1828: Ueber die Berechnung der Expansivkraft des Wasserdunstes. Ann.
-    Phys. Chem., 13, 122–137.
-    Magnus, G., 1844: Versuche über die Spannkräfte des Wasserdampfs. Ann. Phys. Chem.,
-    61, 225–247.
-
-    Parameters:
-    -----------
-    weather_df : pd.DataFrame
-        Datetime-indexed weather dataframe which contains (at minimum) Ambient
-        temperature ('temp_air') and dew point ('temp_dew') in units [C]
-
-    Returns:
-    --------
-    weather_df : pd.DataFrame
-        identical datetime-indexed dataframe with addional column 'relative_humidity'
-        containing ambient relative humidity [%]
-    """
-    temp_air = weather_df["temp_air"]
-    # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
-    dew_point = weather_df.get("dew_point")
-
-    num = np.exp(17.625 * dew_point / (243.04 + dew_point))
-    den = np.exp(17.625 * temp_air / (243.04 + temp_air))
-    rh_ambient = 100 * num / den
-
-    weather_df["relative_humidity"] = rh_ambient
-
-    return weather_df
-
-
 # TODO: When is dew_yield used?
 @jit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
