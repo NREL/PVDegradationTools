@@ -10,6 +10,7 @@ import numpy as np
 import pvdeg
 from rex import Outputs
 import json
+import shutil
 
 import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
@@ -104,13 +105,19 @@ def test_add_material():
         "Po": 1,
     }
 
+    # Ensure the test file exists
+    fpath = os.path.join(TEST_DATA_DIR, "dynamic", "O2permeation.json")
+    if not os.path.exists(fpath):
+        os.makedirs(os.path.dirname(fpath), exist_ok=True)
+        src_file = os.path.join(DATA_DIR, "O2permeation.json")
+        shutil.copy(src_file, fpath)
+
     # add new material to file
     pvdeg.utilities._add_material(
         name="tmat", fp=TEST_DATA_DIR, fname="dynamic/O2permeation.json", **new_mat
     )
 
     # read updated file
-    fpath = os.path.join(TEST_DATA_DIR, "dynamic", "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
 
@@ -123,7 +130,6 @@ def test_add_material():
     assert data["tmat"] == new_mat
 
     # restore file to original state
-    fpath = os.path.join(TEST_DATA_DIR, "dynamic", "O2permeation.json")
     with open(fpath) as f:
         data = json.load(f)
     data.pop("tmat")  # reset to default state
