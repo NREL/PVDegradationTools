@@ -85,7 +85,13 @@ ENTRIES_PERIODICITY_MAP = {
 }
 
 
-def get(database: str, id=None, geospatial=False, find_meta: bool = None, **kwargs):
+def get(
+    database: str,
+    id: int | tuple = None,
+    geospatial: bool = False,
+    find_meta: bool = False,
+    **kwargs,
+):
     """
     Load weather data directly from  NSRDB or through any other PVLIB i/o
     tools function.
@@ -100,11 +106,12 @@ def get(database: str, id=None, geospatial=False, find_meta: bool = None, **kwar
     geospatial : (bool)
         If True, initialize weather data via xarray dataset and meta data via
         dask dataframe. This is useful for large scale geospatial analyses on
-        distributed compute systems. Geospaital analyses are only supported for
+        distributed compute systems. Geospatial analyses are only supported for
         NSRDB data and locally stored h5 files that follow pvlib conventions.
     find_meta : (bool)
-        if true, this instructs the code to look up additional meta data.
-        The default is True if geospatial is False.
+        If true, this instructs the code to look up additional meta data.
+        This only works for single locations and not for distributed data download or
+        geospatial analysis. The default is False.
     **kwargs :
         Additional keyword arguments to pass to the get_weather function
         (see pvlib.iotools.get_psm3 for NSRDB)
@@ -184,8 +191,6 @@ def get(database: str, id=None, geospatial=False, find_meta: bool = None, **kwar
             )
 
     if not geospatial:
-        if find_meta is None:
-            find_meta = True
         if database == "NSRDB":
             weather_df, meta = get_NSRDB(gid=gid, location=location, **kwargs)
         elif database == "PVGIS":
@@ -834,7 +839,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01":],
+                        this_year[str(year) + "-03-01" :],
                     ]
                 )
                 new_time_series = this_year
@@ -866,7 +871,7 @@ def repeat_annual_time_series(time_series, start_year, n_years):
                             ),
                             columns=time_series.columns,
                         ),
-                        this_year[str(year) + "-03-01":],
+                        this_year[str(year) + "-03-01" :],
                     ]
                 )
                 new_time_series = pd.concat([new_time_series, this_year])
