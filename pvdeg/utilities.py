@@ -1219,8 +1219,7 @@ def nrel_kestrel_check():
     if kestrel_hostname != device_domain:
         raise ConnectionError(
             f"""
-            connected to {device_domain}
-            not a node of {kestrel_hostname}")
+            connected to {device_domain} not a node of {kestrel_hostname}")
             """
         )
 
@@ -1425,7 +1424,7 @@ def display_json(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                f"{pvdeg_file} does not exist in pvdeg/data. Options are "
+                f"{pvdeg_file} is not in pvdeg/data. Options are "
                 f"{pvdeg_datafiles.keys()}"
             )
 
@@ -1490,8 +1489,8 @@ def search_json(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                rf"{pvdeg_file} does not exist in pvdeg/data. Options are \
-                    {pvdeg_datafiles.keys()}"
+                rf"{pvdeg_file} is not exist in pvdeg/data. Options are:"
+                " {pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r") as file:
@@ -1545,8 +1544,8 @@ def read_material(
             fp = pvdeg_datafiles[pvdeg_file]
         except KeyError:
             raise KeyError(
-                f"{pvdeg_file} does not exist in pvdeg/data. Options are\
-                {pvdeg_datafiles.keys()}"
+                f"{pvdeg_file} is not in pvdeg/data. Options are:"
+                " {pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r") as file:
