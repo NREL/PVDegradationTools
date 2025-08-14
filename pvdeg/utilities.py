@@ -563,6 +563,7 @@ def _add_material(
     Eap=None,
     Po=None,
     fickian=True,
+    fp=DATA_DIR,
     fname="O2permeation.json",
 ):
     """Add a new material to the materials.json database.
@@ -592,12 +593,16 @@ def _add_material(
         Permeability Prefactor [g*mm/m^2/day] (unused)
     fickian : (boolean)
         I have no idea what this means (unused)
+    fp : (str)
+        file path to the materials.json file
+    fname : (str)
+        name of the materials.json file
     """
     # TODO: test then delete commented code
     # root = os.path.realpath(__file__)
     # root = root.split(r'/')[:-1]
     # OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
-    fpath = os.path.join(DATA_DIR, fname)
+    fpath = os.path.join(fp, fname)
 
     material_dict = {
         "alias": alias,
