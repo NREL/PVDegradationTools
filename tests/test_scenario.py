@@ -38,9 +38,10 @@ def test_Scenario_add(monkeypatch, tmp_path):
         value=monkeypatch_addLocation,
     )
 
-    a = Scenario(name="test")
+    a = Scenario(path=tmp_path)
 
     EMAIL = "placeholder@email.xxx"
+
     API_KEY = "fake_key"
 
     a.clean()
@@ -60,7 +61,6 @@ def test_Scenario_add(monkeypatch, tmp_path):
     assert a.name == restored.name
     assert len(a.modules) == len(restored.modules)
     assert len(a.pipeline) == len(restored.pipeline)
-
 
 def test_Scenario_run(monkeypatch, tmp_path):
     # monkey patch to bypass psm3 api calls in addLocation called by load_json
@@ -88,6 +88,17 @@ def test_Scenario_run(monkeypatch, tmp_path):
     pd.testing.assert_frame_equal(res_df, known_df, check_dtype=False)
 
 
+# def test_clean():
+#     a = Scenario(name='clean-a')
+#     a.file = 'non-existent-file.json'
+#     with pytest.raises(FileNotFoundError):
+#         a.clean()
+
+#     b = Scenario(name='clean-b')
+#     with pytest.raises(ValueError):
+#         b.clean()
+
+
 def test_addLocation_pvgis(tmp_path):
     a = Scenario(
         name="location-test",
@@ -97,7 +108,12 @@ def test_addLocation_pvgis(tmp_path):
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
 
 
-def test_addModule_badkey():
+def test_addModule_badmat(capsys, monkeypatch):
+    ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
+    monkeypatch.setattr(
+        target=Scenario, name="addLocation", value=monkeypatch_addLocation
+    )
+
     a = Scenario.load_json(
         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
         email=EMAIL,
@@ -354,3 +370,4 @@ def test_add_material_mixed_valid_invalid():
 
     with pytest.raises(ValueError, match="material_name is required for layer 'invalid_layer'"):
         scenario.add_material(materials_dict)
+
