@@ -6,6 +6,9 @@ from numba import jit
 
 from pvdeg import temperature, spectral, decorators, utilities
 
+# Constants
+R_GAS = 0.00831446261815324  # Gas constant in kJ/(mol·K)
+
 
 def _ambient(weather_df):
     """Calculate ambient relative humidity from dry bulb air temperature and dew point.
@@ -195,9 +198,9 @@ def _diffusivity_numerator(
     # Generate a series of the numerator values "prior to summation"
     diff_numerator = (
         So
-        * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15))))
+        * np.exp(-(Eas / (R_GAS * (temp_module + 273.15))))
         * rh_surface
-        * np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
+        * np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
     )
 
     return diff_numerator
@@ -227,7 +230,7 @@ def _diffusivity_denominator(temp_module, Ead=38.14):
     diff_denominator : pandas series (float)
         Denominator of the diffuse_water equation prior to summation
     """
-    diff_denominator = np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
+    diff_denominator = np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
     return diff_denominator
 
 
@@ -323,7 +326,7 @@ def front_encap(
 
     RHfront_series = (
         diffuse_water
-        / (So * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15)))))
+        / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
     return RHfront_series
@@ -357,7 +360,7 @@ def _csat(temp_module, So=1.81390702, Eas=16.729):
         Saturation of Water Concentration [g/cm³]
     """
     # Saturation of water concentration
-    Csat = So * np.exp(-(Eas / (0.00831446261815324 * (273.15 + temp_module))))
+    Csat = So * np.exp(-(Eas / (R_GAS * (273.15 + temp_module))))
 
     return Csat
 
@@ -408,8 +411,7 @@ def Ce(
 
     This calculation uses a quasi-steady state approximation of the diffusion equation
     to calculate the concentration of water in the encapsulant. For this, it is assumed
-    that the diffusion in the encapsulant is much larger than the diffusion in the
-backsheet, and it ignores the transients in the backsheet.
+    that the diffusion in the encapsulant is much larger than the diffusion in the backsheet, and it ignores the transients in the backsheet.
 
     Numba was used to isolate recursion requiring a for loop
     Numba Functions are very fast because they compile and run in machine code but can
@@ -504,9 +506,9 @@ backsheet, and it ignores the transients in the backsheet.
                 back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / t
-    EaWVTR = Ea_p_b / 0.00831446261815324
+    EaWVTR = Ea_p_b / R_GAS
     So = So_e * back_encap_thickness / 10
-    Eas = Ea_s_e / 0.00831446261815324
+    Eas = Ea_s_e / R_GAS
     # Ce is the initial start of concentration of water
     if start is None:
         Ce_start = (
@@ -640,20 +642,20 @@ def Ce_numba(
                 / 100
                 / 24
                 * np.exp(
-                    -((EaWVTR) / (0.00831446261815324 * (temp_module[i] + 273.15)))
+                    -((EaWVTR) / (R_GAS * (temp_module[i] + 273.15)))
                 )
             )
             / (
                 So
                 * back_encap_thickness
                 / 10
-                * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
+                * np.exp(-((Eas) / (R_GAS * (temp_module[i] + 273.15))))
             )
             * (
                 rh_surface[i]
                 / 100
                 * So
-                * np.exp(-((Eas) / (0.00831446261815324 * (temp_module[i] + 273.15))))
+                * np.exp(-((Eas) / (R_GAS * (temp_module[i] + 273.15))))
                 - Ce
             )
         )
