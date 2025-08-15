@@ -183,9 +183,9 @@ def front_encap(
     Parameters
     ----------
     rh_ambient : series (float)
-        ambient Relative Humidity [%]
+        Ambient outdoor relative humidity. [%] Example: 50 = 50%, NOT .5 = 50%
     temp_ambient : series (float)
-        ambient outdoor temperature [°C]
+        Ambient outdoor temperature [°C]
     temp_module : pandas series (float)
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
