@@ -610,8 +610,6 @@ def back_encap(
         Eas=Eas,
     )
 
-    # RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) /
-    #                   (0.00831446261815324 * (temp_module + 273.15))  )) ))
     RHback_series = 100 * (Ce_nparray / Csat)
 
     return RHback_series
