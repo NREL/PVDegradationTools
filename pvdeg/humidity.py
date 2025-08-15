@@ -148,7 +148,7 @@ def front_encap(
     rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
     encapsulant="W001"
 ):
-    """Return a diffusivity weighted average Relative Humidity of the module surface.
+    """Calculate diffusivity weighted average Relative Humidity of the module surface.
 
     Parameters
     ----------
@@ -175,7 +175,7 @@ def front_encap(
     Return
     ------
     RHfront_series : pandas series (float)
-        Relative Humidity of Frontside Solar module Encapsulant [%]
+        Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
