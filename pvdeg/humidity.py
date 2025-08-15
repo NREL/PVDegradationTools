@@ -719,6 +719,7 @@ def module(
     back_encap_thickness=0.5,
     Eas=16.729,
     wind_factor=0.33,
+    Ead=38.14
 ):
     """Calculate the Relative Humidity of solar module backsheet from timeseries data.
 
@@ -805,6 +806,7 @@ def module(
         temp_module=temp_module,
         So=So,
         Eas=Eas,
+        Ead=Ead
     )
 
     rh_back_encap = back_encap(
