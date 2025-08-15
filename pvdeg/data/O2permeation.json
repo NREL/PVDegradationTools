@@ -8,12 +8,12 @@
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 30.48,
-        "Do": 0.0001421,
-        "Eas": -0.0272266,
-        "So": 0.0003594,
-        "Eap": 30.2107,
-        "Po": 441.26
+        "Ead": { "units": "", "value": 30.48, "stdev": "" },
+        "Do": { "units": "", "value": 0.0001421, "stdev": "" },
+        "Eas": { "units": "", "value": -0.0272266, "stdev": "" },
+        "So": { "units": "", "value": 0.0003594, "stdev": "" },
+        "Eap": { "units": "", "value": 30.2107, "stdev": "" },
+        "Po": { "units": "", "value": 441.26, "stdev": "" }
     },
     "OX002": {
         "name": "ST504",
@@ -21,12 +21,12 @@
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 47.603,
-        "Do": 0.554153,
-        "Eas": -11.5918,
-        "So": 9.554366e-07,
-        "Eap": 34.2011,
-        "Po": 2128.8937
+        "Ead": { "units": "", "value": 47.603, "stdev": "" },
+        "Do": { "units": "", "value": 0.554153, "stdev": "" },
+        "Eas": { "units": "", "value": -11.5918, "stdev": "" },
+        "So": { "units": "", "value": 9.554366e-07, "stdev": "" },
+        "Eap": { "units": "", "value": 34.2011, "stdev": "" },
+        "Po": { "units": "", "value": 2128.8937, "stdev": "" }
     },
     "OX003": {
         "name": "EVA",
@@ -34,12 +34,12 @@
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 29.43112031,
-        "Do": 0.129061678,
-        "Eas": 16.6314948252219,
-        "So": 0.136034525059804,
-        "Eap": 49.1083457348515,
-        "Po": 528718258.338532
+        "Ead": { "units": "", "value": 29.43112031, "stdev": "" },
+        "Do": { "units": "", "value": 0.129061678, "stdev": "" },
+        "Eas": { "units": "", "value": 16.6314948252219, "stdev": "" },
+        "So": { "units": "", "value": 0.136034525059804, "stdev": "" },
+        "Eap": { "units": "", "value": 49.1083457348515, "stdev": "" },
+        "Po": { "units": "", "value": 528718258.338532, "stdev": "" }
     },
     "OX004": {
         "name": "AAA polyamide backsheet",
@@ -48,12 +48,12 @@
         "source": "unpublished measurements",
         "comment": "This is the trilayer polyamide backsheet that saw cracking in the field after 3 or 4 years of exposure",
         "Fickian": true,
-        "Ead": 37.41778528,
-        "Do": 24.10839436,
-        "Eas": -0.947566422,
-        "So": 7.81445e-06,
-        "Eap": 36.47021886,
-        "Po": 1627722.989
+        "Ead": { "units": "", "value": 37.41778528, "stdev": "" },
+        "Do": { "units": "", "value": 24.10839436, "stdev": "" },
+        "Eas": { "units": "", "value": -0.947566422, "stdev": "" },
+        "So": { "units": "", "value": 7.81445e-06, "stdev": "" },
+        "Eap": { "units": "", "value": 36.47021886, "stdev": "" },
+        "Po": { "units": "", "value": 1627722.989, "stdev": "" }
     },
     "OX005": {
         "name": "Helioseal_101_dry",
@@ -62,12 +62,12 @@
         "comment": "This measurement is from a fresh film with active desiccant.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 45.01267147,
-        "Do": 3.370970011,
-        "Eas": -3.528965263,
-        "So": 5.25558996546881e-05,
-        "Eap": 41.48370621,
-        "Po": 1530700.085
+        "Ead": { "units": "", "value": 45.01267147, "stdev": "" },
+        "Do": { "units": "", "value": 3.370970011, "stdev": "" },
+        "Eas": { "units": "", "value": -3.528965263, "stdev": "" },
+        "So": { "units": "", "value": 5.25558996546881e-05, "stdev": "" },
+        "Eap": { "units": "", "value": 41.48370621, "stdev": "" },
+        "Po": { "units": "", "value": 1530700.085, "stdev": "" }
     },
     "OX006": {
         "name": "Helioseal_101_wet",
@@ -76,12 +76,12 @@
         "comment": "This measurement is after saturation with water.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 50.75602972,
-        "Do": 37.24247609,
-        "Eas": -5.398392306,
-        "So": 1.58555e-05,
-        "Eap": 45.35763741,
-        "Po": 5101898.064
+        "Ead": { "units": "", "value": 50.75602972, "stdev": "" },
+        "Do": { "units": "", "value": 37.24247609, "stdev": "" },
+        "Eas": { "units": "", "value": -5.398392306, "stdev": "" },
+        "So": { "units": "", "value": 1.58555e-05, "stdev": "" },
+        "Eap": { "units": "", "value": 45.35763741, "stdev": "" },
+        "Po": { "units": "", "value": 5101898.064, "stdev": "" }
     },
     "OX007": {
         "name": "LPO3_dry",
@@ -90,12 +90,12 @@
         "comment": "This measurement is from a fresh film with active desiccant.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 40.99859372,
-        "Do": 0.690368586,
-        "Eas": 3.507719187,
-        "So": 0.000543049,
-        "Eap": 44.5738773,
-        "Po": 3287750.401
+        "Ead": { "units": "", "value": 40.99859372, "stdev": "" },
+        "Do": { "units": "", "value": 0.690368586, "stdev": "" },
+        "Eas": { "units": "", "value": 3.507719187, "stdev": "" },
+        "So": { "units": "", "value": 0.000543049, "stdev": "" },
+        "Eap": { "units": "", "value": 44.5738773, "stdev": "" },
+        "Po": { "units": "", "value": 3287750.401, "stdev": "" }
     },
     "OX008": {
         "name": "LPO3_wet",
@@ -104,12 +104,12 @@
         "comment": "This measurement is after saturation with water.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 48.73189239,
-        "Do": 10.50219391,
-        "Eas": -2.129673846,
-        "So": 9.19588e-05,
-        "Eap": 46.60221855,
-        "Po": 8344245.628
+        "Ead": { "units": "", "value": 48.73189239, "stdev": "" },
+        "Do": { "units": "", "value": 10.50219391, "stdev": "" },
+        "Eas": { "units": "", "value": -2.129673846, "stdev": "" },
+        "So": { "units": "", "value": 9.19588e-05, "stdev": "" },
+        "Eap": { "units": "", "value": 46.60221855, "stdev": "" },
+        "Po": { "units": "", "value": 8344245.628, "stdev": "" }
     },
     "OX009": {
         "name": "Nagase_dry",
@@ -118,12 +118,12 @@
         "comment": "This measurement is from a fresh film with active desiccant.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 47.53715467,
-        "Do": 11.22649621,
-        "Eas": 2.574465974,
-        "So": 0.000433787,
-        "Eap": 50.11162064,
-        "Po": 42076035.42
+        "Ead": { "units": "", "value": 47.53715467, "stdev": "" },
+        "Do": { "units": "", "value": 11.22649621, "stdev": "" },
+        "Eas": { "units": "", "value": 2.574465974, "stdev": "" },
+        "So": { "units": "", "value": 0.000433787, "stdev": "" },
+        "Eap": { "units": "", "value": 50.11162064, "stdev": "" },
+        "Po": { "units": "", "value": 42076035.42, "stdev": "" }
     },
     "OX010": {
         "name": "Nagase_wet",
@@ -132,12 +132,12 @@
         "comment": "This measurement is after saturation with water.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": 42.09928821,
-        "Do": 0.973239619,
-        "Eas": 3.706124657,
-        "So": 0.001037698,
-        "Eap": 45.80541287,
-        "Po": 8725784.224
+        "Ead": { "units": "", "value": 42.09928821, "stdev": "" },
+        "Do": { "units": "", "value": 0.973239619, "stdev": "" },
+        "Eas": { "units": "", "value": 3.706124657, "stdev": "" },
+        "So": { "units": "", "value": 0.001037698, "stdev": "" },
+        "Eap": { "units": "", "value": 45.80541287, "stdev": "" },
+        "Po": { "units": "", "value": 8725784.224, "stdev": "" }
     },
     "OX011": {
         "name": "Oppanol_B_200",
@@ -145,12 +145,12 @@
         "Source": "G. J. Van Amerongen, The Permeability of Different Rubbers to Gases and Its Relation to Diffusivity and Solubility, Journal of Applied Physics 17, 972 (1946); https://doi.org/10.1063/1.1707667",
         "alias": "PIB-lit",
         "Fickian": true,
-        "Ead": 45.18908901,
-        "Do": 7.3,
-        "Eas": -0.418217328,
-        "So": 0.000129043,
-        "Eap": 44.77087169,
-        "Po": 8138979.958
+        "Ead": { "units": "", "value": 45.18908901, "stdev": "" },
+        "Do": { "units": "", "value": 7.3, "stdev": "" },
+        "Eas": { "units": "", "value": -0.418217328, "stdev": "" },
+        "So": { "units": "", "value": 0.000129043, "stdev": "" },
+        "Eap": { "units": "", "value": 44.77087169, "stdev": "" },
+        "Po": { "units": "", "value": 8138979.958, "stdev": "" }
     },
     "OX012": {
         "name": "EVA",
@@ -158,8 +158,8 @@
         "contributor": "Michael Kempe",
         "source": "Urban Weber, Ralf Eiden, Christine Strubel, Thorsten Soegding, Markus Heiss, Peter Zachmann, Kurt Nattermann, Harry Engelmann, Annelene Dethlefsen, Norbert Lenck, Acetic Acid Production, Migration and Corrosion Effects in Ethylene-Vinyl-Acetate-(EVA-)Based PV Modules, 27th European Photovoltaic Solar Energy Conference and Exhibition.",
         "comment": "Extracted from Figure 10 of Weber et al. The activation energy does not exactly match that in the published work (25.4 kJ/mol). I did this because I wanted to include the prefactor.",
-        "Ead": 28.1814557950317,
-        "Do": 0.0331146659105106
+        "Ead": { "units": "", "value": 28.1814557950317, "stdev": "" },
+        "Do": { "units": "", "value": 0.0331146659105106, "stdev": "" }
     },
     "OX013": {
         "name": "polyolefin elastomer (POE)",
@@ -168,11 +168,11 @@
         "source": "unpublished measurements",
         "comment": "This is a NREL laboratory formulation made similar to a typical EVA but using Dow Chemical Engage 8100, a poly ethylene octene copolymer, as the base resin.",
         "Fickian": true,
-        "Ead": 32.9383902685319,
-        "Do": 1.00914093168826,
-        "Eas": 6.33958717324394,
-        "So": 0.00148313008211379,
-        "Eap": 39.2779774417758,
-        "Po": 12931378.0376762
+        "Ead": { "units": "", "value": 32.9383902685319, "stdev": "" },
+        "Do": { "units": "", "value": 1.00914093168826, "stdev": "" },
+        "Eas": { "units": "", "value": 6.33958717324394, "stdev": "" },
+        "So": { "units": "", "value": 0.00148313008211379, "stdev": "" },
+        "Eap": { "units": "", "value": 39.2779774417758, "stdev": "" },
+        "Po": { "units": "", "value": 12931378.0376762, "stdev": "" }
     }
 }
