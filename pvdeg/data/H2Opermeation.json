@@ -1,7 +1,7 @@
 {
     "W000": {
 	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm^2/s]. So is in [g/cm^3/atm]. Po is in[g*mm/m^2/day/atm]. t is in [mm]."
-    },	
+    },
     "W001": {
 		"name": "Ethylene Vinyl Acetate",
 		"alias": "EVA",
