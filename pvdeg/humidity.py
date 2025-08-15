@@ -175,7 +175,8 @@ def _diffusivity_weighted_water(
 
 
 def front_encap(
-    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant="W001"
+    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
+    encapsulant="W001"
 ):
     """Return a diffusivity weighted average Relative Humidity of the module surface.
 
@@ -195,21 +196,24 @@ def front_encap(
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729(kJ/mol) is the suggested value for EVA.
+    Ead : float
+        Encapsulant diffusivity activation energy in [kJ/mol]
+        Ead = 38.14(kJ/mol) is the suggested value for EVA.
+    encapsulant : str
+        This is the code number for the encapsulant. The default is EVA 'W001'.
 
     Return
     ------
     RHfront_series : pandas series (float)
         Relative Humidity of Frontside Solar module Encapsulant [%]
     """
-
-    if So is None or Eas is None:
+    if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]
-
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+        Ead = utilities._read_material(
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
     diffuse_water = _diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
