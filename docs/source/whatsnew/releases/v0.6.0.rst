@@ -16,6 +16,23 @@ Breaking Changes
 - Replace print messages for failure or succesful addition of objects (location, job...)
   with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
 - Remove deprecated `pvdeg.store` module. (:issue:`168`, :pull:`180`)
+- Refactored and cleaned up `:py:mod:pvdeg.humiditiy` by removing unused functions,
+  improving docstrings, and standardizing physical constants. Full details are as
+  follows:
+    - Remove unused helper function `_ambient()`
+    - Remove `_diffusivity_numerator()` and `_diffusivity_denominator()` helper
+      functionsby refactoring them into `_diffusivity_weighted_water()`
+    - Remove legacy comments and commented out code
+    - Clean and streamlined docstrings, for example removing redundant docstring from
+      helper functions
+    - Improve function docstrings
+    - Introduce a module level constant `R_GAS` for the universal gas constant and
+      replaced all hardcoded instances of the gas constant (0.00831446261815324) with
+      `R_GAS`
+    - Add `Ead` argument to `front_encap`
+    - Improve argument handling in `front_encap` to include check for presence of `Ead`
+  (:issue:`202`, :pull:`212`)
+
 
 Enhancements
 ------------
