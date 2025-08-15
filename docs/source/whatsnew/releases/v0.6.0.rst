@@ -29,7 +29,8 @@ Breaking Changes
     - Introduce a module level constant `R_GAS` for the universal gas constant and
       replaced all hardcoded instances of the gas constant (0.00831446261815324) with
       `R_GAS`
-    - Add `Ead` argument to `front_encap`
+    - Add `Ead` argument to `front_encap` to enable user to specify custom material
+      fully, previous behaviour enforced the `Ead` value for EVA material
     - Improve argument handling in `front_encap` to include check for presence of `Ead`
   (:issue:`202`, :pull:`212`)
 
