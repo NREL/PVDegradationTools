@@ -120,36 +120,6 @@ def _diffusivity_weighted_water(
     rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
 ):
     """Calculate weighted average module surface RH, helper function.
-
-    Calculation is used in determining a weighted average water content at the
-    surface of a module. It is used as a constant water content that is equivalent to
-    the time varying one with respect to moisture ingress.
-
-    The function calculates the Diffusivity weighted water content.
-
-    Parameters
-    ----------
-    rh_ambient : pandas series (float)
-        The ambient outdoor environmnet relative humidity in (%)
-        EXAMPLE: "50 = 50% NOT .5 = 50%"
-    temp_ambient : pandas series (float)
-        The ambient outdoor environmnet temperature in Celsius
-    temp_module : pandas series (float)
-        The surface temperature in Celsius of the solar panel module
-    So : float
-        Float, Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
-    Eas : float
-        Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
-    Ead : float
-        Encapsulant diffusivity activation energy in [kJ/mol]
-        Ead = 38.14(kJ/mol) is the suggested value for EVA.
-
-    Returns
-    ------
-    diffuse_water : float
-        Diffusivity weighted water content
     """
     # Get the relative humidity of the surface
     rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
