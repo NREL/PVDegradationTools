@@ -3,7 +3,7 @@
 from importlib.metadata import version
 import logging
 
-from .config import *
+from .config import *  # noqa: F403
 
 # from . import cli
 from . import collection
@@ -17,7 +17,6 @@ from . import letid
 from . import montecarlo
 from . import pysam
 from . import spectral
-from . import store
 from . import symbolic
 from . import standards
 from . import temperature

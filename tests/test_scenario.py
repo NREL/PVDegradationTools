@@ -13,7 +13,7 @@ API_KEY = "DEMO_KEY"
 
 
 def monkeypatch_addLocation(self, *args, **kwargs) -> None:
-    """Mocker function to be monkey patched at runtime for Scenario.addLocation to avoid.
+    """Mocker function to be monkey patched at runtime for Scenario.addLocation to avoid
 
     psm3 api calls and use local weather files instead.
     """
@@ -29,13 +29,15 @@ def monkeypatch_addLocation(self, *args, **kwargs) -> None:
     self.gids = np.asanyarray([1245357])
 
 
-def test_Scenario_add(monkeypatch):
-    ### monkey patch to bypass psm3 api calls in addLocation ###
+def test_Scenario_add(monkeypatch, tmp_path):
+    # monkey patch to bypass psm3 api calls in addLocation
     monkeypatch.setattr(
-        target=Scenario, name="addLocation", value=monkeypatch_addLocation
+        target=Scenario,
+        name="addLocation",
+        value=monkeypatch_addLocation,
     )
 
-    a = Scenario(name="test")
+    a = Scenario(path=tmp_path)
 
     EMAIL = ("placeholder@email.xxx",)
     API_KEY = "fake_key"
@@ -50,14 +52,15 @@ def test_Scenario_add(monkeypatch):
         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json")
     )
 
+    a.name, restored.name = None, None
     a.path, restored.path = None, None
     a.file, restored.file = None, None
 
     assert a == restored
 
 
-def test_Scenario_run(monkeypatch):
-    ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
+def test_Scenario_run(monkeypatch, tmp_path):
+    # monkey patch to bypass psm3 api calls in addLocation called by load_json
     monkeypatch.setattr(
         target=Scenario, name="addLocation", value=monkeypatch_addLocation
     )
@@ -67,6 +70,7 @@ def test_Scenario_run(monkeypatch):
         email=EMAIL,
         api_key=API_KEY,
     )
+    a.path = tmp_path
     a.run()
 
     res_df = a.results["test-module"]["GLUSE"]
@@ -92,74 +96,44 @@ def test_Scenario_run(monkeypatch):
 #         b.clean()
 
 
-def test_addLocation_pvgis():
-    a = Scenario(name="location-test")
+def test_addLocation_pvgis(tmp_path):
+    a = Scenario(
+        name="location-test",
+        path=tmp_path,
+    )
     with pytest.raises(ValueError):
         a.addLocation((40.63336, -73.99458), weather_db="PSM3")  # no api key
 
 
-def test_addModule_badmat(capsys, monkeypatch):
-    ### monkey patch to bypass psm3 api calls in addLocation called by load_json ###
-    monkeypatch.setattr(
-        target=Scenario, name="addLocation", value=monkeypatch_addLocation
-    )
-
+def test_addModule_badkey():
     a = Scenario.load_json(
         file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
         email=EMAIL,
         api_key=API_KEY,
     )
 
-    a.addModule(module_name="fail", material="fake-material")
-
-    captured = capsys.readouterr()
-    assert "Material Not Found - No module added to scenario." in captured.out
-    assert "If you need to add a custom material, use .add_material()" in captured.out
+    with pytest.warns(UserWarning, match="Material Not Found"):
+        a.addModule(module_name="test-invalid-key", material="invalid-key")
 
 
-# def test_addModule_existingmod(capsys):
-#     b = Scenario.load_json(file_path=os.path.join(TEST_DATA_DIR, 'test-scenario.json'), email=EMAIL, api_key=API_KEY)
+def test_addModule_existingmod():
+    a = Scenario.load_json(
+        file_path=os.path.join(TEST_DATA_DIR, "test-scenario.json"),
+        email=EMAIL,
+        api_key=API_KEY,
+    )
+    a.addModule(module_name="test-module")
 
-#     b.addModule(module_name='test-module')
-
-#     captured = capsys.readouterr()
-#     assert 'WARNING - Module already found by name "test-module"' in captured.out
-#     assert "Module will be replaced with new instance." in captured.out
-
-# just stdout not errout
-# def test_addModule_seeadded(capsys):
-#     c = Scenario(name='see-added-module')
-
-#     c.addModule(module_name='works-see-added')
-
-#     captured = capsys.readouterr()
-#     assert 'Module "works-see-added" added.' in captured.out
+    with pytest.warns(UserWarning, match="Module already found"):
+        a.addModule(module_name="test-module")
 
 
-def test_addJob_bad(capsys):
-    a = Scenario(name="non-callable-pipeline-func")
-
-    a.addJob(func="str_not_callable")
-
-    captured = capsys.readouterr()
-    assert 'FAILED: Requested function "str_not_callable" not found' in captured.out
-    assert "Function has not been added to pipeline." in captured.out
+def monkeypatch_badjob_new_id_fail(*args, **kwargs):
+    raise RuntimeError("invalid_job")
 
 
-# def test_addJob_seeadded():
-#     a = Scenario(name='good-func-see-added')
-#     func=standoff
-
-#     with pytest.warns(UserWarning) as record:
-#         a.addJob(func=func,see_added=True)
-
-#     hex_addr = hex(id(func)).replace('0x', '').lstrip()
-#     hex_addr = '0x' + hex_addr.lower()
-#     message = f"{{'job': <function {func.__name__} at {hex_addr}>, 'params': {{}}}}"
-
-#     assert len(record) == 1
-#     assert record[0].category == UserWarning
-#     assert str(record[0].message) == message
-
-
-# geospatial tests should only run if on hpc, ask martin about protocol. load meta csv and weather nc (for very small scenario?)
+def test_addJob_bad(monkeypatch):
+    a = Scenario(name="bad-job")
+    monkeypatch.setattr("pvdeg.utilities.new_id", monkeypatch_badjob_new_id_fail)
+    with pytest.warns(UserWarning, match="Failed to add job: invalid_job"):
+        a.addJob(func=lambda: None, func_kwarg={})
