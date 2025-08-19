@@ -1,4 +1,5 @@
-<img src="docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg" width="600">  
+<img src="https://raw.githubusercontent.com/NREL/PVDegradationTools/refs/heads/main/docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg" width="600">  
+
 
 <table>
 <tr>
