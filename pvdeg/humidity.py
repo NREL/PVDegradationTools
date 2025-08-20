@@ -2,8 +2,7 @@
 
 import numpy as np
 import pandas as pd
-from numba import jit
-
+from numba import njit, jit
 from pvdeg import temperature, spectral, decorators, utilities
 
 
@@ -12,17 +11,17 @@ def _ambient(weather_df):
 
     references:
     Alduchov, O. A., and R. E. Eskridge, 1996: Improved Magnus' form approximation of
-    saturation vapor pressure. J. Appl. Meteor., 35, 601–609.
+    saturation vapor pressure. J. Appl. Meteor., 35, 601-609.
     August, E. F., 1828: Ueber die Berechnung der Expansivkraft des Wasserdunstes. Ann.
-    Phys. Chem., 13, 122–137.
+    Phys. Chem., 13, 122-137.
     Magnus, G., 1844: Versuche über die Spannkräfte des Wasserdampfs. Ann. Phys. Chem.,
-    61, 225–247.
+    61, 225-247.
 
     Parameters:
     -----------
     weather_df : pd.DataFrame
         Datetime-indexed weather dataframe which contains (at minimum) Ambient
-        temperature ('temp_air') and dew point ('temp_dew') in units [C]
+        temperature ('temp_air') and dew point ('temp_dew') in units [°C]
 
     Returns:
     --------
@@ -44,7 +43,7 @@ def _ambient(weather_df):
 
 
 # TODO: When is dew_yield used?
-@jit
+@njit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """Estimate the dew yield in [mm/day].
 
@@ -92,8 +91,8 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
 
 
 def psat(temp, average=True):
-    """Calculate water saturation temperature or dew point for given vapor pressure.
-
+    """
+    Calculate water saturation temperature or dew point for given vapor pressure.
     Water vapor pressure model created from an emperical fit of ln(Psat) vs temperature
     using a 6th order polynomial fit. The fit produced
     R^2=0.999813. Calculation created by Michael Kempe, unpublished data.
@@ -127,7 +126,8 @@ def psat(temp, average=True):
 
 
 def surface_outside(rh_ambient, temp_ambient, temp_module):
-    """Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
+    """
+    Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
 
     Parameters
     ----------
@@ -281,10 +281,10 @@ def _diffusivity_weighted_water(
     return diffuse_water
 
 
-def front_encap(
-    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant="W001"
-):
-    """Return a diffusivity weighted average Relative Humidity of the module surface.
+def front_encap(rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant='W001'):
+    """
+    Function returns a diffusivity weighted average Relative Humidity to calculate an equilibrium average 
+    absolute humidity in the front contact from which a series with the RH in the front encapsulant is estimated.
 
     Parameters
     ----------
@@ -296,27 +296,25 @@ def front_encap(
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
     So : float
-        Encapsulant solubility prefactor in [g/cm3]
-        Will default to 1.81390702(g/cm3) which is the suggested value for EVA 001 if
-        not specified.
+        Encapsulant solubility prefactor in [g/cm³]
+        Will default to 1.81390702(g/cm³) which is the suggested value for EVA 001 if not specified.
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
+        Will default to Eas = 16.729(kJ/mol) is the suggested value for EVA 001 if not specified..
+    encapsulant : str
+        This is the code number for the encapsulant. 
+        The default is EVA 001.
 
     Return
     ------
     RHfront_series : pandas series (float)
         Relative Humidity of Frontside Solar module Encapsulant [%]
     """
-
+    
     if So is None or Eas is None:
-        So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]
-        Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]
-
+        So = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['So']
+        Eas = utilities._read_material(name=encapsulant, fname="H2Opermeation", item=None, fp=None)['Eas']
+    
     diffuse_water = _diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
@@ -514,17 +512,6 @@ backsheet, and it ignores the transients in the backsheet.
         )
     else:
         Ce_start = start
-        #   for i in range(0, len(rh_surface)):
-        #       if i == 0:
-        #           # Ce = Initial start of concentration of water
-        #           if start is None:
-        #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100  # noqa
-        #           else:
-        #               Ce = start
-        #       else:
-        #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
-        #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
-        #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )  # noqa
 
         Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce_start, rh_surface)
 
@@ -815,10 +802,10 @@ def backsheet(
         Thickness of the backside encapsulant [mm].
         The suggested value for EVA encapsulant  is 0.46 mm.
     backsheet : str
-        This is the code number for the backsheet.
+        This is the code number for the backsheet. 
         The default is PET 'W017'.
     encapsulant : str
-        This is the code number for the encapsulant.
+        This is the code number for the encapsulant. 
         The default is EVA 'W001'.
 
     Returns
@@ -828,9 +815,7 @@ def backsheet(
     """
 
     # Get the relative humidity of the surface
-    surface = surface_outside(
-        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
-    )
+    surface = surface_outside(rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module)
 
     # Get the relative humidity of the back encapsulant
     RHback_series = Ce(
@@ -852,10 +837,8 @@ def backsheet(
     return (RHback_series + surface) / 2
 
 
-@decorators.geospatial_quick_shape(
-    "timeseries",
-    ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"],
-)
+@decorators.geospatial_quick_shape('timeseries', ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
+
 def module(
     weather_df,
     meta,
@@ -909,23 +892,22 @@ def module(
         Encapsulant solubility activation energy in [kJ/mol]
         Eas = 16.729(kJ/mol) is the suggested value for EVA.
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement
-        heights between weather database (e.g. NSRDB) and the tempeature model
-        (e.g. SAPM). The NSRDB provides calculations at 2 m (i.e module height) but SAPM
-        uses a 10m height. It is recommended that a power-law relationship between
-        height and wind speed of 0.33 be used*. This results in a wind speed that is
-        1.7 times higher. It is acknowledged that this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement heights
+        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
+        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
+        It is recommended that a power-law relationship between height and wind speed of 0.33
+        be used. This results in a wind speed that is 1.7 times higher. It is acknowledged that
+        this can vary significantly.
 
     Returns
     --------
     rh_backsheet : float series or array
         relative humidity of the PV backsheet as a time-series
     """
+
     # solar_position = spectral.solar_position(weather_df, meta)
-    # poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth,
-    # sky_model)
-    # temp_module = temperature.module(weather_df, poa, temp_model, mount_type,
-    # wind_factor)
+    # poa = spectral.poa_irradiance(weather_df, meta, solar_position, tilt, azimuth, sky_model)
+    # temp_module = temperature.module(weather_df, poa, temp_model, mount_type, wind_factor)
 
     poa = spectral.poa_irradiance(
         weather_df=weather_df,

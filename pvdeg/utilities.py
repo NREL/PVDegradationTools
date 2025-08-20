@@ -21,6 +21,7 @@ pvdeg_datafiles = {
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
     "DegradationDatabase": os.path.join(DATA_DIR, "DegradationDatabase.json"),
+    "albedo.json": os.path.join(DATA_DIR, "albedo.json"),
 }
 
 
@@ -499,8 +500,8 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     If name=None it will return the Json file if item=None, or a list of specific fields
     in each Json entry identified by item.
 
-    Parameters
-    ----------
+    Parameters:
+    -----------
     name : (str)
         unique name of material in a given database
     fname : (str)
@@ -535,14 +536,8 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
         if item is None:
             mat_dict = data
         else:
-            mat_dict = {
-                keys: {
-                    keyss: data[keys][keyss] for keyss in data[keys] if keyss in item
-                }
-                for keys in data
-                if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})
-                != {}
-            }
+            mat_dict = {keys: {keyss: data[keys][keyss] for keyss in data[keys] if keyss in item} for keys in data 
+                    if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})!={}  }
     else:
         try:
             mat_dict = data[name]
@@ -1415,7 +1410,7 @@ def display_json(
     ------------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
-        >>> "AApermeation", "H2Opermeation", "O2permeation", "DegradationDatabase"
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
     fp: str
         file path to material parameters json with same schema as material parameters
         json files in `pvdeg/data`.  `pvdeg_file` will override `fp` if both are
