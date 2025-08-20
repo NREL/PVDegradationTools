@@ -249,8 +249,7 @@ class GeospatialScenario(pvdeg.Scenario):
 
         geo_weather, geo_meta = self.weather_data, self.meta_data
 
-        geo_meta = geo_meta[geo_meta["state"] != "Alaska"]
-        geo_meta = geo_meta[geo_meta["state"] != "Hawaii"]
+        geo_meta = geo_meta[~geo_meta["state"].isin(["Alaska", "Hawaii"])]
         geo_weather = geo_weather.sel(gid=geo_meta.index)
 
         self.weather_data = geo_weather
@@ -1082,14 +1081,14 @@ class GeospatialScenario(pvdeg.Scenario):
 
         if not iterable.issubset(to_check):
             raise ValueError(
-                f"All of iterable: {iterable} does not exist in {to_check}"
+                f"All of iterable: {iterable} is not in {to_check}"
             )
 
     def format_geospatial_work(self):
         if self.func:
             return f"""
-                <p><strong>self.func:</strong> {self.func.__name__}</p>
-                <p><strong>self.template:</strong> {self.format_template()}</p>
+                <p><strong>self.func:</strong> {self.func.__name__}</p>  # noqa
+                <p><strong>self.template:</strong> {self.format_template()}</p> # noqa
             """
 
         return ""

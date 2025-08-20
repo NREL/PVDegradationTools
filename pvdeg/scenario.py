@@ -4,7 +4,6 @@ import pvdeg
 from pvdeg import utilities
 
 import matplotlib.pyplot as plt
-from datetime import date
 from datetime import datetime as dt
 import os
 from shutil import rmtree
@@ -48,12 +47,11 @@ class Scenario:
         Parameters:
         -----------
         name : (str)
-            custom name for deg. scenario. If none given, will use date of
-            initialization (DDMMYY)
+            custom name for deg. scenario. If none given, will use datetime of
+            initialization (DDMMYY_HHMMSS)
         path : (str, pathObj)
             File path to operate within and store results. If none given, new folder
-            "name" will be
-            created in the working directory.
+            "name" will be created in the working directory.
         gids : (str, pathObj)
             Spatial area to perform calculation for. This can be Country or Country and
             State.
@@ -81,7 +79,7 @@ class Scenario:
         self.api_key = api_key
         self.email = email
 
-        filedate = dt.strftime(date.today(), "%d%m%y")
+        filedate = dt.now().strftime("%d%m%y_%H%M%S")
 
         if name is None:
             name = filedate
@@ -89,8 +87,11 @@ class Scenario:
 
         if path is None:
             self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
+        else:
+            self.path = os.path.join(self.path, self.name)
+
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         os.chdir(self.path)
 
         if file:
@@ -600,6 +601,7 @@ class Scenario:
 
         def get_qualified(x):
             return f"{x.__module__}.{x.__name__}"
+
         for task in modified_pipeline.values():
             function_ref = task["job"]
             task["qualified_function"] = get_qualified(function_ref)
@@ -759,6 +761,7 @@ class Scenario:
                                 )
 
         if tmy:
+
             def set_placeholder_year(dt):
                 return dt.replace(year=1970)
 
@@ -854,7 +857,9 @@ class Scenario:
     def _ipython_display_(self):
         file_url = "no file provided"
         if self.path:
-            file_url = f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"  # noqa
+            file_url = (
+                f"file:///{os.path.abspath(self.path).replace(os.sep, '/')}"  # noqa
+            )
         html_content = f"""
         <div style="border: 1px solid #ddd; border-radius: 5px; padding: 3px; margin-top: 5px;">  # noqa
             <h2>self.name: {self.name}</h2>
