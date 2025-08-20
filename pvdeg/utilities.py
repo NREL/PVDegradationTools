@@ -21,6 +21,7 @@ pvdeg_datafiles = {
     "H2Opermeation": os.path.join(DATA_DIR, "H2Opermeation.json"),
     "O2permeation": os.path.join(DATA_DIR, "O2permeation.json"),
     "DegradationDatabase": os.path.join(DATA_DIR, "DegradationDatabase.json"),
+    "albedo.json": os.path.join(DATA_DIR, "albedo.json"),
 }
 
 
