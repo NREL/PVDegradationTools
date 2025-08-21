@@ -13,7 +13,6 @@ import json
 import sys
 import os
 
-
 from pvdeg import (
     weather,
     utilities,
@@ -426,8 +425,8 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame, tilt: 
             # SCALARS
             # we will calculate these for some configs.
             # these are calculated in inspire_ground_irradiance using inspire_practical_pitch
-            "tilt": tilt,
-            "pitch": pitch,
+            "tilt": float(tilt),
+            "pitch": float(pitch),
 
             "annual_poa" : annual_poa,
             "annual_energy" : annual_energy,
@@ -502,7 +501,7 @@ INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
 # TODO: should this gcr 
 # TODO: should this be in standards or design (or other)?
 # TODO: should this contain all of the parameters for optimal gcr and let us choose
-def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float]:
+def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float, float]:
     """
     determine optimal gcr and pitch for fixed tilt systems according to latitude and optimal GCR parameters for fixed tilt bifacial systems.
 
@@ -562,7 +561,7 @@ def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float]:
     pitch = cw / gcr
     return gcr, pitch
 
-def inspire_practical_pitch(latitude: float, cw: float):
+def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, float]:
     """
     Calculate pitch for fixed tilt systems for InSPIRE Agrivoltaics Irradiance Dataset.
 
@@ -602,7 +601,7 @@ def inspire_practical_pitch(latitude: float, cw: float):
     # practical gcr from practical pitch
     gcr_practical = cw / pitch_optimal
 
-    return tilt_practical, pitch_practical, gcr_practical
+    return float(tilt_practical), float(pitch_practical), float(gcr_practical)
 
 def load_gcr_from_config(config_files:dict):
     """
@@ -664,13 +663,12 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
         print("using config 10 with vertical fixed tilt.")
         gcr_used = load_gcr_from_config(config_files=config_files)
         pitch_used = gcr_used / cw
-        tilt_used=90
+        tilt_used=90.0
     
     else: # conigurations 01 - 05 using tracking, use default gcr from pysam config
         gcr_used = load_gcr_from_config(config_files=config_files)
         pitch_used = gcr_used / cw
-        tilt_used = -999 # tracking doesnt have fixed tilt (use placeholder instead)
-
+        tilt_used = -999.0 # tracking doesnt have fixed tilt (use placeholder instead)
 
     outputs = pysam(
         weather_df = weather_df,
