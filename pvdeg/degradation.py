@@ -8,11 +8,11 @@ from pvdeg import humidity
 from . import (
     temperature,
     spectral,
-    weather,
     decorators,
 )
 
 # TODO: Clean up all those functions and add gaps functionality
+
 
 def arrhenius(
     weather_df=None,
@@ -24,9 +24,8 @@ def arrhenius(
     p=None,
     n=None,
     C2=None,
-    parameters=None
-    ):
-
+    parameters=None,
+):
     """
     Calculate the degradation rate using an Arrhenius function with power law
     functions for humidity and irradiance dependence.
@@ -346,7 +345,8 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     Parameters
     ----------
     Tf : float
-        Multiplier for the increase in degradation for every 10[°C] temperature increase. Default value of 1.41.
+        Multiplier for the increase in degradation for every 10[°C] temperature
+        increase. Default value of 1.41.
     temp : pandas series
         Solar module surface or Cell temperature [°C]
 
@@ -366,7 +366,7 @@ def _to_eq_vantHoff(temp, Tf=1.41):
     return Toeq
 
 
-@decorators.geospatial_quick_shape('numeric', ["Iwa"])
+@decorators.geospatial_quick_shape("numeric", ["Iwa"])
 def IwaVantHoff(
     weather_df,
     meta,
@@ -945,7 +945,7 @@ def degradation_spectral(
     time : time indicator in [h]
         if not included it will assume 1 h for each dataframe entry.
     Ea : float [kJ/mol]
-        Arrhenius activation energy. The default is 0 ofr no dependence 
+        Arrhenius activation energy. The default is 0 ofr no dependence
     n : float
         Power law fit paramter for RH sensitivity. The default is 0 for no dependence.
     p : float
@@ -985,7 +985,7 @@ def degradation_spectral(
     except Exception:
         # TODO: Fix this except it works on some cases, veto it by cases
         print("Removing brackets from spectral irradiance data")
-    # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
         irr.columns = wavelengths
 
