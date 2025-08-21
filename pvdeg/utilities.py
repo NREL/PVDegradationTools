@@ -536,8 +536,14 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
         if item is None:
             mat_dict = data
         else:
-            mat_dict = {keys: {keyss: data[keys][keyss] for keyss in data[keys] if keyss in item} for keys in data 
-                    if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})!={}  }
+            mat_dict = {
+                keys: {
+                    keyss: data[keys][keyss] for keyss in data[keys] if keyss in item
+                }
+                for keys in data
+                if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})
+                != {}
+            }
     else:
         try:
             mat_dict = data[name]
