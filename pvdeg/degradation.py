@@ -985,7 +985,8 @@ def degradation_spectral(
     except Exception:
         # TODO: Fix this except it works on some cases, veto it by cases
         print("Removing brackets from spectral irradiance data")
-        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        # irr = data['spectra'].str.strip('[]').str.split(
+        # ',', expand=True).astype(float)
         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
         irr.columns = wavelengths
 
