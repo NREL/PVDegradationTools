@@ -1,4 +1,4 @@
-,RH,Temperature,"Spectra: [ 300, 325, 350, 375, 400 ]"
+,RH,Temperature,"spectra: [ 300, 325, 350, 375, 400 ]"
 2021-01-01 00:00:00-05:00,95,-1.1,"[nan, nan, nan, nan, nan]"
 2021-01-01 01:00:00-05:00,72,-1.1,"[nan, nan, nan, nan, nan]"
 2021-01-01 02:00:00-05:00,72,-1.3,"[nan, nan, nan, nan, nan]"
