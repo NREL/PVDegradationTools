@@ -109,3 +109,6 @@ addopts = [
     "-p no:warnings",
     "--verbose",
 ]
+
+[tool.black]
+line-length = 88
