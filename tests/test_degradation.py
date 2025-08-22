@@ -154,3 +154,130 @@ def test_vecArrhenius():
     )
 
     pytest.approx(degradation, 6.603006830204657)
+
+
+def test_arrhenius_basic():
+    # Basic test with only temperature dependence
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    result = pvdeg.degradation.arrhenius(weather_df=df, Ea=40)
+    assert result == pytest.approx( 3.92292E-7, abs=1E-11)
+
+
+
+def test_arrhenius_with_humidity():
+    # Test with humidity dependence
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    result = pvdeg.degradation.arrhenius(weather_df=df, Ea=40, n=1)
+    assert result == pytest.approx( 1.5123467E-5, abs=1E-9)
+
+
+def test_arrhenius_with_irradiance():
+    # Test with irradiance dependence
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    result = pvdeg.degradation.arrhenius(weather_df=df, Ea=40, p=1)
+    assert result == pytest.approx(0.000359824, abs=1E-8)
+
+
+def test_arrhenius_all_dependence():
+    # Test with all dependencies
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    result = pvdeg.degradation.arrhenius(weather_df=df, Ea=40, n=1, p=1)
+    assert result == pytest.approx( 0.014073859, abs=1E-6)
+
+
+def test_arrhenius_no_dependence():
+    # Test with no dependence (Ea=0, n=0, p=0)
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    result = pvdeg.degradation.arrhenius(weather_df=df)
+    assert result == 3 
+
+def test_arrhenius_action_spectra_no_dependence():
+    # Test with no dependence (Ea=0, n=0, p=0)
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    spectra = pd.DataFrame({
+        "Spectra: garbage identification here [ 300, 350, 400 ]": [0.1, 0.2, 0.5],})
+    result = pvdeg.degradation.arrhenius(weather_df=df, irradiance=spectra, C2=0.07)
+    assert result == 3 
+
+def test_arrhenius_action_spectra():
+    # Full test with all dependencies but even time steps
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    spectra = pd.DataFrame({
+        "Spectra: garbage identification here [ 300, 350, 400 ]": [0.1, 0.2, 0.5],})
+    result = pvdeg.degradation.arrhenius(weather_df=df, irradiance=spectra, p=0.5, n=1, Ea=40, C2=0.07)
+    assert result == pytest.approx( 1.97876255E-9, abs=1E-13)
+
+def test_arrhenius_action_spectra_uneven_time():
+    # Full test with all dependencies and uneven time steps
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    spectra = pd.DataFrame({
+        "Spectra: garbage identification here [ 300, 350, 400 ]": [0.1, 0.2, 0.5],})
+    times = pd.DataFrame({
+        "elapsed_time": [1, 2, 3],})
+    result = pvdeg.degradation.arrhenius(weather_df=df, irradiance=spectra, elapsed_time=times, p=0.5, n=1, Ea=40, C2=0.07)
+    assert result == pytest.approx( 2.928567627E-9, abs=1E-13)
+
+def test_arrhenius_action_spectra_uneven_time_one_DataFrame():
+    # Full test with all dependencies, uneven time steps, and all in one DataFrame
+    df = pd.DataFrame({
+        "temp": [25, 30, 35],
+        "relative_humidity": [40, 50, 60],
+        "temp_air": [20, 25, 30],
+        "temp_module": [25, 30, 35],
+        "poa_global": [800, 900, 1000],
+    })
+    spectra = pd.DataFrame({
+        "Spectra: garbage identification here [ 300, 350, 400 ]": [0.1, 0.2, 0.5],})
+    times = pd.DataFrame({
+        "elapsed_time": [1, 2, 3],})
+    df = pd.concat([df, times, spectra], axis=1)
+    result = pvdeg.degradation.arrhenius(weather_df=df, p=0.5, n=1, Ea=40, C2=0.07)
+    assert result == pytest.approx( 2.928567627E-9, abs=1E-13)
