@@ -19,6 +19,7 @@ def arrhenius(
     temperature=None,
     RH=None,
     irradiance=None,
+    elapsed_time=None,
     Ro=None,
     Ea=None,
     p=None,
@@ -53,6 +54,10 @@ def arrhenius(
         If C2 is provided, wavelength spectral intensity data must be provided.
         The header should start with "spectra", followed by wavelength points.
         Each element is a list of intensity values at each wavelength [W/m²/nm].
+    elapsed_time : pd.DataFrame
+        If the time step for each interval is not constant, this can be used to
+        provide a different elapsed time value for each element. If it is included 
+        in the weather_df, it must be under a column named "elapsed_time".
     Ro : float
         Degradation rate prefactor [e.g. %/h/%RH/(1000 W/m²)]. Defaults to 1 if
         not provided.
@@ -136,13 +141,30 @@ def arrhenius(
             if weather_df is not None:
                 for col in weather_df.columns:
                     if "SPECTRA" in (col[:7]).upper():
-                        irradiance = weather_df[col].copy
-                        irradiance.columns = [col]
+                        irradiance = weather_df[col].copy()
+                        irradiance = pd.DataFrame(irradiance)
                         break
-                if "poa_global" in weather_df:
-                    irradiance = weather_df["poa_global"]
-                    print("Using poa_global from weather_df for irradiance.")
-
+                if "poa_global" in weather_df and irradiance is None:
+                    if C2 == 0:
+                        irradiance = weather_df["poa_global"]
+                        print("Using poa_global from weather_df for irradiance.")
+                    else:
+                        raise ValueError(
+                            "Irradiance data not provided. Please provide irradiance data in weather_df."  # noqa
+                        )
+                else:
+                    if irradiance is None:
+                        raise ValueError(
+                            "POA data not provided. Please provide it in irradiance or weather_df."  # noqa
+                        )
+            else:
+                raise ValueError(
+                    "Irradiance data must be provided if C2 or p are provided."  # noqa
+                )
+    if elapsed_time is None:
+        if weather_df is not None:
+            if "elapsed_time" in weather_df:
+                elapsed_time = weather_df["elapsed_time"]
     if C2 != 0:
         wavelengths = [
             float(i)
@@ -158,6 +180,11 @@ def arrhenius(
         # or previous bin, respectively.
         bin_widths[0] = bin_widths[1]
         bin_widths[-1] = bin_widths[-2]
+        bin_widths = pd.Series(bin_widths)
+        wavelengths = pd.Series(wavelengths)
+        if isinstance(irradiance, pd.DataFrame):
+            irradiance = irradiance.T.to_numpy().reshape(-1,)
+            irradiance = pd.Series(irradiance)
 
         if p == 0:
             if Ea != 0:
@@ -166,16 +193,12 @@ def arrhenius(
                         -(Ea / (0.00831446261815324 * (temperature + 273.15)))
                     )
                 else:
-                    degradation = (
-                        Ro
-                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
-                        * (RH**n)
-                    )
+                    degradation = (Ro* np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))* (RH**n))
             else:
                 if n == 0:
-                    degradation = Ro
+                    degradation = Ro*temperature/temperature # This makes sure it sums over the corect number of time intervals.
                 else:
-                    degradation = Ro * (RH**n)
+                    degradation = Ro * (RH**n)*temperature/temperature
         else:
             degradation = bin_widths * ((np.exp(-C2 * wavelengths) * irradiance) ** p)
             if Ea != 0:
@@ -223,13 +246,19 @@ def arrhenius(
             )
     else:
         if n == 0 and p == 0:
-            degradation = Ro
+            degradation = Ro*temperature/temperature
         elif n == 0 and p != 0:
             degradation = Ro * (irradiance**p)
         elif n != 0 and p == 0:
             degradation = Ro * (RH**n)
         else:
             degradation = Ro * (RH**n) * (irradiance**p)
+
+    if elapsed_time is not None:
+        if isinstance(elapsed_time, pd.DataFrame):
+            elapsed_time = elapsed_time.T.to_numpy().reshape(-1,)
+            elapsed_time = pd.Series(elapsed_time)
+        degradation = degradation * elapsed_time     
 
     return degradation.sum(axis=0, skipna=True)
 
