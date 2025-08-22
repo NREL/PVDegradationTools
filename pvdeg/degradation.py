@@ -56,7 +56,7 @@ def arrhenius(
         Each element is a list of intensity values at each wavelength [W/m²/nm].
     elapsed_time : pd.DataFrame
         If the time step for each interval is not constant, this can be used to
-        provide a different elapsed time value for each element. If it is included 
+        provide a different elapsed time value for each element. If it is included
         in the weather_df, it must be under a column named "elapsed_time".
     Ro : float
         Degradation rate prefactor [e.g. %/h/%RH/(1000 W/m²)]. Defaults to 1 if
@@ -183,7 +183,9 @@ def arrhenius(
         bin_widths = pd.Series(bin_widths)
         wavelengths = pd.Series(wavelengths)
         if isinstance(irradiance, pd.DataFrame):
-            irradiance = irradiance.T.to_numpy().reshape(-1,)
+            irradiance = irradiance.T.to_numpy().reshape(
+                -1,
+            )
             irradiance = pd.Series(irradiance)
 
         if p == 0:
@@ -193,12 +195,18 @@ def arrhenius(
                         -(Ea / (0.00831446261815324 * (temperature + 273.15)))
                     )
                 else:
-                    degradation = (Ro* np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))* (RH**n))
+                    degradation = (
+                        Ro
+                        * np.exp(-(Ea / (0.00831446261815324 * (temperature + 273.15))))
+                        * (RH**n)
+                    )
             else:
                 if n == 0:
-                    degradation = Ro*temperature/temperature # This makes sure it sums over the corect number of time intervals.
+                    degradation = (
+                        Ro * temperature / temperature
+                    )  # This makes sure it sums over the corect number of time intervals.
                 else:
-                    degradation = Ro * (RH**n)*temperature/temperature
+                    degradation = Ro * (RH**n) * temperature / temperature
         else:
             degradation = bin_widths * ((np.exp(-C2 * wavelengths) * irradiance) ** p)
             if Ea != 0:
@@ -246,7 +254,7 @@ def arrhenius(
             )
     else:
         if n == 0 and p == 0:
-            degradation = Ro*temperature/temperature
+            degradation = Ro * temperature / temperature
         elif n == 0 and p != 0:
             degradation = Ro * (irradiance**p)
         elif n != 0 and p == 0:
@@ -256,9 +264,11 @@ def arrhenius(
 
     if elapsed_time is not None:
         if isinstance(elapsed_time, pd.DataFrame):
-            elapsed_time = elapsed_time.T.to_numpy().reshape(-1,)
+            elapsed_time = elapsed_time.T.to_numpy().reshape(
+                -1,
+            )
             elapsed_time = pd.Series(elapsed_time)
-        degradation = degradation * elapsed_time     
+        degradation = degradation * elapsed_time
 
     return degradation.sum(axis=0, skipna=True)
 
@@ -886,7 +896,7 @@ def degradation_spectral(
     except Exception:
         # TODO: Fix this except it works on some cases, veto it by cases
         print("Removing brackets from spectral irradiance data")
-    # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
+        # irr = data['spectra'].str.strip('[]').str.split(',', expand=True).astype(float)
         irr = spectra.str.strip("[]").str.split(",", expand=True).astype(float)
         irr.columns = wavelengths
 
