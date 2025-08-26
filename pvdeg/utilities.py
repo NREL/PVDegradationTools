@@ -26,14 +26,14 @@ def gid_downsampling(meta, n):
     """
     Downsample the NSRDB GID grid by a factor of n
 
-    Parameters:
+    Parameters
     -----------
     meta : (pd.DataFrame)
         DataFrame of NSRDB meta data
     n : (int)
         Downsample factor
 
-    Returns:
+    Returns
     --------
     meta_sub : (pd.DataFrame)
         DataFrame of NSRDB meta data
@@ -61,12 +61,12 @@ def meta_as_dict(rec):
     """
     Turn a numpy recarray record into a dict.
 
-    Parameters:
+    Parameters
     -----------
     rec : (np.recarray)
         numpy structured array with labels as dtypes
 
-    Returns:
+    Returns
     --------
      : (dict)
         dictionary of numpy structured array
@@ -79,12 +79,12 @@ def get_kinetics(name=None, fname="kinetic_parameters.json"):
     """
     Returns a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json
 
-    Parameters:
+    Parameters
     -----------
     name : str
         unique name of kinetic parameter set. If None, returns a list of the possible options.
 
-    Returns:
+    Returns
     --------
     parameter_dict : (dict)
         dictionary of kinetic parameters
@@ -1604,3 +1604,35 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
 
+
+def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
+    """
+    Convert dataset gids to gridded latitude, longitude dataset. Maintains all other coordiantes.
+
+    Aims to support advanced workflows where pvdeg.geospatial.analysis is applied twice. 
+
+    Parameters
+    ----------
+    ds_gids : xr.Dataset
+        dataset with "gid" dimension/coords
+    meta_df : pd.DataFrame
+        metadata pandas dataframe containing gid index, and latitude and longitude columns
+    
+    Returns
+    -------
+    coords_ds: xr.Dataset
+        dataset with "latitude", "longitude" dimensions/coords in addition to original coords not including "gids"
+    """
+
+    stacked = ds_gids.drop(["gid"])
+
+    mindex_obj = pd.MultiIndex.from_arrays(
+        [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
+    )
+    mindex_coords = xr.Coordinates.from_pandas_multiindex(mindex_obj, "gid")
+    stacked = stacked.assign_coords(mindex_coords)
+
+    stacked = stacked.drop_duplicates("gid")
+    res = stacked.unstack("gid")
+    return res
+    
