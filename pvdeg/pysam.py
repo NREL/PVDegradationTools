@@ -593,8 +593,11 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
 
     gcr_optimal, pitch_optimal = optimal_gcr_pitch(latitude=latitude, cw=cw)
 
-    pitch_ceil = min(pitch_optimal, 12)
-    pitch_practical = max(pitch_ceil, 3.8)
+    pitch_ceil = min(pitch_optimal, 12)    # 12 m pitch ceiling
+    pitch_practical = max(pitch_ceil, 3.8) # 3.8m pitch floor
+
+    if not (3.8 <= pitch_practical <= 12):
+        raise ValueError("calculated practical pitch is outside range [3.8m, 12m]")
 
     tilt_practical = min(latitude, 40)
 
@@ -650,7 +653,11 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     # force localize utc from tmy to local time by moving rows
     weather_df = weather.roll_tmy(weather_df, meta)
 
-    pratical_considerations_setups = ["06", "07", "08", "09"] # want to calculate pitch/gcr as a function of latitude, latitude tilt capped at 40 deg
+    tracking_setups = ["01", "02", "03", "04", "05"] 
+    pratical_considerations_setups = ["06", "07", "08", "09"] # fixed tilt setups want to calculate pitch/gcr as a function of latitude capped at 40 degrees
+    # vertical tilt (fixed spacing) 10
+
+    print(f"config file string: {config_files['pv']} -- debug")
     
     cw = 2 # collector width 2 [m]
     pratical_consideration = False
@@ -659,16 +666,22 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
         pratical_consideration=True
         tilt_used, pitch_used, gcr_used = inspire_practical_pitch(latitude=meta['latitude'], cw=cw)
     
-    elif "10" not in config_files["pv"]:
+    # why would this be not in
+    # this should check in "10" is in the config files
+    elif "10" in config_files["pv"]:
         print("using config 10 with vertical fixed tilt.")
         gcr_used = load_gcr_from_config(config_files=config_files)
         pitch_used = gcr_used / cw
         tilt_used=90.0
     
-    else: # conigurations 01 - 05 using tracking, use default gcr from pysam config
+    elif any(setup in config_files["pv"] for setup in tracking_setups): # conf 01- 05 using tracking, default gcr from pysam config
         gcr_used = load_gcr_from_config(config_files=config_files)
         pitch_used = gcr_used / cw
         tilt_used = -999.0 # tracking doesnt have fixed tilt (use placeholder instead)
+    
+    else:
+        # this is not portable but we don't care. this can be custom for this calculation.
+        raise ValueError("Valid config not found, config name must contain setup name from 01-10")
 
     outputs = pysam(
         weather_df = weather_df,
