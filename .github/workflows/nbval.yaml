@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false  # don't cancel other matrix jobs when one fails
       matrix:
-        notebook-file: [        
+        notebook-file: [
           "1 - Basics, Humidity, Design.ipynb",
           "2 - Degradation.ipynb",
           "3 - Spectral Degradation.ipynb",
@@ -67,6 +67,26 @@ jobs:
         NOTEBOOK_DIR="tutorials_and_tools/tutorials_and_tools"
         mkdir -p "$NOTEBOOK_DIR/artifacts"
         cd "$NOTEBOOK_DIR"
+        # Copy conftest.py so the notebook kernel can import it and apply patches
+        cp ../../conftest.py .
+        # Inject an import statement into the first cell of the notebook
+        python << 'EOF'
+        import json
+        notebook_file = "${{ matrix.notebook-file }}"
+        with open(notebook_file, 'r') as f:
+            notebook = json.load(f)
+        import_cell = {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": ["# This cell is injected by the CI to apply test patches\nimport conftest"]
+        }
+        notebook['cells'].insert(0, import_cell)
+        with open(notebook_file, 'w') as f:
+            json.dump(notebook, f, indent=2)
+        EOF
+        # Now execute the modified notebook
         jupyter nbconvert --to html --execute \
                           --ExecutePreprocessor.timeout=600 \
                           --allow-errors \
