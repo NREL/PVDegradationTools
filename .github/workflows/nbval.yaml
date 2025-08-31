@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false  # don't cancel other matrix jobs when one fails
       matrix:
-        notebook-file: [        
+        notebook-file: [
           "1 - Basics, Humidity, Design.ipynb",
           "2 - Degradation.ipynb",
           "3 - Spectral Degradation.ipynb",
@@ -58,10 +58,9 @@ jobs:
         pip install global_land_mask dotenv imageio # dependency for certain notebooks
     - name: Run notebook and check output
       run: |
-        # --nbval-sanitize-with: pre-process text to remove irrelevant differences
-        pytest --nbval \
-               "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}" \
-               --nbval-sanitize-with nbval_sanitization_rules.cfg
+        cd tutorials_and_tools/tutorials_and_tools
+        pytest --nbval "${{ matrix.notebook-file }}" \
+                --nbval-sanitize-with nbval_sanitization_rules.cfg
     - name: Run notebooks again, save files
       run: |
         pip install nbconvert[webpdf]
