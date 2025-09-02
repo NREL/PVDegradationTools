@@ -1558,6 +1558,17 @@ def read_material(
     material_dict = data[key]
 
     if parameters:
-        material_dict = {k: material_dict.get(k, None) for k in parameters}
+        material_dict = {
+            k: (
+                material_dict[k]["value"]
+                if k in material_dict and isinstance(material_dict[k], dict)
+                else material_dict[k]
+                if k in material_dict
+                else None
+            )
+            for k in parameters
+        }
+    else:
+        material_dict = {k: v["value"] if isinstance(v, dict) else v for k, v in material_dict.items()}
 
     return material_dict
