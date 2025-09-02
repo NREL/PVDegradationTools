@@ -403,17 +403,17 @@ def Ce(
     """Return water concentration in encapsulant.
 
     Calculation is used in determining Relative Humidity of Backside Solar Module
-    Encapsulant. This function returns a numpy array of the Concentration of water in
-    the encapsulant at every time step.
+    Encapsulant. This function returns a numpy array of the Concentration of water
+    in the encapsulant at every time step.
 
-    This calculation uses a quasi-steady state approximation of the diffusion equation
-    to calculate the concentration of water in the encapsulant. For this, it is assumed
-    that the diffusion in the encapsulant is much larger than the diffusion in the
-backsheet, and it ignores the transients in the backsheet.
+    This calculation uses a quasi-steady state approximation of the diffusion
+    equation to calculate the concentration of water in the encapsulant. For this,
+    it is assumed that the diffusion in the encapsulant is much larger than the
+    diffusion in the backsheet, and it ignores the transients in the backsheet.
 
     Numba was used to isolate recursion requiring a for loop
-    Numba Functions are very fast because they compile and run in machine code but can
-    not use pandas dataframes.
+    Numba Functions are very fast because they compile and run in machine code but
+    can  not use pandas dataframes.
 
     Parameters
     -----------
@@ -425,7 +425,8 @@ backsheet, and it ignores the transients in the backsheet.
         EXAMPLE: "50 = 50% NOT .5 = 50%"
     start : float
         Initial value of the Concentration of water in the encapsulant.
-        by default, the function will use half the equilibrium value as the first value
+        by default, the function will use half the equilibrium value as the first
+        value
     Po_b : float
         Water permeation rate prefactor [g·mm/m²/day].
         The suggested value for PET W17 is Po = 1319534666.90318 [g·mm/m²/day].
@@ -451,8 +452,8 @@ backsheet, and it ignores the transients in the backsheet.
         This is the code number for the encapsulant.
         The default is EVA 'W001'.
     output : str
-        The default is "rh" which is the relative humidity in the encapsulant in [%],
-        any other value, e.g. "Ce" will return the concentration in [g/cm³].
+        The default is "rh" which is the relative humidity in the encapsulant
+        in [%], any other value, e.g. "Ce" will return the concentration in [g/cm³].
 
 
     Returns
@@ -514,17 +515,6 @@ backsheet, and it ignores the transients in the backsheet.
         )
     else:
         Ce_start = start
-        #   for i in range(0, len(rh_surface)):
-        #       if i == 0:
-        #           # Ce = Initial start of concentration of water
-        #           if start is None:
-        #               Ce = So * np.exp(-(Eas / (temp_module[0] + 273.15)))*rh_surface[0] / 100  # noqa
-        #           else:
-        #               Ce = start
-        #       else:
-        #           Ce = Ce + ( WVTRo * np.exp(-EaWVTR / (temp_module[i] + 273.15))
-        #                   ) / ( So * np.exp(-Eas / (temp_module[i] + 273.15))
-        #                           ) * ( rh_surface[i] / 100 * So * np.exp(-Eas / (temp_module[i] + 273.15))- Ce )  # noqa
 
         Ce_list[0] = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce_start, rh_surface)
 
