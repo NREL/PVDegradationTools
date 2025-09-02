@@ -1569,6 +1569,9 @@ def read_material(
             for k in parameters
         }
     else:
-        material_dict = {k: v["value"] if isinstance(v, dict) else v for k, v in material_dict.items()}
+        material_dict = {
+            k: v["value"] if isinstance(v, dict) else v
+            for k, v in material_dict.items()
+        }
 
     return material_dict
