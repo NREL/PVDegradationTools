@@ -8,12 +8,12 @@
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 30.48 },
-        "Do": { "name": "", "units": "cm²/s", "value": 0.0001421 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -0.0272266 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.0003594 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 30.2107 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 441.26 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 30.48 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0001421 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -0.0272266 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.0003594 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 30.2107 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 441.26 }
     },
     "OX002": {
         "name": "ST504",
@@ -21,12 +21,12 @@
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 47.603 },
-        "Do": { "name": "", "units": "cm²/s", "value": 0.554153 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -11.5918 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 9.554366e-07 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 34.2011 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 2128.8937 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.603 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.554153 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -11.5918 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.554366e-07 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 34.2011 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937 }
     },
     "OX003": {
         "name": "EVA",
@@ -34,12 +34,12 @@
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 29.43112031 },
-        "Do": { "name": "", "units": "cm²/s", "value": 0.129061678 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": 16.6314948252219 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.136034525059804 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 49.1083457348515 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 528718258.338532 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 29.43112031 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.129061678 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 16.6314948252219 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.136034525059804 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 49.1083457348515 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 528718258.338532 }
     },
     "OX004": {
         "name": "AAA polyamide backsheet",
@@ -48,12 +48,12 @@
         "source": "unpublished measurements",
         "comment": "This is the trilayer polyamide backsheet that saw cracking in the field after 3 or 4 years of exposure",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 37.41778528 },
-        "Do": { "name": "", "units": "cm²/s", "value": 24.10839436 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -0.947566422 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 7.81445e-06 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 36.47021886 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 1627722.989 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 37.41778528 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 24.10839436 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -0.947566422 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 7.81445e-06 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 36.47021886 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 1627722.989 }
     },
     "OX005": {
         "name": "Helioseal_101_dry",
@@ -62,12 +62,12 @@
         "comment": "This measurement is from a fresh film with active desiccant.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 45.01267147 },
-        "Do": { "name": "", "units": "cm²/s", "value": 3.370970011 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -3.528965263 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 5.25558996546881e-05 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 41.48370621 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 1530700.085 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 45.01267147 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 3.370970011 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -3.528965263 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 5.25558996546881e-05 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 41.48370621 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 1530700.085 }
     },
     "OX006": {
         "name": "Helioseal_101_wet",
@@ -76,12 +76,12 @@
         "comment": "This measurement is after saturation with water.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 50.75602972 },
-        "Do": { "name": "", "units": "cm²/s", "value": 37.24247609 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -5.398392306 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 1.58555e-05 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 45.35763741 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 5101898.064 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 50.75602972 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 37.24247609 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -5.398392306 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 1.58555e-05 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 45.35763741 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 5101898.064 }
     },
     "OX007": {
         "name": "LPO3_dry",
@@ -90,12 +90,12 @@
         "comment": "This measurement is from a fresh film with active desiccant.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 40.99859372 },
-        "Do": { "name": "", "units": "cm²/s", "value": 0.690368586 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": 3.507719187 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.000543049 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 44.5738773 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 3287750.401 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 40.99859372 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.690368586 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 3.507719187 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.000543049 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 44.5738773 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 3287750.401 }
     },
     "OX008": {
         "name": "LPO3_wet",
@@ -104,12 +104,12 @@
         "comment": "This measurement is after saturation with water.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 48.73189239 },
-        "Do": { "name": "", "units": "cm²/s", "value": 10.50219391 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -2.129673846 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 9.19588e-05 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 46.60221855 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 8344245.628 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 48.73189239 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 10.50219391 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -2.129673846 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.19588e-05 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 46.60221855 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 8344245.628 }
     },
     "OX009": {
         "name": "Nagase_dry",
@@ -118,12 +118,12 @@
         "comment": "This measurement is from a fresh film with active desiccant.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 47.53715467 },
-        "Do": { "name": "", "units": "cm²/s", "value": 11.22649621 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": 2.574465974 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.000433787 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 50.11162064 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 42076035.42 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.53715467 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 11.22649621 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 2.574465974 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.000433787 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 50.11162064 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 42076035.42 }
     },
     "OX010": {
         "name": "Nagase_wet",
@@ -132,12 +132,12 @@
         "comment": "This measurement is after saturation with water.",
         "source": "unpublished measurements",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 42.09928821 },
-        "Do": { "name": "", "units": "cm²/s", "value": 0.973239619 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": 3.706124657 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.001037698 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 45.80541287 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 8725784.224 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 42.09928821 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.973239619 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 3.706124657 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.001037698 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 45.80541287 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 8725784.224 }
     },
     "OX011": {
         "name": "Oppanol_B_200",
@@ -145,12 +145,12 @@
         "Source": "G. J. Van Amerongen, The Permeability of Different Rubbers to Gases and Its Relation to Diffusivity and Solubility, Journal of Applied Physics 17, 972 (1946); https://doi.org/10.1063/1.1707667",
         "alias": "PIB-lit",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 45.18908901 },
-        "Do": { "name": "", "units": "cm²/s", "value": 7.3 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": -0.418217328 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.000129043 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 44.77087169 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 8138979.958 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 45.18908901 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 7.3 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -0.418217328 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.000129043 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 44.77087169 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 8138979.958 }
     },
     "OX012": {
         "name": "EVA",
@@ -168,11 +168,11 @@
         "source": "unpublished measurements",
         "comment": "This is a NREL laboratory formulation made similar to a typical EVA but using Dow Chemical Engage 8100, a poly ethylene octene copolymer, as the base resin.",
         "Fickian": true,
-        "Ead": { "name": "", "units": "kJ/mol", "value": 32.9383902685319 },
-        "Do": { "name": "", "units": "cm²/s", "value": 1.00914093168826 },
-        "Eas": { "name": "", "units": "kJ/mol", "value": 6.33958717324394 },
-        "So": { "name": "", "units": "g/cm³/atm", "value": 0.00148313008211379 },
-        "Eap": { "name": "", "units": "kJ/mol", "value": 39.2779774417758 },
-        "Po": { "name": "", "units": "g*mm/m²/day/atm", "value": 12931378.0376762 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 32.9383902685319 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 1.00914093168826 },
+        "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 6.33958717324394 },
+        "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.00148313008211379 },
+        "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 39.2779774417758 },
+        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 12931378.0376762 }
     }
 }
