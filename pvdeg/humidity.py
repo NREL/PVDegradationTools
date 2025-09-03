@@ -819,7 +819,7 @@ def backsheet(
     """
 
     # Get the relative humidity of the surface
-    surface = surface_outside(
+    surface = surface_relative_humidity(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
