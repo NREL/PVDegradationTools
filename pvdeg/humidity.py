@@ -127,7 +127,7 @@ def water_saturation_pressure(temp, average=True):
         return water_saturation_pressure
 
 
-def surface_outside(rh_ambient, temp_ambient, temp_module):
+def surface_relative_humidity(rh_ambient, temp_ambient, temp_module):
     """Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
 
     Parameters
@@ -191,7 +191,7 @@ def _diffusivity_numerator(
         Nnumerator of the Sdw equation prior to summation
     """
     # Get the relative humidity of the surface
-    rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
+    rh_surface = surface_relative_humidity(rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
     diff_numerator = (
@@ -701,7 +701,7 @@ def back_encap(
     RHback_series : pandas series (float)
         Relative Humidity of Backside Solar Module Encapsulant [%]
     """
-    rh_surface = surface_outside(
+    rh_surface = surface_relative_humidity(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
@@ -743,7 +743,7 @@ def backsheet_from_encap(rh_back_encap, rh_surface_outside):
         Relative Humidity of Frontside Solar module Encapsulant. *See rh_back_encap()
     rh_surface_outside : pandas series (float)
         The relative humidity of the surface of a solar module.
-        *See rh_surface_outside()
+        *See surface_relative_humidity()
 
     Returns
     -------
