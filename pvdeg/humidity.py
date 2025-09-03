@@ -941,13 +941,13 @@ def module(
         wind_factor=wind_factor,
     )
 
-    rh_surface_outside = surface_outside(
+    rh_surface_outside = surface_relative_humidity(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
     )
 
-    rh_front_encap = front_encap(
+    rh_front_encap = front_encapsulant_humidity(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
@@ -955,7 +955,7 @@ def module(
         Eas=Eas,
     )
 
-    rh_back_encap = back_encap(
+    rh_back_encap = back_encapsulant_humidity(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
