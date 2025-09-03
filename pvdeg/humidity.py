@@ -306,7 +306,7 @@ def front_encapsulant_humidity(
 
     Return
     ------
-    RHfront_series : pandas series (float)
+    front_encapsulant_humidity : pandas series (float)
         Relative Humidity of Frontside Solar module Encapsulant [%]
     """
 
@@ -322,12 +322,12 @@ def front_encapsulant_humidity(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
-    RHfront_series = (
+    front_encapsulant_humidity = (
         diffuse_water
         / (So * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15)))))
     ) * 100
 
-    return RHfront_series
+    return front_encapsulant_humidity
 
     ###########
     # Back Encapsulant Relative Humidity
