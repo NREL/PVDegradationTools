@@ -546,7 +546,6 @@ def _Ce(
     return Ce
 
 
-
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
     """Calculate the Relative Humidity of solar module backsheet as timeseries.
 
