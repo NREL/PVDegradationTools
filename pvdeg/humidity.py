@@ -387,7 +387,7 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-def Ce(
+def back_encapsulant_water_concentration(
     temp_module,
     rh_surface,
     start=None,
@@ -824,7 +824,7 @@ def backsheet(
     )
 
     # Get the relative humidity of the back encapsulant
-    RHback_series = Ce(
+    RHback_series = back_encapsulant_water_concentration(
         rh_surface=surface,
         # temp_ambient=temp_ambient,
         temp_module=temp_module,
