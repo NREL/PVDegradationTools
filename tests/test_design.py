@@ -15,12 +15,12 @@ PSM, META = weather.read(PSM_FILE, "psm")
 def test_edge_seal_ingress_rate():
     # test calculation for constant k
 
-    water_saturation_pressure, average_water_saturation_pressure = (
+    water_saturation_pressure, avg_water_saturation_pressure = (
         humidity.water_saturation_pressure(
             PSM.get("dew_point")
         )
     )
-    k = design.edge_seal_ingress_rate(average_water_saturation_pressure)
+    k = design.edge_seal_ingress_rate(avg_water_saturation_pressure)
     assert k == pytest.approx(0.00096, abs=0.000005)
 
 
