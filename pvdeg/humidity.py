@@ -145,7 +145,13 @@ def surface_relative_humidity(rh_ambient, temp_ambient, temp_module):
         The relative humidity of the surface of a solar module as a fraction or percent
         depending on input.
     """
-    rh_Surface = rh_ambient * (psat(temp_ambient)[0] / psat(temp_module)[0])
+    rh_Surface = (
+        rh_ambient
+        * (
+            water_saturation_pressure(temp_ambient)[0]
+            / water_saturation_pressure(temp_module)[0]
+        )
+    )
 
     return rh_Surface
 
