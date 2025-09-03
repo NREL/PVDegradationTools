@@ -282,7 +282,7 @@ def _diffusivity_weighted_water(
     return diffuse_water
 
 
-def front_encap(
+def front_encapsulant_humidity(
     rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant="W001"
 ):
     """Return a diffusivity weighted average Relative Humidity of the module surface.
