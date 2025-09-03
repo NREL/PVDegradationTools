@@ -121,6 +121,7 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
     # Front Encapsulant RH
     ###########
 
+
 def diffusivity_weighted_water(
     rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
     encapsulant="W001"
@@ -298,8 +299,8 @@ def front_encap(
         Ead = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
     diffuse_water = diffusivity_weighted_water(
-        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module, So=So,
-        Eas=Eas, Ead=Ead
+        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module,
+        So=So, Eas=Eas, Ead=Ead
     )
 
     RHfront_series = (
@@ -308,6 +309,7 @@ def front_encap(
     ) * 100
 
     return RHfront_series
+
 
 def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
     """Return saturation of Water Concentration [g/cm³].
