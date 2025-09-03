@@ -664,7 +664,8 @@ def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
     rh_outdoor : pandas series
         Relative Humidity of material of interest. Acceptable relative
         humiditys can be calculated from the below functions:
-        rh_backsheet(), rh_back_encap(), rh_front_encap(), rh_surface_relative_humidity()
+        rh_backsheet(), rh_back_encap(), rh_front_encap(),
+        rh_surface_relative_humidity()
     temp : pandas series
         solar module temperature or Cell temperature [°C]
     Ea : float
