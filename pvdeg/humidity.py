@@ -654,7 +654,7 @@ def Ce_numba(
     return Ce_list
 
 
-def back_encap(
+def back_encapsulant_humidity(
     rh_ambient,
     temp_ambient,
     temp_module,
@@ -664,7 +664,7 @@ def back_encap(
     back_encap_thickness=0.5,
     Eas=16.729,
 ):
-    """Return RH of backside module encapsulant.
+    """Return the relative humidity of the backside module encapsulant.
 
     Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
     and return a pandas series for each time step
@@ -698,7 +698,7 @@ def back_encap(
 
     Returns
     -------
-    RHback_series : pandas series (float)
+    back_encapsulant_humidity : pandas series (float)
         Relative Humidity of Backside Solar Module Encapsulant [%]
     """
     rh_surface = surface_relative_humidity(
@@ -724,11 +724,11 @@ def back_encap(
         Eas=Eas,
     )
 
-    # RHback_series = 100 * (Ce_nparray / (So * np.exp(-( (Eas) /
+    # back_encapsulant_humidity = 100 * (Ce_nparray / (So * np.exp(-( (Eas) /
     #                   (0.00831446261815324 * (temp_module + 273.15))  )) ))
-    RHback_series = 100 * (Ce_nparray / Csat)
+    back_encapsulant_humidity = 100 * (Ce_nparray / Csat)
 
-    return RHback_series
+    return back_encapsulant_humidity
 
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
