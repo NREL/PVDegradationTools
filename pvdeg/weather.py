@@ -234,7 +234,13 @@ def get(
                 'Column "relative_humidity" not found in DataFrame. Calculating...',
                 end="",
             )
-            weather_df = humidity._ambient(weather_df)
+            temp_air = weather_df["temp_air"]
+            dew_point = weather_df.get("dew_point")
+            if dew_point or temp_air is None:
+                raise ValueError('Cannot calculate "relative_humidity": one of'
+                                 '"dew_point" or "temp_air" column not found in'
+                                 'DataFrame.')
+            weather_df["relative_humidity"] = humidity.relative(temp_air, dew_point)
             print(
                 "\r",
                 "                                                                    ",
