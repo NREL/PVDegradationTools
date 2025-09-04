@@ -37,9 +37,9 @@ def relative(temperature_air, dew_point):
     position will return NaN values in the output at those same position(s) in
     ``relative_humidity``.
 
-    Returns:
-    --------
-    relative_humidity : pd.Series
+    Returns
+    -------
+    relative_humidity : pd.Series or float
         Series or float of ambient relative humidity. [%]
     """
     if temperature_air.isna().any() or dew_point.isna().any():
