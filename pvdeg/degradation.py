@@ -515,10 +515,12 @@ def arrhenius_deg(
     meta : dict
         Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.Series
-        Relative Humidity of material of interest
-        Acceptable relative humiditys can be calculated
-        from these functions: rh_backsheet(), rh_back_encap(), rh_front_encap(),
-        rh_surface_relative_humidity()
+        Relative Humidity of material of interest.
+        Acceptable relative humiditys can be calculated from these functions:
+        - pvdeg.humidity.backsheet()
+        - pvdeg.humidity.back_encapsulant()
+        - pvdeg.humidity.front_encapsulant()
+        - pvdeg.humidity.surface_relative()
     I_chamber : float
         Irradiance of Controlled Condition [W/m²]
     rh_chamber : float
@@ -662,10 +664,12 @@ def _RH_wa_arrhenius(rh_outdoor, temp, Ea, Teq=None, n=1):
     Parameters
     -----------
     rh_outdoor : pandas series
-        Relative Humidity of material of interest. Acceptable relative
-        humiditys can be calculated from the below functions:
-        rh_backsheet(), rh_back_encap(), rh_front_encap(),
-        rh_surface_relative_humidity()
+        Relative Humidity of material of interest.
+        Acceptable relative humiditys can be calculated from these functions:
+        - pvdeg.humidity.backsheet()
+        - pvdeg.humidity.back_encapsulant()
+        - pvdeg.humidity.front_encapsulant()
+        - pvdeg.humidity.surface_relative()
     temp : pandas series
         solar module temperature or Cell temperature [°C]
     Ea : float
@@ -729,8 +733,11 @@ def IwaArrhenius(
         Location meta-data containing at least latitude, longitude, altitude
     rh_outdoor : pd.Series
         Relative Humidity of material of interest
-        Acceptable relative humiditys include: rh_backsheet(), rh_back_encap(),
-        rh_front_encap(), rh_surface_relative_humidity()
+        Acceptable relative humiditys can be calculated from these functions:
+        - pvdeg.humidity.backsheet()
+        - pvdeg.humidity.back_encapsulant()
+        - pvdeg.humidity.front_encapsulant()
+        - pvdeg.humidity.surface_relative()
     Ea : float
         Degradation Activation Energy [kJ/mol]
     poa : pd.DataFrame, optional
