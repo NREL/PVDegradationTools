@@ -33,6 +33,9 @@ Enhancements
 - Lint codebase for PEP8 compliance (:pull:`166`, :pull:`175`, :pull:`196`)
 - Change default for ``find_meta`` argument in :py:func:`pvdeg.weather.read` to
   ``False`` to avoid unnecessary network calls when reading local files. (:pull:`223`)
+- Add `"name"`, `"units"`, and `"value"` fields to the materials JSON databases
+  `AApermeation.json`, `H2Opermeation.json`, and `O2permeation.json`.
+  (:issue:`211`, :pull:`224`)
 
 Deprecations
 -------------
