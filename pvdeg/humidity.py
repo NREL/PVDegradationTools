@@ -58,11 +58,11 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     return dew_yield
 
 
-def psat(temp, average=True):
-    """Calculate water saturation temperature or dew point for given vapor pressure.
+def water_saturation_pressure(temp, average=True):
+    """Calculate the water saturation temperature or dew point for given vapor pressure.
 
-    Water vapor pressure model created from an emperical fit of ln(Psat) vs temperature
-    using a 6th order polynomial fit. The fit produced
+    Water saturation pressure (psat) model created from an emperical fit of
+    ln(psat) vs temperature using a 6th order polynomial fit. The fit produced
     R^2=0.999813. Calculation created by Michael Kempe, unpublished data.
 
     Parameters:
@@ -70,15 +70,16 @@ def psat(temp, average=True):
     temp : series, float
         The air temperature (dry bulb) as a time-indexed series [C]
     average : boolean, default = True
-        If true, return both psat serires and average psat (used for certain calcs)
+        If true, return both water saturation pressure serires and the average water
+        saturation pressure (used for certain calcs)
     Returns:
     --------
-    psat : array, float
+    water_saturation_pressure : array, float
         Saturation point
-    avg_psat : float, optional
-        mean saturation point for the series given
+    avg_water_saturation_pressure : float, optional
+        Mean saturation point for the series given
     """
-    psat = np.exp(
+    water_saturation_pressure = np.exp(
         (3.2575315268e-13 * temp**6)
         - (1.5680734584e-10 * temp**5)
         + (2.2213041913e-08 * temp**4)
@@ -88,12 +89,12 @@ def psat(temp, average=True):
         - (5.6983551678e-1)
     )
     if average:
-        return psat, psat.mean()
+        return water_saturation_pressure, water_saturation_pressure.mean()
     else:
-        return psat
+        return water_saturation_pressure
 
 
-def surface_outside(rh_ambient, temp_ambient, temp_module):
+def surface_relative(rh_ambient, temp_ambient, temp_module):
     """Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
 
     Parameters
@@ -111,7 +112,13 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
         The relative humidity of the surface of a solar module as a fraction or percent
         depending on input.
     """
-    rh_Surface = rh_ambient * (psat(temp_ambient)[0] / psat(temp_module)[0])
+    rh_Surface = (
+        rh_ambient
+        * (
+            water_saturation_pressure(temp_ambient)[0]
+            / water_saturation_pressure(temp_module)[0]
+        )
+    )
 
     return rh_Surface
 
@@ -122,7 +129,7 @@ def _diffusivity_weighted_water(
     """Calculate weighted average module surface RH, helper function.
     """
     # Get the relative humidity of the surface
-    rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
+    rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
     numerator = (
@@ -144,7 +151,7 @@ def _diffusivity_weighted_water(
     return diffuse_water
 
 
-def front_encap(
+def front_encapsulant(
     rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
     encapsulant="W001"
 ):
@@ -174,7 +181,7 @@ def front_encap(
 
     Return
     ------
-    RHfront_series : pandas series (float)
+    front_encapsulant : pandas series (float)
         Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
     if So is None or Eas is None or Ead is None:
@@ -188,12 +195,12 @@ def front_encap(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
-    RHfront_series = (
+    front_encapsulant = (
         diffuse_water
         / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
-    return RHfront_series
+    return front_encapsulant
 
 
 def _csat(temp_module, So=1.81390702, Eas=16.729):
@@ -249,7 +256,7 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-def Ce(
+def back_encapsulant_water_concentration(
     temp_module,
     rh_surface,
     start=None,
@@ -516,7 +523,7 @@ def Ce_numba(
     return Ce_list
 
 
-def back_encap(
+def back_encapsulant(
     rh_ambient,
     temp_ambient,
     temp_module,
@@ -526,7 +533,7 @@ def back_encap(
     back_encap_thickness=0.5,
     Eas=16.729,
 ):
-    """Return RH of backside module encapsulant.
+    """Return the relative humidity of the backside module encapsulant.
 
     Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
     and return a pandas series for each time step
@@ -560,10 +567,10 @@ def back_encap(
 
     Returns
     -------
-    RHback_series : pandas series (float)
+    back_encapsulant : pandas series (float)
         Relative Humidity of Backside Solar Module Encapsulant [%]
     """
-    rh_surface = surface_outside(
+    rh_surface = surface_relative(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
@@ -586,9 +593,9 @@ def back_encap(
         Eas=Eas,
     )
 
-    RHback_series = 100 * (Ce_nparray / Csat)
+    back_encapsulant = 100 * (Ce_nparray / Csat)
 
-    return RHback_series
+    return back_encapsulant
 
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
@@ -603,7 +610,7 @@ def backsheet_from_encap(rh_back_encap, rh_surface_outside):
         Relative Humidity of Frontside Solar module Encapsulant. *See rh_back_encap()
     rh_surface_outside : pandas series (float)
         The relative humidity of the surface of a solar module.
-        *See rh_surface_outside()
+        *See surface_relative()
 
     Returns
     -------
@@ -679,12 +686,12 @@ def backsheet(
     """
 
     # Get the relative humidity of the surface
-    surface = surface_outside(
+    surface = surface_relative(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
     # Get the relative humidity of the back encapsulant
-    RHback_series = Ce(
+    RHback_series = back_encapsulant_water_concentration(
         rh_surface=surface,
         # temp_ambient=temp_ambient,
         temp_module=temp_module,
@@ -796,13 +803,13 @@ def module(
         wind_factor=wind_factor,
     )
 
-    rh_surface_outside = surface_outside(
+    rh_surface_outside = surface_relative(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
     )
 
-    rh_front_encap = front_encap(
+    rh_front_encap = front_encapsulant(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
@@ -811,7 +818,7 @@ def module(
         Ead=Ead
     )
 
-    rh_back_encap = back_encap(
+    rh_back_encap = back_encapsulant(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
