@@ -43,15 +43,16 @@ def test_module():
     pd.testing.assert_frame_equal(result, rh_expected, check_dtype=False)
 
 
-def test_psat():
-    """Test pvdeg.humidity.psat.
+def test_water_saturation_pressure():
+    """Test pvdeg.humidity.water_saturation_pressure.
 
     Requires:
     ---------
-    weahter dataframe and meta dictionary
+    weather dataframe and meta dictionary
     """
-    psat_avg = pvdeg.humidity.psat(temp=WEATHER["temp_air"])[1]
-    assert psat_avg == approx(0.47607, abs=5e-5)
+    water_saturation_pressure_avg = pvdeg.humidity.water_saturation_pressure(
+        temp=WEATHER["temp_air"])[1]
+    assert water_saturation_pressure_avg == approx(0.47607, abs=5e-5)
 
 
 """
