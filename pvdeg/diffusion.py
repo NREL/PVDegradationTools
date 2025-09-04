@@ -136,32 +136,28 @@ def esdiffusion(
 
     # These are the edge seal oxygen or water permeation parameters
     if Dos is None:
-        Dos = esp.get("Do")
+        Dos = esp.get("Do", {}).get("value")
     if Eads is None:
-        Eads = esp.get("Ead") / 0.0083144626
+        Eads = esp.get("Ead", {}).get("value") / 0.0083144626
     else:
         Eads = Eads / 0.0083144626
     if Sos is None:
-        Sos = (
-            esp.get("So") * press
-        )  # puts in the adjustment for the atmospheric pressure or oxygen.
+        Sos = esp.get("So", {}).get("value") * press
     if Eass is None:
-        Eass = esp.get("Eas") / 0.0083144626
+        Eass = esp.get("Eas", {}).get("value") / 0.0083144626
     else:
         Eass = Eass / 0.0083144626
     # These are the encapsulant oxygen permeaiton parameters
     if Doe is None:
-        Doe = encp.get("Do")
+        Doe = encp.get("Do", {}).get("value")
     if Eade is None:
-        Eade = encp.get("Ead") / 0.0083144626
+        Eade = encp.get("Ead", {}).get("value") / 0.0083144626
     else:
         Eade = Eade / 0.0083144626
     if Soe is None:
-        Soe = (
-            encp.get("So") * press
-        )  # puts in the adjustment for the atmospheric pressure or oxygen.
+        Soe = encp.get("So", {}).get("value") * press
     if Ease is None:
-        Ease = encp.get("Eas") / 0.0083144626
+        Ease = encp.get("Eas", {}).get("value") / 0.0083144626
     else:
         Ease = Ease / 0.0083144626
 
