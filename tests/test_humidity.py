@@ -39,12 +39,13 @@ def test_relative_series():
     expected = pd.Series([53.83, 28.94, 15.51])
     np.testing.assert_allclose(result, expected, atol=0.01)
 
+
 def test_relative_nan_combinations():
     test_cases = [
-        (pd.Series([25.0, np.nan]), pd.Series([15.0, 10.0])),
-        (pd.Series([25.0, 30.0]), pd.Series([15.0, np.nan])),
-        (np.nan, 10.0),
-        (25.0, np.nan),
+        (pd.Series([25.0, np.nan]), pd.Series([15.0, 10.0])),  # nan in temp series
+        (pd.Series([25.0, 30.0]), pd.Series([15.0, np.nan])),  # nan in dew series
+        (np.nan, 10.0),  # nan in temp float
+        (25.0, np.nan),  # nan in dew float
     ]
 
     for temp, dew in test_cases:
