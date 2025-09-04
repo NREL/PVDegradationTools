@@ -94,7 +94,7 @@ def water_saturation_pressure(temp, average=True):
         return water_saturation_pressure
 
 
-def surface_relative_humidity(rh_ambient, temp_ambient, temp_module):
+def surface_relative(rh_ambient, temp_ambient, temp_module):
     """Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
 
     Parameters
@@ -129,7 +129,7 @@ def _diffusivity_weighted_water(
     """Calculate weighted average module surface RH, helper function.
     """
     # Get the relative humidity of the surface
-    rh_surface = surface_relative_humidity(rh_ambient, temp_ambient, temp_module)
+    rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
     numerator = (
@@ -151,7 +151,7 @@ def _diffusivity_weighted_water(
     return diffuse_water
 
 
-def front_encapsulant_humidity(
+def front_encapsulant(
     rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
     encapsulant="W001"
 ):
@@ -181,7 +181,7 @@ def front_encapsulant_humidity(
 
     Return
     ------
-    front_encapsulant_humidity : pandas series (float)
+    front_encapsulant : pandas series (float)
         Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
     if So is None or Eas is None or Ead is None:
@@ -195,12 +195,12 @@ def front_encapsulant_humidity(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
-    front_encapsulant_humidity = (
+    front_encapsulant = (
         diffuse_water
         / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
-    return front_encapsulant_humidity
+    return front_encapsulant
 
 
 def _csat(temp_module, So=1.81390702, Eas=16.729):
@@ -570,7 +570,7 @@ def back_encapsulant_humidity(
     back_encapsulant_humidity : pandas series (float)
         Relative Humidity of Backside Solar Module Encapsulant [%]
     """
-    rh_surface = surface_relative_humidity(
+    rh_surface = surface_relative(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
@@ -610,7 +610,7 @@ def backsheet_from_encap(rh_back_encap, rh_surface_outside):
         Relative Humidity of Frontside Solar module Encapsulant. *See rh_back_encap()
     rh_surface_outside : pandas series (float)
         The relative humidity of the surface of a solar module.
-        *See surface_relative_humidity()
+        *See surface_relative()
 
     Returns
     -------
@@ -686,7 +686,7 @@ def backsheet(
     """
 
     # Get the relative humidity of the surface
-    surface = surface_relative_humidity(
+    surface = surface_relative(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
@@ -803,13 +803,13 @@ def module(
         wind_factor=wind_factor,
     )
 
-    rh_surface_outside = surface_relative_humidity(
+    rh_surface_outside = surface_relative(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
     )
 
-    rh_front_encap = front_encapsulant_humidity(
+    rh_front_encap = front_encapsulant(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
