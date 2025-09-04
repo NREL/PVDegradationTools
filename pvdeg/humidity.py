@@ -523,7 +523,7 @@ def Ce_numba(
     return Ce_list
 
 
-def back_encapsulant_humidity(
+def back_encapsulant(
     rh_ambient,
     temp_ambient,
     temp_module,
@@ -567,7 +567,7 @@ def back_encapsulant_humidity(
 
     Returns
     -------
-    back_encapsulant_humidity : pandas series (float)
+    back_encapsulant : pandas series (float)
         Relative Humidity of Backside Solar Module Encapsulant [%]
     """
     rh_surface = surface_relative(
@@ -593,9 +593,9 @@ def back_encapsulant_humidity(
         Eas=Eas,
     )
 
-    back_encapsulant_humidity = 100 * (Ce_nparray / Csat)
+    back_encapsulant = 100 * (Ce_nparray / Csat)
 
-    return back_encapsulant_humidity
+    return back_encapsulant
 
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
@@ -818,7 +818,7 @@ def module(
         Ead=Ead
     )
 
-    rh_back_encap = back_encapsulant_humidity(
+    rh_back_encap = back_encapsulant(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
