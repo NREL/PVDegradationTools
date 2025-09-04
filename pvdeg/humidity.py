@@ -42,9 +42,15 @@ def relative(temperature_air, dew_point):
     relative_humidity : pd.Series or float
         Series or float of ambient relative humidity. [%]
     """
-    if temperature_air.isna().any() or dew_point.isna().any():
-        warnings.warn("Input contains NaN values. Output will contain NaNs at those"
-        "positions.")
+    if (
+        (isinstance(temperature_air, pd.Series) and temperature_air.isna().any())
+        or (isinstance(dew_point, pd.Series) and dew_point.isna().any())
+        or (isinstance(temperature_air, float) and pd.isna(temperature_air))
+        or (isinstance(dew_point, float) and pd.isna(dew_point))
+    ):
+        warnings.warn(
+            "Input contains NaN values. Output will contain NaNs at those positions."
+        )
 
     num = np.exp(17.625 * dew_point / (243.04 + dew_point))
     den = np.exp(17.625 * temperature_air / (243.04 + temperature_air))
