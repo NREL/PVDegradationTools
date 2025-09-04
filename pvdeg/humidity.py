@@ -200,7 +200,7 @@ def front_encapsulant_humidity(
         / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
-    return RHfront_series
+    return front_encapsulant_humidity
 
 
 def _csat(temp_module, So=1.81390702, Eas=16.729):
