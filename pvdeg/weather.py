@@ -259,7 +259,7 @@ def get(
         return weather_ds, meta_df
 
 
-def read(file_in, file_type, map_variables=True, find_meta=True, **kwargs):
+def read(file_in, file_type, map_variables=True, find_meta=False, **kwargs):
     """
     Read a locally stored weather file of any PVLIB compatible type
 
