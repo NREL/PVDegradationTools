@@ -122,7 +122,7 @@ def arrhenius(
         and "temp_air" in weather_df
         and "temp_module" in weather_df
     ):
-        RH = humidity.surface_relative_humidity(
+        RH = humidity.surface_relative(
             weather_df["relative_humidity"],
             weather_df["temp_air"],
             weather_df["temp_module"],
