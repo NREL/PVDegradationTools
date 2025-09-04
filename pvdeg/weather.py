@@ -240,9 +240,7 @@ def get(
                 raise ValueError('Cannot calculate "relative_humidity": one of'
                                  '"dew_point" or "temp_air" column not found in'
                                  'DataFrame.')
-            numerator = np.exp(17.625 * dew_point / (243.04 + dew_point))
-            denominator = np.exp(17.625 * temp_air / (243.04 + temp_air))
-            weather_df["relative_humidity"] = 100 * numerator / denominator
+            weather_df["relative_humidity"] = humidity.relative(temp_air, dew_point)
             print(
                 "\r",
                 "                                                                    ",
