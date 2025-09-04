@@ -10,6 +10,7 @@ from pvdeg import temperature, spectral, decorators, utilities
 R_GAS = 0.00831446261815324  # Gas constant in kJ/(mol·K)
 
 
+# TODO: When is dew_yield used?
 @jit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """Estimate the dew yield in [mm/day].
@@ -117,14 +118,15 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
 
     return rh_Surface
 
-    ###########
-    # Front Encapsulant RH
-    ###########
-
 
 def diffusivity_weighted_water(
-    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
-    encapsulant="W001"
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    So=None,
+    Eas=None,
+    Ead=None,
+    encapsulant="W001",
 ):
     """Calculate the diffusivity weighted average module surface RH.
 
@@ -159,96 +161,30 @@ def diffusivity_weighted_water(
 
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Ead"]
 
     # Get the relative humidity of the surface
     rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
-    diff_numerator = (
+    numerator = (
         So
-        * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15))))
+        * np.exp(-(Eas / (R_GAS * (temp_module + 273.15))))
         * rh_surface
-        * np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
-    )
-
-    return diff_numerator
-
-
-def _diffusivity_denominator(temp_module, Ead=38.14):
-    """Calculate weighted average module surface RH, helper function.
-
-    Calculation is used in determining a weighted average Relative Humidity of the
-    outside surface of a module. This funciton is used exclusively in the function
-    _diffusivity_weighted_water and could be combined.
-
-    The function returns values needed for the denominator of the Diffusivity
-    weighted water content equation(diffuse_water). This function will return a pandas
-    series prior to summation of the denominator
-
-    Parameters
-    ----------
-    Ead : float
-        Encapsulant diffusivity activation energy in [kJ/mol]
-        38.14(kJ/mol) is the suggested value for EVA.
-    temp_module : pandas series (float)
-        The surface temperature in Celsius of the solar panel module
-
-    Returns
-    -------
-    diff_denominator : pandas series (float)
-        Denominator of the diffuse_water equation prior to summation
-    """
-    diff_denominator = np.exp(-(Ead / (0.00831446261815324 * (temp_module + 273.15))))
-    return diff_denominator
-
-
-def _diffusivity_weighted_water(
-    rh_ambient, temp_ambient, temp_module, So=1.81390702, Eas=16.729, Ead=38.14
-):
-    """Calculate weighted average module surface RH, helper function.
-
-    Calculation is used in determining a weighted average water content at the
-    surface of a module. It is used as a constant water content that is equivalent to
-    the time varying one with respect to moisture ingress.
-
-    The function calculates the Diffusivity weighted water content.
-
-    Parameters
-    ----------
-    rh_ambient : pandas series (float)
-        The ambient outdoor environmnet relative humidity in (%)
-        EXAMPLE: "50 = 50% NOT .5 = 50%"
-    temp_ambient : pandas series (float)
-        The ambient outdoor environmnet temperature in Celsius
-    temp_module : pandas series (float)
-        The surface temperature in Celsius of the solar panel module
-    So : float
-        Float, Encapsulant solubility prefactor in [g/cm3]
-        So = 1.81390702(g/cm3) is the suggested value for EVA.
-    Eas : float
-        Encapsulant solubility activation energy in [kJ/mol]
-        Eas = 16.729(kJ/mol) is the suggested value for EVA.
-    Ead : float
-        Encapsulant diffusivity activation energy in [kJ/mol]
-        Ead = 38.14(kJ/mol) is the suggested value for EVA.
-
-    Returns
-    ------
-    diffuse_water : float
-        Diffusivity weighted water content
-    """
-    numerator = _diffusivity_numerator(
-        rh_ambient, temp_ambient, temp_module, So, Eas, Ead
+        * np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
     )
     # get the summation of the numerator
     numerator = numerator.sum(axis=0, skipna=True)
 
-    denominator = _diffusivity_denominator(temp_module, Ead)
+    denominator = np.exp(-(Ead / (R_GAS * (temp_module + 273.15))))
+
     # get the summation of the denominator
     denominator = denominator.sum(axis=0, skipna=True)
 
@@ -258,16 +194,22 @@ def _diffusivity_weighted_water(
 
 
 def front_encap(
-    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, encapsulant="W001"
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    So=None,
+    Eas=None,
+    Ead=None,
+    encapsulant="W001",
 ):
-    """Return a diffusivity weighted average Relative Humidity of the module surface.
+    """Calculate diffusivity weighted average Relative Humidity of the module surface.
 
     Parameters
     ----------
     rh_ambient : series (float)
-        Ambient outdoor relative humidity. [%] Example: 50 = 50%, NOT 0.5 = 50%
+        Ambient outdoor relative humidity. [%] Example: 50 = 50%, NOT .5 = 50%
     temp_ambient : series (float)
-        ambient outdoor temperature [°C]
+        Ambient outdoor temperature [°C]
     temp_module : pandas series (float)
         The surface temperature in Celsius of the solar panel module
         "module temperature [°C]"
@@ -287,25 +229,29 @@ def front_encap(
     Return
     ------
     RHfront_series : pandas series (float)
-        Relative Humidity of Frontside Solar module Encapsulant [%]
+        Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
-
-    if So is None or Eas is None:
+    if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
         )["So"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Ead"]
     diffuse_water = diffusivity_weighted_water(
-        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module,
-        So=So, Eas=Eas, Ead=Ead
+        rh_ambient=rh_ambient,
+        temp_ambient=temp_ambient,
+        temp_module=temp_module,
+        So=So,
+        Eas=Eas,
+        Ead=Ead,
     )
 
     RHfront_series = (
-        diffuse_water
-        / (So * np.exp(-(Eas / (0.00831446261815324 * (temp_module + 273.15)))))
+        diffuse_water / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
     return RHfront_series
@@ -340,12 +286,14 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
 
     if So is None or Eas is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]
 
     # Saturation of water concentration
-    Csat = So * np.exp(-(Eas / (0.00831446261815324 * (273.15 + temp_module))))
+    Csat = So * np.exp(-(Eas / (R_GAS * (273.15 + temp_module))))
 
     return Csat
 
@@ -495,9 +443,9 @@ def Ce(
                 back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / t
-    EaWVTR = Ea_p_b / 0.00831446261815324
+    EaWVTR = Ea_p_b / R_GAS
     So = So_e * back_encap_thickness / 10
-    Eas = Ea_s_e / 0.00831446261815324
+    Eas = Ea_s_e / R_GAS
     # Ce is the initial start of concentration of water
     if start is None:
         Ce_start = (
@@ -682,7 +630,7 @@ def module(
     back_encap_thickness=None,
     backsheet="W017",
     encapsulant="W001",
-    ** weather_kwargs
+    **weather_kwargs,
 ):
     """Calculate the Relative Humidity of solar module backsheet from timeseries data.
 
@@ -817,7 +765,7 @@ def module(
         output="Ce",
     )
 
-    rh_backsheet = (rh_back_encap + rh_surface_outside)/2
+    rh_backsheet = (rh_back_encap + rh_surface_outside) / 2
 
     data = {
         "RH_surface_outside": rh_surface_outside,
@@ -828,109 +776,3 @@ def module(
     }
     results = pd.DataFrame(data=data)
     return results
-
-
-# def run_module(
-#     project_points,
-#     out_dir,
-#     tag,
-#     weather_db,
-#     weather_satellite,
-#     weather_names,
-#     max_workers=None,
-#     tilt=None,
-#     azimuth=180,
-#     sky_model='isotropic',
-#     temp_model='sapm',
-#     mount_type='open_rack_glass_glass',
-#     WVTRo=7970633554,
-#     EaWVTR=55.0255,
-#     So=1.81390702,
-#     back_encap_thickness=0.5,
-#     Eas=16.729,
-#     wind_factor=1
-# ):
-
-#     """Run the relative humidity calculation for a set of project points."""
-
-#     #inputs
-#     weather_arg = {}
-#     weather_arg['satellite'] = weather_satellite
-#     weather_arg['names'] = weather_names
-#     weather_arg['NREL_HPC'] = True  #TODO: add argument or auto detect
-#     weather_arg['attributes'] = [
-#         'temp_air',
-#         'wind_speed',
-#         'dhi', 'ghi',
-#         'dni','relative_humidity'
-#         ]
-
-#     #TODO: is there a better way to add the meta data?
-#     nsrdb_fnames, hsds  = weather.get_NSRDB_fnames(
-#         weather_arg['satellite'],
-#         weather_arg['names'],
-#         weather_arg['NREL_HPC'])
-
-#     with NSRDBX(nsrdb_fnames[0], hsds=hsds) as f:
-#         meta = f.meta[f.meta.index.isin(project_points.gids)]
-#         ti = f.time_index
-
-#     all_fields = ['RH_surface_outside',
-#                 'RH_front_encap',
-#                 'RH_back_encap',
-#                 'RH_backsheet']
-
-#     out_fp = Path(out_dir) / f"out_rel_humidity{tag}.h5"
-#     shapes = {n : (len(ti), len(project_points)) for n in all_fields}
-#     attrs = {n : {'units': '%'} for n in all_fields}
-#     chunks = {n : None for n in all_fields}
-#     dtypes = {n : "float32" for n in all_fields}
-
-#     Outputs.init_h5(
-#         out_fp,
-#         all_fields,
-#         shapes,
-#         attrs,
-#         chunks,
-#         dtypes,
-#         meta=meta.reset_index(),
-#         time_index=ti
-#     )
-
-#     future_to_point = {}
-#     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-#         for point in project_points:
-#             gid = int(point.gid)
-#             weather_df, meta = weather.load(
-#                 database = weather_db,
-#                 id = gid,
-#                 **weather_arg)
-#             future = executor.submit(
-#                 module,
-#                 weather_df,
-#                 meta,
-#                 tilt,
-#                 azimuth,
-#                 sky_model,
-#                 temp_model,
-#                 mount_type,
-#                 WVTRo,
-#                 EaWVTR,
-#                 So,
-#                 l,
-#                 Eas,
-#                 wind_factor
-#             )
-#             future_to_point[future] = gid
-
-#         with Outputs(out_fp, mode="a") as out:
-#             for future in as_completed(future_to_point):
-#                 result = future.result()
-#                 gid = future_to_point.pop(future)
-
-#                 ind = project_points.index(gid)
-#                 for dset, data in result.items():
-#                     out[dset, :, ind] = data.values
-
-#     return out_fp.as_posix()
-#     return out_fp.as_posix()
