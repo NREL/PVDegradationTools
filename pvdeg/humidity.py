@@ -76,7 +76,7 @@ def water_saturation_pressure(temp, average=True):
     --------
     water_saturation_pressure : array, float
         Saturation point
-    average_water_saturation_pressure : float, optional
+    avg_water_saturation_pressure : float, optional
         Mean saturation point for the series given
     """
     water_saturation_pressure = np.exp(
