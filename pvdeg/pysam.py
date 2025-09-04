@@ -351,9 +351,8 @@ def pysam(
                     subarrays.add(k.split("_")[0])
 
     if inspire_practical_pitch_tilt == True:
-        print("overriding pitch -- debug (remove)")
-        print("subarrays --debug (remove)")
-        print(subarrays)
+        print("overriding pitch with practical considerations")
+        print(f"subarrays {subarrays}")
 
         # Create lists of parameter names
         # need to check all subarrays and update all subarrays
@@ -363,7 +362,7 @@ def pysam(
         param_gcr = [f"{subarray}_gcr" for subarray in subarrays]
 
         if any(pysam_model.value(name) != 0 for name in param_latitude_tilt):
-            print('latitude tilt defined for one of the subarrays, overriding to disable latitude tilt')
+            print('config defined latitude tilt defined for one of the subarrays, disabling config latitude tilt (will be set later using practical consideration)')
             for name in param_latitude_tilt:
                 pysam_model.value(name, 0) 
         
@@ -671,12 +670,15 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     elif "10" in config_files["pv"]:
         print("using config 10 with vertical fixed tilt.")
         gcr_used = load_gcr_from_config(config_files=config_files)
-        pitch_used = gcr_used / cw
+        print(f"gcr used: {gcr_used}")
+        pitch_used = cw / gcr_used
         tilt_used=90.0
     
     elif any(setup in config_files["pv"] for setup in tracking_setups): # conf 01- 05 using tracking, default gcr from pysam config
+        print("SAT scenario, using -999.0 as tilt fill value")
         gcr_used = load_gcr_from_config(config_files=config_files)
-        pitch_used = gcr_used / cw
+        # print(f"gcr used: {gcr_used}")
+        pitch_used = cw / gcr_used
         tilt_used = -999.0 # tracking doesnt have fixed tilt (use placeholder instead)
     
     else:
