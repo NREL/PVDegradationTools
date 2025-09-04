@@ -33,15 +33,15 @@ Breaking Changes
       material fully, previous behaviour enforced the `Ead` value for EVA material
     - Improve argument handling in `front_encapsulant` to include check for presence of
       `Ead`. (:issue:`202`, :pull:`212`)
-- Renamed several variable and function names in :py:mod:`pvdeg.humidity` to improve
+- Rename several variable and function names in :py:mod:`pvdeg.humidity` to improve
   code clarity and maintainability. Full details are as follows:
-    - Rename variable `psat` and function `psat()` to `water_saturation_pressure`
-    - Rename variable `avg_psat` to `avg_water_saturation_pressure`
-    - Rename variable `surface_outside` to `surface_relative`
-    - Rename variable `RHfront_series` to `front_encapsulant`
-    - Rename function `front_encap()` to `front_encapsulant`
-    - Rename function `Ce()` to `back_encapsulant_water_concentration`
-    - Rename function `back_encap` to `back_encapsulant`
+    - Variable `psat` and function `psat()` to `water_saturation_pressure`
+    - Variable `avg_psat` to `avg_water_saturation_pressure`
+    - Variable `surface_outside` to `surface_relative`
+    - Variable `RHfront_series` to `front_encapsulant`
+    - Function `front_encap()` to `front_encapsulant`
+    - Function `Ce()` to `back_encapsulant_water_concentration`
+    - Function `back_encap` to `back_encapsulant`
   (:issue:`213`, :pull:`224`)
 
 
