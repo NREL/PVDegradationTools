@@ -25,22 +25,22 @@ def relative(temperature_air, dew_point):
 
     Parameters
     ----------
-    temperature_air : pd.Series
-        Datetime-indexed dataframe or series of ambient air temperature. [°C]
+    temperature_air : pd.Series or float
+        Series or float of ambient air temperature. [°C]
 
-    dew_point : pd.Series
-        Datetime-indexed series of dew point temperature. [°C]
+    dew_point : pd.Series or float
+        Series or float of dew point temperature. [°C]
 
     Notes
     -----
-    Passing NaN values in either ``temperature_air`` or ``dew_point`` at any datetime
+    Passing NaN values in either ``temperature_air`` or ``dew_point`` at any index
     position will return NaN values in the output at those same position(s) in
     ``relative_humidity``.
 
     Returns:
     --------
     relative_humidity : pd.Series
-        Datetime-indexed series containing ambient relative humidity. [%]
+        Series or float of ambient relative humidity. [%]
     """
     if temperature_air.isna().any() or dew_point.isna().any():
         warnings.warn("Input contains NaN values. Output will contain NaNs at those"
