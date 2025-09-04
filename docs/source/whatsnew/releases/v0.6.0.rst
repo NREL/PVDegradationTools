@@ -16,6 +16,24 @@ Breaking Changes
 - Replace print messages for failure or succesful addition of objects (location, job...)
   with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
 - Remove deprecated `pvdeg.store` module. (:issue:`168`, :pull:`180`)
+- Refactored and cleaned up `:py:mod:pvdeg.humiditiy` by removing unused functions,
+  improving docstrings, and standardizing physical constants. Full details are as
+  follows:
+    - Remove unused helper function `_ambient()`
+    - Remove `_diffusivity_numerator()` and `_diffusivity_denominator()` helper
+      functionsby refactoring them into `_diffusivity_weighted_water()`
+    - Remove legacy comments and commented out code
+    - Clean and streamlined docstrings, for example removing redundant docstring from
+      helper functions
+    - Improve function docstrings
+    - Introduce a module level constant `R_GAS` for the universal gas constant and
+      replaced all hardcoded instances of the gas constant (0.00831446261815324) with
+      `R_GAS`
+    - Add `Ead` argument to `front_encap` to enable user to specify custom material
+      fully, previous behaviour enforced the `Ead` value for EVA material
+    - Improve argument handling in `front_encap` to include check for presence of `Ead`
+  (:issue:`202`, :pull:`212`)
+
 
 Enhancements
 ------------
@@ -31,6 +49,11 @@ Enhancements
 - Add a new GitHub Actions workflow to automatically run flake8 for linting on pull
   requests (:issue:`164`, :pull:`165`)
 - Lint codebase for PEP8 compliance (:pull:`166`, :pull:`175`, :pull:`196`)
+- Change default for ``find_meta`` argument in :py:func:`pvdeg.weather.read` to
+  ``False`` to avoid unnecessary network calls when reading local files. (:pull:`223`)
+- Add `"name"`, `"units"`, and `"value"` fields to the materials JSON databases
+  `AApermeation.json`, `H2Opermeation.json`, and `O2permeation.json`.
+  (:issue:`211`, :pull:`224`)
 
 Deprecations
 -------------
