@@ -234,7 +234,11 @@ def get(
                 'Column "relative_humidity" not found in DataFrame. Calculating...',
                 end="",
             )
-            weather_df = humidity._ambient(weather_df)
+            temp_air = weather_df["temp_air"]
+            dew_point = weather_df.get("dew_point")
+            numerator = np.exp(17.625 * dew_point / (243.04 + dew_point))
+            denominator = np.exp(17.625 * temp_air / (243.04 + temp_air))
+            weather_df["relative_humidity"] = 100 * numerator / denominator
             print(
                 "\r",
                 "                                                                    ",
