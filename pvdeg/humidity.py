@@ -971,7 +971,7 @@ def module(
         output="rh",
     )
 
-    Ce_back_encap = Ce(
+    Ce_back_encap = _Ce(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
