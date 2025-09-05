@@ -217,13 +217,13 @@ def diffusivity_weighted_water(
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]
+        )["So"]["value"]
         Eas = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]
+        )["Eas"]["value"]
         Ead = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Ead"]
+        )["Ead"]["value"]
 
     # Get the relative humidity of the surface
     rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
@@ -292,8 +292,7 @@ def front_encapsulant(
         Eas = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Ead"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]["value"]
     diffuse_water = diffusivity_weighted_water(
         rh_ambient=rh_ambient,
         temp_ambient=temp_ambient,
@@ -340,11 +339,9 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
 
     if So is None or Eas is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
 
     # Saturation of water concentration
     Csat = So * np.exp(-(Eas / (R_GAS * (273.15 + temp_module))))
@@ -696,8 +693,8 @@ def back_encapsulant(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
-    Csat = _csat(temp_module=temp_module, So=So, Eas=Eas)
-    Ceq = _ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
+    Csat = csat(temp_module=temp_module, So=So, Eas=Eas)
+    Ceq = ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
     start = Ceq.iloc[0]
 
