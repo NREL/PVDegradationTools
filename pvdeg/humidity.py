@@ -234,11 +234,11 @@ def front_encapsulant(
     """
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]["value"]
     diffuse_water = _diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
@@ -392,33 +392,33 @@ def back_encapsulant_water_concentration(
     if Po_b is None or Ea_p_b is None:
         Po_b = utilities._read_material(
             name=backsheet, fname="H2Opermeation", item=None, fp=None
-        )["Po"]
+        )["Po"]["value"]
         Ea_p_b = utilities._read_material(
             name=backsheet, fname="H2Opermeation", item=None, fp=None
-        )["Eap"]
+        )["Eap"]["value"]
         if t is None:
             if "t" in utilities._read_material(
                 name=backsheet, fname="H2Opermeation", item=None, fp=None
             ):
                 t = utilities._read_material(
                     name=backsheet, fname="H2Opermeation", item=None, fp=None
-                )["t"]
+                )["t"]["value"]
             else:
                 t = 0.3
     if So_e is None or Ea_s_e is None:
         So_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]
+        )["So"]["value"]
         Ea_s_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]
+        )["Eas"]["value"]
         if back_encap_thickness is None:
             if "t" in utilities._read_material(
                 name=encapsulant, fname="H2Opermeation", item=None, fp=None
             ):
                 back_encap_thickness = utilities._read_material(
                     name=encapsulant, fname="H2Opermeation", item=None, fp=None
-                )["t"]
+                )["t"]["value"]
             else:
                 back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
