@@ -55,7 +55,7 @@ jobs:
             -r tutorials_and_tools/requirements.txt
         pip install --timeout=300 -e .[test]
         pip install nbval
-        pip install global_land_mask dotenv imageio # dependency for certain notebooks
+        pip install global_land_mask dotenv imageio nrel-pysam
     - name: Run notebook and check output
       run: |
         # --nbval-sanitize-with: pre-process text to remove irrelevant differences
