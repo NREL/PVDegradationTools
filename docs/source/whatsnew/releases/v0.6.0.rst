@@ -64,6 +64,8 @@ Enhancements
 - Add `"name"`, `"units"`, and `"value"` fields to the materials JSON databases
   `AApermeation.json`, `H2Opermeation.json`, and `O2permeation.json`.
   (:issue:`211`, :pull:`224`)
+- Add new (public) function :py:mod:`pvdeg.humidity` to calculate relative humidity from
+  air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
 
 Deprecations
 -------------

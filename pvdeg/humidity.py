@@ -3,11 +3,59 @@
 import numpy as np
 import pandas as pd
 from numba import jit
+import warnings
 
 from pvdeg import temperature, spectral, decorators, utilities
 
 # Constants
 R_GAS = 0.00831446261815324  # Gas constant in kJ/(mol·K)
+
+
+def relative(temperature_air, dew_point):
+    """Calculate ambient relative humidity from dry bulb air temperature and dew point.
+
+    References
+    ----------
+    Alduchov, O. A., and R. E. Eskridge, 1996: Improved Magnus' form approximation of
+    saturation vapor pressure. J. Appl. Meteor., 35, 601–609.
+    August, E. F., 1828: Ueber die Berechnung der Expansivkraft des Wasserdunstes. Ann.
+    Phys. Chem., 13, 122–137.
+    Magnus, G., 1844: Versuche über die Spannkräfte des Wasserdampfs. Ann. Phys. Chem.,
+    61, 225–247.
+
+    Parameters
+    ----------
+    temperature_air : pd.Series or float
+        Series or float of ambient air temperature. [°C]
+
+    dew_point : pd.Series or float
+        Series or float of dew point temperature. [°C]
+
+    Notes
+    -----
+    Passing NaN values in either ``temperature_air`` or ``dew_point`` at any index
+    position will return NaN values in the output at those same position(s) in
+    ``relative_humidity``.
+
+    Returns
+    -------
+    relative_humidity : pd.Series or float
+        Series or float of ambient relative humidity. [%]
+    """
+    if (
+        (isinstance(temperature_air, pd.Series) and temperature_air.isna().any())
+        or (isinstance(dew_point, pd.Series) and dew_point.isna().any())
+        or (isinstance(temperature_air, float) and pd.isna(temperature_air))
+        or (isinstance(dew_point, float) and pd.isna(dew_point))
+    ):
+        warnings.warn(
+            "Input contains NaN values. Output will contain NaNs at those positions."
+        )
+
+    num = np.exp(17.625 * dew_point / (243.04 + dew_point))
+    den = np.exp(17.625 * temperature_air / (243.04 + temperature_air))
+
+    return 100 * num / den
 
 
 # TODO: When is dew_yield used?
