@@ -687,7 +687,7 @@ def back_encapsulant(
     Returns
     -------
     back_encapsulant : pandas series (float)
-        Relative Humidity of Backside Solar Module Encapsulant [%]
+        Relative Humidity of backside solar module encapsulant [%]
     """
     rh_surface = surface_relative(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
@@ -712,16 +712,16 @@ def back_encapsulant(
         Eas=Eas,
     )
 
-    RHback_series = 100 * (Ce_nparray / Csat)
+    back_encapsulant = 100 * (Ce_nparray / Csat)
 
-    return RHback_series
+    return back_encapsulant
 
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
     """Calculate the Relative Humidity of solar module backsheet as timeseries.
 
-    Requires the RH of the backside encapsulant and the outside surface of
-    the module.
+    Requires the relative humidity of the backside encapsulant and the outside surface
+    of the module.
 
     Parameters
     ----------
@@ -810,7 +810,7 @@ def backsheet(
     )
 
     # Get the relative humidity of the back encapsulant
-    RHback_series = back_encapsulant_water_concentration(
+    back_encapsulant = back_encapsulant_water_concentration(
         rh_surface=surface,
         # temp_ambient=temp_ambient,
         temp_module=temp_module,
@@ -826,7 +826,7 @@ def backsheet(
         output="rh",
     )
 
-    return (RHback_series + surface) / 2
+    return (back_encapsulant + surface) / 2
 
 
 @decorators.geospatial_quick_shape(
