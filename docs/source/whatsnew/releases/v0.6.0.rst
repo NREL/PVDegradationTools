@@ -29,10 +29,20 @@ Breaking Changes
     - Introduce a module level constant `R_GAS` for the universal gas constant and
       replaced all hardcoded instances of the gas constant (0.00831446261815324) with
       `R_GAS`
-    - Add `Ead` argument to `front_encap` to enable user to specify custom material
-      fully, previous behaviour enforced the `Ead` value for EVA material
-    - Improve argument handling in `front_encap` to include check for presence of `Ead`
-  (:issue:`202`, :pull:`212`)
+    - Add `Ead` argument to `front_encapsulant` to enable user to specify custom
+      material fully, previous behaviour enforced the `Ead` value for EVA material
+    - Improve argument handling in `front_encapsulant` to include check for presence of
+      `Ead`. (:issue:`202`, :pull:`212`)
+- Rename several variable and function names in :py:mod:`pvdeg.humidity` to improve
+  code clarity and maintainability. Full details are as follows:
+    - Variable `psat` and function `psat()` to `water_saturation_pressure`
+    - Variable `avg_psat` to `avg_water_saturation_pressure`
+    - Variable `surface_outside` to `surface_relative`
+    - Variable `RHfront_series` to `front_encapsulant`
+    - Function `front_encap()` to `front_encapsulant`
+    - Function `Ce()` to `back_encapsulant_water_concentration`
+    - Function `back_encap` to `back_encapsulant`
+  (:issue:`213`, :pull:`224`)
 
 
 Enhancements
@@ -54,6 +64,8 @@ Enhancements
 - Add `"name"`, `"units"`, and `"value"` fields to the materials JSON databases
   `AApermeation.json`, `H2Opermeation.json`, and `O2permeation.json`.
   (:issue:`211`, :pull:`224`)
+- Add new (public) function :py:mod:`pvdeg.humidity` to calculate relative humidity from
+  air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
 
 Deprecations
 -------------

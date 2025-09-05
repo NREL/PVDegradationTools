@@ -8,7 +8,8 @@ import os
 import json
 import pandas as pd
 import pvdeg
-from pytest import approx
+import numpy as np
+import pytest
 from pvdeg import TEST_DATA_DIR
 
 # Load weather data
@@ -24,6 +25,32 @@ rh_expected = pd.read_csv(
 )
 rh_cols = [col for col in rh_expected.columns if "RH" in col]
 rh_expected = rh_expected[rh_cols]
+
+
+def test_relative_float():
+    result = pvdeg.humidity.relative(40.0, 30.0)
+    assert result == pytest.approx(57.45, abs=0.01)
+
+
+def test_relative_series():
+    temp = pd.Series([25.0, 30.0, 35.0])
+    dew = pd.Series([15.0, 10.0, 5.0])
+    result = pvdeg.humidity.relative(temp, dew)
+    expected = pd.Series([53.83, 28.94, 15.51])
+    np.testing.assert_allclose(result, expected, atol=0.01)
+
+
+def test_relative_nan_combinations():
+    test_cases = [
+        (pd.Series([25.0, np.nan]), pd.Series([15.0, 10.0])),  # nan in temp series
+        (pd.Series([25.0, 30.0]), pd.Series([15.0, np.nan])),  # nan in dew series
+        (np.nan, 10.0),  # nan in temp float
+        (25.0, np.nan),  # nan in dew float
+    ]
+
+    for temp, dew in test_cases:
+        with pytest.warns(UserWarning, match="Input contains NaN values"):
+            pvdeg.humidity.relative(temp, dew)
 
 
 def test_module():
@@ -43,15 +70,16 @@ def test_module():
     pd.testing.assert_frame_equal(result, rh_expected, check_dtype=False)
 
 
-def test_psat():
-    """Test pvdeg.humidity.psat.
+def test_water_saturation_pressure():
+    """Test pvdeg.humidity.water_saturation_pressure.
 
     Requires:
     ---------
-    weahter dataframe and meta dictionary
+    weather dataframe and meta dictionary
     """
-    psat_avg = pvdeg.humidity.psat(temp=WEATHER["temp_air"])[1]
-    assert psat_avg == approx(0.47607, abs=5e-5)
+    water_saturation_pressure_avg = pvdeg.humidity.water_saturation_pressure(
+        temp=WEATHER["temp_air"])[1]
+    assert water_saturation_pressure_avg == pytest.approx(0.47607, abs=5e-5)
 
 
 """
