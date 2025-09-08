@@ -5,7 +5,7 @@ from . import humidity, decorators
 import pandas as pd
 
 
-def edge_seal_ingress_rate(avg_psat):
+def edge_seal_ingress_rate(avg_water_saturation_pressure):
     """Calculate moisture ingress rate factor.
 
     Calculates a constant, k, relating the average moisture ingress rate
@@ -25,7 +25,7 @@ def edge_seal_ingress_rate(avg_psat):
 
     Parameters
     ----------
-    avg_psat : float
+    avg_water_saturation_pressure : float
         Time averaged time averaged saturation point for an environment in kPa.
         When looking at outdoor data, one should average over 1 year
 
@@ -38,7 +38,7 @@ def edge_seal_ingress_rate(avg_psat):
         distance for a particular climate without more complicated numerical methods and
         detailed environmental analysis.
     """
-    k = 0.0013 * (avg_psat) ** 0.4933
+    k = 0.0013 * (avg_water_saturation_pressure) ** 0.4933
 
     return k
 
@@ -81,8 +81,10 @@ def edge_seal_width(
         temp = weather_df["temp_air"]
 
     if k is None:
-        psat, avg_psat = humidity.psat(temp)
-        k = edge_seal_ingress_rate(avg_psat)
+        water_saturation_pressure, avg_water_saturation_pressure = (
+            humidity.water_saturation_pressure(temp)
+        )
+        k = edge_seal_ingress_rate(avg_water_saturation_pressure)
 
     width = k * (years * 365.25 * 24) ** 0.5
 
