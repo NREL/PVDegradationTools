@@ -17,11 +17,11 @@ def relative(temperature_air, dew_point):
     References
     ----------
     Alduchov, O. A., and R. E. Eskridge, 1996: Improved Magnus' form approximation of
-    saturation vapor pressure. J. Appl. Meteor., 35, 601–609.
+    saturation vapor pressure. J. Appl. Meteor., 35, 601-609.
     August, E. F., 1828: Ueber die Berechnung der Expansivkraft des Wasserdunstes. Ann.
-    Phys. Chem., 13, 122–137.
+    Phys. Chem., 13, 122-137.
     Magnus, G., 1844: Versuche über die Spannkräfte des Wasserdampfs. Ann. Phys. Chem.,
-    61, 225–247.
+    61, 225-247.
 
     Parameters
     ----------
