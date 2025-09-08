@@ -3,11 +3,60 @@
 import numpy as np
 import pandas as pd
 from numba import jit
+import warnings
 
 from pvdeg import temperature, spectral, decorators, utilities
 
 # Constants
 R_GAS = 0.00831446261815324  # Gas constant in kJ/(mol·K)
+
+
+def relative(temperature_air, dew_point):
+    """Calculate ambient relative humidity from dry bulb air temperature and dew point.
+
+    References
+    ----------
+    Alduchov, O. A., and R. E. Eskridge, 1996: Improved Magnus' form approximation of
+    saturation vapor pressure. J. Appl. Meteor., 35, 601–609.
+    August, E. F., 1828: Ueber die Berechnung der Expansivkraft des Wasserdunstes. Ann.
+    Phys. Chem., 13, 122–137.
+    Magnus, G., 1844: Versuche über die Spannkräfte des Wasserdampfs. Ann. Phys. Chem.,
+    61, 225–247.
+
+    Parameters
+    ----------
+    temperature_air : pd.Series or float
+        Series or float of ambient air temperature. [°C]
+
+    dew_point : pd.Series or float
+        Series or float of dew point temperature. [°C]
+
+    Notes
+    -----
+    Passing NaN values in either ``temperature_air`` or ``dew_point`` at any index
+    position will return NaN values in the output at those same position(s) in
+    ``relative_humidity``.
+
+    Returns
+    -------
+    relative_humidity : pd.Series or float
+        Series or float of ambient relative humidity. [%]
+    """
+    if (
+        (isinstance(temperature_air, pd.Series) and temperature_air.isna().any())
+        or (isinstance(dew_point, pd.Series) and dew_point.isna().any())
+        or (isinstance(temperature_air, float) and pd.isna(temperature_air))
+        or (isinstance(dew_point, float) and pd.isna(dew_point))
+    ):
+        warnings.warn(
+            "Input contains NaN values. Output will contain NaNs at those positions."
+        )
+
+    num = np.exp(17.625 * dew_point / (243.04 + dew_point))
+    den = np.exp(17.625 * temperature_air / (243.04 + temperature_air))
+
+    return 100 * num / den
+
 
 
 @jit
@@ -60,11 +109,11 @@ def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     return dew_yield
 
 
-def psat(temp, average=True):
-    """Calculate water saturation temperature or dew point for given vapor pressure.
+def water_saturation_pressure(temp, average=True):
+    """Calculate the water saturation temperature or dew point for given vapor pressure.
 
-    Water vapor pressure model created from an emperical fit of ln(Psat) vs temperature
-    using a 6th order polynomial fit. The fit produced
+    Water saturation pressure (psat) model created from an emperical fit of
+    ln(psat) vs temperature using a 6th order polynomial fit. The fit produced
     R^2=0.999813. Calculation created by Michael Kempe, unpublished data.
 
     Parameters:
@@ -72,15 +121,16 @@ def psat(temp, average=True):
     temp : series, float
         The air temperature (dry bulb) as a time-indexed series [C]
     average : boolean, default = True
-        If true, return both psat serires and average psat (used for certain calcs)
+        If true, return both water saturation pressure serires and the average water
+        saturation pressure (used for certain calcs)
     Returns:
     --------
-    psat : array, float
+    water_saturation_pressure : array, float
         Saturation point
-    avg_psat : float, optional
-        mean saturation point for the series given
+    avg_water_saturation_pressure : float, optional
+        Mean saturation point for the series given
     """
-    psat = np.exp(
+    water_saturation_pressure = np.exp(
         (3.2575315268e-13 * temp**6)
         - (1.5680734584e-10 * temp**5)
         + (2.2213041913e-08 * temp**4)
@@ -90,12 +140,12 @@ def psat(temp, average=True):
         - (5.6983551678e-1)
     )
     if average:
-        return psat, psat.mean()
+        return water_saturation_pressure, water_saturation_pressure.mean()
     else:
-        return psat
+        return water_saturation_pressure
 
 
-def surface_outside(rh_ambient, temp_ambient, temp_module):
+def surface_relative(rh_ambient, temp_ambient, temp_module):
     """Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
 
     Parameters
@@ -113,7 +163,13 @@ def surface_outside(rh_ambient, temp_ambient, temp_module):
         The relative humidity of the surface of a solar module as a fraction or percent
         depending on input.
     """
-    rh_Surface = rh_ambient * (psat(temp_ambient)[0] / psat(temp_module)[0])
+    rh_Surface = (
+        rh_ambient
+        * (
+            water_saturation_pressure(temp_ambient)[0]
+            / water_saturation_pressure(temp_module)[0]
+        )
+    )
 
     return rh_Surface
 
@@ -162,7 +218,7 @@ def diffusivity_weighted_water(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
 
     # Get the relative humidity of the surface
-    rh_surface = surface_outside(rh_ambient, temp_ambient, temp_module)
+    rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
 
     # Generate a series of the numerator values "prior to summation"
     numerator = (
@@ -184,7 +240,7 @@ def diffusivity_weighted_water(
     return diffuse_weighted_water
 
 
-def front_encap(
+def front_encapsulant(
     rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
     encapsulant="W001"
 ):
@@ -214,27 +270,27 @@ def front_encap(
 
     Return
     ------
-    RHfront_series : pandas series (float)
+    front_encapsulant : pandas series (float)
         Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]["value"]
     diffuse_water = diffusivity_weighted_water(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module, So=So,
         Eas=Eas, Ead=Ead
     )
 
-    RHfront_series = (
+    front_encapsulant = (
         diffuse_water
         / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
-    return RHfront_series
+    return front_encapsulant
 
 def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
     """Return saturation of Water Concentration [g/cm³].
@@ -301,7 +357,7 @@ def ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-def Ce(
+def back_encapsulant_water_concentration(
     temp_module,
     rh_surface,
     start=None,
@@ -389,33 +445,33 @@ def Ce(
     if Po_b is None or Ea_p_b is None:
         Po_b = utilities._read_material(
             name=backsheet, fname="H2Opermeation", item=None, fp=None
-        )["Po"]
+        )["Po"]["value"]
         Ea_p_b = utilities._read_material(
             name=backsheet, fname="H2Opermeation", item=None, fp=None
-        )["Eap"]
+        )["Eap"]["value"]
         if t is None:
             if "t" in utilities._read_material(
                 name=backsheet, fname="H2Opermeation", item=None, fp=None
             ):
                 t = utilities._read_material(
                     name=backsheet, fname="H2Opermeation", item=None, fp=None
-                )["t"]
+                )["t"]["value"]
             else:
                 t = 0.3
     if So_e is None or Ea_s_e is None:
         So_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]
+        )["So"]["value"]
         Ea_s_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]
+        )["Eas"]["value"]
         if back_encap_thickness is None:
             if "t" in utilities._read_material(
                 name=encapsulant, fname="H2Opermeation", item=None, fp=None
             ):
                 back_encap_thickness = utilities._read_material(
                     name=encapsulant, fname="H2Opermeation", item=None, fp=None
-                )["t"]
+                )["t"]["value"]
             else:
                 back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
@@ -486,7 +542,7 @@ def backsheet_from_encap(rh_back_encap, rh_surface_outside):
         Relative Humidity of Frontside Solar module Encapsulant. *See rh_back_encap()
     rh_surface_outside : pandas series (float)
         The relative humidity of the surface of a solar module.
-        *See rh_surface_outside()
+        *See surface_relative()
 
     Returns
     -------
@@ -562,12 +618,12 @@ def backsheet(
     """
 
     # Get the relative humidity of the surface
-    surface = surface_outside(
+    surface = surface_relative(
         rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
     )
 
     # Get the relative humidity of the back encapsulant
-    RHback_series = Ce(
+    RHback_series = back_encapsulant_water_concentration(
         rh_surface=surface,
         # temp_ambient=temp_ambient,
         temp_module=temp_module,
@@ -697,13 +753,13 @@ def module(
         **weather_kwargs,
     )
 
-    rh_surface_outside = surface_outside(
+    rh_surface_outside = surface_relative(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
     )
 
-    rh_front_encap = front_encap(
+    rh_front_encap = front_encapsulant(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,

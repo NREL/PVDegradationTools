@@ -514,6 +514,13 @@ class Scenario:
         for task in process_pipeline.values():
             utilities._update_pipeline_task(task=task)
 
+        for mod in modules:
+            if "material_params" in mod:
+                mod["material_params"] = {
+                    k: v["value"] if isinstance(v, dict) and "value" in v else v
+                    for k, v in mod["material_params"].items()
+                }
+
         instance = cls()
         instance.name = name
         instance.path = path
