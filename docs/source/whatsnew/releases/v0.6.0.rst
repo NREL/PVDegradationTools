@@ -88,6 +88,7 @@ Bug Fixes
   - Remove unused functions and variables
   - Improve code consistency
   (:issue:`177`, :pull:`178`)
+- Clean up and fix bugs in notebooks. (:issue:`179`, :pull:`184`)
 
 
 Dependencies
