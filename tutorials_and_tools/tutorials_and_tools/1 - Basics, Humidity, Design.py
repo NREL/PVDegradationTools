@@ -216,7 +216,7 @@ rh_front_encap = pvdeg.humidity.front_encapsulant(
     temp_module=temp_mod,
 )
 
-rh_back_encap = pvdeg.humidity.Ce(
+rh_back_encap = pvdeg.humidity.back_encapsulant_water_concentration(
     rh_ambient=rh_surface_relative,
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_mod,
