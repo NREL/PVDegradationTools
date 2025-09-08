@@ -210,7 +210,7 @@ rh_surface_outside = pvdeg.humidity.surface_relative(
     temp_module=temp_mod,
 )
 
-rh_front_encap = pvdeg.humidity.front_encap(
+rh_front_encap = pvdeg.humidity.front_encapsulant(
     rh_ambient=rh_surface_outside,
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_mod,
