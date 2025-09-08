@@ -27,7 +27,7 @@
 		"So": { "units": "g/cm³", "value": 0.0982242435416737 },
 		"Eap": { "units": "kJ/mol", "value": 66.9611315410624 },
 		"Po": { "units": "g*mm/m²/day", "value": 189338932521.637 },
-		"t": { "units": "mm", "value": 0.032 }
+		"t": { "units": "mm", "value": 0.32 }
     },
     "W003": {
 		"name": "Coveme",
