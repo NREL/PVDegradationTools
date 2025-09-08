@@ -146,7 +146,7 @@ def water_saturation_pressure(temp, average=True):
 
 
 def surface_relative(rh_ambient, temp_ambient, temp_module):
-    """Calculate the Relative Humidity of a Solar Panel Surface at module temperature.
+    """Calculate the relative humidity on a solar panel surface at the module temperature.
 
     Parameters
     ----------
