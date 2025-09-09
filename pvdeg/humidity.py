@@ -59,8 +59,8 @@ def relative(temperature_air, dew_point):
 
 
 
-@jit
-def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
+#@jit
+def dew_yield(elevation: float, dew_point: float, dry_bulb: float, wind_speed: float, n: float):
     """Estimate the dew yield in [mm/day].
         This may be useful for degradation modeling where the presence of water is a
         factor. E.g. much greater surface conductivity on glass promoting potential 
@@ -115,11 +115,12 @@ def water_saturation_pressure(temp, average=True):
     Water saturation pressure (psat) model created from an emperical fit of
     ln(psat) vs temperature using a 6th order polynomial fit. The fit produced
     R^2=0.999813. Calculation created by Michael Kempe, unpublished data.
+    The fit used data from -40°C to 200°C.
 
     Parameters:
     -----------
     temp : series, float
-        The air temperature (dry bulb) as a time-indexed series [C]
+        The air temperature (dry bulb) as a time-indexed series [°C]
     average : boolean, default = True
         If true, return both water saturation pressure serires and the average water
         saturation pressure (used for certain calcs)
@@ -449,16 +450,12 @@ def back_encapsulant_water_concentration(
                 "If rh_surface is not provided, both rh_ambient and temp_ambient must be provided."
             )
         # Get the relative humidity of the surface
-        rh_surface = surface_outside(
+        rh_surface = surface_relative(
             rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
-        )
-    else:
-        raise ValueError(
-            "rh_surface most be provided, or rh_ambient and temp_ambient must be provided to calculate rh_surface."
         )
     
     Ce_list = np.zeros(len(temp_module))
-    Ce_out = temp_module
+    index_passthrough_variable = temp_module.index
     if not isinstance(temp_module, np.ndarray):
         temp_module = temp_module.to_numpy()
     if not isinstance(rh_surface, np.ndarray):
@@ -512,21 +509,16 @@ def back_encapsulant_water_concentration(
         )
     else:
         Ce_start = start
-        Ce_list = _Ce(WVTRo, EaWVTR, temp_module, So, Eas, Ce_start, rh_surface)
 
-    print("error check=", So, Eas, Ce_start, WVTRo, EaWVTR, temp_module, rh_surface)
-    print(Ce_list)
+    Ce_list = _Ce(WVTRo=WVTRo, EaWVTR=EaWVTR, temp_module=temp_module, So=So, Eas=Eas, Ce_start=Ce_start, rh_surface=rh_surface)
 
     if output == "rh":
         # Convert the concentration to relative humidity
         Ce_list = 100 * (Ce_list / (So * np.exp(-(Eas / (temp_module + 273.15)))))
-        Ce_list = pd.Series(Ce_list, name="RH_back_encapsulant")
+        Ce_list = pd.Series(Ce_list, index=index_passthrough_variable, name="RH_back_encapsulant")
     else:
-        Ce_list = pd.Series(Ce_list, name="Ce_back_encapsulant")
+        Ce_list = pd.Series(Ce_list, index=index_passthrough_variable, name="Ce_back_encapsulant")
 
-    print(Ce_list)
-
-    Ce_list.index = Ce_out.index
     return Ce_list
 
 
@@ -659,7 +651,8 @@ def backsheet(
     # Get the relative humidity of the back encapsulant
     RHback_series = back_encapsulant_water_concentration(
         rh_surface=surface,
-        # temp_ambient=temp_ambient,
+        #temp_ambient=temp_ambient,
+        #rh_ambient=rh_ambient,
         temp_module=temp_module,
         start=start,
         Po_b=Po_b,
@@ -803,7 +796,7 @@ def module(
         encapsulant=encapsulant,
     )
 
-    rh_back_encap = Ce(
+    rh_back_encap = back_encapsulant_water_concentration(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
@@ -818,7 +811,7 @@ def module(
         output="rh",
     )
 
-    Ce_back_encap = Ce(
+    Ce_back_encap = back_encapsulant_water_concentration(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
