@@ -58,9 +58,10 @@ def relative(temperature_air, dew_point):
     return 100 * num / den
 
 
-
-#@jit
-def dew_yield(elevation: float, dew_point: float, dry_bulb: float, wind_speed: float, n: float):
+# @jit
+def dew_yield(
+    elevation: float, dew_point: float, dry_bulb: float, wind_speed: float, n: float
+):
     """Estimate the dew yield in [mm/day].
         This may be useful for degradation modeling where the presence of water is a
         factor. E.g. much greater surface conductivity on glass promoting potential
@@ -164,12 +165,9 @@ def surface_relative(rh_ambient, temp_ambient, temp_module):
         The relative humidity of the surface of a solar module as a fraction or percent
         depending on input.
     """
-    rh_Surface = (
-        rh_ambient
-        * (
-            water_saturation_pressure(temp_ambient)[0]
-            / water_saturation_pressure(temp_module)[0]
-        )
+    rh_Surface = rh_ambient * (
+        water_saturation_pressure(temp_ambient)[0]
+        / water_saturation_pressure(temp_module)[0]
     )
 
     return rh_Surface
@@ -217,11 +215,14 @@ def diffusivity_weighted_water(
 
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]["value"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Ead"]["value"]
 
     # Get the relative humidity of the surface
     rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
@@ -288,11 +289,14 @@ def front_encapsulant(
     """
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]["value"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Ead"]["value"]
     diffuse_water = diffusivity_weighted_water(
         rh_ambient=rh_ambient,
         temp_ambient=temp_ambient,
@@ -303,8 +307,7 @@ def front_encapsulant(
     )
 
     front_encapsulant = (
-        diffuse_water
-        / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
+        diffuse_water / (So * np.exp(-(Eas / (R_GAS * (temp_module + 273.15)))))
     ) * 100
 
     return front_encapsulant
@@ -339,9 +342,11 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
 
     if So is None or Eas is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]["value"]
 
     # Saturation of water concentration
     Csat = So * np.exp(-(Eas / (R_GAS * (273.15 + temp_module))))
@@ -517,9 +522,6 @@ def back_encapsulant_water_concentration(
     Eas = Ea_s_e / R_GAS
     # Ce is the initial start of concentration of water
 
-
-
-
     if start is None:
         Ce_start = (
             So * np.exp(-(Eas / (temp_module[0] + 273.15))) * rh_surface[0] / 100 / 2
@@ -527,14 +529,26 @@ def back_encapsulant_water_concentration(
     else:
         Ce_start = start
 
-    Ce_list = _Ce(WVTRo=WVTRo, EaWVTR=EaWVTR, temp_module=temp_module, So=So, Eas=Eas, Ce_start=Ce_start, rh_surface=rh_surface)
+    Ce_list = _Ce(
+        WVTRo=WVTRo,
+        EaWVTR=EaWVTR,
+        temp_module=temp_module,
+        So=So,
+        Eas=Eas,
+        Ce_start=Ce_start,
+        rh_surface=rh_surface,
+    )
 
     if output == "rh":
         # Convert the concentration to relative humidity
         Ce_list = 100 * (Ce_list / (So * np.exp(-(Eas / (temp_module + 273.15)))))
-        Ce_list = pd.Series(Ce_list, index=index_passthrough_variable, name="RH_back_encapsulant")
+        Ce_list = pd.Series(
+            Ce_list, index=index_passthrough_variable, name="RH_back_encapsulant"
+        )
     else:
-        Ce_list = pd.Series(Ce_list, index=index_passthrough_variable, name="Ce_back_encapsulant")
+        Ce_list = pd.Series(
+            Ce_list, index=index_passthrough_variable, name="Ce_back_encapsulant"
+        )
 
     return Ce_list
 
@@ -643,9 +657,7 @@ def Ce_numba(
                 / 100
                 / 100
                 / 24
-                * np.exp(
-                    -((EaWVTR) / (R_GAS * (temp_module[i] + 273.15)))
-                )
+                * np.exp(-((EaWVTR) / (R_GAS * (temp_module[i] + 273.15))))
             )
             / (
                 So
@@ -837,8 +849,8 @@ def backsheet(
     # Get the relative humidity of the back encapsulant
     back_encapsulant = back_encapsulant_water_concentration(
         rh_surface=surface,
-        #temp_ambient=temp_ambient,
-        #rh_ambient=rh_ambient,
+        # temp_ambient=temp_ambient,
+        # rh_ambient=rh_ambient,
         temp_module=temp_module,
         start=start,
         Po_b=Po_b,
@@ -989,14 +1001,10 @@ def module(
     )
 
     rh_back_encap = back_encapsulant_water_concentration(
+        temp_module=temp_module,
+        rh_surface=None,
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
-        temp_module=temp_module,
-        Po_b=Po_b,
-        Ea_p_b=Ea_p_b,
-        t=backsheet_thickness,
-        So_e=So_e,
-        Ea_s_e=Ea_s_e,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
         t=backsheet_thickness,
@@ -1023,7 +1031,7 @@ def module(
         output="Ce",
     )
 
-    rh_backsheet = (rh_back_encap + rh_surface_outside)/2
+    rh_backsheet = (rh_back_encap + rh_surface_outside) / 2
 
     data = {
         "RH_surface_outside": rh_surface_outside,
