@@ -1459,6 +1459,7 @@ def display_json(
 
     # Display the HTML
     display(HTML(html))
+    print(html)
 
 
 def search_json(
