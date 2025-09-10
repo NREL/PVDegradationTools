@@ -993,10 +993,6 @@ def module(
         Eas=Ea_s_e,
         Ead=Ea_d_e,
         encapsulant=encapsulant,
-        So=So_e,
-        Eas=Ea_s_e,
-        Ead=Ea_d_e,
-        encapsulant=encapsulant,
     )
 
     rh_back_encap = back_encapsulant_water_concentration(
