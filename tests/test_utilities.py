@@ -11,10 +11,13 @@ import pvdeg
 from rex import Outputs
 import json
 import shutil
+import io
+import sys
 
 import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
 from collections import OrderedDict
+
 
 
 def test_read_material_basic():
@@ -79,10 +82,6 @@ def test_search_json_fp():
     if alias:
         result = pvdeg.utilities.search_json(fp=fpath, name_or_alias=alias)
         assert result == known_key
-
-
-import io
-import sys
 
 
 def test_display_json_basic():
@@ -411,6 +410,7 @@ def test_strip_normalize_tmy():
 def test_tilt_azimuth_scan():
     def dummy_func(tilt, azimuth, **kwarg):
         return tilt + azimuth
+
 
 def test_tilt_azimuth_scan_basic():
     """Test pvdeg.utilities.tilt_azimuth_scan with a dummy function."""

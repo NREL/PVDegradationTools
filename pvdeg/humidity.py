@@ -148,7 +148,8 @@ def water_saturation_pressure(temp, average=True):
 
 
 def surface_relative(rh_ambient, temp_ambient, temp_module):
-    """Calculate the relative humidity on a solar panel surface at the module temperature.
+    """Calculate the relative humidity on a solar panel surface at the module
+    temperature.
 
     Parameters
     ----------
@@ -418,13 +419,16 @@ def back_encapsulant_water_concentration(
     rh_surface : list (float)
         The relative humidity of the surface of a solar module [%]
         EXAMPLE: "50 = 50% NOT 0.5 = 50%"
-        if this parameter is not provided, it will be calculated using rh_ambient and temp_ambient.
+        if this parameter is not provided, it will be calculated using rh_ambient and
+        temp_ambient.
     rh_ambient : series (float)
         Ambient outdoor relative humidity. [%] Example: 50 = 50%, NOT 0.5 = 50%
-        If rh_surface is not provided, this parameter along with temp_ambient will be used to calculate it.
+        If rh_surface is not provided, this parameter along with temp_ambient will be
+        used to calculate it.
     temp_ambient : series (float)
         Ambient outdoor temperature [°C]
-        If rh_surface is not provided, this parameter along with rh_ambient will be used to calculate it.
+        If rh_surface is not provided, this parameter along with rh_ambient will be used
+        to calculate it.
     start : float
         Initial value of the Concentration of water in the encapsulant.
         by default, the function will use half the equilibrium value as the first
@@ -468,7 +472,8 @@ def back_encapsulant_water_concentration(
     if rh_surface is None:
         if rh_ambient is None or temp_ambient is None:
             raise ValueError(
-                "If rh_surface is not provided, both rh_ambient and temp_ambient must be provided."
+                "If rh_surface is not provided, both rh_ambient and temp_ambient must be" \
+                "provided."
             )
         # Get the relative humidity of the surface
         rh_surface = surface_relative(
