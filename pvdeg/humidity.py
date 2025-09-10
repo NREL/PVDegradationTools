@@ -63,7 +63,7 @@ def relative(temperature_air, dew_point):
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """Estimate the dew yield in [mm/day].
         This may be useful for degradation modeling where the presence of water is a
-        factor. E.g. much greater surface conductivity on glass promoting potential 
+        factor. E.g. much greater surface conductivity on glass promoting potential
         induced degradation (PID).
 
         Calculation taken from: Beysens,
@@ -175,8 +175,13 @@ def surface_relative(rh_ambient, temp_ambient, temp_module):
 
 
 def diffusivity_weighted_water(
-    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
-    encapsulant="W001"
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    So=None,
+    Eas=None,
+    Ead=None,
+    encapsulant="W001",
 ):
     """Calculate the diffusivity weighted average module surface RH.
 
@@ -205,17 +210,20 @@ def diffusivity_weighted_water(
     Return
     ------
     diffuse_weighted_water : pandas series (float)
-        Average water content in equilibrium with the module surface, weighted 
+        Average water content in equilibrium with the module surface, weighted
         by the encapsulant diffusivity in [g/cm³].
     """
 
     if So is None or Eas is None or Ead is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Eas"]["value"]
         Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None
+        )["Ead"]["value"]
 
     # Get the relative humidity of the surface
     rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
@@ -236,13 +244,20 @@ def diffusivity_weighted_water(
     denominator = denominator.sum(axis=0, skipna=True)
 
     diffuse_weighted_water = (numerator / denominator) / 100
+    diffuse_weighted_water = (numerator / denominator) / 100
 
+    return diffuse_weighted_water
     return diffuse_weighted_water
 
 
 def front_encapsulant(
-    rh_ambient, temp_ambient, temp_module, So=None, Eas=None, Ead=None,
-    encapsulant="W001"
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    So=None,
+    Eas=None,
+    Ead=None,
+    encapsulant="W001",
 ):
     """Calculate diffusivity weighted average Relative Humidity of the module surface.
 
@@ -281,8 +296,12 @@ def front_encapsulant(
         Ead = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Ead"]["value"]
     diffuse_water = diffusivity_weighted_water(
-        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module, So=So,
-        Eas=Eas, Ead=Ead
+        rh_ambient=rh_ambient,
+        temp_ambient=temp_ambient,
+        temp_module=temp_module,
+        So=So,
+        Eas=Eas,
+        Ead=Ead,
     )
 
     front_encapsulant = (
@@ -291,6 +310,7 @@ def front_encapsulant(
     ) * 100
 
     return front_encapsulant
+
 
 def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
     """Return saturation of Water Concentration [g/cm³].
@@ -310,7 +330,7 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
     Eas : float
         Encapsulant solubility activation energy in [kJ/mol]
     encapsulant : str
-        This is the code number for the encapsulant. 
+        This is the code number for the encapsulant.
         The default is EVA 'W001'.
 
     Returns
@@ -318,13 +338,13 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
     Csat : pandas series (float)
         Saturation of Water Concentration [g/cm³]
     """
-    
+
     if So is None or Eas is None:
         So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["So"]["value"]
         Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]
-    
+            name=encapsulant, fname="H2Opermeation", item=None, fp=None)["Eas"]["value"]
+
     # Saturation of water concentration
     Csat = So * np.exp(-(Eas / (R_GAS * (273.15 + temp_module))))
 
@@ -336,7 +356,7 @@ def ceq(Csat, rh_SurfaceOutside):
     Return Equilibration water concentration [g/cm³].
 
     Calculation is used in determining Relative Humidity of Backside Solar Module
-    Encapsulant, and returns Equilibration water concentration [g/cm³]. 
+    Encapsulant, and returns Equilibration water concentration [g/cm³].
     For most coding, it is better to just run the calculation insitu. The code is
     here for completeness and for informational purposes.
 
@@ -529,12 +549,181 @@ def _Ce(
     return Ce
 
 
+@jit
+def Ce_numba(
+    start,
+    temp_module,
+    rh_surface,
+    WVTRo=7970633554,
+    EaWVTR=55.0255,
+    So=1.81390702,
+    back_encap_thickness=0.5,
+    Eas=16.729,
+):
+    """Return water concentration in encapsulant.
+
+    Calculation is used in determining Relative Humidity of Backside Solar Module
+    Encapsulant. This function returns a numpy array of the Concentration of water in
+    the encapsulant at every time step.
+
+    Numba was used to isolate recursion requiring a for loop
+    Numba Functions compile and run in machine code but can not use pandas (Very fast).
+
+    Parameters
+    -----------
+    start : float
+        Initial value of the Concentration of water in the encapsulant
+        currently takes the first value produced from
+        the _ceq(Saturation of Water Concentration) as a point
+        of acceptable equilibrium
+    temp_module : pandas series (float)
+        The surface temperature in Celsius of the solar panel module
+        "module temperature [°C]"
+    rh_Surface : list (float)
+        The relative humidity of the surface of a solar module [%]
+        EXAMPLE: "50 = 50% NOT .5 = 50%"
+    WVTRo : float
+        Water Vapor Transfer Rate prefactor [g/m2/day].
+        The suggested value for EVA is WVTRo = 7970633554(g/m2/day).
+    EaWVTR : float
+        Water Vapor Transfer Rate activation energy [kJ/mol] .
+        It is suggested to use 0.15[mm] thick PET as a default
+        for the backsheet and set EaWVTR=55.0255[kJ/mol]
+    So : float
+        Encapsulant solubility prefactor in [g/cm3]
+        So = 1.81390702(g/cm3) is the suggested value for EVA.
+    back_encap_thickness : float
+        Thickness of the backside encapsulant [mm].
+        The suggested value for EVA encapsulant is 0.5 mm
+    Eas : float
+        Encapsulant solubility activation energy in [kJ/mol]
+        Eas = 16.729[kJ/mol] is the suggested value for EVA.
+
+    Returns
+    --------
+    Ce_list : numpy array
+        Concentration of water in the encapsulant at every time step
+    """
+    dataPoints = len(temp_module)
+    Ce_list = np.zeros(dataPoints)
+
+    for i in range(0, len(rh_surface)):
+        if i == 0:
+            # Ce = Initial start of concentration of water
+            Ce = start
+        else:
+            Ce = Ce_list[i - 1]
+
+        Ce = Ce + (
+            (
+                WVTRo
+                / 100
+                / 100
+                / 24
+                * np.exp(
+                    -((EaWVTR) / (R_GAS * (temp_module[i] + 273.15)))
+                )
+            )
+            / (
+                So
+                * back_encap_thickness
+                / 10
+                * np.exp(-((Eas) / (R_GAS * (temp_module[i] + 273.15))))
+            )
+            * (
+                rh_surface[i]
+                / 100
+                * So
+                * np.exp(-((Eas) / (R_GAS * (temp_module[i] + 273.15))))
+                - Ce
+            )
+        )
+
+        Ce_list[i] = Ce
+
+    return Ce_list
+
+
+def back_encapsulant(
+    rh_ambient,
+    temp_ambient,
+    temp_module,
+    WVTRo=7970633554,
+    EaWVTR=55.0255,
+    So=1.81390702,
+    back_encap_thickness=0.5,
+    Eas=16.729,
+):
+    """Return RH of backside module encapsulant.
+
+    Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
+    and return a pandas series for each time step
+
+    Parameters
+    ----------
+    rh_ambient : pandas series (float)
+        The ambient outdoor environmnet relative humidity in [%]
+        EXAMPLE: "50 = 50% NOT .5 = 50%"
+    temp_ambient : pandas series (float)
+        The ambient outdoor environmnet temperature in Celsius
+    temp_module : list (float)
+        The surface temperature in Celsius of the solar panel module
+        "module temperature [°C]"
+    WVTRo : float
+        Water Vapor Transfer Rate prefactor [g/m2/day].
+        The suggested value for EVA is WVTRo = 7970633554[g/m2/day].
+    EaWVTR : float
+        Water Vapor Transfer Rate activation energy [kJ/mol] .
+        It is suggested to use 0.15[mm] thick PET as a default
+        for the backsheet and set EaWVTR=55.0255[kJ/mol]
+    So : float
+        Encapsulant solubility prefactor in [g/cm3]
+        So = 1.81390702[g/cm3] is the suggested value for EVA.
+    back_encap_thickness : float
+        Thickness of the backside encapsulant [mm].
+        The suggested value for EVA encapsulant is 0.5 mm.
+    Eas : float
+        Encapsulant solubility activation energy in [kJ/mol]
+        Eas = 16.729[kJ/mol] is the suggested value for EVA.
+
+    Returns
+    -------
+    back_encapsulant : pandas series (float)
+        Relative Humidity of backside solar module encapsulant [%]
+    """
+    rh_surface = surface_relative(
+        rh_ambient=rh_ambient, temp_ambient=temp_ambient, temp_module=temp_module
+    )
+
+    Csat = csat(temp_module=temp_module, So=So, Eas=Eas)
+    Ceq = ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
+
+    start = Ceq.iloc[0]
+
+    # Need to convert these series to numpy arrays for numba function
+    temp_module_numba = temp_module.to_numpy()
+    rh_surface_numba = rh_surface.to_numpy()
+    Ce_nparray = Ce_numba(
+        start=start,
+        temp_module=temp_module_numba,
+        rh_surface=rh_surface_numba,
+        WVTRo=WVTRo,
+        EaWVTR=EaWVTR,
+        So=So,
+        back_encap_thickness=back_encap_thickness,
+        Eas=Eas,
+    )
+
+    back_encapsulant = 100 * (Ce_nparray / Csat)
+
+    return back_encapsulant
+
 
 def backsheet_from_encap(rh_back_encap, rh_surface_outside):
     """Calculate the Relative Humidity of solar module backsheet as timeseries.
 
-    Requires the RH of the backside encapsulant and the outside surface of
-    the module.
+    Requires the relative humidity of the backside encapsulant and the outside surface
+    of the module.
 
     Parameters
     ----------
@@ -623,7 +812,7 @@ def backsheet(
     )
 
     # Get the relative humidity of the back encapsulant
-    RHback_series = back_encapsulant_water_concentration(
+    back_encapsulant = back_encapsulant_water_concentration(
         rh_surface=surface,
         # temp_ambient=temp_ambient,
         temp_module=temp_module,
@@ -639,7 +828,7 @@ def backsheet(
         output="rh",
     )
 
-    return (RHback_series + surface) / 2
+    return (back_encapsulant + surface) / 2
 
 
 @decorators.geospatial_quick_shape(
@@ -664,7 +853,7 @@ def module(
     back_encap_thickness=None,
     backsheet="W017",
     encapsulant="W001",
-    ** weather_kwargs
+    **weather_kwargs,
 ):
     """Calculate the Relative Humidity of solar module backsheet from timeseries data.
 
@@ -688,7 +877,7 @@ def module(
         (e.g. SAPM). The NSRDB provides calculations at 2 m (i.e module height) but SAPM
         uses a 10m height. It is recommended that a power-law relationship between
         height and wind speed of 0.33 be used*. This results in a wind speed that is
-        1.7 times higher. It is acknowledged that this can vary significantly.               
+        1.7 times higher. It is acknowledged that this can vary significantly.
     Po_b : float
         Water permeation rate prefactor [g·mm/m²/day].
         The suggested value for PET W17 is Po = 1319534666.90318 [g·mm/m²/day].
@@ -717,15 +906,15 @@ def module(
 
     Returns
     --------
-    rh_surface_outside : float pandas dataframe 
+    rh_surface_outside : float pandas dataframe
         relative humidity of the PV module surface as a time-series,
-    rh_front_encap: float pandas dataframe 
+    rh_front_encap: float pandas dataframe
         relative humidity of the PV frontside encapsulant as a time-series,
     rh_back_encap : float pandas dataframe
         relative humidity of the PV backside encapsulant as a time-series,
-    Ce_back_encap : float pandas dataframe 
+    Ce_back_encap : float pandas dataframe
         concentration of water in the PV backside encapsulant as a time-series,
-    rh_backsheet : float pandas dataframe 
+    rh_backsheet : float pandas dataframe
         relative humidity of the PV backsheet as a time-series
     """
     # solar_position = spectral.solar_position(weather_df, meta)
@@ -741,6 +930,7 @@ def module(
         azimuth=azimuth,
         sky_model=sky_model,
         **weather_kwargs,
+        **weather_kwargs,
     )
 
     temp_module = temperature.module(
@@ -750,6 +940,7 @@ def module(
         temp_model=temp_model,
         conf=conf,
         wind_factor=wind_factor,
+        **weather_kwargs,
         **weather_kwargs,
     )
 
@@ -767,12 +958,21 @@ def module(
         Eas=Ea_s_e,
         Ead=Ea_d_e,
         encapsulant=encapsulant,
+        So=So_e,
+        Eas=Ea_s_e,
+        Ead=Ea_d_e,
+        encapsulant=encapsulant,
     )
 
     rh_back_encap = Ce(
         rh_ambient=weather_df["relative_humidity"],
         temp_ambient=weather_df["temp_air"],
         temp_module=temp_module,
+        Po_b=Po_b,
+        Ea_p_b=Ea_p_b,
+        t=backsheet_thickness,
+        So_e=So_e,
+        Ea_s_e=Ea_s_e,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
         t=backsheet_thickness,
