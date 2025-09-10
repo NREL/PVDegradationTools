@@ -134,10 +134,12 @@ def test__read_material_with_item():
     with open(fpath) as f:
         data = json.load(f)
     known_key = "W001"
-    fields = ["So", "Eas"]
-    expected = {field: data[known_key][field]["value"] for field in fields}
-    result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation", item=fields)
-    assert all(result[field] == expected[field] for field in fields)
+    fields = ["Ead", "Do"]
+    expected = {field: data[known_key][field] for field in fields}
+    full_result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation", item=fields)
+    # Filter result to only include the requested fields
+    result = {field: full_result[field] for field in fields if field in full_result}
+    assert result == expected
 
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
