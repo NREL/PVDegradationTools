@@ -135,7 +135,7 @@ def test__read_material_with_item():
         data = json.load(f)
     known_key = "W001"
     fields = ["So", "Eas"]
-    expected = {field: data[known_key][field] for field in fields}
+    expected = {field: data[known_key][field]["value"] for field in fields}
     result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation", item=fields)
     assert all(result[field] == expected[field] for field in fields)
 
