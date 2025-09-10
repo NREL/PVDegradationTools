@@ -16,6 +16,130 @@ import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
 from collections import OrderedDict
 
+def test_read_material_basic():
+    """Test pvdeg.utilities.read_material returns correct dict for a known key."""
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    known_key = next(iter(data.keys()))
+    expected = data[known_key]
+    result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key)
+    assert result == expected
+
+def test_read_material_parameters():
+    """Test pvdeg.utilities.read_material returns only requested parameters."""
+    fpath = os.path.join(DATA_DIR, "O2permeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    known_key = next(iter(data.keys()))
+    params = ["name", "alias"]
+    expected = {k: data[known_key].get(k, None) for k in params}
+    result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key, parameters=params)
+    assert result == expected
+
+def test_search_json_name():
+    """Test pvdeg.utilities.search_json with name lookup."""
+    # Find a known name in H2Opermeation.json
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    # Use the first entry's 'name' or 'alias' field
+    known_key = next(iter(data.keys()))
+    name = data[known_key].get("name", None)
+    if name:
+        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation", name_or_alias=name)
+        assert result == known_key
+
+def test_search_json_alias():
+    """Test pvdeg.utilities.search_json with alias lookup."""
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    known_key = next(iter(data.keys()))
+    alias = data[known_key].get("alias", None)
+    if alias:
+        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation", name_or_alias=alias)
+        assert result == known_key
+
+def test_search_json_fp():
+    """Test pvdeg.utilities.search_json with explicit file path."""
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    known_key = next(iter(data.keys()))
+    alias = data[known_key].get("alias", None)
+    if alias:
+        result = pvdeg.utilities.search_json(fp=fpath, name_or_alias=alias)
+        assert result == known_key
+
+import io
+import sys
+
+def test_display_json_basic():
+    """Test pvdeg.utilities.display_json prints JSON for a known file."""
+    # Capture stdout
+    captured_output = io.StringIO()
+    sys_stdout = sys.stdout
+    sys.stdout = captured_output
+    try:
+        pvdeg.utilities.display_json(pvdeg_file="H2Opermeation")
+    finally:
+        sys.stdout = sys_stdout
+    output = captured_output.getvalue()
+    # Check that output contains expected keys from the file
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    for key in list(data.keys())[:2]:  # Check first two keys for brevity
+        assert key in output
+
+def test_display_json_fp():
+    """Test pvdeg.utilities.display_json with explicit file path."""
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    captured_output = io.StringIO()
+    sys_stdout = sys.stdout
+    sys.stdout = captured_output
+    try:
+        pvdeg.utilities.display_json(fp=fpath)
+    finally:
+        sys.stdout = sys_stdout
+    output = captured_output.getvalue()
+    with open(fpath) as f:
+        data = json.load(f)
+    for key in list(data.keys())[:2]:
+        assert key in output
+
+def test__read_material_no_name():
+    """Test pvdeg.utilities._read_material with no name (should return full dict)."""
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        expected = json.load(f)
+    result = pvdeg.utilities._read_material(name=None, fname="H2Opermeation")
+    assert result == expected
+
+def test__read_material_with_name():
+    """Test pvdeg.utilities._read_material with a specific material name."""
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    # Pick a known key from the file
+    known_key = next(iter(data.keys()))
+    expected = data[known_key]
+    result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation")
+    assert result == expected
+
+def test__read_material_with_item():
+    """Test pvdeg.utilities._read_material with item parameter (list of fields)."""
+    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
+    with open(fpath) as f:
+        data = json.load(f)
+    # Pick a known key and some fields
+    known_key = next(iter(data.keys()))
+    fields = ["So", "Eas"]
+    expected = {field: data[known_key][field] for field in fields}
+    result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation", item=fields)
+    assert all(result[field] == expected[field] for field in fields)
+
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
     "psm3": os.path.join(TEST_DATA_DIR, "psm3_pytest.csv"),
@@ -271,6 +395,21 @@ def test_tilt_azimuth_scan():
     def dummy_func(tilt, azimuth, **kwarg):
         return tilt + azimuth
 
+def test_tilt_azimuth_scan_basic():
+    """Test pvdeg.utilities.tilt_azimuth_scan with a dummy function."""
+    def dummy_func(tilt, azimuth, **kwarg):
+        return tilt + azimuth
+
+    arr = pvdeg.utilities.tilt_azimuth_scan(
+        weather_df=None, meta=None, tilt_step=45, azimuth_step=90, func=dummy_func
+    )
+    # Check output type and shape
+    assert isinstance(arr, np.ndarray)
+    assert arr.shape[1] == 3
+    # Check that the dummy function is applied correctly
+    for row in arr:
+        tilt, azimuth, value = row
+        assert value == tilt + azimuth
     arr = pvdeg.utilities.tilt_azimuth_scan(
         weather_df=None, meta=None, tilt_step=45, azimuth_step=90, func=dummy_func
     )
