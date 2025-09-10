@@ -63,13 +63,13 @@ def dew_yield(
     elevation: float, dew_point: float, dry_bulb: float, wind_speed: float, n: float
 ):
     """Estimate the dew yield in [mm/day].
-        This may be useful for degradation modeling where the presence of water is a
-        factor. E.g. much greater surface conductivity on glass promoting potential
-        induced degradation (PID).
+    This may be useful for degradation modeling where the presence of water is a
+    factor. E.g. much greater surface conductivity on glass promoting potential
+    induced degradation (PID).
 
-        Calculation taken from: Beysens,
-        "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167
-        (2016) 146-155.
+    Calculation taken from: Beysens,
+    "Estimating dew yield worldwide from a few meteo data", Atmospheric Research 167
+    (2016) 146-155.
 
     Parameters
     ----------
@@ -599,8 +599,8 @@ def Ce_numba(
     """Return water concentration in encapsulant.
 
     Calculation is used in determining Relative Humidity of Backside Solar Module
-    Encapsulant. This function returns a numpy array of the Concentration of water in
-    the encapsulant at every time step.
+    Encapsulant. This function returns a numpy array of the Concentration of water
+    in the encapsulant at every time step.
 
     Numba was used to isolate recursion requiring a for loop
     Numba Functions compile and run in machine code but can not use pandas (Very fast).

@@ -16,6 +16,7 @@ import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
 from collections import OrderedDict
 
+
 def test_read_material_basic():
     """Test pvdeg.utilities.read_material returns correct dict for a known key."""
     fpath = os.path.join(DATA_DIR, "O2permeation.json")
@@ -25,6 +26,7 @@ def test_read_material_basic():
     expected = data[known_key]
     result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key)
     assert result == expected
+
 
 def test_read_material_parameters():
     """Test pvdeg.utilities.read_material returns only requested parameters."""
@@ -37,6 +39,7 @@ def test_read_material_parameters():
     result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key,
                                            parameters=params)
     assert result == expected
+
 
 def test_search_json_name():
     """Test pvdeg.utilities.search_json with name lookup."""
@@ -52,6 +55,7 @@ def test_search_json_name():
                                              name_or_alias=name)
         assert result == known_key
 
+
 def test_search_json_alias():
     """Test pvdeg.utilities.search_json with alias lookup."""
     fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
@@ -64,6 +68,7 @@ def test_search_json_alias():
                                              name_or_alias=alias)
         assert result == known_key
 
+
 def test_search_json_fp():
     """Test pvdeg.utilities.search_json with explicit file path."""
     fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
@@ -75,8 +80,10 @@ def test_search_json_fp():
         result = pvdeg.utilities.search_json(fp=fpath, name_or_alias=alias)
         assert result == known_key
 
+
 import io
 import sys
+
 
 def test_display_json_basic():
     """Test pvdeg.utilities.display_json prints JSON for a known file."""
@@ -96,6 +103,7 @@ def test_display_json_basic():
     for key in list(data.keys())[:2]:  # Check first two keys for brevity
         assert key in output
 
+
 def test_display_json_fp():
     """Test pvdeg.utilities.display_json with explicit file path."""
     fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
@@ -112,6 +120,7 @@ def test_display_json_fp():
     for key in list(data.keys())[:2]:
         assert key in output
 
+
 def test__read_material_no_name():
     """Test pvdeg.utilities._read_material with no name (should return full dict)."""
     fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
@@ -119,6 +128,7 @@ def test__read_material_no_name():
         expected = json.load(f)
     result = pvdeg.utilities._read_material(name=None, fname="H2Opermeation")
     assert result == expected
+
 
 def test__read_material_with_name():
     """Test pvdeg.utilities._read_material with a specific material name."""
@@ -130,6 +140,7 @@ def test__read_material_with_name():
     expected = data[known_key]
     result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation")
     assert result == expected
+
 
 def test__read_material_with_item():
     """Test pvdeg.utilities._read_material with item parameter (list of fields)."""
@@ -144,6 +155,7 @@ def test__read_material_with_item():
     # Filter result to only include the requested fields
     result = {field: full_result[field] for field in fields if field in full_result}
     assert result == expected
+
 
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),

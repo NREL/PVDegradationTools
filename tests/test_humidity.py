@@ -11,7 +11,6 @@ import pvdeg
 import numpy as np
 import pytest
 from pvdeg import TEST_DATA_DIR
-import numpy as np
 
 # Load weather data
 WEATHER = pd.read_csv(
@@ -33,12 +32,14 @@ def test_relative_float():
     assert result == pytest.approx(57.45, abs=0.01)
 
 
+
 def test_relative_series():
     temp = pd.Series([25.0, 30.0, 35.0])
     dew = pd.Series([15.0, 10.0, 5.0])
     result = pvdeg.humidity.relative(temp, dew)
     expected = pd.Series([53.83, 28.94, 15.51])
     np.testing.assert_allclose(result, expected, atol=0.01)
+
 
 
 def test_relative_nan_combinations():
@@ -52,6 +53,7 @@ def test_relative_nan_combinations():
     for temp, dew in test_cases:
         with pytest.warns(UserWarning, match="Input contains NaN values"):
             pvdeg.humidity.relative(temp, dew)
+
 
 def test_water_saturation_pressure_mean():
     """Test pvdeg.humidity.water_saturation_pressure.
@@ -69,6 +71,7 @@ def test_water_saturation_pressure_mean():
     assert water_saturation_pressure_avg[0][3] == pytest.approx(0.462112, abs=5e-5)
     assert water_saturation_pressure_avg[0][4] == pytest.approx(0.458343, abs=5e-5)
 
+
 def test_water_saturation_pressure_individual_points():
     """Test pvdeg.humidity.water_saturation_pressure.
 
@@ -83,6 +86,7 @@ def test_water_saturation_pressure_individual_points():
     assert water_saturation_pressure[2] == pytest.approx(0.462112, abs=5e-5)
     assert water_saturation_pressure[3] == pytest.approx(0.462112, abs=5e-5)
     assert water_saturation_pressure[4] == pytest.approx(0.458343, abs=5e-5)
+
 
 def test_module():
     """Test pvdeg.humidity.calc_rel_humidity.
@@ -103,7 +107,6 @@ def test_module():
     assert result.shape == rh_expected.shape
     for col in rh_expected.columns:
         np.testing.assert_allclose(result[col].values, rh_expected[col].values, rtol=1e-3, atol=1e-3)
-
 
 
 def test_module_basic():
@@ -131,6 +134,7 @@ def test_module_basic():
     # Check shape matches input
     assert result.shape[0] == WEATHER.shape[0]
 
+
 def test_module_with_params():
     """Test pvdeg.humidity.module with explicit parameters."""
     result = pvdeg.humidity.module(
@@ -152,6 +156,7 @@ def test_module_with_params():
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == WEATHER.shape[0]
 
+
 def test_module_edge_cases():
     """Test pvdeg.humidity.module with edge case input (extreme weather values)."""
     weather_df = pd.DataFrame({
@@ -172,11 +177,14 @@ def test_module_edge_cases():
     )
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3
-    assert result["RH_surface_outside"].tolist() == pytest.approx([0.0,89.991403,43.299585], abs=1e-3)
+    assert result["RH_surface_outside"].tolist() == pytest.approx([0.0, 89.991403, 43.299585], abs=1e-3)
     assert result["RH_front_encap"].tolist() == pytest.approx([430.443613, 73.762802, 122.953936], abs=1e-3)
-    assert result["RH_back_encap"].tolist() == pytest.approx([74.572295, 12.779052, 21.301181], abs=1e-3) 
+    assert result["RH_back_encap"].tolist() == pytest.approx([74.572295, 12.779052, 21.301181], abs=1e-3)
     assert result["RH_backsheet"].tolist() == pytest.approx([37.286147, 51.385227, 32.300383], abs=1e-3)
-    assert result["Ce_back_encap"].tolist() == pytest.approx([0.000021991545, 0.0000219915458, 0.0000219915458], abs=1e-10)
+    assert result["Ce_back_encap"].tolist() == pytest.approx([
+        0.000021991545, 0.0000219915458, 0.0000219915458
+    ], abs=1e-10)
+
 
 def test_backsheet():
     rh_ambient = pd.Series([40, 60, 80])
@@ -185,6 +193,7 @@ def test_backsheet():
     result = pvdeg.humidity.backsheet(rh_ambient, temp_ambient, temp_module)
     # Should return a pandas Series and have same length as input
     assert result.tolist() == pytest.approx([24.535486, 31.149815, 38.113095], abs=1e-5)
+
 
 def test_dew_yield():
     """Test pvdeg.humidity.dew_yield with basic input."""
@@ -197,6 +206,7 @@ def test_dew_yield():
     result = pvdeg.humidity.dew_yield(elevation=1, dry_bulb=temp_air, dew_point=dew_point, wind_speed=wind_speed, n=n)
     # Check result type and shape
     assert result.tolist() == pytest.approx([0.332943, 0.316928, 0.358373], abs=1e-6)
+
 
 def test_diffusivity_weighted_water_basic():
     """Test pvdeg.humidity.diffusivity_weighted_water with basic input."""
@@ -218,11 +228,13 @@ def test_diffusivity_weighted_water_with_params():
     result = pvdeg.humidity.diffusivity_weighted_water(rh_ambient, temp_ambient, temp_module, So=So, Eas=Eas, Ead=Ead)
     assert result == pytest.approx(0.0006841420183438176, abs=1e-9)
 
+
 def test_csat_basic():
     """Test pvdeg.humidity.csat with basic input."""
     temp_module = pd.Series([25, 30, 35])
     result = pvdeg.humidity.csat(temp_module)
     assert result.tolist() == pytest.approx([0.002128, 0.002378, 0.002648], abs=1e-6)
+
 
 def test_csat_with_params():
     """Test pvdeg.humidity.csat with explicit parameters."""
@@ -231,6 +243,7 @@ def test_csat_with_params():
     Eas = 16.7
     result = pvdeg.humidity.csat(temp_module, So=So, Eas=Eas)
     assert result.tolist() == pytest.approx([0.001904, 0.002136, 0.002387], abs=1e-6)
+
 
 def test_ceq():
     """Test pvdeg.humidity.ceq with basic input."""
@@ -241,6 +254,7 @@ def test_ceq():
 
 
 # Unit tests for backsheet_from_encap
+
 def test_backsheet_from_encap():
     rh_back_encap = pd.Series([40, 60, 80])
     rh_surface_outside = pd.Series([20, 40, 60])
