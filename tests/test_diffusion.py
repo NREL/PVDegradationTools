@@ -1,9 +1,11 @@
 import os
 import pandas as pd
 import pvdeg
+import pytest
 from pvdeg import TEST_DATA_DIR
 import json
 from copy import copy
+
 
 WEATHER = pd.read_csv(
     os.path.join(TEST_DATA_DIR, "weather_day_pytest.csv"), index_col=0, parse_dates=True
@@ -49,9 +51,9 @@ def test_diffusion_1d():
 
     assert RESULT_1D == pytest.approx(oxygen_profile, abs=1e-3)
 
-    #pd.testing.assert_frame_equal(
+    # pd.testing.assert_frame_equal(
     #    oxygen_profile,
     #    RESULT_1D,
     #    check_dtype=False,
     #    check_column_type=False,
-    #)
+    # )
