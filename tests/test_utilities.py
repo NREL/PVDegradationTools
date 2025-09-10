@@ -133,8 +133,7 @@ def test__read_material_with_item():
     fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
     with open(fpath) as f:
         data = json.load(f)
-    # Pick a known key and some fields
-    known_key = next(iter(data.keys()))
+    known_key = "W001"
     fields = ["So", "Eas"]
     expected = {field: data[known_key][field] for field in fields}
     result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation", item=fields)
