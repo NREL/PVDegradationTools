@@ -34,7 +34,8 @@ def test_read_material_parameters():
     known_key = next(iter(data.keys()))
     params = ["name", "alias"]
     expected = {k: data[known_key].get(k, None) for k in params}
-    result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key, parameters=params)
+    result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key,
+    parameters=params)
     assert result == expected
 
 def test_search_json_name():
@@ -47,7 +48,8 @@ def test_search_json_name():
     known_key = next(iter(data.keys()))
     name = data[known_key].get("name", None)
     if name:
-        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation", name_or_alias=name)
+        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation",
+                                             name_or_alias=name)
         assert result == known_key
 
 def test_search_json_alias():
@@ -58,7 +60,8 @@ def test_search_json_alias():
     known_key = next(iter(data.keys()))
     alias = data[known_key].get("alias", None)
     if alias:
-        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation", name_or_alias=alias)
+        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation",
+                                             name_or_alias=alias)
         assert result == known_key
 
 def test_search_json_fp():
@@ -136,7 +139,8 @@ def test__read_material_with_item():
     known_key = "W001"
     fields = ["Ead", "Do"]
     expected = {field: data[known_key][field] for field in fields}
-    full_result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation", item=fields)
+    full_result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation",
+                                                 item=fields)
     # Filter result to only include the requested fields
     result = {field: full_result[field] for field in fields if field in full_result}
     assert result == expected
