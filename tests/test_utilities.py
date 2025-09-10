@@ -35,7 +35,7 @@ def test_read_material_parameters():
     params = ["name", "alias"]
     expected = {k: data[known_key].get(k, None) for k in params}
     result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key,
-    parameters=params)
+                                           parameters=params)
     assert result == expected
 
 def test_search_json_name():
