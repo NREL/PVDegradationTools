@@ -246,7 +246,6 @@ def diffusivity_weighted_water(
     diffuse_weighted_water = (numerator / denominator) / 100
 
     return diffuse_weighted_water
-    return diffuse_weighted_water
 
 
 def front_encapsulant(
