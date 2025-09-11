@@ -272,3 +272,33 @@ def test_backsheet_from_encap():
     result = pvdeg.humidity.backsheet_from_encap(rh_back_encap, rh_surface_outside)
     expected = pd.Series([30, 50, 70])
     np.testing.assert_allclose(result, expected, atol=1e-8)
+
+
+def test_back_encapsulant_water_concentration_missing_t():
+    temp_module = pd.Series([25, 30, 35])
+    rh_surface = pd.Series([50, 55, 60])
+    with pytest.raises(ValueError, match="backsheet_thickness must be specified"):
+        pvdeg.humidity.back_encapsulant_water_concentration(
+            temp_module=temp_module,
+            rh_surface=rh_surface,
+            Po_b=None,
+            Ea_p_b=None,
+            t=None,
+            backsheet="W017",
+            back_encap_thickness=0.46,
+        )
+
+
+def test_back_encapsulant_water_concentration_missing_back_encap_thickness():
+    temp_module = pd.Series([25, 30, 35])
+    rh_surface = pd.Series([50, 55, 60])
+    with pytest.raises(ValueError, match="back_encap_thickness must be specified"):
+        pvdeg.humidity.back_encapsulant_water_concentration(
+            temp_module=temp_module,
+            rh_surface=rh_surface,
+            Po_b=None,
+            Ea_p_b=None,
+            back_encap_thickness=None,
+            backsheet="W017",
+            t=0.3,
+        )
