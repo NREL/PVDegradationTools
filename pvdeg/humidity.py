@@ -441,7 +441,7 @@ def back_encapsulant_water_concentration(
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
     t : float
         Thickness of the backsheet [mm].
-        The suggested default for a PET backsheet is t=0.3 [mm]
+        The suggested value for a PET backsheet is t=0.3 [mm]
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -502,7 +502,9 @@ def back_encapsulant_water_concentration(
                     name=backsheet, fname="H2Opermeation", item=None, fp=None
                 )["t"]["value"]
             else:
-                t = 0.3
+                raise ValueError("backsheet_thickness must be specified as a float or "
+                "a backsheet material with a backsheet_thickness available should be "
+                "specified.")
     if So_e is None or Ea_s_e is None:
         So_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
@@ -518,7 +520,9 @@ def back_encapsulant_water_concentration(
                     name=encapsulant, fname="H2Opermeation", item=None, fp=None
                 )["t"]["value"]
             else:
-                back_encap_thickness = 0.46
+                raise ValueError("back_encap_thickness must be specified as a float or "
+                "a backsheet material with a back_encap_thickness available should be "
+                "specified.")
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / t
     EaWVTR = Ea_p_b / R_GAS
@@ -822,7 +826,7 @@ def backsheet(
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
     t : float
         Thickness of the backsheet [mm].
-        The suggested default for a PET backsheet is t=0.3 [mm]
+        The suggested valuue for a PET backsheet is t=0.3 [mm]
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -925,7 +929,7 @@ def module(
         Backsheet permeation  activation energy [kJ/mol].
     backsheet_thickness : float
         Thickness of the backsheet [mm].
-        The suggested default for a PET backsheet is t=0.3 mm
+        The suggested value for a PET backsheet is t=0.3 mm
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
     Ea_s_e : float
