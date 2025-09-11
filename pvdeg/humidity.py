@@ -472,7 +472,7 @@ def back_encapsulant_water_concentration(
     if rh_surface is None:
         if rh_ambient is None or temp_ambient is None:
             raise ValueError(
-                "If rh_surface is not provided, both rh_ambient and temp_ambient must" \
+                "If rh_surface is not provided, both rh_ambient and temp_ambient must"
                 "be provided."
             )
         # Get the relative humidity of the surface
