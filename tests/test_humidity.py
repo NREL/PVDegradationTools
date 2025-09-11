@@ -32,14 +32,12 @@ def test_relative_float():
     assert result == pytest.approx(57.45, abs=0.01)
 
 
-
 def test_relative_series():
     temp = pd.Series([25.0, 30.0, 35.0])
     dew = pd.Series([15.0, 10.0, 5.0])
     result = pvdeg.humidity.relative(temp, dew)
     expected = pd.Series([53.83, 28.94, 15.51])
     np.testing.assert_allclose(result, expected, atol=0.01)
-
 
 
 def test_relative_nan_combinations():

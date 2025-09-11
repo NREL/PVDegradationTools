@@ -19,7 +19,6 @@ from pvdeg import TEST_DATA_DIR, DATA_DIR
 from collections import OrderedDict
 
 
-
 def test_read_material_basic():
     """Test pvdeg.utilities.read_material returns correct dict for a known key."""
     fpath = os.path.join(DATA_DIR, "O2permeation.json")
