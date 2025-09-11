@@ -693,7 +693,7 @@ def back_encapsulant(
     back_encap_thickness=0.5,
     Eas=16.729,
 ):
-    """Return RH of backside module encapsulant.
+    """Return the relative humidity of backside module encapsulant.
 
     Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
     and return a pandas series for each time step
