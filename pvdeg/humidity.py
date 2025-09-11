@@ -388,7 +388,7 @@ def back_encapsulant_water_concentration(
     start=None,
     Po_b=None,
     Ea_p_b=None,
-    t=None,
+    backsheet_thickness=None,
     So_e=None,
     Ea_s_e=None,
     back_encap_thickness=None,
@@ -498,11 +498,11 @@ def back_encapsulant_water_concentration(
             if "t" in utilities._read_material(
                 name=backsheet, fname="H2Opermeation", item=None, fp=None
             ):
-                t = utilities._read_material(
+                backsheet_thickness = utilities._read_material(
                     name=backsheet, fname="H2Opermeation", item=None, fp=None
                 )["t"]["value"]
             else:
-                t = 0.3
+                backsheet_thickness = 0.3
     if So_e is None or Ea_s_e is None:
         So_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
@@ -520,7 +520,7 @@ def back_encapsulant_water_concentration(
             else:
                 back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
-    WVTRo = Po_b / 100 / 100 / 24 / t
+    WVTRo = Po_b / 100 / 100 / 24 / backsheet_thickness
     EaWVTR = Ea_p_b / R_GAS
     So = So_e * back_encap_thickness / 10
     Eas = Ea_s_e / R_GAS
