@@ -27,7 +27,7 @@
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0982242435416737 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 66.9611315410624 },
 		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 189338932521.637 },
-		"t": { "name": "Thickness", "units": "mm", "value": 0.032 }
+		"t": { "name": "Thickness", "units": "mm", "value": 0.32 }
     },
     "W003": {
 		"name": "Coveme",
