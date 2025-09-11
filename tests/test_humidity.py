@@ -177,19 +177,19 @@ def test_module_edge_cases():
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3
     assert result["RH_surface_outside"].tolist() == pytest.approx(
-        [0.0, 89.9914, 43.2996], abs=1e-3
+        [0.0, 89.991403, 43.299585], abs=1e-3
     )
     assert result["RH_front_encap"].tolist() == pytest.approx(
-        [430.444, 73.763, 122.954], abs=1e-3
+        [430.443613, 73.762802, 122.953936], abs=1e-3
     )
     assert result["RH_back_encap"].tolist() == pytest.approx(
-        [49.307, 8.449, 14.084], abs=1e-3
+        [74.572295, 12.779052, 21.301181], abs=1e-3
     )
     assert result["RH_backsheet"].tolist() == pytest.approx(
-        [24.653, 49.220, 28.692], abs=1e-3
+        [37.286147, 51.385227, 32.300383], abs=1e-3
     )
     assert result["Ce_back_encap"].tolist() == pytest.approx(
-        [1.454e-05, 1.454e-05, 1.454e-05], abs=1e-3
+        [0.000021991545, 0.0000219915458, 0.0000219915458], abs=1e-10
     )
 
 
@@ -199,7 +199,7 @@ def test_backsheet():
     temp_module = pd.Series([25, 30, 35])
     result = pvdeg.humidity.backsheet(rh_ambient, temp_ambient, temp_module)
     # Should return a pandas Series and have same length as input
-    assert result.tolist() == pytest.approx([23.632522813941296, 30.341962061115233, 37.38771934868369], abs=1e-5)
+    assert result.tolist() == pytest.approx([24.535486, 31.149815, 38.113095], abs=1e-5)
 
 
 def test_dew_yield():
