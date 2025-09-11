@@ -388,6 +388,7 @@ def back_encapsulant_water_concentration(
     start=None,
     Po_b=None,
     Ea_p_b=None,
+    t=None,
     So_e=None,
     Ea_s_e=None,
     back_encap_thickness=None,
@@ -438,6 +439,9 @@ def back_encapsulant_water_concentration(
     Ea_p_b : float
         Backsheet permeation  activation energy [kJ/mol] .
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
+    t : float
+        Thickness of the backsheet [mm].
+        The suggested default for a PET backsheet is t=0.3 [mm]
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -446,7 +450,7 @@ def back_encapsulant_water_concentration(
         Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
     back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for EVA encapsulant is 0.46mm, PET backsheet is 0.3mm.
+        The suggested value for EVA encapsulant is 0.46 mm
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
@@ -490,15 +494,15 @@ def back_encapsulant_water_concentration(
         Ea_p_b = utilities._read_material(
             name=backsheet, fname="H2Opermeation", item=None, fp=None
         )["Eap"]["value"]
-        if back_encap_thickness is None:
+        if t is None:
             if "t" in utilities._read_material(
                 name=backsheet, fname="H2Opermeation", item=None, fp=None
             ):
-                back_encap_thickness = utilities._read_material(
+                t = utilities._read_material(
                     name=backsheet, fname="H2Opermeation", item=None, fp=None
                 )["t"]["value"]
             else:
-                back_encap_thickness = 0.46  # Default thickness of EVA encapsulant
+                t = 0.3
     if So_e is None or Ea_s_e is None:
         So_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
@@ -506,9 +510,17 @@ def back_encapsulant_water_concentration(
         Ea_s_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
         )["Eas"]["value"]
-
+        if back_encap_thickness is None:
+            if "t" in utilities._read_material(
+                name=encapsulant, fname="H2Opermeation", item=None, fp=None
+            ):
+                back_encap_thickness = utilities._read_material(
+                    name=encapsulant, fname="H2Opermeation", item=None, fp=None
+                )["t"]["value"]
+            else:
+                back_encap_thickness = 0.46
     # Convert the parameters to the correct and convenient units
-    WVTRo = Po_b / 100 / 100 / 24 / back_encap_thickness
+    WVTRo = Po_b / 100 / 100 / 24 / t
     EaWVTR = Ea_p_b / R_GAS
     So = So_e * back_encap_thickness / 10
     Eas = Ea_s_e / R_GAS
@@ -777,6 +789,7 @@ def backsheet(
     start=None,
     Po_b=None,
     Ea_p_b=None,
+    t=None,
     So_e=None,
     Ea_s_e=None,
     back_encap_thickness=None,
@@ -807,6 +820,9 @@ def backsheet(
     Ea_p_b : float
         Backsheet permeation  activation energy [kJ/mol] .
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
+    t : float
+        Thickness of the backsheet [mm].
+        The suggested default for a PET backsheet is t=0.3 [mm]
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -843,6 +859,7 @@ def backsheet(
         start=start,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
+        t=t,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,
@@ -908,7 +925,7 @@ def module(
         Backsheet permeation  activation energy [kJ/mol].
     backsheet_thickness : float
         Thickness of the backsheet [mm].
-        The suggested default for a PET backsheet is 0.3mm
+        The suggested default for a PET backsheet is t=0.3 mm
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
     Ea_s_e : float
@@ -917,7 +934,7 @@ def module(
         Encapsulant diffusivity activation energy in [kJ/mol]
     back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for EVA encapsulant  is 0.46 mm, and for PET is 0.3mm.
+        The suggested value for EVA encapsulant  is 0.46 mm.
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
@@ -990,6 +1007,7 @@ def module(
         temp_ambient=weather_df["temp_air"],
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
+        t=backsheet_thickness,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,
@@ -1004,6 +1022,7 @@ def module(
         temp_module=temp_module,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
+        t=backsheet_thickness,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,
