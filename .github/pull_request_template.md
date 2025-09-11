@@ -23,5 +23,4 @@ Please delete options that are not relevant.
 - [ ] Code changes have been evaluated for compatibility/integration with geospatial autotemplating (for future PRs)
 - [ ] New functions added to __init__.py
 - [ ] API.rst is up to date, along with other sphinx docs pages
-- [ ] Example notebooks are rerun and differences in results scrutinized
 - [ ] What's new changelog has been updated in the docs
