@@ -298,17 +298,17 @@ def test_read_material_special():
 
 def test_read_material_normal():
     res = {
-        'name': 'ST504',
-        'alias': 'PET1',
-        'contributor': 'Michael Kempe',
-        'source': 'unpublished measurements',
-        'Fickian': True,
-        'Ead': 47.603,
-        'Do': 0.554153,
-        'Eas': -11.5918,
-        'So': 9.554366e-07,
-        'Eap': 34.2011,
-        'Po': 2128.8937
+        "name": "ST504",
+        "alias": "PET1",
+        "contributor": "Michael Kempe",
+        "source": "unpublished measurements",
+        "Fickian": True,
+        "Ead": 47.603,
+        "Do": 0.554153,
+        "Eas": -11.5918,
+        "So": 9.554366e-07,
+        "Eap": 34.2011,
+        "Po": 2128.8937,
     }
 
     template_material = pvdeg.utilities.read_material(
@@ -320,8 +320,8 @@ def test_read_material_normal():
 
 def test_read_material_fewer_params():
     res = {
-        'name': 'ST504',
-        'Fickian': True,
+        "name": "ST504",
+        "Fickian": True,
     }
 
     template_material = pvdeg.utilities.read_material(
@@ -349,17 +349,17 @@ def test_read_material_extra_params():
 # pvdeg_file should override fp if both are provided
 def test_read_material_fp_override():
     res = {
-        'name': 'ST504',
-        'alias': 'PET1',
-        'contributor': 'Michael Kempe',
-        'source': 'unpublished measurements',
-        'Fickian': True,
-        'Ead': 47.603,
-        'Do': 0.554153,
-        'Eas': -11.5918,
-        'So': 9.554366e-07,
-        'Eap': 34.2011,
-        'Po': 2128.8937
+        "name": "ST504",
+        "alias": "PET1",
+        "contributor": "Michael Kempe",
+        "source": "unpublished measurements",
+        "Fickian": True,
+        "Ead": 47.603,
+        "Do": 0.554153,
+        "Eas": -11.5918,
+        "So": 9.554366e-07,
+        "Eap": 34.2011,
+        "Po": 2128.8937,
     }
 
     from pvdeg import DATA_DIR
