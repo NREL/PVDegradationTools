@@ -3,9 +3,21 @@ Collection of classes and functions to obtain spectral parameters.
 """
 
 import pvlib
+import pandas as pd
+from pvdeg import decorators
 
-
-def solar_position(weather_df, meta):
+@decorators.geospatial_quick_shape(
+    'timeseries',
+    [
+        "apparent_zenith",
+        "zenith",
+        "apparent_elevation",
+        "elevation",
+        "azimuth",
+        "equation_of_time",
+    ],
+)
+def solar_position(weather_df: pd.DataFrame, meta: dict) -> pd.DataFrame:
     """
     Calculate solar position using pvlib based on weather data from the
     National Solar Radiation Database (NSRDB) for a given location (gid).
@@ -14,7 +26,7 @@ def solar_position(weather_df, meta):
     ----------
     weather_df : pandas.DataFrame
         Weather data for given location.
-    meta : pandas.Series
+    meta : dict
         Meta data of location.
 
     Returns
@@ -41,9 +53,24 @@ def solar_position(weather_df, meta):
     return solar_position
 
 
+@decorators.geospatial_quick_shape(
+    'timeseries',
+    [
+        "poa_global",
+        "poa_direct",
+        "poa_diffuse",
+        "poa_sky_diffuse",
+        "poa_ground_diffuse",
+    ],
+)
 def poa_irradiance(
-    weather_df, meta, sol_position=None, tilt=None, azimuth=None, sky_model="isotropic"
-):
+    weather_df: pd.DataFrame,
+    meta: dict,
+    sol_position=None,
+    tilt=None,
+    azimuth=None,
+    sky_model="isotropic",
+) -> pd.DataFrame:
     """
     Calculate plane-of-array (POA) irradiance using pvlib based on weather data from the
     National Solar Radiation Database (NSRDB) for a given location (gid).
@@ -68,17 +95,29 @@ def poa_irradiance(
     -------
     poa : pandas.DataFrame
          Contains keys/columns 'poa_global', 'poa_direct', 'poa_diffuse',
-         'poa_sky_diffuse', 'poa_ground_diffuse'.
+         'poa_sky_diffuse', 'poa_ground_diffuse'. [W/m2]
     """
 
     # TODO: change for handling HSAT tracking passed or requested
     if tilt is None:
-        tilt = float(meta["latitude"])
+        try:
+            tilt = float(meta["tilt"])
+        except:
+            tilt = float(meta["latitude"])
+            print(
+                f"The array tilt angle was not provided, therefore the latitude tilt of {tilt:.1f} was used."
+            )
     if azimuth is None:  # Sets the default orientation to equator facing.
-        if float(meta["latitude"]) < 0:
-            azimuth = 0
-        else:
-            azimuth = 180
+        try:
+            azimuth = float(meta["azimuth"])
+        except:
+            if float(meta["latitude"]) < 0:
+                azimuth = 0
+            else:
+                azimuth = 180
+                print(
+                    f"The array azimuth was not provided, therefore an azimuth of {azimuth:.1f} was used."
+                )
 
     if sol_position is None:
         sol_position = solar_position(weather_df, meta)

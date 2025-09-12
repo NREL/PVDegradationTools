@@ -1,0 +1,14 @@
+v0.3.2 (2024-05-06)
+=======================
+
+Enhancements
+------------
+* Added workflow for automated deployment of jupyter-books
+
+Bug Fixes
+---------
+* Re-run notebooks and fixed minor bugs
+
+Contributors
+~~~~~~~~~~~~
+* Martin Springer (:ghuser:`martin-springer`)

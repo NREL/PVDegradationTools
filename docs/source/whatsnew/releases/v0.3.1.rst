@@ -1,0 +1,24 @@
+v0.3.1 (2024-05-06)
+=======================
+
+Enhancements
+------------
+* Added new LETID tests
+
+Bug Fixes
+---------
+* Multiple bug fixes in geospatial analysis
+
+Documentation
+-------------
+* Renamed pvdeg_tutorials folder to tutorials_and_tools, and added more tutorials
+to be run easily in google collab.
+* Jupyter Journals now have information regarding the version of the programs used near
+the beginning, to simplify debugging and user support.
+
+Contributors
+~~~~~~~~~~~~
+* Martin Springer (:ghuser:`martin-springer`)
+* Mike Kempe (:ghuser:`MDKempe`)
+* Silvana Ovaitt (:ghuser:`shirubana`)
+* Tobin Ford (:ghuser:`tobin-ford`)

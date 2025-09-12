@@ -10,7 +10,7 @@ authors = [{name = "Pvdeg Python Developers", email = "Michael.Kempe@nrel.gov"}]
 maintainers = [{email = "Silvana.Ovaitt@nrel.gov"}]
 license = {text = "BSD-3"}
 readme = "README.md"
-requires-python = ">=3.9.0, <3.12"
+requires-python = ">=3.9.0"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Operating System :: OS Independent",
@@ -28,10 +28,15 @@ keywords = [
     "PV",
 ]
 dependencies = [
+    "aiohttp==3.10.11",
+    "numpy==1.26.4",
+    "pvlib==0.10.3",
+    "scipy<1.14.0",
     "NREL-rex",
     "cartopy",
-    "dask",
+    "dask[dataframe]",
     "dask-jobqueue",
+    "bokeh",
     "h5netcdf",
     "h5py",
     "jupyterlab",
@@ -39,18 +44,18 @@ dependencies = [
     "netCDF4",
     "notebook",
     "numba",
-    "numpy",
     "openpyxl",
     "pandas",
     "photovoltaic",
-    "pvlib",
     "python-dateutil",
     "pytz",
-    "scipy",
+    "seaborn",
     "tables",
     "tqdm",
     "xarray",
     "pre-commit",
+    "sympy",
+    "zarr",
 ]
 dynamic = ["version"]
 
@@ -63,13 +68,21 @@ docs = [
     "nbsphinx",
     "sphinx_toggleprompt",
     "pydata_sphinx_theme",
+    "mistune==3.0.0",
 ]
 test = [
     "pytest",
     "pytest-cov",
+    "sympy",
+]
+books = [
+    "jupyter-book",
+]
+sam = [
+    "NREL-PySAM==5.1.0",
 ]
 all = [
-    "pvdeg[docs,test]",
+    "pvdeg[docs,test,books,sam]",
 ]
 
 [project.entry-points.pvdeg]
@@ -83,6 +96,9 @@ Documentation = "https://pvdegradationtools.readthedocs.io/"
 
 [tool.setuptools.packages.find]
 include = ["pvdeg"]
+
+[tool.setuptools.package-data]
+"pvdeg.data" = ["*.json"]
 
 [tool.setuptools_scm]
 

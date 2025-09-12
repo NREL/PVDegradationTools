@@ -1,7 +1,11 @@
-"""Collection of functions for PV module design considertations.
-"""
+"""Collection of functions for PV module design considertations."""
 
-from . import humidity
+from . import (
+    humidity,
+    decorators
+)
+
+import pandas as pd
 
 
 def edge_seal_ingress_rate(avg_psat):
@@ -41,14 +45,21 @@ def edge_seal_ingress_rate(avg_psat):
     return k
 
 
-def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
+@decorators.geospatial_quick_shape('numeric', ["width"])
+def edge_seal_width(
+    weather_df: pd.DataFrame,
+    meta: dict,
+    k: float = None,
+    years: int = 25,
+    from_dew_point: bool = False,
+):
     """
     Determine the width of edge seal required for given number of years water ingress.
 
     Parameters
     ----------
     weather_df : pd.DataFrame
-        must be datetime indexed and contain at least temp_air, temp_dew
+        must be datetime indexed and contain at least temp_air, dew_point
     meta : dict
         location meta-data (from weather file)
     k: float
@@ -58,7 +69,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
     years : integer, default = 25
         Integer number of years under water ingress
     from_dew_point : boolean, optional
-        If true, will compute the edge seal width from temp_dew instead of dry bulb air temp
+        If true, will compute the edge seal width from dew_point instead of dry bulb air temp
 
     Returns
     ----------
@@ -68,7 +79,7 @@ def edge_seal_width(weather_df, meta, k=None, years=25, from_dew_point=False):
 
     if from_dew_point:
         # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
-        temp = weather_df.get("temp_dew", weather_df.get("Dew Point"))
+        temp = weather_df.get("dew_point", weather_df.get("Dew Point"))
     else:
         temp = weather_df["temp_air"]
 

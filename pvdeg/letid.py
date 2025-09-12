@@ -10,7 +10,13 @@ import datetime
 import pvlib
 
 
-from pvdeg import collection, utilities, standards, DATA_DIR
+from pvdeg import (
+    collection, 
+    utilities, 
+    standards, 
+    decorators,
+    DATA_DIR,
+)
 
 
 def tau_now(tau_0, tau_deg, n_b):
@@ -658,7 +664,7 @@ def calc_energy_loss(timesteps):
 
         Column names must include:
             - ``'Pmp_norm'``, a column of normalized (0-1) maximum power such as returned by
-            Degradation.calc_device_params
+            letid.calc_device_params
 
     Returns
     -------
@@ -672,9 +678,10 @@ def calc_energy_loss(timesteps):
         start = timesteps["Datetime"].iloc[0]
         timedelta = [(d - start).total_seconds() / 3600 for d in timesteps["Datetime"]]
 
+    print(timesteps.columns)
     pmp_norm = timesteps["Pmp_norm"]
     energy_loss = 1 - (
-        simpson(pmp_norm, timedelta) / simpson(np.ones(len(pmp_norm)), timedelta)
+        simpson(pmp_norm, x=timedelta) / simpson(np.ones(len(pmp_norm)), x=timedelta)
     )
 
     return energy_loss
@@ -696,7 +703,7 @@ def calc_regeneration_time(timesteps, x=80, rtol=1e-05):
         percentage regeneration to look for. Note that 100% State C will take a very long time,
         whereas in most cases >99% of power is regenerated after NC = ~80%
 
-    rel_tol : float
+    rel_tol : float, default = 1e-05
         The relative tolerance parameter
 
     Returns
@@ -870,6 +877,23 @@ def calc_injection_outdoors(results):
     return injection
 
 
+@decorators.geospatial_quick_shape(
+    'timeseries',
+    [
+        "Temperature",
+        "Injection",
+        "NA",
+        "NB",
+        "NC",
+        "tau",
+        "Jsc",
+        "Voc",
+        "Isc",
+        "FF",
+        "Pmp",
+        "Pmp_norm",
+    ],
+)
 def calc_letid_outdoors(
     tau_0,
     tau_deg,
@@ -887,6 +911,7 @@ def calc_letid_outdoors(
     tilt=None,
     azimuth=180,
     module_parameters=None,
+    inverter_parameters=None,
     temp_model="sapm",
     temperature_model_parameters="open_rack_glass_polymer",
 ):
@@ -964,6 +989,9 @@ def calc_letid_outdoors(
         full DC power results, so requires either the CEC or SAPM model, (i.e., not PVWatts).
         If None, defaults to "Jinko_Solar_Co___Ltd_JKM260P_60" from the CEC module database.
 
+    inverter_parameters : dict or None, default None
+        pvlib inverter parameters. see pvlib documentation for details. .
+
     temp_model : str, default "sapm"
         pvlib temperature model, either "sapm" or "pvsyst". See pvlib.temperature.
 
@@ -986,7 +1014,7 @@ def calc_letid_outdoors(
     # Set up system, run pvlib.modelchain, and get the results we need: cell temp and injection
     lat = float(meta["latitude"])
     lon = float(meta["longitude"])
-    tz = meta["timezone"]
+    tz = meta["tz"]
     elevation = meta["altitude"]
 
     if tilt is None:
@@ -1003,9 +1031,11 @@ def calc_letid_outdoors(
         ]  # a random module from the CEC database
 
     location = pvlib.location.Location(lat, lon, tz, elevation)
-    inverter_parameters = {
-        "pdc0": 1000
-    }  # inverter parameters are hard-coded, because we don't care about AC results
+
+    if inverter_parameters is None:
+        inverter_parameters = {
+            "pdc0": 1000
+        }  # inverter parameters are hard-coded, because we don't care about AC results
 
     system = pvlib.pvsystem.PVSystem(
         surface_tilt=surface_tilt,

@@ -4,15 +4,18 @@
 import numpy as np
 import pandas as pd
 import pvlib
-from numba import jit
+from numba import njit
 from rex import NSRDBX
 from rex import Outputs
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from . import temperature
-from . import spectral
-from . import weather
+from pvdeg import (
+    temperature,
+    spectral,
+    weather,
+    decorators
+)
 
 
 def _ambient(weather_df):
@@ -40,7 +43,7 @@ def _ambient(weather_df):
     """
     temp_air = weather_df["temp_air"]
     # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
-    dew_point = weather_df.get("temp_dew", weather_df.get("Dew Point"))
+    dew_point = weather_df.get("dew_point")
 
     num = np.exp(17.625 * dew_point / (243.04 + dew_point))
     den = np.exp(17.625 * temp_air / (243.04 + temp_air))
@@ -52,7 +55,7 @@ def _ambient(weather_df):
 
 
 # TODO: When is dew_yield used?
-@jit(nopython=True, error_model="python")
+@njit
 def dew_yield(elevation, dew_point, dry_bulb, wind_speed, n):
     """
     Estimates the dew yield in [mm/day].  Calculation taken from:
@@ -389,7 +392,7 @@ def _ceq(Csat, rh_SurfaceOutside):
     return Ceq
 
 
-@jit(nopython=True)
+@njit
 def Ce_numba(
     start,
     temp_module,
@@ -542,7 +545,7 @@ def back_encap(
     Csat = _csat(temp_module=temp_module, So=So, Eas=Eas)
     Ceq = _ceq(Csat=Csat, rh_SurfaceOutside=rh_surface)
 
-    start = Ceq[0]
+    start = Ceq.iloc[0]
 
     # Need to convert these series to numpy arrays for numba function
     temp_module_numba = temp_module.to_numpy()
@@ -650,6 +653,7 @@ def backsheet(
     return backsheet
 
 
+@decorators.geospatial_quick_shape('timeseries', ["RH_surface_outside", "RH_front_encap", "RH_back_encap", "RH_backsheet"])
 def module(
     weather_df,
     meta,
@@ -729,8 +733,8 @@ def module(
     )
 
     temp_module = temperature.module(
-        weather_df,
-        meta,
+        weather_df=weather_df,
+        meta=meta,
         poa=poa,
         temp_model=temp_model,
         conf=conf,
