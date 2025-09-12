@@ -91,7 +91,7 @@ def test_search_json_alias():
 
 def test_search_json_fp():
     """Test pvdeg.utilities.search_json with explicit file path."""
-    filename="H2Opermeation.json"
+    filename = "H2Opermeation.json"
     data = load_json(filename)
     fpath = os.path.join(DATA_DIR, filename)
     known_key = next(iter(data.keys()))
