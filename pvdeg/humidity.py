@@ -890,7 +890,7 @@ def module(
     wind_factor=0.33,
     Po_b=None,
     Ea_p_b=None,
-    backsheet_thickness=None,
+    t=None,
     So_e=None,
     Ea_s_e=None,
     Ea_d_e=None,
@@ -927,7 +927,7 @@ def module(
         The suggested value for PET W17 is Po = 1319534666.90318 [g·mm/m²/day].
     Ea_p_b : float
         Backsheet permeation  activation energy [kJ/mol].
-    backsheet_thickness : float
+    t : float
         Thickness of the backsheet [mm].
         The suggested value for a PET backsheet is t=0.3 mm
     So_e : float
@@ -1011,7 +1011,7 @@ def module(
         temp_ambient=weather_df["temp_air"],
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
-        t=backsheet_thickness,
+        t=t,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,
@@ -1026,7 +1026,7 @@ def module(
         temp_module=temp_module,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
-        t=backsheet_thickness,
+        t=t,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,

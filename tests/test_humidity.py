@@ -99,6 +99,8 @@ def test_module():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
+        t=0.3,
+        back_encap_thickness=0.46,
     )
 
     # Check approximate equality for all columns
@@ -173,6 +175,8 @@ def test_module_edge_cases():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
+        t=0.3,
+        back_encap_thickness=0.46,
     )
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3
@@ -197,7 +201,11 @@ def test_backsheet():
     rh_ambient = pd.Series([40, 60, 80])
     temp_ambient = pd.Series([20, 25, 30])
     temp_module = pd.Series([25, 30, 35])
-    result = pvdeg.humidity.backsheet(rh_ambient, temp_ambient, temp_module)
+    result = pvdeg.humidity.backsheet(rh_ambient,
+                                      temp_ambient,
+                                      temp_module,
+                                      t=0.3,
+                                      back_encap_thickness=0.46,)
     # Should return a pandas Series and have same length as input
     assert result.tolist() == pytest.approx([24.535486, 31.149815, 38.113095], abs=1e-5)
 
