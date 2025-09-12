@@ -38,12 +38,15 @@ DSETS = [
     "wind_speed",
 ]
 
+def load_json(filename):
+    fpath = os.path.join(DATA_DIR, filename)
+    with open(fpath) as f:
+        return json.load(f)
+
 
 def test_read_material_basic():
     """Test pvdeg.utilities.read_material returns correct dict for a known key."""
-    fpath = os.path.join(DATA_DIR, "O2permeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("O2permeation.json")
     known_key = next(iter(data.keys()))
     expected = data[known_key]
     result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key)
@@ -52,9 +55,7 @@ def test_read_material_basic():
 
 def test_read_material_parameters():
     """Test pvdeg.utilities.read_material returns only requested parameters."""
-    fpath = os.path.join(DATA_DIR, "O2permeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("O2permeation.json")
     known_key = next(iter(data.keys()))
     params = ["name", "alias"]
     expected = {k: data[known_key].get(k, None) for k in params}
@@ -66,9 +67,7 @@ def test_read_material_parameters():
 def test_search_json_name():
     """Test pvdeg.utilities.search_json with name lookup."""
     # Find a known name in H2Opermeation.json
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("H2Opermeation.json")
     # Use the first entry's 'name' or 'alias' field
     known_key = next(iter(data.keys()))
     name = data[known_key].get("name", None)
@@ -80,9 +79,7 @@ def test_search_json_name():
 
 def test_search_json_alias():
     """Test pvdeg.utilities.search_json with alias lookup."""
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("H2Opermeation.json")
     known_key = next(iter(data.keys()))
     alias = data[known_key].get("alias", None)
     if alias:
@@ -93,9 +90,7 @@ def test_search_json_alias():
 
 def test_search_json_fp():
     """Test pvdeg.utilities.search_json with explicit file path."""
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("H2Opermeation.json")
     known_key = next(iter(data.keys()))
     alias = data[known_key].get("alias", None)
     if alias:
@@ -115,9 +110,7 @@ def test_display_json_basic():
         sys.stdout = sys_stdout
     output = captured_output.getvalue()
     # Check that output contains expected keys from the file
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("H2Opermeation.json")
     for key in list(data.keys())[:2]:  # Check first two keys for brevity
         assert key in output
 
@@ -141,18 +134,15 @@ def test_display_json_fp():
 
 def test__read_material_no_name():
     """Test pvdeg.utilities._read_material with no name (should return full dict)."""
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        expected = json.load(f)
+    data = load_json("H2Opermeation.json")
+
     result = pvdeg.utilities._read_material(name=None, fname="H2Opermeation")
     assert result == expected
 
 
 def test__read_material_with_name():
     """Test pvdeg.utilities._read_material with a specific material name."""
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("H2Opermeation.json")
     # Pick a known key from the file
     known_key = next(iter(data.keys()))
     expected = data[known_key]
@@ -162,9 +152,7 @@ def test__read_material_with_name():
 
 def test__read_material_with_item():
     """Test pvdeg.utilities._read_material with item parameter (list of fields)."""
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("H2Opermeation.json")
     known_key = "W001"
     fields = ["Ead", "Do"]
     expected = {field: data[known_key][field] for field in fields}
@@ -196,11 +184,8 @@ def test_get_kinetics():
     --------
     data : dict, from DATA_LIBRARY/kinetic_parameters.json
     """
-    fpath = os.path.join(DATA_DIR, "kinetic_parameters.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("kinematic_parameters.json")
     result = pvdeg.utilities.get_kinetics('repins')
-
     assert data['repins'] == result
 
 
@@ -218,9 +203,7 @@ def test_gid_downsampling():
 
 def test_get_kinetics_bad():
     # no name provided case
-    fpath = os.path.join(DATA_DIR, "kinetic_parameters.json")
-    with open(fpath) as f:
-        data = json.load(f)
+    data = load_json("kinematic_parameters.json")
     parameters_list = data.keys()
 
     desired_output = ("Choose a set of kinetic parameters:", [*parameters_list])
@@ -233,12 +216,8 @@ def test_get_kinetics_bad():
 # DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
 def test_read_material_bad():
     # no name case
-    fpath = os.path.join(DATA_DIR, "H2Opermeation.json")
-    with open(fpath) as f:
-        data = json.load(f)
-
+    data = load_json("H2Opermeation.json")
     res = pvdeg.utilities._read_material(name=None)
-
     assert res == data
 
 
