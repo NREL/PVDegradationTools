@@ -18,13 +18,6 @@ import sys
 import pytest
 from pvdeg import TEST_DATA_DIR, DATA_DIR
 from collections import OrderedDict
-from pvdeg import TEST_DATA_DIR, DATA_DIR, DATA_LIBRARY
-
-fname="kinetic_parameters.json"
-fpath = os.path.join(DATA_LIBRARY, fname)
-
-with open(fpath) as f:
-    data = json.load(f)
 
 FILES = {
     "tmy3": os.path.join(TEST_DATA_DIR, "tmy3_pytest.csv"),
@@ -44,6 +37,7 @@ DSETS = [
     "time_index",
     "wind_speed",
 ]
+
 
 def test_read_material_basic():
     """Test pvdeg.utilities.read_material returns correct dict for a known key."""
@@ -202,7 +196,9 @@ def test_get_kinetics():
     --------
     data : dict, from DATA_LIBRARY/kinetic_parameters.json
     """
-
+    fpath = os.path.join(DATA_DIR, "kinetic_parameters.json")
+    with open(fpath) as f:
+        data = json.load(f)
     result = pvdeg.utilities.get_kinetics('repins')
 
     assert data['repins'] == result
