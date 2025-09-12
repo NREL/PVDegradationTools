@@ -90,9 +90,12 @@ def test_search_json_alias():
 
 def test_search_json_fp():
     """Test pvdeg.utilities.search_json with explicit file path."""
-    data = load_json("H2Opermeation.json")
+    filename="H2Opermeation.json"
+    data = load_json(filename)
+    fpath = os.path.join(DATA_DIR, filename)
     known_key = next(iter(data.keys()))
     alias = data[known_key].get("alias", None)
+
     if alias:
         result = pvdeg.utilities.search_json(fp=fpath, name_or_alias=alias)
         assert result == known_key
@@ -134,8 +137,7 @@ def test_display_json_fp():
 
 def test__read_material_no_name():
     """Test pvdeg.utilities._read_material with no name (should return full dict)."""
-    data = load_json("H2Opermeation.json")
-
+    expected = load_json("H2Opermeation.json")
     result = pvdeg.utilities._read_material(name=None, fname="H2Opermeation")
     assert result == expected
 
