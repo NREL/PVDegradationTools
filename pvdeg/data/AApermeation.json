@@ -1,14 +1,14 @@
 {
     "AA000": {
-	 "comment": "This data is for acetic acid permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm^2/s]. So is in [g/cm^3/atm]. Po is in[g*mm/m^2/day]."
-    },	
+	"comment": "This data is for acetic acid permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm²/s]. So is in [g/cm³]. Po is in[g*mm/m²/day]."
+    },
     "AA001": {
 	"name": "EVA",
-    "alias": "EVA-2",
+      "alias": "EVA-2",
 	"contributor": "Michael Kempe",
 	"source": "Urban Weber, Ralf Eiden, Christine Strubel, Thorsten Soegding, Markus Heiss, Peter Zachmann, Kurt Nattermann, Harry Engelmann, Annelene Dethlefsen, Norbert Lenck, Acetic Acid Production, Migration and Corrosion Effects in Ethylene-Vinyl-Acetate-(EVA-)Based PV Modules, 27th European Photovoltaic Solar Energy Conference and Exhibition.",
 	"comment": "Extracted from Figure 10 of Weber et al. The activation energy does not exactly match that in the published work (35.0 kJ/mol). I did this because I wanted to include the prefactor.",
-    "Ead": 39.1970399216688,
-    "Do": 0.190570685252167
+      "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 39.1970399216688 },
+      "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.190570685252167 }
     }
 }

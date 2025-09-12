@@ -1,31 +1,31 @@
 """Collection of functions for PV module design considertations."""
 
-from . import (
-    humidity,
-    decorators
-)
+from . import humidity, decorators
 
 import pandas as pd
 
 
-def edge_seal_ingress_rate(avg_psat):
-    """
-    This function generates a constant k, relating the average moisture ingress rate through a
-    specific edge seal, Helioseal 101. Is an emperical estimation the rate of water ingress of
-    water through edge seal material. This function was determined from numerical calculations
-    from several locations and thus produces typical responses. This simplification works
-    because the environmental temperature is not as important as local water vapor pressure.
-    For the same environmental water concentration, a higher temperature results in lower
-    absorption in the edge seal but lower diffusivity through the edge seal. In practice, these
-    effects nearly cancel out makeing absolute humidity the primary parameter determining
-    moisture ingress through edge seals.
+def edge_seal_ingress_rate(avg_water_saturation_pressure):
+    """Calculate moisture ingress rate factor.
 
-    See: Kempe, Nobles, Postak Calderon,"Moisture ingress prediction in polyisobutylene‐based
-    edge seal with molecular sieve desiccant", Progress in Photovoltaics, DOI: 10.1002/pip.2947
+    Calculates a constant, k, relating the average moisture ingress rate
+    through a specific edge seal, Helioseal 101. Is an empirical estimation the rate of
+    water ingress of water through edge seal material. This function was determined from
+    numerical calculations from several locations and thus produces typical responses.
+    This simplification works because the environmental temperature is not as important
+    as local water vapor pressure. For the same environmental water concentration, a
+    higher temperature results in lower absorption in the edge seal but lower
+    diffusivity through the edge seal. In practice, these effects nearly cancel out
+    makeing absolute humidity the primary parameter determining moisture ingress through
+    edge seals.
+
+    See: Kempe, Nobles, Postak Calderon,"Moisture ingress prediction in
+    polyisobutylene‐based edge seal with molecular sieve desiccant", Progress in
+    Photovoltaics, DOI: 10.1002/pip.2947
 
     Parameters
-    -----------
-    avg_psat : float
+    ----------
+    avg_water_saturation_pressure : float
         Time averaged time averaged saturation point for an environment in kPa.
         When looking at outdoor data, one should average over 1 year
 
@@ -34,18 +34,16 @@ def edge_seal_ingress_rate(avg_psat):
     k : float [cm/h^0.5]
         Ingress rate of water through edge seal.
         Specifically it is the ratio of the breakthrough distance X/t^0.5.
-        With this constant, one can determine an approximate estimate of the ingress distance
-        for a particular climate without more complicated numerical methods and detailed
-        environmental analysis.
-
+        With this constant, one can determine an approximate estimate of the ingress
+        distance for a particular climate without more complicated numerical methods and
+        detailed environmental analysis.
     """
-
-    k = 0.0013 * (avg_psat) ** 0.4933
+    k = 0.0013 * (avg_water_saturation_pressure) ** 0.4933
 
     return k
 
 
-@decorators.geospatial_quick_shape('numeric', ["width"])
+@decorators.geospatial_quick_shape("numeric", ["width"])
 def edge_seal_width(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -53,8 +51,7 @@ def edge_seal_width(
     years: int = 25,
     from_dew_point: bool = False,
 ):
-    """
-    Determine the width of edge seal required for given number of years water ingress.
+    """Determine width of edge seal required for given number of years water ingress.
 
     Parameters
     ----------
@@ -69,14 +66,14 @@ def edge_seal_width(
     years : integer, default = 25
         Integer number of years under water ingress
     from_dew_point : boolean, optional
-        If true, will compute the edge seal width from dew_point instead of dry bulb air temp
+        If true, will compute the edge seal width from dew_point instead of dry bulb
+        air temp.
 
     Returns
-    ----------
+    -------
     width : float
         Width of edge seal required for input number of years water ingress. [cm]
     """
-
     if from_dew_point:
         # "Dew Point" fallback handles key-name bug in pvlib < v0.10.3.
         temp = weather_df.get("dew_point", weather_df.get("Dew Point"))
@@ -84,8 +81,10 @@ def edge_seal_width(
         temp = weather_df["temp_air"]
 
     if k is None:
-        psat, avg_psat = humidity.psat(temp)
-        k = edge_seal_ingress_rate(avg_psat)
+        water_saturation_pressure, avg_water_saturation_pressure = (
+            humidity.water_saturation_pressure(temp)
+        )
+        k = edge_seal_ingress_rate(avg_water_saturation_pressure)
 
     width = k * (years * 365.25 * 24) ** 0.5
 

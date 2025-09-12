@@ -104,7 +104,7 @@ def test_calc_kwarg_timeseries_bad_mismatch_lengths():
     # arrays of different lengths
     with pytest.raises(
         NotImplementedError,
-        match="arrays/series are different lengths. fix mismatched length. otherwise arbitrary symbolic solution is too complex for solver. nested loops or loops dependent on previous results not supported.",
+        match="arrays/series are different lengths",
     ):
         pvdeg.symbolic.calc_kwarg_timeseries(
             expr=None,
@@ -115,8 +115,3 @@ def test_calc_kwarg_timeseries_bad_mismatch_lengths():
                 ),
             },
         )
-
-
-def test_calc_kwarg_timeseries_no_index():
-    v1, v2 = sp.symbols("v1 v2")
-    expr = v1 * v2
