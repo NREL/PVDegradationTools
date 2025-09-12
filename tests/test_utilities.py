@@ -38,6 +38,7 @@ DSETS = [
     "wind_speed",
 ]
 
+
 def load_json(filename):
     fpath = os.path.join(DATA_DIR, filename)
     with open(fpath) as f:
@@ -177,6 +178,7 @@ def test_convert_tmy(tmp_path):
     with Outputs(fp_h5, "r") as f:
         datasets = f.dsets
     assert datasets.sort() == DSETS.sort()
+
 
 def test_get_kinetics():
     """
