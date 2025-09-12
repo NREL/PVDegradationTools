@@ -188,7 +188,7 @@ def test_get_kinetics():
     --------
     data : dict, from kinetic_parameters.json
     """
-    data = load_json("kinematic_parameters.json")
+    data = load_json("kinetic_parameters.json")
     result = pvdeg.utilities.get_kinetics('repins')
     assert data['repins'] == result
 
@@ -207,7 +207,7 @@ def test_gid_downsampling():
 
 def test_get_kinetics_bad():
     # no name provided case
-    data = load_json("kinematic_parameters.json")
+    data = load_json("kinetic_parameters.json")
     parameters_list = data.keys()
 
     desired_output = ("Choose a set of kinetic parameters:", [*parameters_list])
