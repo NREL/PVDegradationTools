@@ -974,7 +974,6 @@ def module(
         azimuth=azimuth,
         sky_model=sky_model,
         **weather_kwargs,
-        **weather_kwargs,
     )
 
     temp_module = temperature.module(
@@ -984,7 +983,6 @@ def module(
         temp_model=temp_model,
         conf=conf,
         wind_factor=wind_factor,
-        **weather_kwargs,
         **weather_kwargs,
     )
 

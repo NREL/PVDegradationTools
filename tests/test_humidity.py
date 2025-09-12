@@ -148,7 +148,7 @@ def test_module_with_params():
         wind_factor=0.33,
         Po_b=1e9,
         Ea_p_b=55.4,
-        backsheet_thickness=0.3,
+        t=0.3,
         So_e=1.8,
         Ea_s_e=16.7,
         Ea_d_e=38.1,
