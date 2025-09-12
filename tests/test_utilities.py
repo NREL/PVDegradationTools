@@ -186,7 +186,7 @@ def test_get_kinetics():
 
     Requires:
     --------
-    data : dict, from DATA_LIBRARY/kinetic_parameters.json
+    data : dict, from kinetic_parameters.json
     """
     data = load_json("kinematic_parameters.json")
     result = pvdeg.utilities.get_kinetics('repins')
