@@ -309,4 +309,4 @@ def test_back_encapsulant_water_concentration_missing_back_encap_thickness():
             back_encap_thickness=None,
             backsheet="W017",
             t=0.3,
-        )
+            )

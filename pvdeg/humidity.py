@@ -503,8 +503,8 @@ def back_encapsulant_water_concentration(
                 )["t"]["value"]
             else:
                 raise ValueError("backsheet_thickness must be specified as a float or "
-                "a backsheet material with a backsheet_thickness available should be "
-                "specified.")
+                                 "a backsheet material with a backsheet_thickness"
+                                 "available should be specified.")
     if So_e is None or Ea_s_e is None:
         So_e = utilities._read_material(
             name=encapsulant, fname="H2Opermeation", item=None, fp=None
@@ -521,8 +521,8 @@ def back_encapsulant_water_concentration(
                 )["t"]["value"]
             else:
                 raise ValueError("back_encap_thickness must be specified as a float or "
-                "a backsheet material with a back_encap_thickness available should be "
-                "specified.")
+                                 "a backsheet material with a back_encap_thickness"
+                                 "available should be specified.")
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / t
     EaWVTR = Ea_p_b / R_GAS
