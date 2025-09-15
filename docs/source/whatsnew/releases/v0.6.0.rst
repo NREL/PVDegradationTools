@@ -66,6 +66,9 @@ Enhancements
   (:issue:`211`, :pull:`224`)
 - Add new (public) function :py:mod:`pvdeg.humidity` to calculate relative humidity from
   air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
+- Remove "materials.json" and all associated references. Users should now use the
+  "O2_permeation.json" database for oxygen permeation data. (:issue:`240`, :pull:`243`)
+
 
 Deprecations
 -------------
