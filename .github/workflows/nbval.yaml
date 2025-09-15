@@ -85,19 +85,19 @@ jobs:
       fail-fast: false
       matrix:
         notebook-file: [
-          # "API Call Required - PYSam.ipynb",
-          # "Removed store.py Required - load_pvgis_distributed.ipynb",
-          # "API Call Required - load_nsrdb_distributed.ipynb",
-          # "HPC Connection Required - Geospatial_world_map.ipynb",
-          # "HPC Connection Required - DuraMAT Live Demo.ipynb",
+          "API Call Required - PYSam.ipynb",
+          "Removed store.py Required - load_pvgis_distributed.ipynb",
+          "API Call Required - load_nsrdb_distributed.ipynb",
+          "HPC Connection Required - Geospatial_world_map.ipynb",
+          "HPC Connection Required - DuraMAT Live Demo.ipynb",
           "HPC Connection Required - Scenario - Geographical Features.ipynb",
-          # "HPC Connection Required - Scenario - Geospatial.ipynb",
-          # "HPC Connection Required - Scenario - Non-uniform Mountain Prefferential Downselect.ipynb",
-          # "HPC Connection Required - Scenario - Single Location.ipynb",
-          # "HPC Connection Required - Scenario - Temperatrure.ipynb",
-          # "HPC Connection Required - Tools - Module Standoff for IEC TS 63126.ipynb",
-          # "HPC Connection Required - LETID - Outdoor Geospatial Demo.ipynb",
-          # "HPC Connection Required - Geospatial Templates.ipynb",
+          "HPC Connection Required - Scenario - Geospatial.ipynb",
+          "HPC Connection Required - Scenario - Non-uniform Mountain Prefferential Downselect.ipynb",
+          "HPC Connection Required - Scenario - Single Location.ipynb",
+          "HPC Connection Required - Scenario - Temperatrure.ipynb",
+          "HPC Connection Required - Tools - Module Standoff for IEC TS 63126.ipynb",
+          "HPC Connection Required - LETID - Outdoor Geospatial Demo.ipynb",
+          "HPC Connection Required - Geospatial Templates.ipynb",
         ]
 
     steps:
@@ -116,5 +116,5 @@ jobs:
         pip install global_land_mask dotenv imageio nrel-pysam
     - name: Run notebook with testbook and monkeypatching
       run: |
-        python testbook.py "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}"
+        python notebooks_testbook.py "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}"
         python-version: "3.12"
