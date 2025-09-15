@@ -109,3 +109,4 @@ TEMP/
 
 # Slurm log files
 slurm-*.out
+run_all_testbook.py
