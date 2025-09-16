@@ -319,14 +319,14 @@ def map_meta(meta):
     return meta
 
 
-def map_weather(weather_df):
-    """ "
+def map_weather(weather_df: pd.DataFrame) -> pd.DataFrame:
+    """
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.
 
-    Returns:
+    Returns
     --------
-    weather_df : (pd.DataFrame)
+    weather_df : pd.DataFrame
         DataFrame of weather data with modified column headers.
     """
 
