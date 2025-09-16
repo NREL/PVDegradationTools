@@ -6,6 +6,7 @@ import dask.distributed
 from pvdeg import humidity
 from pvdeg.utilities import nrel_kestrel_check
 
+from typing import Union
 from pvlib import iotools
 import os
 import glob
@@ -319,7 +320,7 @@ def map_meta(meta):
     return meta
 
 
-def map_weather(weather_df: pd.DataFrame) -> pd.DataFrame:
+def map_weather(weather_df: Union[pd.DataFrame, xr.Dataset]) -> Union[pd.DataFrame, xr.Dataset]:
     """
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.

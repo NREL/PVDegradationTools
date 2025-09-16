@@ -15,6 +15,7 @@ import dask.array as da
 import pandas as pd
 import numpy as np
 from dask.distributed import Client, LocalCluster
+from dask.delayed import Delayed
 from scipy.interpolate import griddata
 from copy import deepcopy
 
@@ -25,7 +26,7 @@ import cartopy.io.shapereader as shpreader
 from collections.abc import Callable
 import cartopy.feature as cfeature
 
-from typing import Tuple
+from typing import Union
 from shapely import LineString, MultiLineString
 
 
@@ -240,7 +241,7 @@ def analysis(
     preserve_gid_dim: bool = False,
     compute: bool = True,
     **func_kwargs,
-):
+) -> Union[xr.Dataset, Delayed]:
     """
     Applies a function to each gid of a weather dataset. `analysis` will attempt to create a template using `geospatial.auto_template`.
     If this process fails you will have to provide a geospatial template to the template argument.
@@ -268,7 +269,7 @@ def analysis(
 
     Returns
     -------
-    ds_res : xarray.Dataset
+    ds_res : xarray.Dataset | dask.delayed.Delayed
         Dataset with results for a block of gids.
     """
 
@@ -1096,7 +1097,7 @@ def interpolate_analysis(
     data_var: str,
     method="nearest",
     resolution=100j,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Interpolate sparse spatial result data against DataArray coordinates.
     Takes DataArray instead of Dataset, index one variable of a dataset to get a dataarray.
