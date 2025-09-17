@@ -17,6 +17,7 @@ import bifacialvf
 from pathlib import Path
 from pvlib import iotools
 import sys, platform
+from pvdeg.utilities import read_material
 
 @decorators.geospatial_quick_shape(
     'timeseries',
@@ -317,12 +318,16 @@ def poa_irradiance_tracker(
 
 def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelengths: np.ndarray, testfolder: Path = None, 
                                    spectra_folder: Path = None, 
+                                   frontResultsOnly: bool = None,
                                    module_mount=None,
                                    tilt=None,
                                    azimuth=None,
                                    axis_tilt=None,
                                    axis_azimuth=None,
-                                   custom_albedo_df: pd.DataFrame = None,
+                                   custom_albedo_summer: str | dict = None,
+                                   custom_albedo_winter: str | dict = None,
+                                   min_wavelength=280, 
+                                   max_wavelength=4000,
                                    **kwargs_irradiance: dict) -> pd.DataFrame:
     """
     Calculate spectrally resolved irradiance using SMARTS spectra
@@ -366,7 +371,7 @@ def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelen
     #Run once to generate spectra files, then comment out
     if spectra_folder is None:
         cwd = os.getcwd()
-        alb, dni, dhi, ghi = demo.generate_spectra(ground_material='Grass')
+        alb, dni, dhi, ghi = demo.generate_spectra(ground_material='Grass', min_wavelength=min_wavelength, max_wavelength=max_wavelength)
         os.chdir(cwd)
     else: 
         print("Using existing spectra folder: ", spectra_folder)
@@ -380,7 +385,19 @@ def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelen
     #     for alb_name in custom_albedo_df.columns:
     #         if alb_name in myTMY3.columns:
     #             myTMY3[alb_name] = custom_albedo_df[alb_name]
-
+    custom_albedo_dict = {}
+    if isinstance(custom_albedo_summer, str):
+        custom_albedo_dict['Summer'] = read_material('Albedo', key=custom_albedo_summer)
+    elif isinstance(custom_albedo_summer, dict):
+        custom_albedo_dict['Summer'] = custom_albedo_summer
+    else:
+        custom_albedo_dict['Summer'] = None
+    if isinstance(custom_albedo_winter, str):
+        custom_albedo_dict['Winter'] = read_material('Albedo', key=custom_albedo_winter)
+    elif isinstance(custom_albedo_winter, dict):
+        custom_albedo_dict['Winter'] = custom_albedo_winter
+    else:
+        custom_albedo_dict['Winter'] = None
 
     meta = meta
     print(myTMY3)
@@ -467,7 +484,7 @@ def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelen
 
     print(weather_df)
     composite_data = bifacialvf.skycomposition_method(myTMY3=myTMY3, spectral_file_path='data/spectral_tmys', lambda_range=wavelengths, integrated_spectrum=spectrum_sums, meta=meta, 
-            custom_albedo_df=custom_albedo_df, writefiletitle=composite_file, 
+            custom_albedo_dict=custom_albedo_dict, frontResultsOnly=frontResultsOnly, writefiletitle=composite_file, 
             tilt=tilt, sazm=sazm, pitch=pitch, clearance_height=clearance_height, 
             rowType=rowType, transFactor=transFactor, sensorsy=sensorsy, 
             PVfrontSurface=PVfrontSurface, PVbackSurface=PVbackSurface, 
@@ -476,4 +493,4 @@ def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelen
     composite_data['RH'] = weather_df['relative_humidity']
     return composite_data
 
-        
+
