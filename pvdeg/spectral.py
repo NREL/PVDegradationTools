@@ -5,6 +5,19 @@ import pandas as pd
 import inspect
 import warnings
 from pvdeg import decorators
+import os
+import re
+from datetime import datetime as dt
+from datetime import date
+import bifacial_radiance as br
+import numpy as np
+import pandas as pd
+from itertools import product
+import bifacialvf
+from pathlib import Path
+from pvlib import iotools
+import sys, platform
+from pvdeg.utilities import read_material
 
 
 @decorators.geospatial_quick_shape(
@@ -472,3 +485,182 @@ def poa_irradiance_tracker(
     )
 
     return tracker_poa
+
+def spectrally_resolved_irradiance(weather_df: pd.DataFrame, meta: dict, wavelengths: np.ndarray, testfolder: Path = None, 
+                                   spectra_folder: Path = None, 
+                                   frontResultsOnly: bool = None,
+                                   module_mount=None,
+                                   tilt=None,
+                                   azimuth=None,
+                                   axis_tilt=None,
+                                   axis_azimuth=None,
+                                   custom_albedo_summer: str | dict = None,
+                                   custom_albedo_winter: str | dict = None,
+                                   min_wavelength=280, 
+                                   max_wavelength=4000,
+                                   **kwargs_irradiance: dict) -> pd.DataFrame:
+    """
+    Calculate spectrally resolved irradiance using SMARTS spectra
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data for given location.
+    meta : dict
+        Meta data of location.
+    wavelengths : np.ndarray
+        Wavelengths for which to calculate the irradiance [nm].
+    testfolder : Path, optional
+        Folder to save the spectra files. If None, no files are saved.
+    irradiance_kwargs : dict
+        Additional keyword arguments for the irradiance calculation.
+
+    Returns
+    -------
+    spectral_irradiance : pd.DataFrame
+        Spectrally resolved irradiance values.
+    """
+    if testfolder is not None:
+        if not os.path.exists(testfolder):
+            os.makedirs(testfolder)
+
+    demo = br.RadianceObj('demo')
+    # meta['TZ'] = meta['tz']  # Ensure timezone is set correctly
+    metdata = demo.readWeatherData(metadata=meta, metdata=weather_df)
+    print(metdata)
+    myTMY3 = demo.metdata.tmydata
+    print(myTMY3.columns)
+    myTMY3.rename(columns={'dni': 'DNI',
+                            'dhi': 'DHI',
+                            'ghi': 'GHI',
+                            'temp_air': 'DryBulb',
+                            'wind_speed': 'Wspd',
+                            'albedo': 'Alb'
+                            }, inplace=True)       
+    print(myTMY3)
+    #Run once to generate spectra files, then comment out
+    if spectra_folder is None:
+        cwd = os.getcwd()
+        alb, dni, dhi, ghi = demo.generate_spectra(ground_material='Grass', min_wavelength=min_wavelength, max_wavelength=max_wavelength)
+        os.chdir(cwd)
+    else: 
+        print("Using existing spectra folder: ", spectra_folder)
+
+    location_name = meta['State']+ '_' +  meta['City']
+    
+    demo.generate_spectral_tmys(wavelengths=wavelengths, source = "SAM", spectra_folder=r'spectra', location_name=location_name)
+    #myTMY3 = weather_df
+    # if custom_albedo_df is not None:
+    #     # If a custom albedo DataFrame is provided, use it to set the albedo: 
+    #     for alb_name in custom_albedo_df.columns:
+    #         if alb_name in myTMY3.columns:
+    #             myTMY3[alb_name] = custom_albedo_df[alb_name]
+    custom_albedo_dict = {}
+    if isinstance(custom_albedo_summer, str):
+        custom_albedo_dict['Summer'] = read_material('Albedo', key=custom_albedo_summer)
+    elif isinstance(custom_albedo_summer, dict):
+        custom_albedo_dict['Summer'] = custom_albedo_summer
+    else:
+        custom_albedo_dict['Summer'] = None
+    if isinstance(custom_albedo_winter, str):
+        custom_albedo_dict['Winter'] = read_material('Albedo', key=custom_albedo_winter)
+    elif isinstance(custom_albedo_winter, dict):
+        custom_albedo_dict['Winter'] = custom_albedo_winter
+    else:
+        custom_albedo_dict['Winter'] = None
+
+    meta = meta
+    print(myTMY3)
+    deltastyle = 'SAM'  # 
+
+    # Variables
+    if (module_mount == 'fixed'):
+        # TODO: change for handling HSAT tracking passed or requested
+        if tilt is None:
+            try:
+                tilt = float(meta["tilt"])
+            except:
+                tilt = float(abs(meta["latitude"]))
+                print(
+                    f"The array tilt angle was not provided, therefore the latitude tilt of {tilt:.1f} was used."
+                )
+        if azimuth is None:  # Sets the default orientation to equator facing.
+            try:
+                azimuth = float(meta["azimuth"])
+            except:
+                if float(meta["latitude"]) < 0:
+                    azimuth = 0
+                else:
+                    azimuth = 180
+                    print(
+                        f"The array azimuth was not provided, therefore an azimuth of {azimuth:.1f} was used."
+                    )
+        tilt = tilt                 # PV tilt (deg)
+        sazm = azimuth                  # PV Azimuth(deg) or tracker axis direction
+        tracking = False
+    elif (module_mount == '1_axis'):
+        
+        if axis_azimuth is None:  # Sets the default orientation to north-south.
+            try:
+                axis_azimuth = float(meta["axis_azimuth"])
+            except:
+                if float(meta["latitude"]) < 0:
+                    axis_azimuth = 0
+                else:
+                    axis_azimuth = 180
+                    print(f"The array axis_azimuth was not provided, therefore an azimuth of {axis_azimuth:.1f} was used.")
+                    
+        if axis_tilt is None:  # Sets the default orientation to horizontal.
+            try:
+                axis_tilt = float(meta["axis_tilt"])
+            except:
+                axis_tilt = 0
+                print(f"The array axis_tilt was not provided, therefore an axis tilt of 0° was used.")
+            tilt = axis_tilt
+            sazm = axis_azimuth
+            tracking=True
+            backtrack=False
+            limit_angle = 50
+    else:
+        raise NotImplementedError(f"The input module_mount '{module_mount}' is not implemented")
+
+    albedo = 0.62               # ground albedo
+    clearance_height=0.4
+    pitch = 1.5                   # row to row spacing in normalized panel lengths. 
+    rowType = "interior"        # RowType(first interior last single)
+    transFactor = 0.013         # TransmissionFactor(open area fraction)
+    sensorsy = 6                # sensorsy(# hor rows in panel)   <--> THIS ASSUMES LANDSCAPE ORIENTATION 
+    PVfrontSurface = "glass"    # PVfrontSurface(glass or ARglass)
+    PVbackSurface = "glass"     # PVbackSurface(glass or ARglass)
+
+    # Calculate PV Output Through Various Methods    
+    # This variables are advanced and explored in other tutorials.
+    #calculateBilInterpol = True         # Only works with landscape at the moment.
+    #calculatePVMismatch = True
+    #portraitorlandscape='landscape'   # portrait or landscape
+    #cellsnum = 72
+    #bififactor = 1.0
+    #agriPV = True                       # Returns ground irradiance values
+
+    if testfolder is None:
+        testfolder = Path.cwd()
+    else:
+        testfolder = Path(testfolder)
+    composite_file = os.path.join(testfolder, 'Spectrally_resolved_irradiance.csv')
+    #spectra_folder = "C:\\Users\\mprillim\\Documents\\Spectral_example\\NSRDB_example\\Tutorial_01\\data\\spectral_tmys"
+
+    spectrum_sums = demo.integrated_spectrum(spectra_folder=r'spectra')
+    spectrum_sums.to_csv('spectrum_sums.csv')
+
+    print(weather_df)
+    composite_data = bifacialvf.skycomposition_method(myTMY3=myTMY3, spectral_file_path='data/spectral_tmys', lambda_range=wavelengths, integrated_spectrum=spectrum_sums, meta=meta, 
+            custom_albedo_dict=custom_albedo_dict, frontResultsOnly=frontResultsOnly, writefiletitle=composite_file, 
+            tilt=tilt, sazm=sazm, pitch=pitch, clearance_height=clearance_height, 
+            rowType=rowType, transFactor=transFactor, sensorsy=sensorsy, 
+            PVfrontSurface=PVfrontSurface, PVbackSurface=PVbackSurface, 
+            albedo=albedo, tracking=tracking, backtrack=backtrack, 
+            limit_angle=limit_angle, deltastyle=deltastyle)
+    composite_data['RH'] = weather_df['relative_humidity']
+    return composite_data
+
+
