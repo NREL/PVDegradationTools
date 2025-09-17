@@ -2,36 +2,33 @@
 # coding: utf-8
 
 # # DuraMAT Workshop Live Demo - Geospatial analysis
-# 
+#
 # ![PVDeg Logo](../PVD_logo.png)
-# 
-# 
+#
+#
 # **Steps:**
 # 1. Initialize weather data into xarray
 # 2. Calculate installation standoff for New Mexico
 # 3. Plot results
-# 
+#
 # **Xarray: multi-dimensional data frame**
-# 
+#
 # ![Xarray](./images/xarray.webp)
 
 # In[2]:
 
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import pvdeg
-import dask.array as da
-import dask.dataframe as dd
-import xarray as xr
 
 
 # In[ ]:
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
+
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
 print("Pandas version ", pd.__version__)
@@ -50,12 +47,21 @@ pvdeg.geospatial.start_dask()
 
 
 # Get weather data
-weather_db = 'NSRDB'
+weather_db = "NSRDB"
 
-weather_arg = {'satellite': 'Americas',
-               'names': 2022,
-               'NREL_HPC': True,
-               'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
+weather_arg = {
+    "satellite": "Americas",
+    "names": 2022,
+    "NREL_HPC": True,
+    "attributes": [
+        "air_temperature",
+        "wind_speed",
+        "dhi",
+        "ghi",
+        "dni",
+        "relative_humidity",
+    ],
+}
 
 weather_ds, meta_df = pvdeg.weather.get(weather_db, geospatial=True, **weather_arg)
 
@@ -69,13 +75,13 @@ weather_ds
 # In[6]:
 
 
-meta_df['state'].unique()
+meta_df["state"].unique()
 
 
 # In[7]:
 
 
-meta_NM = meta_df[meta_df['state'] == 'New Mexico']
+meta_NM = meta_df[meta_df["state"] == "New Mexico"]
 
 
 # In[8]:
@@ -88,9 +94,11 @@ weather_NM_sub = weather_ds.sel(gid=meta_NM_sub.index)
 # In[9]:
 
 
-geo = {'func': pvdeg.standards.standoff,
-       'weather_ds': weather_NM_sub,
-       'meta_df': meta_NM_sub}
+geo = {
+    "func": pvdeg.standards.standoff,
+    "weather_ds": weather_NM_sub,
+    "meta_df": meta_NM_sub,
+}
 
 standoff_res = pvdeg.geospatial.analysis(**geo)
 
@@ -104,10 +112,14 @@ standoff_res
 # In[11]:
 
 
-fig, ax = pvdeg.geospatial.plot_USA(standoff_res['x'], 
-                   cmap='viridis', vmin=0, vmax=None, 
-                   title='Minimum estimated air standoff to qualify as level 1 system', 
-                   cb_title='Standoff (cm)')
+fig, ax = pvdeg.geospatial.plot_USA(
+    standoff_res["x"],
+    cmap="viridis",
+    vmin=0,
+    vmax=None,
+    title="Minimum estimated air standoff to qualify as level 1 system",
+    cb_title="Standoff (cm)",
+)
 
 
 # # Relative Humidity Example - Time dimension
@@ -117,14 +129,25 @@ fig, ax = pvdeg.geospatial.plot_USA(standoff_res['x'],
 
 # State bar of new mexico: (35.16482, -106.58979)
 
-weather_db = 'NSRDB'
-weather_id = (35.16482, -106.58979) #NREL (39.741931, -105.169891)
-weather_arg = {'satellite': 'Americas',
-               'names': 2022,
-               'NREL_HPC': True,
-               'attributes': ['air_temperature', 'wind_speed', 'dhi', 'ghi', 'dni', 'relative_humidity']}
+weather_db = "NSRDB"
+weather_id = (35.16482, -106.58979)  # NREL (39.741931, -105.169891)
+weather_arg = {
+    "satellite": "Americas",
+    "names": 2022,
+    "NREL_HPC": True,
+    "attributes": [
+        "air_temperature",
+        "wind_speed",
+        "dhi",
+        "ghi",
+        "dni",
+        "relative_humidity",
+    ],
+}
 
-weather_df, meta = pvdeg.weather.get(weather_db, weather_id, geospatial=False, **weather_arg)
+weather_df, meta = pvdeg.weather.get(
+    weather_db, weather_id, geospatial=False, **weather_arg
+)
 
 
 # In[13]:
@@ -142,15 +165,17 @@ RH_module
 # In[15]:
 
 
-RH_module.plot(ls='--')
+RH_module.plot(ls="--")
 
 
 # In[16]:
 
 
-geo = {'func': pvdeg.humidity.module,
-       'weather_ds': weather_NM_sub,
-       'meta_df': meta_NM_sub}
+geo = {
+    "func": pvdeg.humidity.module,
+    "weather_ds": weather_NM_sub,
+    "meta_df": meta_NM_sub,
+}
 
 RH_module = pvdeg.geospatial.analysis(**geo)
 
@@ -178,8 +203,8 @@ RH_module
 #             if d == 15:
 #                 if t == datetime.time(12):
 #                     fig, ax = pvdeg.geospatial.plot_USA(RH_module['RH_surface_outside'].sel(time=np_t),
-#                             cmap='viridis', vmin=0, vmax=100, 
-#                             title=f'RH_surface_outside  - 2022-{m}-{d} 12:00', 
+#                             cmap='viridis', vmin=0, vmax=100,
+#                             title=f'RH_surface_outside  - 2022-{m}-{d} 12:00',
 #                             cb_title='Relative humidity (%)')
 #                     plt.savefig(f'./images/RH_animation_{n}.png', dpi=600)
 
@@ -191,7 +216,3 @@ RH_module
 # ![PVDeg Logo](./images/RH_animation.gif)
 
 # In[ ]:
-
-
-
-
