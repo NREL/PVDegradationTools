@@ -177,11 +177,16 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
         meta_gid = utilities.fix_metadata(meta_gid)
 
     # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
+    # check for multiindex and convert to just time index, don't know what was causing this
     df_weather = ds_gid.to_dataframe()
-    if isinstance(
-        df_weather.index, pd.MultiIndex
-    ):  # check for multiindex and convert to just time index, don't know what was causing this
+    if isinstance(df_weather.index, pd.MultiIndex):
         df_weather = df_weather.reset_index().set_index("time")
+
+    # HARD FORCE non-nullable numpy dtypes (avoid arrow error)
+    df_weather = df_weather.astype(
+        {col: np.asarray(df_weather[col]).dtype for col in df_weather.columns}, 
+    copy=False)
+    df_weather.index = np.asarray(df_weather.index.values, dtype="datetime64[ns]")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
     # res is the type returned by func
@@ -197,6 +202,10 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
 
     if not df.index.name:
         ds_res = ds_res.isel(index=0, drop=True)
+
+    # WILL BREAK ON NON-NUMERIC TYPES
+    # desired = {name: np.float64 for name in ds_res.data_vars}
+    # ds_res = ds_res.astype(desired)
 
     return ds_res
 

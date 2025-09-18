@@ -1240,16 +1240,16 @@ def nrel_kestrel_check():
     Kestrel Documentation : https://nrel.github.io/HPC/Documentation/
     """
 
-    kestrel_hostname = "kestrel.hpc.nrel.gov"
+    KESTREL_HOSTNAME = "kestrel.hpc.nrel.gov"
 
     host = run(args=["hostname", "-f"], shell=False, capture_output=True, text=True)
     device_domain = ".".join(host.stdout.split(".")[-4:])[:-1]
 
-    if kestrel_hostname != device_domain:
+    if KESTREL_HOSTNAME != device_domain:
         raise ConnectionError(
             f"""
             connected to {device_domain}
-            not a node of {kestrel_hostname}")
+            not a node of {KESTREL_HOSTNAME}")
             """
         )
 
