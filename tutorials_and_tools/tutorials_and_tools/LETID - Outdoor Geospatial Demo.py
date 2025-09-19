@@ -50,7 +50,7 @@ kwargs = {
     "na_0": 100,
     "nb_0": 0,
     "nc_0": 0,
-    "mechanism_params": "repins",
+    "mechanism_params": 'D037',
 }
 
 
@@ -137,7 +137,7 @@ geo = {
     "na_0": 100,
     "nb_0": 0,
     "nc_0": 0,
-    "mechanism_params": "repins",
+    "mechanism_params": 'D037',
 }
 
 letid_res = pvdeg.geospatial.analysis(**geo)
