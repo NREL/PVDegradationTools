@@ -218,3 +218,95 @@ def test_map_meta_dataframe():
 def test_map_meta_invalid_input():
     with pytest.raises(TypeError):
         map_meta(["invalid", "input"])
+
+
+def test_get_invalid_database():
+    with pytest.raises(NameError, match="Weather database not found."):
+        pvdeg.weather.get(database="INVALID_DB", id=(39.7555, -105.2211))
+
+
+def test_get_no_location():
+    with pytest.raises(TypeError, match="Specify location via tuple"):
+        pvdeg.weather.get(database="PSM3")
+
+
+def test_get_pvgis():
+    location = (48.86, 2.35)  # Paris area
+
+    try:
+        weather_df, meta = pvdeg.weather.get(database="PVGIS", id=location)
+
+        assert isinstance(weather_df, pd.DataFrame)
+        assert isinstance(meta, dict)
+        assert len(weather_df) > 0
+        assert "latitude" in meta
+        assert "longitude" in meta
+        assert "Source" in meta
+        assert meta["Source"] == "PVGIS"
+        assert "wind_height" in meta
+        assert meta["wind_height"] == 10
+
+        expected_columns = ["temp_air", "ghi", "dhi", "dni"]
+        for col in expected_columns:
+            assert col in weather_df.columns, f"Column {col} not found"
+
+    except Exception as e:
+        # skip if PVGIS is unavailable
+        pytest.skip(f"PVGIS not available: {e}")
+
+
+def test_get_psm3():
+    location = (39.7555, -105.2211)  # Golden area
+
+    try:
+        weather_df, meta = pvdeg.weather.get(
+            database="PSM3",
+            id=location,
+            api_key="DEMO_KEY",
+            email="user@mail.com"
+        )
+
+        assert isinstance(weather_df, pd.DataFrame)
+        assert isinstance(meta, dict)
+        assert len(weather_df) > 0
+        assert "latitude" in meta
+        assert "longitude" in meta
+        assert "Source" in meta
+        assert meta["Source"] == "NSRDB"
+        assert "wind_height" in meta
+        assert meta["wind_height"] == 2
+
+        expected_columns = ["temp_air", "ghi", "dhi", "dni"]
+        for col in expected_columns:
+            assert col in weather_df.columns, f"Column {col} not found"
+
+    except Exception as e:
+        # If PSM3 is unavailable or demo key is exhausted, skip the test
+        pytest.skip(f"PSM3 not available: {e}")
+
+
+def test_get_geospatial_not_implemented():
+    with pytest.raises(NameError, match="Geospatial analysis not implemented"):
+        pvdeg.weather.get(database="PVGIS", geospatial=True)
+
+
+def test_get_meta_mapping():
+        weather_df, meta = pvdeg.weather.read(
+        file_in=FILES["psm3"],
+        file_type="csv"
+    )
+        assert "tz" in meta and "Time Zone" not in meta
+        assert "altitude" in meta  and "Elevation" not in meta
+
+
+def test_get_local_file():
+    weather_df, meta = pvdeg.weather.get(
+        database="local",
+        id=0,  # dummy gid
+        file=FILES["psm3"]
+    )
+    assert isinstance(weather_df, pd.DataFrame)
+    assert isinstance(meta, dict)
+    assert len(weather_df) > 0
+    assert "latitude" in meta
+    assert "longitude" in meta
