@@ -66,6 +66,8 @@ Enhancements
   (:issue:`211`, :pull:`224`)
 - Add new (public) function :py:mod:`pvdeg.humidity` to calculate relative humidity from
   air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
+- Removed `kinetic_parameters.json` and merged parameters into
+  'DegradationDatabase.json`. (:issue:`176`, :pull:`248`)
 
 Deprecations
 -------------
