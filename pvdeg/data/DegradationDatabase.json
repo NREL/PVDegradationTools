@@ -940,7 +940,8 @@
             	"stdev": 0.22},
         	"Corr-E_a-P":{"value": -0.606}},
 
-    "repins": {
+    "D037": {
+        "DataEntryPerson": "Rajiv (Dax) Daxini",
         "mechanism": "LETID",
         "v_ab": 46700000.0,
         "v_ba": 4.7e-25,
@@ -968,7 +969,7 @@
         "doi": "doi:10.1557/s43577-022-00438-8",
         "comments": ""
     },
-    "repins_best_case": {
+    "D038": {
         "mechanism": "LETID",
         "v_ab": 46700000.0,
         "v_ba": 4.7e-25,
@@ -996,7 +997,7 @@
         "doi": "doi:10.1557/s43577-022-00438-8",
         "comments": ""
     },
-    "kwapil": {
+    "D039": {
         "mechanism": "LETID",
         "v_ab": 33000000.0,
         "v_ba": 4.7e-25,
@@ -1024,7 +1025,7 @@
         "doi": "doi:10.1016/j.solmat.2017.05.066, doi:10.1109/JPHOTOV.2020.3025240",
         "comments": ""
     },
-    "bredemeier": {
+    "D040": {
         "mechanism": "LETID",
         "v_ab": 937000000.0,
         "v_ba": 0.0,
@@ -1052,7 +1053,7 @@
         "doi": "doi:10.1016/j.solmat.2017.08.007",
         "comments": ""
     },
-    "wyller_wafer": {
+    "D050": {
         "mechanism": "LETID",
         "v_ab": 1900000000000.0,
         "v_ba": 0.0,
@@ -1080,7 +1081,7 @@
         "doi": "doi:10.1109/JPHOTOV.2021.3078367",
         "comments": ""
     },
-    "wyller_cell": {
+    "D051": {
         "mechanism": "LETID",
         "v_ab": 483000.0,
         "v_ba": 0.0,
@@ -1108,7 +1109,7 @@
         "doi": "doi:10.1109/JPHOTOV.2021.3078367",
         "comments": ""
     },
-    "graf": {
+    "D052": {
         "mechanism": "LETID",
         "v_ab": 483000.0,
         "v_ba": 0.0,
@@ -1136,7 +1137,7 @@
         "doi": "doi:10.1063/1.5123890",
         "comments": ""
     },
-    "dark letid": {
+    "D053": {
         "mechanism": "Dark LETID",
         "v_ab": 84400000.0,
         "v_ba": 0.0,
@@ -1163,7 +1164,7 @@
         "srv_bc": 0,
         "comments": ""
     },
-    "bo-lid": {
+    "D054": {
         "mechanism": "BO-LID",
         "v_ab": 4000.0,
         "v_ba": 10000000000000.0,
@@ -1190,7 +1191,7 @@
         "srv_bc": 0,
         "comments": ""
     },
-    "Lit BO-LID + fit to Qcells destab": {
+    "D055": {
         "mechanism": "BO-LID",
         "v_ab": 4000.0,
         "v_ba": 10000000000000.0,
