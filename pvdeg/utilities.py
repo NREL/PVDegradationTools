@@ -74,8 +74,8 @@ def meta_as_dict(rec):
     return {name: rec[name].item() for name in rec.dtype.names}
 
 
-def get_kinetics(name=None, fname="kinetic_parameters.json"):
-    """Return a list of LETID/B-O LID kinetic parameters from kinetic_parameters.json.
+def get_kinetics(name=None, fname="DegradationDatabase.json"):
+    """Return a list of LETID/B-O LID kinetic parameters from DegradationDatabase.json.
 
     Parameters
     ----------
