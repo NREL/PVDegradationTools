@@ -207,7 +207,7 @@ def test_gid_downsampling():
 
 def test_get_kinetics_bad():
     # no name provided case
-    fpath = os.path.join(DATA_DIR, "kinetic_parameters.json")
+    fpath = os.path.join(DATA_DIR, "DegradationDatabase.json")
     with open(fpath) as f:
         data = json.load(f)
     parameters_list = data.keys()
