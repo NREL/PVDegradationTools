@@ -10,7 +10,6 @@ import pvdeg
 import pytest
 import xarray as xr
 from pvdeg.weather import map_meta
-
 from pvdeg import TEST_DATA_DIR
 
 FILES = {
@@ -31,6 +30,7 @@ DSETS = [
     "time_index",
     "wind_speed",
 ]
+
 META_KEYS = [""]
 
 DISTRIBUTED_PVGIS_WEATHER = xr.load_dataset(
