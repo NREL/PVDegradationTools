@@ -279,12 +279,12 @@ def test_get_geospatial_not_implemented():
 
 
 def test_get_meta_mapping():
-        weather_df, meta = pvdeg.weather.read(
+    _, meta = pvdeg.weather.read(
         file_in=FILES["psm3"],
         file_type="csv"
-    )
-        assert "tz" in meta and "Time Zone" not in meta
-        assert "altitude" in meta  and "Elevation" not in meta
+        )
+    assert "tz" in meta and "Time Zone" not in meta
+    assert "altitude" in meta and "Elevation" not in meta
 
 
 def test_get_local_file():
@@ -292,7 +292,7 @@ def test_get_local_file():
         database="local",
         id=0,  # dummy gid
         file=FILES["psm3"]
-    )
+        )
     assert isinstance(weather_df, pd.DataFrame)
     assert isinstance(meta, dict)
     assert len(weather_df) > 0
