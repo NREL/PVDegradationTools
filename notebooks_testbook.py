@@ -1,8 +1,9 @@
 import sys
 from testbook import testbook
 
+
 def monkeypatch_addLocation_code():
-    # This string will be injected into the notebook to monkeypatch GeospatialScenario.addLocation
+    # this string injected to monkeypatch GeospatialScenario.addLocation
     return """
 import pandas as pd
 import xarray as xr
@@ -25,6 +26,7 @@ def monkeypatch_addLocation(self, *args, **kwargs):
 pvdeg.GeospatialScenario.addLocation = monkeypatch_addLocation
 """
 
+
 def monkeypatch_cells(tb):
     # Find a cell that contains pvdeg import and inject after it
     for i, cell in enumerate(tb.cells):
@@ -38,11 +40,13 @@ def monkeypatch_cells(tb):
         tb.inject(monkeypatch_addLocation_code(), 0)
         print("Monkeypatch injected at beginning")
 
+
 def main(notebook_path):
     with testbook(notebook_path, execute=False) as tb:
         monkeypatch_cells(tb)
         # Now execute all cells
         tb.execute()
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
