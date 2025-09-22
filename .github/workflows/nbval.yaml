@@ -44,6 +44,9 @@ jobs:
         pip install nbval
         pip install global_land_mask dotenv imageio nrel-pysam
     - name: Run notebook and check output
+      env:
+        api_key: "user@mail.com"
+        email: "DEMO_KEY"
       run: |
         # --nbval-sanitize-with: pre-process text to remove irrelevant differences
         pytest --nbval \
