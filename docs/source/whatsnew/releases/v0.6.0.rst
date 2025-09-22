@@ -101,6 +101,7 @@ Testing
 -------
 - Added nbval-based notebook testing workflow to CI for validating tutorial and example
   notebooks (:issue:`179`, :pull:`184`)
+- Add tests for :py:func:`pvdeg.weather.get`. (pull:`249`)
 
 
 Contributors
