@@ -1,9 +1,11 @@
 import sys
 from testbook import testbook
+import os
+import pvdeg
 
 
-def monkeypatch_addLocation_code():
-    # this string injected to monkeypatch GeospatialScenario.addLocation
+def monkeypatch_addLocation():
+    """String to monkeypatch GeospatialScenario.addLocation"""
     return """
 import pandas as pd
 import xarray as xr
@@ -11,7 +13,7 @@ import pvdeg
 import os
 
 def monkeypatch_addLocation(self, *args, **kwargs):
-    print("Monkeypatch applied!")  # Debug print
+    print("Monkeypatch for addLocation applied!")
     self.gids, self.weather_data, self.meta_data = None, None, None
     GEO_META = pd.read_csv(
         os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0
@@ -27,29 +29,39 @@ pvdeg.GeospatialScenario.addLocation = monkeypatch_addLocation
 """
 
 
+def monkeypatch_hpc_check():
+    """String to monkeypatch pvdeg.utilities.nrel_kestrel_check"""
+    return """
+def monkeypatch_nrel_kestrel_check():
+    print("Monkeypatch for nrel_kestrel_check applied!")
+    pass # This function now does nothing, preventing the ConnectionError.
+
+pvdeg.utilities.nrel_kestrel_check = monkeypatch_nrel_kestrel_check
+"""
+
 def monkeypatch_cells(tb):
-    # Find a cell that contains pvdeg import and inject after it
+    # Find a cell that contains 'import pvdeg' and inject after it
     for i, cell in enumerate(tb.cells):
         if 'import pvdeg' in str(cell.source):
-            # Inject after the import cell
-            tb.inject(monkeypatch_addLocation_code(), i+1)
-            print(f"Monkeypatch injected after cell {i}")
+            # Inject both monkey patches after the import cell
+            tb.inject(monkeypatch_addLocation(), i + 1)
+            tb.inject(monkeypatch_hpc_check(), i + 2)
+            print(f"Monkeypatches injected after cell {i}")
             break
     else:
         # Fallback: inject at the beginning if no pvdeg import found
-        tb.inject(monkeypatch_addLocation_code(), 0)
-        print("Monkeypatch injected at beginning")
-
+        tb.inject(monkeypatch_addLocation(), 0)
+        tb.inject(monkeypatch_hpc_check(), 1)
+        print("Monkeypatches injected at beginning")
 
 def main(notebook_path):
     with testbook(notebook_path, execute=False) as tb:
         monkeypatch_cells(tb)
-        # Now execute all cells
         tb.execute()
-
+    print("Notebook executed successfully.")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python test_notebooks_with_testbook.py <notebook_path>")
+        print("Usage: python notebooks_testbook.py <notebook_path>")
         sys.exit(1)
     main(sys.argv[1])
