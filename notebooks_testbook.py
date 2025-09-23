@@ -1,7 +1,5 @@
 import sys
 from testbook import testbook
-import os
-import pvdeg
 
 
 def monkeypatch_addLocation():
@@ -13,7 +11,6 @@ import pvdeg
 import os
 
 def monkeypatch_addLocation(self, *args, **kwargs):
-    print("Monkeypatch for addLocation applied!")
     self.gids, self.weather_data, self.meta_data = None, None, None
     GEO_META = pd.read_csv(
         os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0
@@ -38,6 +35,7 @@ def monkeypatch_nrel_kestrel_check():
 pvdeg.utilities.nrel_kestrel_check = monkeypatch_nrel_kestrel_check
 """
 
+
 def monkeypatch_cells(tb):
     # Find a cell that contains 'import pvdeg' and inject after it
     for i, cell in enumerate(tb.cells):
@@ -51,10 +49,12 @@ def monkeypatch_cells(tb):
         tb.inject(monkeypatch_addLocation(), 0)
         tb.inject(monkeypatch_hpc_check(), 1)
 
+
 def main(notebook_path):
     with testbook(notebook_path, execute=False) as tb:
         monkeypatch_cells(tb)
         tb.execute()
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
