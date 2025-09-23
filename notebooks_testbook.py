@@ -9,6 +9,7 @@ import xarray as xr
 import pvdeg
 import os
 
+
 def monkeypatch_addLocation(self, *args, **kwargs):
     self.gids, self.weather_data, self.meta_data = None, None, None
     GEO_META = pd.read_csv(
@@ -37,18 +38,12 @@ pvdeg.utilities.nrel_kestrel_check = monkeypatch_nrel_kestrel_check
 
 
 def monkeypatch_cells(tb):
-    # Inject hpc_check before any pvdeg import
     tb.inject(monkeypatch_hpc_check(), 0)
-
-    # Find cell with 'import pvdeg' and inject addLocation after it
     for i, cell in enumerate(tb.cells):
         if 'import pvdeg' in str(cell.source):
-            # Inject addLocation monkey patch after the import cell
-            tb.inject(monkeypatch_addLocation(), i + 1)
+            cell.source = monkeypatch_addLocation() + cell.source
             break
     else:
-        # Fallback: inject at the beginning if no pvdeg import found
-        # Note: hpc_check is already at 0, so this starts at 1.
         tb.inject(monkeypatch_addLocation(), 1)
 
 
