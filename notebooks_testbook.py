@@ -37,17 +37,19 @@ pvdeg.utilities.nrel_kestrel_check = monkeypatch_nrel_kestrel_check
 
 
 def monkeypatch_cells(tb):
-    # Find a cell that contains 'import pvdeg' and inject after it
+    # Inject hpc_check at the beginning to patch before any pvdeg import
+    tb.inject(monkeypatch_hpc_check(), 0)
+
+    # Find a cell that contains 'import pvdeg' and inject addLocation after it
     for i, cell in enumerate(tb.cells):
         if 'import pvdeg' in str(cell.source):
-            # Inject both monkey patches after the import cell
+            # Inject the addLocation monkey patch after the import cell
             tb.inject(monkeypatch_addLocation(), i + 1)
-            tb.inject(monkeypatch_hpc_check(), i + 2)
             break
     else:
         # Fallback: inject at the beginning if no pvdeg import found
-        tb.inject(monkeypatch_addLocation(), 0)
-        tb.inject(monkeypatch_hpc_check(), 1)
+        # Note: hpc_check is already at 0, so this starts at 1.
+        tb.inject(monkeypatch_addLocation(), 1)
 
 
 def main(notebook_path):
