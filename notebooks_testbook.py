@@ -1,6 +1,7 @@
 import sys
 from testbook import testbook
 
+
 def monkeypatch_addLocation():
     """String to monkeypatch GeospatialScenario.addLocation"""
     return """
@@ -26,19 +27,7 @@ pvdeg.GeospatialScenario.addLocation = monkeypatch_addLocation
 """
 
 
-def monkeypatch_hpc_check():
-    """String to monkeypatch pvdeg.utilities.nrel_kestrel_check"""
-    return """
-import pvdeg
-def monkeypatch_nrel_kestrel_check():
-    pass # This function now does nothing, preventing the ConnectionError.
-
-pvdeg.utilities.nrel_kestrel_check = monkeypatch_nrel_kestrel_check
-"""
-
-
 def monkeypatch_cells(tb):
-    tb.inject(monkeypatch_hpc_check(), 0)
     for i, cell in enumerate(tb.cells):
         if 'import pvdeg' in str(cell.source):
             cell.source = monkeypatch_addLocation() + cell.source
