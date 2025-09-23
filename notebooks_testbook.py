@@ -1,7 +1,6 @@
 import sys
 from testbook import testbook
 
-
 def monkeypatch_addLocation():
     """String to monkeypatch GeospatialScenario.addLocation"""
     return """
@@ -29,6 +28,7 @@ pvdeg.GeospatialScenario.addLocation = monkeypatch_addLocation
 def monkeypatch_hpc_check():
     """String to monkeypatch pvdeg.utilities.nrel_kestrel_check"""
     return """
+import pvdeg
 def monkeypatch_nrel_kestrel_check():
     pass # This function now does nothing, preventing the ConnectionError.
 
@@ -37,13 +37,13 @@ pvdeg.utilities.nrel_kestrel_check = monkeypatch_nrel_kestrel_check
 
 
 def monkeypatch_cells(tb):
-    # Inject hpc_check at the beginning to patch before any pvdeg import
+    # Inject hpc_check before any pvdeg import
     tb.inject(monkeypatch_hpc_check(), 0)
 
-    # Find a cell that contains 'import pvdeg' and inject addLocation after it
+    # Find cell with 'import pvdeg' and inject addLocation after it
     for i, cell in enumerate(tb.cells):
         if 'import pvdeg' in str(cell.source):
-            # Inject the addLocation monkey patch after the import cell
+            # Inject addLocation monkey patch after the import cell
             tb.inject(monkeypatch_addLocation(), i + 1)
             break
     else:
