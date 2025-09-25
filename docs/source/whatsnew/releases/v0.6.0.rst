@@ -69,8 +69,10 @@ Enhancements
   air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
 - :py:func:`pvdeg.humidity.back_encapsulant_water_concentration` and
   :py:func:`pvdeg.humidity.module` now raise ValueError if ``back_encap_thickness`` or
-  ``t`` is None, and no value is available in the specified material from the database.
-  (:issue:`237`, :pull:`238`)
+  ``backsheet_thickness`` is None, and no value is available in the specified material
+  from the database. (:issue:`237`, :pull:`238`)
+- Remove "materials.json" and all associated references. Users should now use the
+  "O2_permeation.json" database for oxygen permeation data. (:issue:`240`, :pull:`243`)
 
 
 Deprecations
