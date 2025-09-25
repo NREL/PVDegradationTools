@@ -56,15 +56,14 @@ def test_pysam_results_list_conf0():
 
     assert res == {'annual_energy': 53062.51753616376}
 
+
 def test_pysam_results_list_default_model():
-    """
-    Use default model instead of custom configuration.
-    """
+    """Use default model instead of custom configuration."""
     res = pvdeg.pysam.pysam(
         weather_df=weather[::2],
         meta=meta,
         pv_model="pvsamv1",
-        pv_model_default="FlatPlatePVCommercial", # use default config instead of custom
+        pv_model_default="FlatPlatePVCommercial",
         results=["annual_energy"],
     )
 
@@ -101,7 +100,8 @@ def test_pysam_inspire_practical_tilt():
         inspire_practical_pitch_tilt=True,
     )
 
-    # latitude point is above 40 deg N, so we floor to 40 deg tilt due to practical racking considerations
+    # latitude point is above 40 deg N
+    # so we floor to 40 deg tilt due to practical racking considerations
     assert 40 == max(res["subarray1_surf_tilt"])
 
     res = pvdeg.pysam.pysam(

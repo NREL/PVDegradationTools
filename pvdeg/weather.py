@@ -422,7 +422,9 @@ def map_meta(meta):
         raise TypeError(f"Input must be dict or pandas.DataFrame, got {type(meta)}")
 
 
-def map_weather(weather_df: Union[pd.DataFrame, xr.Dataset]) -> Union[pd.DataFrame, xr.Dataset]:
+def map_weather(
+    weather_df: Union[pd.DataFrame, xr.Dataset]
+) -> Union[pd.DataFrame, xr.Dataset]:
     """
     This will update the headings for meterological data to standard forms
     as outlined in https://github.com/DuraMAT/pv-terms.

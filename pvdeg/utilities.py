@@ -1621,7 +1621,8 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
 
 def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
     """
-    Convert dataset gids to gridded latitude, longitude dataset. Maintains all other coordiantes.
+    Convert dataset gids to gridded latitude, longitude dataset. 
+    Maintains all other coordiantes.
 
     Aims to support advanced workflows where pvdeg.geospatial.analysis is applied twice. 
 
@@ -1630,12 +1631,14 @@ def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
     ds_gids : xr.Dataset
         dataset with "gid" dimension/coords
     meta_df : pd.DataFrame
-        metadata pandas dataframe containing gid index, and latitude and longitude columns
+        metadata pandas dataframe containing gid index, and latitude 
+        and longitude columns
     
     Returns
     -------
     coords_ds: xr.Dataset
-        dataset with "latitude", "longitude" dimensions/coords in addition to original coords not including "gids"
+        dataset with "latitude", "longitude" dimensions/coords in
+        addition to original coords not including "gids"
     """
 
     stacked = ds_gids.drop(["gid"])
@@ -1649,4 +1652,3 @@ def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
     stacked = stacked.drop_duplicates("gid")
     res = stacked.unstack("gid")
     return res
-    

@@ -8,17 +8,15 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 import json
-import sys
-import os
 
 from pvdeg import (
     weather,
     utilities,
-    decorators,
-    DATA_DIR
 )
 
-# TODO: add grid_default, cashloan_default, utilityrate_defaults for expanded pysam simulation capabilities
+
+# TODO: add grid_default, cashloan_default, utilityrate_defaults
+# for expanded pysam simulation capabilities
 def pysam(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -226,7 +224,7 @@ def pysam(
                 if k.startswith("subarray"):
                     subarrays.add(k.split("_")[0])
 
-    if inspire_practical_pitch_tilt == True:
+    if inspire_practical_pitch_tilt is True:
         print("overriding pitch with practical considerations")
         print(f"subarrays {subarrays}")
 
@@ -238,27 +236,40 @@ def pysam(
         param_gcr = [f"{subarray}_gcr" for subarray in subarrays]
 
         if any(pysam_model.value(name) != 0 for name in param_latitude_tilt):
-            print('config defined latitude tilt defined for one of the subarrays, disabling config latitude tilt (will be set later using practical consideration)')
+            print(
+                'config defined latitude tilt defined for one of the subarrays, '
+                'disabling config latitude tilt'
+                '(will be set later using practical consideration)'
+            )
             for name in param_latitude_tilt:
-                pysam_model.value(name, 0) 
-        
+                pysam_model.value(name, 0)
+
         if any(pysam_model.value(name) != 0 for name in param_tracker_mode):
-            raise ValueError("Inspire Practical Pitch, Tilt Consideration Failed: at least one subarray is using tracking")
+            raise ValueError(
+                "Inspire Practical Pitch,"
+                "Tilt Consideration Failed: at least one subarray is using tracking"
+            )
 
         if any(pysam_model.value(name) == 90 for name in param_tilt):
-            raise ValueError("Inspire Practical Pitch, Tilt Consideration Failed: at least one subarray is vertical fixed tilt (tilt = 90 deg)")
+            raise ValueError(
+                "Inspire Practical Pitch,"
+                "Tilt Consideration Failed: "
+                "at least one subarray is vertical fixed tilt (tilt = 90 deg)"
+            )
 
         # collector width of 2m for the inspire scenarios
-        tilt_prac, pitch_prac, gcr_prac = inspire_practical_pitch(latitude=meta["latitude"], cw=2)
+        tilt_prac, pitch_prac, gcr_prac = inspire_practical_pitch(
+            latitude=meta["latitude"], cw=2
+        )
 
         # if the above passed, then we want to run
         for name in param_tilt:
-            pysam_model.value(name, tilt_prac) 
+            pysam_model.value(name, tilt_prac)
 
         for name in param_gcr:
-            pysam_model.value(name, gcr_prac) 
+            pysam_model.value(name, gcr_prac)
 
-    pysam_model.unassign('solar_resource_file') # unassign file
+    pysam_model.unassign('solar_resource_file')
 
     # Duplicate Columns in the dataframe seem to cause this issue
     # Error (-4) converting nested tuple 0 into row in matrix.
@@ -270,12 +281,18 @@ def pysam(
         return outputs
 
     print("gcr used")
-    print(pysam_model.value("subarray1_gcr") )
+    print(pysam_model.value("subarray1_gcr"))
 
     pysam_res = {key: outputs[key] for key in results}
     return pysam_res
 
-def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame, tilt: float, pitch: float) -> xr.Dataset:
+
+def _handle_pysam_return(
+    pysam_res_dict : dict,
+    weather_df: pd.DataFrame,
+    tilt: float,
+    pitch: float
+) -> xr.Dataset:
     """Handle a pysam return object and transform it to an xarray"""
 
     ground_irradiance = pysam_res_dict["subarray1_ground_rear_spatial"]
@@ -283,7 +300,6 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame, tilt: 
     annual_poa = pysam_res_dict["annual_poa_front"]
     annual_energy = pysam_res_dict["annual_energy"]
 
-    # if we have made the considerations then use 
     subarray1_poa_front = pysam_res_dict["subarray1_poa_front"][:8760]
     subarray1_poa_rear = pysam_res_dict["subarray1_poa_rear"][:8760]
     subarray1_celltemp = pysam_res_dict["subarray1_celltemp"][:8760]
@@ -291,15 +307,12 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame, tilt: 
 
     timeseries_index = weather_df.index
 
-    # redo this using numba?
-    # distances = ground_irradiance[0][1:]
     ground_irradiance_values = da.from_array([row[1:] for row in ground_irradiance[1:]])
 
     single_location_ds = xr.Dataset(
         data_vars={
             # SCALARS
-            # we will calculate these for some configs.
-            # these are calculated in inspire_ground_irradiance using inspire_practical_pitch
+            # for some configs these are caluclated with inspire_practical_pitch
             "tilt": float(tilt),
             "pitch": float(pitch),
 
@@ -313,25 +326,30 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame, tilt: 
             "subarray1_dc_gross" : (("time", ), da.array(subarray1_dc_gross)),
 
             # TIMESERIES (weather inputs)
-            "temp_air":(("time", ), da.array(weather_df["temp_air"].values)),
-            "wind_speed":(("time", ), da.array(weather_df["wind_speed"].values)),
-            "wind_direction":(("time", ), da.array(weather_df["wind_direction"].values)),
-            "dhi":(("time", ), da.array(weather_df["dhi"].values)),
-            "ghi":(("time", ), da.array(weather_df["ghi"].values)),
-            "dni":(("time", ), da.array(weather_df["dni"].values)),
-            "relative_humidity":(("time", ), da.array(weather_df["relative_humidity"].values)),
-            "albedo":(("time", ), da.array(weather_df["albedo"].values)),
+            "temp_air": (("time", ), da.array(weather_df["temp_air"].values)),
+            "wind_speed": (("time", ), da.array(weather_df["wind_speed"].values)),
+            "wind_direction": (("time", ), da.array(
+                weather_df["wind_direction"].values
+            )),
+            "dhi": (("time", ), da.array(weather_df["dhi"].values)),
+            "ghi": (("time", ), da.array(weather_df["ghi"].values)),
+            "dni": (("time", ), da.array(weather_df["dni"].values)),
+            "relative_humidity": (("time", ), da.array(
+                weather_df["relative_humidity"].values
+            )),
+            "albedo": (("time", ), da.array(weather_df["albedo"].values)),
 
             # SPATIO-TEMPORAL (model outputs)
-            "ground_irradiance" : (("time", "distance"), ground_irradiance_values),
+            "ground_irradiance": (("time", "distance"), ground_irradiance_values),
         },
         coords={
-            "time" : timeseries_index,
+            "time": timeseries_index,
             # distances vary for config and locations (on fixed tilt configs)
             # so we need to use a distance "index" that is not spatially meaningful
-            "distance" : np.arange(10), # convient way to match the distances in the template
+            # convient way to match the distances in the template
+            "distance": np.arange(10),
         }
-    ) 
+    )
 
     return single_location_ds
 
@@ -353,8 +371,8 @@ temporal = ("gid", "time")
 spatio_temporal = ("gid", "time", "distance")
 
 INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
-    "tilt":scalar,
-    "pitch":scalar,
+    "tilt": scalar,
+    "pitch": scalar,
     "annual_poa": scalar,
     "annual_energy": scalar,
 
@@ -374,9 +392,13 @@ INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
     "ground_irradiance": spatio_temporal,
 }
 
-def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float, float]:
+
+def optimal_gcr_pitch(
+    latitude: float, cw: float = 2
+) -> tuple[float, float]:
     """
-    determine optimal gcr and pitch for fixed tilt systems according to latitude and optimal GCR parameters for fixed tilt bifacial systems.
+    Determine optimal gcr and pitch for fixed tilt systems according
+    to latitude and optimal GCR parameters for fixed tilt bifacial systems.
 
     .. math::
 
@@ -410,7 +432,8 @@ def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float, float]:
     References
     -----------
     Erin M. Tonita, Annie C.J. Russell, Christopher E. Valdivia, Karin Hinzer,
-    Optimal ground coverage ratios for tracked, fixed-tilt, and vertical photovoltaic systems for latitudes up to 75°N,
+    Optimal ground coverage ratios for tracked, fixed-tilt, and vertical photovoltaic
+    systems for latitudes up to 75°N,
     Solar Energy,
     Volume 258,
     2023,
@@ -419,30 +442,33 @@ def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float, float]:
     https://doi.org/10.1016/j.solener.2023.04.038.
     (https://www.sciencedirect.com/science/article/pii/S0038092X23002682)
 
-    Optimal GCR from Equation 4 
+    Optimal GCR from Equation 4
     Parameters from Table 1
     """
 
-    p = -0.560 
-    k = 0.133 
-    alpha_0 = 40.2 
-    gcr_0 = 0.70 
+    p = -0.560
+    k = 0.133
+    alpha_0 = 40.2
+    gcr_0 = 0.70
 
     # optimal gcr
-    gcr = ((p) / (1 + np.exp(-k * (latitude - alpha_0)) )) + gcr_0
+    gcr = ((p) / (1 + np.exp(-k * (latitude - alpha_0)))) + gcr_0
 
     pitch = cw / gcr
     return gcr, pitch
+
 
 def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, float]:
     """
     Calculate pitch for fixed tilt systems for InSPIRE Agrivoltaics Irradiance Dataset.
 
-    We cannot use the optimal pitch due to certain real world restrictions so we will apply some constraints.
+    We cannot use the optimal pitch due to certain real world restrictions
+    so we will apply some constraints.
 
-    We are using latitude tilt but we cannot use tilts > 40 deg, due to racking constraints, cap at 40 deg for latitudes above 40 deg.
+    We are using latitude tilt but we cannot use tilts > 40 deg,
+    due to racking constraints, cap at 40 deg for latitudes above 40 deg.
 
-    pitch minimum: 3.8 m 
+    pitch minimum: 3.8 m
     pitch maximum:  12 m
 
     tilt max: 40 deg (latitude tilt)
@@ -459,15 +485,15 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
     tilt: float
         tilt for a fixed tilt system with practical considerations [deg]
     pitch: float
-        pitch for a fixed tilt system with practical consideration [m] 
+        pitch for a fixed tilt system with practical consideration [m]
     gcr: float
         gcr for a fixed tilt system with practical considerations [unitless]
     """
 
     gcr_optimal, pitch_optimal = optimal_gcr_pitch(latitude=latitude, cw=cw)
 
-    pitch_ceil = min(pitch_optimal, 12)    # 12 m pitch ceiling
-    pitch_practical = max(pitch_ceil, 3.8) # 3.8m pitch floor
+    pitch_ceil = min(pitch_optimal, 12)     # 12 m pitch ceiling
+    pitch_practical = max(pitch_ceil, 3.8)  # 3.8m pitch floor
 
     if not (3.8 <= pitch_practical <= 12):
         raise ValueError("calculated practical pitch is outside range [3.8m, 12m]")
@@ -479,7 +505,8 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
 
     return float(tilt_practical), float(pitch_practical), float(gcr_practical)
 
-def load_gcr_from_config(config_files:dict):
+
+def load_gcr_from_config(config_files: dict):
     """
     dictionary containg 'pv' key
     """
@@ -491,9 +518,11 @@ def load_gcr_from_config(config_files:dict):
 
     return data["subarray1_gcr"]
 
+
 def inspire_ground_irradiance(weather_df, meta, config_files):
     """
-    Get ground irradiance array and annual poa irradiance for a given point using pvsamv1
+    Get ground irradiance array and annual poa irradiance
+    for a given point using pvsamv1
 
     REQUIRES: input weather data time index in UTC time.
 
@@ -520,28 +549,32 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
             meta type : {type(meta)}
         """)
 
-    #### there is no pitch/gcr output from the model so we might have to do other checks to see that this is being applied correctly
-    #### verify that our equations are correct. plot the world, view to see if practical applications have been applied.
-
-    #### there is no pitch/gcr output from the model so we might have to do other checks to see that this is being applied correctly
-    #### verify that our equations are correct. plot the world, view to see if practical applications have been applied.
+    # there is no pitch/gcr output from the model so we might have to do other checks
+    # to see that this is being applied correctly verify that our equations are correct.
+    # plot the world, view to see if practical applications have been applied.
 
     # force localize utc from tmy to local time by moving rows
     weather_df = weather.roll_tmy(weather_df, meta)
 
-    tracking_setups = ["01", "02", "03", "04", "05"] 
-    pratical_considerations_setups = ["06", "07", "08", "09"] # fixed tilt setups want to calculate pitch/gcr as a function of latitude capped at 40 degrees
+    tracking_setups = ["01", "02", "03", "04", "05"]
+    # fixed tilt setups calculate pitch/gcr as a function of latitude capped at 40 deg
+    pratical_considerations_setups = ["06", "07", "08", "09"]
     # vertical tilt (fixed spacing) 10
 
     print(f"config file string: {config_files['pv']} -- debug")
-    
-    cw = 2 # collector width 2 [m]
+
+    cw = 2  # collector width 2 [m]
     pratical_consideration = False
     if any(setup in config_files["pv"] for setup in pratical_considerations_setups):
-        print("setup with practical consieration detected, using pysam inspire_practical_consideration_pitch_tilt=True")
-        pratical_consideration=True
-        tilt_used, pitch_used, gcr_used = inspire_practical_pitch(latitude=meta['latitude'], cw=cw)
-    
+        print(
+            "setup with practical consieration detected, "
+            "using pysam inspire_practical_consideration_pitch_tilt=True"
+        )
+        pratical_consideration = True
+        tilt_used, pitch_used, gcr_used = inspire_practical_pitch(
+            latitude=meta['latitude'], cw=cw
+        )
+
     # why would this be not in
     # this should check in "10" is in the config files
     elif "10" in config_files["pv"]:
@@ -549,28 +582,36 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
         gcr_used = load_gcr_from_config(config_files=config_files)
         print(f"gcr used: {gcr_used}")
         pitch_used = cw / gcr_used
-        tilt_used=90.0
-    
-    elif any(setup in config_files["pv"] for setup in tracking_setups): # conf 01- 05 using tracking, default gcr from pysam config
+        tilt_used = 90.0
+
+    # conf 01- 05 using tracking, default gcr from pysam config
+    elif any(setup in config_files["pv"] for setup in tracking_setups):
         print("SAT scenario, using -999.0 as tilt fill value")
         gcr_used = load_gcr_from_config(config_files=config_files)
         # print(f"gcr used: {gcr_used}")
         pitch_used = cw / gcr_used
-        tilt_used = -999.0 # tracking doesnt have fixed tilt (use placeholder instead)
-    
+        # tracking doesnt have fixed tilt (use placeholder instead)
+        tilt_used = -999.0
+
     else:
-        # this is not portable but we don't care. this can be custom for this calculation.
-        raise ValueError("Valid config not found, config name must contain setup name from 01-10")
+        # this is not portable because it is custom for the calculation
+        raise ValueError(
+            "Valid config not found, "
+            "config name must contain setup name from 01-10"
+        )
 
     outputs = pysam(
-        weather_df = weather_df,
-        meta = meta,
-        pv_model = "pvsamv1",
+        weather_df=weather_df,
+        meta=meta,
+        pv_model="pvsamv1",
         config_files=config_files,
-        inspire_practical_pitch_tilt=pratical_consideration, # tell model to calculate practical tilt, pitch, gcr again inside function, these will be the same results.
+        # tell model to calculate practical tilt, pitch, gcr again inside function
+        inspire_practical_pitch_tilt=pratical_consideration,
     )
 
-    ds_result = _handle_pysam_return(pysam_res_dict=outputs, weather_df=weather_df, tilt=tilt_used, pitch=pitch_used)
+    ds_result = _handle_pysam_return(
+        pysam_res_dict=outputs, weather_df=weather_df, tilt=tilt_used, pitch=pitch_used
+    )
 
     return ds_result
 
@@ -614,4 +655,4 @@ def solar_resource_dict(weather_df, meta):
     if "wind_direction" in weather_df.columns.values:
         sr["wdir"] = list(weather_df["wind_direction"])
 
-    return sr 
+    return sr

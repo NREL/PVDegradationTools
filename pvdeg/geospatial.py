@@ -1,11 +1,7 @@
 """Collection of classes and functions for geospatial analysis."""
 
 from pvdeg import (
-    standards,
-    humidity,
-    letid,
     utilities,
-    decorators,
 )
 
 import xarray as xr
@@ -84,42 +80,8 @@ def start_dask(hpc=None):
 
     client = Client(cluster)
     print("Dashboard:", client.dashboard_link)
-    # client.wait_for_workers(n_workers=1)
 
     return client
-
-
-# rename this?
-# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt
-# really doing anything anymore
-# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset
-# already then we dont want to anything
-# def _ds_from_arbitrary(res, func):
-#     """
-#     Convert an arbitrary return type to xarray.Dataset.
-#     """
-
-#     ######## STRUCTURAL #########
-#     # functions can just return xr.Dataset to take advantage of geospatial
-#     # this should not be required to implement a new geospatial function
-
-#     if isinstance(res, xr.Dataset):
-#         return res
-
-
-#     # if isinstance(res, pysam.inspirePysamReturn):
-#     #     return pysam._handle_pysam_return(res)
-#     # add more conditionals if we have special cases
-#     # or add general case for mixed return dimensions: HARD
-
-#     # handles collections with elements of same shapes
-#     df = _df_from_arbitrary(res=res, func=func)
-#     ds = xr.Dataset.from_dataframe(df)
-
-#     if not df.index.name:
-#         ds = ds.isel(index=0, drop=True)
-
-#     return ds
 
 
 def _df_from_arbitrary(res, func):
@@ -177,16 +139,18 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     if type(meta_gid["latitude"]) is dict:
         meta_gid = utilities.fix_metadata(meta_gid)
 
-    # set time index here? is there any reason the weather shouldn't always have only pd.datetime index? @ martin?
-    # check for multiindex and convert to just time index, don't know what was causing this
+    # set time index here?
+    # is a reason the weather shouldn't always have pd.datetime index?
+    # check for multiindex and convert to just time index
     df_weather = ds_gid.to_dataframe()
     if isinstance(df_weather.index, pd.MultiIndex):
         df_weather = df_weather.reset_index().set_index("time")
 
     # HARD FORCE non-nullable numpy dtypes (avoid arrow error)
     df_weather = df_weather.astype(
-        {col: np.asarray(df_weather[col]).dtype for col in df_weather.columns}, 
-    copy=False)
+        {col: np.asarray(df_weather[col]).dtype for col in df_weather.columns},
+        copy=False
+    )
     df_weather.index = np.asarray(df_weather.index.values, dtype="datetime64[ns]")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
@@ -251,11 +215,13 @@ def analysis(
     **func_kwargs,
 ) -> Union[xr.Dataset, Delayed]:
     """
-    Applies a function to each gid of a weather dataset. `analysis` will attempt to create a template using `geospatial.auto_template`.
-    If this process fails you will have to provide a geospatial template to the template argument.
+    Applies a function to each gid of a weather dataset. `analysis`
+    will attempt to create a template using `geospatial.auto_template`.
+    If this process fails you will have to provide a geospatial template
+    to the template argument.
 
-    `analysis` will attempt to
-    create a template using `geospatial.auto_template`. If this process fails you will
+    `analysis` will attempt to create a template using
+    `geospatial.auto_template`. If this process fails you will
     have to provide a geospatial template to the template argument.
 
     ValueError: <function-name> cannot be autotemplated. create a template manually
@@ -272,10 +238,13 @@ def analysis(
     template : xarray.Dataset
         Template for output data.
     preserve_gid_dim : bool, optional
-        Expert setting. If True, preserves the 'gid' dimension and prevents expansion to latitude/longitude coordinates.
-        Other dimensions such as time and distance are unaffected. Default is False.
+        Expert setting. If True, preserves the 'gid' dimension
+        and prevents expansion to latitude/longitude coordinates.
+        Other dimensions such as time and distance are unaffected.
+        Default is False.
     compute: bool, optional
-        Expert setting. If False, builds lazy computation graph without execution. This is useful for building into larger dask pipelines.
+        Expert setting. If False, builds lazy computation graph without execution.
+        This is useful for building into larger dask pipelines.
         Default is True: Values will be computed when this function is called.
     func_kwargs : dict
         Keyword arguments to pass to func.
@@ -436,7 +405,6 @@ def zero_template(
     res = stacked.unstack("gid")
 
     return res
-
 
 
 def can_auto_template(func) -> None:
