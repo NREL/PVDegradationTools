@@ -22,6 +22,7 @@ Modules, methods, classes and attributes are explained here.
     humidity
     letid
     montecarlo
+    pysam
     scenario
     geospatial
     spectral

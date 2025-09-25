@@ -21,6 +21,7 @@ pvdeg.weather
       
       pvdeg.weather.csv_read
       pvdeg.weather.empty_weather_ds
+      pvdeg.weather.find_metadata
       pvdeg.weather.get
       pvdeg.weather.get_NSRDB
       pvdeg.weather.get_NSRDB_fnames
@@ -63,6 +64,13 @@ pvdeg.weather
    .. _sphx_glr_backref_pvdeg.weather.empty_weather_ds:
 
    .. minigallery:: pvdeg.weather.empty_weather_ds
+       :add-heading:
+
+   .. autofunction:: find_metadata
+
+   .. _sphx_glr_backref_pvdeg.weather.find_metadata:
+
+   .. minigallery:: pvdeg.weather.find_metadata
        :add-heading:
 
    .. autofunction:: get

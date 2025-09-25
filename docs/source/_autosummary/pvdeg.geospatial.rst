@@ -36,7 +36,6 @@ pvdeg.geospatial
       pvdeg.geospatial.plot_USA
       pvdeg.geospatial.plot_sparse_analysis
       pvdeg.geospatial.start_dask
-      pvdeg.geospatial.template_parameters
       pvdeg.geospatial.zero_template
 
    
@@ -170,13 +169,6 @@ pvdeg.geospatial
    .. _sphx_glr_backref_pvdeg.geospatial.start_dask:
 
    .. minigallery:: pvdeg.geospatial.start_dask
-       :add-heading:
-
-   .. autofunction:: template_parameters
-
-   .. _sphx_glr_backref_pvdeg.geospatial.template_parameters:
-
-   .. minigallery:: pvdeg.geospatial.template_parameters
        :add-heading:
 
    .. autofunction:: zero_template

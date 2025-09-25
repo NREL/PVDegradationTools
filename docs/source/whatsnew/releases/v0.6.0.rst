@@ -51,8 +51,7 @@ Enhancements
 ``GeospatialScenario.geospatial_data``
 - Change ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use
 ``GeospatialScenario.coords``
-- Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
-  (:pull:`182`)
+- Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant (:pull:`182`)
 - Update pytest workflow to cancel in-progress runs for the same branch in favour of
   running on the latest commit. (:pull:`191`)
 - Add support for pandas dataframes to :py:mod:`pvdeg.weather.map_meta()` (:pull:`193`)
@@ -66,6 +65,17 @@ Enhancements
   (:issue:`211`, :pull:`224`)
 - Add new (public) function :py:mod:`pvdeg.humidity` to calculate relative humidity from
   air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
+- Expert options added to `pvdeg.geospatial.analysis`. Details are as follows: (:pull:`252`)
+    - `preserve_gid_dim` optional boolean flag. Keeps model outputs in ``gid`` dimension rather than converting to ``latitude``, ``longitude`` domain.
+    - `compute` optional boolean flag. Prevents eager computation inside of anlysis function.
+      ``analysis(..., compute=False)`` will return a ``dask.Delayed`` object which can be used to build a task graph.
+- Add new (public) module :py:mod:`pvdeg.pysam` to wrap NREL-PySAM for easy SAM simulations. (:pull:`252`)
+  - Add new (public) functions as follows:
+    - :py:mod:`pvdeg.pysam.pysam()` to run SAM simulations.
+    - :py:mod:`optimal_gcr_pitch()` to calculate optimal gcr and pitch for fixed tilt bifacial systems according to latitude and optimal GCR parameters.
+    - :py:mod:`inspire_practical_pitch()` to calcuate tilt, pitch, and gcr for practically constrained systems according to :py:mod:`optimal_gcr_pitch()`
+    - :py:mod:`inspire_ground_irradiance()` to calculate inter-row ground irradiance for the InSPIRE agrivoltaics irradiance dataset.
+    - :py:mod:`solar_resource_dict()` to create solar_resource collections for SAM input from PVDeg weather and metadata.
 
 Deprecations
 -------------

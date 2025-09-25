@@ -25,6 +25,7 @@ pvdeg.standards
       pvdeg.standards.interpret_standoff
       pvdeg.standards.standoff
       pvdeg.standards.standoff_x
+      pvdeg.standards.x_eff_temperature_estimate
 
    
    
@@ -80,6 +81,13 @@ pvdeg.standards
    .. _sphx_glr_backref_pvdeg.standards.standoff_x:
 
    .. minigallery:: pvdeg.standards.standoff_x
+       :add-heading:
+
+   .. autofunction:: x_eff_temperature_estimate
+
+   .. _sphx_glr_backref_pvdeg.standards.x_eff_temperature_estimate:
+
+   .. minigallery:: pvdeg.standards.x_eff_temperature_estimate
        :add-heading:
    
    
