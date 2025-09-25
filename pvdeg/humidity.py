@@ -388,7 +388,7 @@ def back_encapsulant_water_concentration(
     start=None,
     Po_b=None,
     Ea_p_b=None,
-    t=None,
+    backsheet_thickness=None,
     So_e=None,
     Ea_s_e=None,
     back_encap_thickness=None,
@@ -439,9 +439,9 @@ def back_encapsulant_water_concentration(
     Ea_p_b : float
         Backsheet permeation  activation energy [kJ/mol] .
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
-    t : float
+    backsheet_thickness : float
         Thickness of the backsheet [mm].
-        The suggested value for a PET backsheet is t=0.3 [mm]
+        The suggested value for a PET backsheet_thickness=0.3 [mm]
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -494,11 +494,11 @@ def back_encapsulant_water_concentration(
         Ea_p_b = utilities._read_material(
             name=backsheet, fname="H2Opermeation", item=None, fp=None
         )["Eap"]["value"]
-        if t is None:
+        if backsheet_thickness is None:
             if "t" in utilities._read_material(
                 name=backsheet, fname="H2Opermeation", item=None, fp=None
             ):
-                t = utilities._read_material(
+                backsheet_thickness = utilities._read_material(
                     name=backsheet, fname="H2Opermeation", item=None, fp=None
                 )["t"]["value"]
             else:
@@ -524,7 +524,7 @@ def back_encapsulant_water_concentration(
                                  "a backsheet material with a back_encap_thickness "
                                  "available should be specified.")
     # Convert the parameters to the correct and convenient units
-    WVTRo = Po_b / 100 / 100 / 24 / t
+    WVTRo = Po_b / 100 / 100 / 24 / backsheet_thickness
     EaWVTR = Ea_p_b / R_GAS
     So = So_e * back_encap_thickness / 10
     Eas = Ea_s_e / R_GAS
@@ -697,7 +697,7 @@ def back_encapsulant(
     back_encap_thickness=0.5,
     Eas=16.729,
 ):
-    """Return RH of backside module encapsulant.
+    """Return the relative humidity of backside module encapsulant.
 
     Function to calculate the Relative Humidity of Backside Solar Module Encapsulant
     and return a pandas series for each time step
@@ -793,7 +793,7 @@ def backsheet(
     start=None,
     Po_b=None,
     Ea_p_b=None,
-    t=None,
+    backsheet_thickness=None,
     So_e=None,
     Ea_s_e=None,
     back_encap_thickness=None,
@@ -824,9 +824,9 @@ def backsheet(
     Ea_p_b : float
         Backsheet permeation  activation energy [kJ/mol] .
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
-    t : float
+    backsheet_thickness : float
         Thickness of the backsheet [mm].
-        The suggested valuue for a PET backsheet is t=0.3 [mm]
+        The suggested value for a PET backsheet is t=0.3 [mm]
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -863,7 +863,7 @@ def backsheet(
         start=start,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
-        t=t,
+        backsheet_thickness=backsheet_thickness,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,
@@ -929,7 +929,7 @@ def module(
         Backsheet permeation  activation energy [kJ/mol].
     t : float
         Thickness of the backsheet [mm].
-        The suggested value for a PET backsheet is t=0.3 mm
+        The suggested value for a PET backsheet is 0.3mm.
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
     Ea_s_e : float
@@ -1009,7 +1009,7 @@ def module(
         temp_ambient=weather_df["temp_air"],
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
-        t=t,
+        backsheet_thickness=backsheet_thickness,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,
@@ -1024,7 +1024,7 @@ def module(
         temp_module=temp_module,
         Po_b=Po_b,
         Ea_p_b=Ea_p_b,
-        t=t,
+        backsheet_thickness=backsheet_thickness,
         So_e=So_e,
         Ea_s_e=Ea_s_e,
         back_encap_thickness=back_encap_thickness,

@@ -39,10 +39,11 @@ Breaking Changes
     - Variable `avg_psat` to `avg_water_saturation_pressure`
     - Variable `surface_outside` to `surface_relative`
     - Variable `RHfront_series` to `front_encapsulant`
+    - Variable `t` to `backsheet_thickness`
     - Function `front_encap()` to `front_encapsulant`
     - Function `Ce()` to `back_encapsulant_water_concentration`
     - Function `back_encap` to `back_encapsulant`
-  (:issue:`213`, :pull:`224`)
+  (:issue:`213`, :issue:`233`, :pull:`224`, :pull:`236`)
 
 
 Enhancements
