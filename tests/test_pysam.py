@@ -1,42 +1,103 @@
 import pvdeg
-  
+
+import builtins
 import os
 import xarray as xr
 import pandas as pd
-import numpy as np
 from pathlib import Path
+import pytest
 
 geo_weather = xr.load_dataset(os.path.join(pvdeg.TEST_DATA_DIR, "summit-weather.nc"))
-meta = pd.read_csv(os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0)
+geo_meta = pd.read_csv(
+    os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0
+)
 
 # fill in dummy wind direction and albedo values
-geo_weather = geo_weather.assign(wind_direction=geo_weather["temp_air"] * 0+0)
-geo_weather = geo_weather.assign(albedo=geo_weather["temp_air"] * 0 + 0.2) 
+geo_weather = geo_weather.assign(wind_direction=geo_weather["temp_air"] * 0 + 0)
+geo_weather = geo_weather.assign(albedo=geo_weather["temp_air"] * 0 + 0.2)
+
+weather = geo_weather.isel(gid=0).to_dataframe()
+meta = geo_meta.iloc[0].to_dict()
+
+
+def test_pysam_missing_nrel_pysam_deps(monkeypatch, capsys):
+    real_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "PySAM" or name.startswith("PySAM."):
+            raise ModuleNotFoundError("No module named 'PySAM'")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+
+    res = pvdeg.pysam.pysam(
+        weather_df=pd.DataFrame(), meta={}, pv_model="pvwatts8", config_files={}
+    )
+
+    out = capsys.readouterr().out
+    assert "pysam not found" in out.lower()
+    assert res is None
+
+
+def test_pysam_results_list_conf0():
+    """
+    Test with provided custom config rather than defautl pvsamv1 configs
+    """
+    res = pvdeg.pysam.pysam(
+        weather_df=geo_weather.isel(gid=0).to_dataframe()[::2],
+        meta=meta,
+        config_files={
+            "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
+        },
+        pv_model="pvsamv1",
+        results=["annual_energy"],
+        inspire_practical_pitch_tilt=True,
+    )
+
+    assert res == {'annual_energy': 53062.51753616376}
+
+def test_pysam_results_list_default_model():
+    """
+    Use default model instead of custom configuration.
+    """
+    res = pvdeg.pysam.pysam(
+        weather_df=weather[::2],
+        meta=meta,
+        pv_model="pvsamv1",
+        pv_model_default="FlatPlatePVCommercial", # use default config instead of custom
+        results=["annual_energy"],
+    )
+
+    assert res == {'annual_energy': 235478.46669741502}
+
 
 # split into multiple tests?
 def test_pysam_inspire_practical_tilt():
-
-    mid_lat = meta.iloc[0].to_dict()
+    mid_lat = geo_meta.iloc[0].to_dict()
 
     res = pvdeg.pysam.pysam(
-        weather_df = geo_weather.isel(gid=0).to_dataframe()[::2],
+        weather_df=weather[::2],
         meta=mid_lat,
-        config_files={'pv':os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))},
-        pv_model='pvsamv1',
+        config_files={
+            "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
+        },
+        pv_model="pvsamv1",
         inspire_practical_pitch_tilt=True,
     )
 
     # use latitude tilt under 40 deg N latitude
-    assert mid_lat['latitude'] == max(res["subarray1_surf_tilt"])
+    assert mid_lat["latitude"] == max(res["subarray1_surf_tilt"])
 
-    high_lat = meta.iloc[0].to_dict()
-    high_lat['latitude'] = 45 # cant use latitude tilt above 40 deg N
+    high_lat = geo_meta.iloc[0].to_dict()
+    high_lat["latitude"] = 45  # cant use latitude tilt above 40 deg N
 
     res = pvdeg.pysam.pysam(
-        weather_df = geo_weather.isel(gid=0).to_dataframe()[::2],
+        weather_df=weather[::2],
         meta=high_lat,
-        config_files={'pv':os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))},
-        pv_model='pvsamv1',
+        config_files={
+            "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
+        },
+        pv_model="pvsamv1",
         inspire_practical_pitch_tilt=True,
     )
 
@@ -44,70 +105,100 @@ def test_pysam_inspire_practical_tilt():
     assert 40 == max(res["subarray1_surf_tilt"])
 
     res = pvdeg.pysam.pysam(
-        weather_df = geo_weather.isel(gid=0).to_dataframe()[::2],
+        weather_df=weather[::2],
         meta=high_lat,
-        config_files={'pv':os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))},
-        pv_model='pvsamv1',
+        config_files={
+            "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
+        },
+        pv_model="pvsamv1",
         inspire_practical_pitch_tilt=False,
     )
 
     # flag is set to false, ignore practical considerations
     assert 45 == max(res["subarray1_surf_tilt"])
 
-def test_inspire_configs_pitches():
 
+def test_inspire_configs_pitches():
     configs = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
-    config_paths=[os.path.join(pvdeg.TEST_DATA_DIR, Path(f"SAM/{conf}/{conf}_pvsamv1.json")) for conf in configs]
+    config_paths = [
+        os.path.join(pvdeg.TEST_DATA_DIR, Path(f"SAM/{conf}/{conf}_pvsamv1.json"))
+        for conf in configs
+    ]
 
     tracking = {"01", "02", "03", "04", "05"}
     fixed = {"06", "07", "08", "09"}
     fixed_vertical = {"10"}
 
-    mid_lat = meta.iloc[0].to_dict()
-
-    high_lat = meta.iloc[0].to_dict()
-    high_lat['latitude'] = 45
+    mid_lat = geo_meta.iloc[0].to_dict()
+    high_lat = geo_meta.iloc[0].to_dict()
+    high_lat["latitude"] = 45
 
     for conf in config_paths:
-
         config_files = {"pv": conf}
 
         res_mid_lat = pvdeg.pysam.inspire_ground_irradiance(
             weather_df=geo_weather.isel(gid=0).to_dataframe()[::2],
             meta=mid_lat,
-            config_files=config_files
+            config_files=config_files,
         )
 
         res_high_lat = pvdeg.pysam.inspire_ground_irradiance(
             weather_df=geo_weather.isel(gid=0).to_dataframe()[::2],
             meta=high_lat,
-            config_files=config_files
+            config_files=config_files,
         )
 
-        cw = 2 # collector width [m]
+        cw = 2  # collector width [m]
 
         if conf in tracking:
             # tracking, we leave the pitch unchanged from the original sam config
-            assert res_mid_lat.pitch.item() == (pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw) # use original pitch
-            assert res_high_lat.pitch.item() == (pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw) # use original pitch
+            assert res_mid_lat.pitch.item() == (
+                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+            )  # use original pitch
+            assert res_high_lat.pitch.item() == (
+                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+            )  # use original pitch
 
             # tracking does not have fixed tilt
             assert res_mid_lat.tilt.item() == -999
             assert res_mid_lat.tilt.item() == -999
 
         elif conf in fixed:
-            # 
-            tilt, pitch, gcr = pvdeg.pysam.inspire_practical_pitch(latitude=meta["latitude"], cw=cw)
+            #
+            tilt, pitch, gcr = pvdeg.pysam.inspire_practical_pitch(
+                latitude=geo_meta["latitude"], cw=cw
+            )
 
             assert res_mid_lat.pitch.item() == pitch
-            assert res_high_lat.pitch.item() == 12 # max of 12 meters
+            assert res_high_lat.pitch.item() == 12  # max of 12 meters
 
-            assert res_mid_lat.tilt == res_mid_lat['latitude']
-            assert res_high_lat.tilt == 40 # no latitude tilt above 40
+            assert res_mid_lat.tilt == res_mid_lat["latitude"]
+            assert res_high_lat.tilt == 40  # no latitude tilt above 40
 
         elif conf in fixed_vertical:
-            assert res_mid_lat.pitch.item() == (pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw) # use original pitch
-            assert res_high_lat.pitch.item() == (pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw) # use original pitch
+            assert res_mid_lat.pitch.item() == (
+                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+            )  # use original pitch
+            assert res_high_lat.pitch.item() == (
+                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+            )  # use original pitch
 
-            assert res_mid_lat.tilt == 90 # fixed vertical tilt
+            assert res_mid_lat.tilt == 90  # fixed vertical tilt
             assert res_high_lat.tilt == 90
+
+
+def test_inspire_ground_irradiance_bad_weather_meta_input():
+    with pytest.raises(
+        ValueError, match=r"weather_df must be pandas DataFrame, meta must be dict\."
+    ):
+        pvdeg.pysam.inspire_ground_irradiance(weather_df=[], meta=0, config_files={})
+
+
+def test_inspire_ground_irradiance_bad_configuration_input():
+    with pytest.raises(
+        ValueError,
+        match=r"Valid config not found, config name must contain setup name from 01-10",
+    ):
+        pvdeg.pysam.inspire_ground_irradiance(
+            weather_df=weather, meta=meta, config_files={"pv": "/bad/path.json"}
+        )
