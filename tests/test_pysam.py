@@ -9,6 +9,7 @@ from pathlib import Path
 geo_weather = xr.load_dataset(os.path.join(pvdeg.TEST_DATA_DIR, "summit-weather.nc"))
 meta = pd.read_csv(os.path.join(pvdeg.TEST_DATA_DIR, "summit-meta.csv"), index_col=0)
 
+# fill in dummy wind direction and albedo values
 geo_weather = geo_weather.assign(wind_direction=geo_weather["temp_air"] * 0+0)
 geo_weather = geo_weather.assign(albedo=geo_weather["temp_air"] * 0 + 0.2) 
 
@@ -21,7 +22,7 @@ def test_pysam_inspire_practical_tilt():
         weather_df = geo_weather.isel(gid=0).to_dataframe()[::2],
         meta=mid_lat,
         config_files={'pv':os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))},
-        pv_model='pysamv1',
+        pv_model='pvsamv1',
         inspire_practical_pitch_tilt=True,
     )
 
@@ -35,7 +36,7 @@ def test_pysam_inspire_practical_tilt():
         weather_df = geo_weather.isel(gid=0).to_dataframe()[::2],
         meta=high_lat,
         config_files={'pv':os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))},
-        pv_model='pysamv1',
+        pv_model='pvsamv1',
         inspire_practical_pitch_tilt=True,
     )
 
@@ -46,7 +47,7 @@ def test_pysam_inspire_practical_tilt():
         weather_df = geo_weather.isel(gid=0).to_dataframe()[::2],
         meta=high_lat,
         config_files={'pv':os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))},
-        pv_model='pysamv1',
+        pv_model='pvsamv1',
         inspire_practical_pitch_tilt=False,
     )
 

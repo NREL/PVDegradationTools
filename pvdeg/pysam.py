@@ -468,7 +468,7 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
     tilt_practical = min(latitude, 40)
 
     # practical gcr from practical pitch
-    gcr_practical = cw / pitch_optimal
+    gcr_practical = cw / pitch_practical
 
     return float(tilt_practical), float(pitch_practical), float(gcr_practical)
 
