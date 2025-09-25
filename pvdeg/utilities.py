@@ -982,10 +982,11 @@ def new_id(collection):
 
     return id
 
+
 def restore_gids(meta_df: xr.Dataset, update_ds: xr.Dataset) -> xr.Dataset:
     """
-    Restore gids to results dataset. 
-    
+    Restore gids to results dataset.
+
     For desired behavior output data must
     have identical ordering to input data, otherwise will fail silently by
     misassigning gids to lat-long coordinates in returned dataset.
@@ -993,9 +994,12 @@ def restore_gids(meta_df: xr.Dataset, update_ds: xr.Dataset) -> xr.Dataset:
     Parameters
     -----------
     meta_df : pd.DataFrame
-        Geospatial metadata dataframe, with gid index. Commonly returned by geospatial ``pvdeg.weather.get``.
+        Geospatial metadata dataframe, with gid index.
+        Commonly returned by geospatial ``pvdeg.weather.get``.
     update_ds : xr.Dataset
-        Dataset with coordinates including latitude and longitude. Commonly returned by ``pvdeg.geospatial.analysis``. Can include the same points or a subset of points from meta_df.
+        Dataset with coordinates including latitude and longitude.
+        Commonly returned by ``pvdeg.geospatial.analysis``.
+        Can include the same points or a subset of points from meta_df.
 
     Returns:
     --------
@@ -1004,18 +1008,28 @@ def restore_gids(meta_df: xr.Dataset, update_ds: xr.Dataset) -> xr.Dataset:
         holding the original gids of each result from the input metadata.
     """
 
-    # there is probably a better way to construct the dataset of gids
-    meta_df.loc[:,"gid"] = meta_df.index.values
-    gids_ds = meta_df.set_index(["latitude","longitude"])["gid"].sort_index().to_xarray().to_dataset().reset_coords().reindex_like(update_ds, method=None)
+    meta_df.loc[:, "gid"] = meta_df.index.values
+    gids_ds = (
+        meta_df.set_index(["latitude", "longitude"])["gid"]
+        .sort_index()
+        .to_xarray()
+        .to_dataset()
+        .reset_coords()
+        .reindex_like(update_ds, method=None)
+    )
     meta_df = meta_df.drop(columns=["gid"])
-    
+
     if update_ds.chunks:
-        chunks = {dim_name: chunk_size[0] for dim_name, chunk_size in update_ds.chunks.items() if dim_name in gids_ds.dims}
+        chunks = {
+            dim_name: chunk_size[0] for dim_name, chunk_size in update_ds.chunks.items()
+            if dim_name in gids_ds.dims
+        }
         gids_ds = gids_ds.chunk(chunks)
 
     expanded_ds = xr.merge([update_ds, gids_ds], compat="no_conflicts", join="override")
 
     return expanded_ds
+
 
 def _find_bbox_corners(coord_1=None, coord_2=None, coords=None):
     """Find min/max latitude and longitude.
@@ -1176,6 +1190,7 @@ def _calc_elevation_weights(
         must be: "linear", "exp", "log"
         """
     )
+
 
 def fix_metadata(meta):
     """Meta gid was appearing with ('lat' : {gid: lat}, 'long' : {gid: long}), ...
@@ -1349,9 +1364,10 @@ def add_time_columns_tmy(weather_df, coerce_year=1979):
     weather_df = pd.concat([weather_df, df], axis=1)
     return weather_df
 
-def merge_sparse(files: list[str], engine:str="h5netcdf")->xr.Dataset:
+
+def merge_sparse(files: list[str], engine: str = "h5netcdf") -> xr.Dataset:
     """
-    Merge an arbitrary number of geospatial analysis results. 
+    Merge an arbitrary number of geospatial analysis results.
     Creates monotonically increasing indicies.
 
     Uses `engine='h5netcdf'` for reliability, use h5netcdf to save your results to
@@ -1573,67 +1589,22 @@ def read_material(
 
     return material_dict
 
-def add_time_columns_tmy(weather_df, coerce_year=1979):
-    """
-    Add time columns to a tmy weather dataframe.
-
-    Parameters:
-    -----------
-    weather_df: pd.DataFrame
-        tmy weather dataframe containing 8760 rows.
-    coerce_year: int
-        year to set the dataframe to.
-
-    Returns:
-    --------
-    weather_df: pd.DataFrame
-        dataframe with columns added new columns will be 
-
-        ``'Year', 'Month', 'Day', 'Hour', 'Minute'``
-    """
-
-    weather_df = weather_df.reset_index(drop=True)    
-
-    if len(weather_df) == 8760:
-        freq = 'h'
-    elif len(weather_df) == 17520:
-        freq = '30min'
-    else:
-        raise ValueError("weather df must be in 1 hour or 30 minute intervals")
-
-    date_range = pd.date_range(
-        start=f'{coerce_year}-01-01 00:00:00', 
-        end=f'{coerce_year}-12-31 23:45:00', # 15 minute internval is highest granularity
-        freq=freq
-    )
-
-    df = pd.DataFrame({
-        'Year': date_range.year,
-        'Month': date_range.month,
-        'Day': date_range.day,
-        'Hour': date_range.hour,
-        'Minute': date_range.minute
-    })
-
-    weather_df = pd.concat([weather_df, df], axis=1)
-    return weather_df
-
 
 def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
     """
-    Convert dataset gids to gridded latitude, longitude dataset. 
+    Convert dataset gids to gridded latitude, longitude dataset.
     Maintains all other coordiantes.
 
-    Aims to support advanced workflows where pvdeg.geospatial.analysis is applied twice. 
+    Aims to support advanced workflows where pvdeg.geospatial.analysis is applied twice.
 
     Parameters
     ----------
     ds_gids : xr.Dataset
         dataset with "gid" dimension/coords
     meta_df : pd.DataFrame
-        metadata pandas dataframe containing gid index, and latitude 
+        metadata pandas dataframe containing gid index, and latitude
         and longitude columns
-    
+
     Returns
     -------
     coords_ds: xr.Dataset
