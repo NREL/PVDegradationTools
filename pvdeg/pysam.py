@@ -28,8 +28,6 @@ def pysam(
     pv_model_default: str = None,
     config_files: dict[str: str] = None,
     results: list[str] = None,
-    # pitch_override: float = None,
-    # tilt_override: float = None,
     inspire_practical_pitch_tilt: bool = False,
 ) -> dict:
     """
@@ -44,9 +42,9 @@ def pysam(
     pv_model: str
         choose pySam photovoltaic system model. 
         Some models are less thorough and run faster. 
-        pvwatts8 is ~50x faster than pysamv1 but only calculates 46 parameters while pysamv1 calculates 195.
+        pvwatts8 is ~50x faster than pvsamv1 but only calculates 46 parameters while pvsamv1 calculates 195.
 
-            options: ``pvwatts8``, ``pysamv1``, etc.
+            options: ``pvwatts8``, ``pvsamv1``, etc.
 
     pv_model_default: str
         pysam config for pv model. [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
@@ -182,7 +180,7 @@ def pysam(
     # https://nrel-pysam.readthedocs.io/en/main/modules/Pvsamv1.html
     model_map = {
         "pvwatts8"  : pv8,
-        "pysamv1"   : pv1,
+        "pvsamv1"   : pv1,
     }
 
     model_module = model_map[pv_model]
@@ -557,7 +555,7 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     outputs = pysam(
         weather_df = weather_df,
         meta = meta,
-        pv_model = "pysamv1",
+        pv_model = "pvsamv1",
         config_files=config_files,
         inspire_practical_pitch_tilt=pratical_consideration, # tell model to calculate practical tilt, pitch, gcr again inside function, these will be the same results.
     )
