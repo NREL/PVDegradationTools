@@ -446,31 +446,6 @@ def template_parameters(func):
 
         add_dims = {}
 
-    elif func == standards.vertical_POA:
-        # res = {"annual_gh": x, "annual_energy": annual_energy, "lcoe_nom": lcoe_nom}
-
-        shapes = {
-            "annual_gh": ("gid",),
-            "annual_energy": ("gid",),
-            "lcoe_nom": ("gid",),
-        }
-
-        attrs = {
-            "annual_gh": {"long_name": "SAM Annual GHI", "units": "Wh/m2/yr"},
-            "annual_energy": {
-                "long_name": "Annual AC energy",
-                "units": "kWh",
-            },
-            "lcoe_nom": {
-                "long_name": "LCOE Levelized cost of energy nominal",
-                "units": "cents/kWh",
-            },
-        }
-
-        global_attrs = {
-            "long_name": "Vertical dataset",
-        }
-        add_dims = {}
 
     elif func == humidity.module:
         shapes = {
