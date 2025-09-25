@@ -1,8 +1,7 @@
-"""
-Collection of classes and functions to calculate different temperatures.
-"""
+"""Collection of classes and functions to calculate different temperatures."""
 
 import pvlib
+
 # import pvdeg
 
 from pvdeg import (
@@ -11,13 +10,11 @@ from pvdeg import (
 )
 import pandas as pd
 from typing import Union
-from functools import partial
 import inspect
 
 
 def map_model(temp_model: str, cell_or_mod: str) -> callable:
-    """
-    Utility function to map string to pvlib function.
+    """Map string to pvlib function.
 
     References
     ----------
@@ -28,23 +25,23 @@ def map_model(temp_model: str, cell_or_mod: str) -> callable:
 
     # double check that models are in correct maps
     module = {  # only module
-        "sapm"          : pvlib.temperature.sapm_module,
-        "sapm_mod"      : pvlib.temperature.sapm_module,
+        "sapm": pvlib.temperature.sapm_module,
+        "sapm_mod": pvlib.temperature.sapm_module,
     }
 
     cell = {  # only cell
-        "sapm"          : pvlib.temperature.sapm_cell,
-        "sapm_cell"     : pvlib.temperature.sapm_cell,
-        "pvsyst"        : pvlib.temperature.pvsyst_cell,
-        "ross"          : pvlib.temperature.ross,
-        "noct_sam"      : pvlib.temperature.noct_sam,
+        "sapm": pvlib.temperature.sapm_cell,
+        "sapm_cell": pvlib.temperature.sapm_cell,
+        "pvsyst": pvlib.temperature.pvsyst_cell,
+        "ross": pvlib.temperature.ross,
+        "noct_sam": pvlib.temperature.noct_sam,
         "generic_linear": pvlib.temperature.generic_linear,
     }
 
     agnostic = {  # module or cell
-        "faiman"        : pvlib.temperature.faiman,
-        "faiman_rad"    : pvlib.temperature.faiman_rad,
-        "fuentes"       : pvlib.temperature.fuentes,
+        "faiman": pvlib.temperature.faiman,
+        "faiman_rad": pvlib.temperature.faiman_rad,
+        "fuentes": pvlib.temperature.fuentes,
     }
 
     super_map = {"module": module, "cell": cell}
@@ -88,7 +85,8 @@ def _wind_speed_factor(temp_model: str, meta: dict, wind_factor: float):
         wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
     elif temp_model == "GenericLinearModel":
         wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-        # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
+        # this one does a linear conversion from the other models, faiman, pvsyst,
+        # noct_sam, sapm_module and generic_linear.
         # An appropriate facter will need to be figured out.
     else:
         wind_speed_factor = 1  # this is just hear for completeness.
@@ -96,7 +94,7 @@ def _wind_speed_factor(temp_model: str, meta: dict, wind_factor: float):
     return wind_speed_factor
 
 
-@decorators.geospatial_quick_shape('timeseries', ["module_temperature"])
+@decorators.geospatial_quick_shape("timeseries", ["module_temperature"])
 def module(
     weather_df,
     meta,
@@ -105,8 +103,7 @@ def module(
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
 ):
-    """
-    Calculate module surface temperature using pvlib.
+    """Calculate module surface temperature using pvlib.
 
     Parameters
     ----------
@@ -151,7 +148,7 @@ def module(
         elif temp_model == "ross":
             wind_speed_factor = (
                 10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess the temperature model height on this one, Kempe
+            ) ** wind_factor  # guessed the temperature model height on this one, Kempe
         elif temp_model == "noct_sam":
             if meta["wind_height"] > 3:
                 wind_speed_factor = 2
@@ -167,7 +164,8 @@ def module(
             wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "GenericLinearModel":
             wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-            # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
+            # this one does a linear conversion from the other models, faiman, pvsyst,
+            # noct_sam, sapm_module and generic_linear.
             # An appropriate facter will need to be figured out.
         else:
             wind_speed_factor = 1  # this is just hear for completeness.
@@ -187,7 +185,7 @@ def module(
     return module_temperature
 
 
-@decorators.geospatial_quick_shape('timeseries', ["cell_temperature"])
+@decorators.geospatial_quick_shape("timeseries", ["cell_temperature"])
 def cell(
     weather_df: pd.DataFrame,
     meta: dict,
@@ -195,9 +193,9 @@ def cell(
     temp_model: str = "sapm",
     conf: str = "open_rack_glass_polymer",
     wind_factor: float = 0.33,
-    ) -> pd.DataFrame:
-    """
-    Calculate the PV cell temperature using PVLIB
+) -> pd.DataFrame:
+    """Calculate the PV cell temperature using pvlib-python.
+
     Currently this only supports the SAPM temperature model.
 
     Parameters
@@ -217,23 +215,23 @@ def cell(
         Options: 'open_rack_glass_polymer' (default), 'open_rack_glass_glass',
                  'close_mount_glass_glass', 'insulated_back_glass_polymer'
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the tempeature model
+        (e.g. SAPM). The NSRDB provides calculations at 2 m (i.e module height) but SAPM
+        uses a 10m height.
+        It is recommended that a power-law relationship between height and wind speed
+        of 0.33 be used*. This results in a wind speed that is 1.7 times higher. It is
+        acknowledged that this can vary significantly.
 
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
-        estimation, analysis of wind characteristics and energy potential assessment for selected
-        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for
+    wind energy estimation, analysis of wind characteristics and energy potential
+    assessment for selected sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
 
     Return:
     -------
     temp_cell : pandas.Series
         This is the temperature of the cell in a module at every time step.[°C]
     """
-
     if "wind_height" not in meta.keys():
         wind_speed_factor = 1
     else:
@@ -250,7 +248,8 @@ def cell(
         elif temp_model == "ross":
             wind_speed_factor = (
                 10 / float(meta["wind_height"])
-            ) ** wind_factor  # I had to guess what the wind height for this temperature model was on this one, Kempe.
+            ) ** wind_factor  # I had to guess what the wind height for this temperature
+            # model was on this one, Kempe.
         elif temp_model == "notc_sam":
             if float(meta["wind_height"]) > 3:
                 wind_speed_factor = 2
@@ -266,14 +265,15 @@ def cell(
             wind_speed_factor = (10 / float(meta["wind_height"])) ** wind_factor
         elif temp_model == "GenericLinearModel":
             wind_speed_factor = (2 / float(meta["wind_height"])) ** wind_factor
-            # this one does a linear conversion from the other models, faiman, pvsyst, noct_sam, sapm_module and generic_linear.
+            # this one does a linear conversion from the other models, faiman, pvsyst,
+            # noct_sam, sapm_module and generic_linear.
             # An appropriate facter will need to be figured out.
         else:
             wind_speed_factor = 1  # this is just here for completeness.
     parameters = pvlib.temperature.TEMPERATURE_MODEL_PARAMETERS[temp_model][conf]
 
     if poa is None:
-        poa = pvdeg.spectral.poa_irradiance(weather_df, meta)
+        poa = spectral.poa_irradiance(weather_df, meta)
 
     if temp_model == "sapm":
         temp_cell = pvlib.temperature.sapm_cell(
@@ -291,8 +291,11 @@ def cell(
 
 # test not providing poa
 # what if we dont need the cell or mod param, only matters for sapm
-# to add more temperature model options just add them to the model_map function with the value as a reference to your function
-# genaric linear is a little weird, we need to calculate the values outside of the function using pvlib.temp.genearilinearmodel and converting, can we take a reference to the model or args for the model instead
+# to add more temperature model options just add them to the model_map function with the
+# value as a reference to your function
+# genaric linear is a little weird, we need to calculate the values outside of the
+# function using pvlib.temp.genearilinearmodel and converting, can we take a reference
+# to the model or args for the model instead
 def temperature(
     weather_df,
     meta,
@@ -302,10 +305,11 @@ def temperature(
     conf="open_rack_glass_polymer",
     wind_factor=0.33,
     irradiance_kwarg={},
-    model_kwarg={}
+    model_kwarg={},
 ):
     """
-    Calculate the PV cell or module temperature using PVLIB
+    Calculate the PV cell or module temperature using PVLIB.
+
     Current supports the following temperature models:
 
     Parameters
@@ -319,7 +323,8 @@ def temperature(
     meta : (dict)
         Weather meta-data dictionary (location info)
     poa : (dataframe or series, optional)
-        Dataframe or series with minimum requirement of 'poa_global'. Will be calculated from weather_df, meta if not provided
+        Dataframe or series with minimum requirement of 'poa_global'. Will be calculated
+        rom weather_df, meta if not provided
     temp_model : (str, optional)
         Specify which temperature model from pvlib to use. Current options:
 
@@ -338,18 +343,21 @@ def temperature(
         'pvsys' options: ``freestanding``, ``insulated``
 
     wind_factor : float, optional
-        Wind speed correction exponent to account for different wind speed measurement heights
-        between weather database (e.g. NSRDB) and the tempeature model (e.g. SAPM)
-        The NSRDB provides calculations at 2 m (i.e module height) but SAPM uses a 10 m height.
-        It is recommended that a power-law relationship between height and wind speed of 0.33
-        be used*. This results in a wind speed that is 1.7 times higher. It is acknowledged that
-        this can vary significantly.
+        Wind speed correction exponent to account for different wind speed measurement
+        heights between weather database (e.g. NSRDB) and the tempeature model
+        (e.g. SAPM). The NSRDB provides calculations at 2 m (i.e module height) but SAPM
+        uses a 10m height.
+        It is recommended that a power-law relationship between height and wind speed
+        of 0.33 be used*. This results in a wind speed that is 1.7 times higher. It is
+        acknowledged that this can vary significantly.
     irradiance_kwarg : (dict, optional)
         keyword argument dictionary used for the poa irradiance caluation.
-        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See ``pvdeg.spectral.poa_irradiance``.
+        options: ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``. See
+        ``pvdeg.spectral.poa_irradiance``.
     model_kwarg : (dict, optional)
         keyword argument dictionary used for the pvlib temperature model calculation.
-        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html for more.
+        See https://pvlib-python.readthedocs.io/en/stable/reference/pv_modeling/temperature.html  # noqa
+        for more.
 
     Return
     -------
@@ -358,10 +366,9 @@ def temperature(
 
     References
     -----------
-    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for wind energy
-        estimation, analysis of wind characteristics and energy potential assessment for selected
-        sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
-
+    R. Rabbani, M. Zeeshan, "Exploring the suitability of MERRA-2 reanalysis data for
+    wind energy estimation, analysis of wind characteristics and energy potential
+    assessment for selected sites in Pakistan", Renewable Energy 154 (2020) 1240-1251.
     """
     cell_or_mod = "module" if cell_or_mod == "mod" else cell_or_mod  # mod->module
 
@@ -385,7 +392,8 @@ def temperature(
         "poa_global": poa["poa_global"],
         "temp_air": weather_df["temp_air"],
         "wind_speed": weather_df["wind_speed"] * wind_speed_factor,
-    }  # but this will ovewrite the model default always, so will have to provide default wind speed in the kwargs
+    }  # but this will ovewrite the model default always, so will have to provide
+    # default wind speed in the kwargs
 
     # only apply nessecary values to the model,
     func = map_model(temp_model, cell_or_mod)
@@ -414,4 +422,3 @@ def temperature(
     temperature = func(**model_args)
 
     return temperature
-

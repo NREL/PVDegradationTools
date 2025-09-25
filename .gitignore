@@ -47,7 +47,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# pvdeg scenario output files generated during testing
+# pvdeg scenario output files generated
+pvd_*
 tests/pvd_*
 
 # Translations
@@ -108,6 +109,3 @@ TEMP/
 
 # Slurm log files
 slurm-*.out
-
-# Run information
-tests\data\h5_pytest.h5

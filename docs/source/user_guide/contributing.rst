@@ -173,9 +173,9 @@ Code style
 
 pvdeg generally follows the `PEP 8 -- Style Guide for Python Code
 <https://www.python.org/dev/peps/pep-0008/>`_. Maximum line length for code
-is 79 characters.
+is 88 characters.
 
-Code must be compatible with Python 3.5 and above.
+Code must be compatible with Python 3.9 and above.
 
 *ALIGN WITH PROJECT VARIABLE NAMES*
 pvdeg uses a mix of full and abbreviated variable names. See

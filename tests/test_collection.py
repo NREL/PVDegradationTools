@@ -1,15 +1,14 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import pytest
 import os
 import pandas as pd
 import numpy as np
-from pvdeg import collection, TEST_DIR, DATA_DIR
+from pvdeg import collection, DATA_DIR
 
 fgen = os.path.join(DATA_DIR, "PVL_GenProfile.xlsx")
 generation_df = pd.read_excel(fgen, header=0, engine="openpyxl")
@@ -19,13 +18,13 @@ depth = generation_df["Depth (um)"]
 
 def test_collection_probability():
     s = 1000
-    l = 100 * 1e-4
+    diffusion_length = 100 * 1e-4
     d = 27
 
     thickness = 180 * 1e-4
     x = thickness
 
-    cp = collection.collection_probability(x, thickness, s, l, d)
+    cp = collection.collection_probability(x, thickness, s, diffusion_length, d)
 
     assert cp == pytest.approx(0.23825592713379518, abs=0.000005)
 
@@ -41,7 +40,6 @@ def test_calculate_jsc_from_tau_cp():
     )
 
     assert jsc == pytest.approx(39.79670015, abs=5e-2)
-    # assert jsc == pytest.approx(39.796733327595729, abs=0.00005)
 
 
 def test_calculate_jsc_from_tau_iqe():
@@ -66,3 +64,15 @@ def test_generation_current():
     jgen = collection.generation_current(generation, depth)
     assert jgen == pytest.approx(42.36089737, abs=5e-2)
     # assert jgen == pytest.approx(42.36324575251117, abs=0.00005)
+
+
+# Additional tests for edge cases and parameter validation
+def test_collection_probability_array():
+    s = 1000
+    diffusion_length = 100 * 1e-4
+    d = 27
+    thickness = 180 * 1e-4
+    x = np.array([0, thickness / 2, thickness])
+    cp = collection.collection_probability(x, thickness, s, diffusion_length, d)
+    assert isinstance(cp, np.ndarray)
+    assert cp[0] > cp[1] > cp[2]  # Should decrease with distance from junction

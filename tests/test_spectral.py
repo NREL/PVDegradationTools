@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -38,8 +37,7 @@ poa_expected = results_expected[poa]
 
 
 def test_solar_position():
-    """
-    test pvdeg.spectral.solar_position
+    """Test pvdeg.spectral.solar_position.
 
     Requires:
     ---------
@@ -50,15 +48,19 @@ def test_solar_position():
 
 
 def test_poa_irradiance():
-    """
-    test pvdeg.spectral.poa_irradiance
+    """Test pvdeg.spectral.poa_irradiance.
 
     Requires:
     ---------
     weather dataframe, meta dictionary, and solar_position dataframe
     """
     result = pvdeg.spectral.poa_irradiance(
-        WEATHER, META, solpos_expected, tilt=None, azimuth=180, sky_model="isotropic"
+        WEATHER,
+        META,
+        sol_position=solpos_expected,
+        tilt=None,
+        azimuth=180,
+        sky_model="isotropic",
     )
 
     pd.testing.assert_frame_equal(result, poa_expected, check_dtype=False)

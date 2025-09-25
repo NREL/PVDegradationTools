@@ -35,7 +35,8 @@ from pvdeg import DATA_DIR
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -203,20 +204,20 @@ rh_module.head()
 # In[13]:
 
 
-rh_surface_outside = pvdeg.humidity.surface_outside(
+rh_surface_outside = pvdeg.humidity.surface_relative(
     rh_ambient=WEATHER["relative_humidity"],
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_mod,
 )
 
-rh_front_encap = pvdeg.humidity.front_encap(
+rh_front_encap = pvdeg.humidity.front_encapsulant(
     rh_ambient=rh_surface_outside,
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_mod,
 )
 
-rh_back_encap = pvdeg.humidity.back_encap(
-    rh_ambient=rh_surface_outside,
+rh_back_encap = pvdeg.humidity.back_encapsulant_water_concentration(
+    rh_ambient=rh_surface_relative,
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_mod,
 )

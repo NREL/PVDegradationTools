@@ -1,14 +1,12 @@
-""" 
-Pysam Integration for pvdeg, supports single site and geospatial calculations.
+"""Pysam Integration for pvdeg, supports single site and geospatial calculations.
+
 Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
 """
 
-import dask.dataframe as dd
 import dask.array as da
 import pandas as pd
 import xarray as xr
 import numpy as np
-import pickle
 import json
 import sys
 import os
@@ -26,32 +24,36 @@ def pysam(
     meta: dict,
     pv_model: str,
     pv_model_default: str = None,
-    config_files: dict[str: str] = None,
+    config_files: dict[str:str] = None,
     results: list[str] = None,
     inspire_practical_pitch_tilt: bool = False,
 ) -> dict:
-    """
-    Run pySam simulation. Only works with pysam weather.
+    """Run pySam simulation.
+
+    Only works with pysam weather.
 
     Parameters
     -----------
     weather_df: pd.DataFrame
         DataFrame of weather data. As returned by ``pvdeg.weather.get``
     meta: dict
-        Dictionary of metadata for the weather data. As returned by ``pvdeg.weather.get``
+        Dictionary of metadata for the weather data. As returned by
+        ``pvdeg.weather.get``
     pv_model: str
-        choose pySam photovoltaic system model. 
-        Some models are less thorough and run faster. 
-        pvwatts8 is ~50x faster than pvsamv1 but only calculates 46 parameters while pvsamv1 calculates 195.
+        choose pySam photovoltaic system model.
+        Some models are less thorough and run faster.
+        pvwatts8 is ~50x faster than pysamv1 but only calculates 46 parameters while
+        pysamv1 calculates 195.
 
             options: ``pvwatts8``, ``pvsamv1``, etc.
 
     pv_model_default: str
-        pysam config for pv model. [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
+        pysam config for pv model.
+        [Pysam Modules](https://nrel-pysam.readthedocs.io/en/main/ssc-modules.html)
 
-        On the docs some modules have availabile defaults listed. 
+        On the docs some modules have availabile defaults listed.
 
-        For example:  
+        For example:
         [Pvwattsv8](https://nrel-pysam.readthedocs.io/en/main/modules/Pvwattsv8.html)
         - "FuelCellCommercial"
         - "FuelCellSingleOwner"
@@ -104,28 +106,33 @@ def pysam(
 
     grid_default: str
 
-        pysam default config for grid model. [Grid Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Grid.html)
+        pysam default config for grid model.
+        [Grid Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Grid.html)
 
     cashloan_default: str
 
-        pysam default config for cashloan model. [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)  
-        - "FlatPlatePVCommercial"  
-        - "FlatPlatePVResidential"  
-        - "PVBatteryCommercial"  
-        - "PVBatteryResidential"  
-        - "PVWattsBatteryCommercial"  
-        - "PVWattsBatteryResidential"  
-        - "PVWattsCommercial"  
-        - "PVWattsResidential"  
+        pysam default config for cashloan model.
+        [Cashloan Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Cashloan.html)  # noqa
+        - "FlatPlatePVCommercial"
+        - "FlatPlatePVResidential"
+        - "PVBatteryCommercial"
+        - "PVBatteryResidential"
+        - "PVWattsBatteryCommercial"
+        - "PVWattsBatteryResidential"
+        - "PVWattsCommercial"
+        - "PVWattsResidential"
 
     utiltityrate_default: str
 
-        pysam default config for utilityrate5 model. [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())
+        pysam default config for utilityrate5 model.
+        [Utilityrate5 Defaults](https://nrel-pysam.readthedocs.io/en/main/modules/Utilityrate5.html())  # noqa
 
     config_files: dict
         SAM configuration files. A dictionary containing a mapping to filepaths.
 
-        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`. Each key should contain a value as a string representing the file path to a SAM config file. Cannot deal with the entire SAM config json.
+        Keys must be `'pv', 'grid', 'utilityrate', 'cashloan'`.
+        Each key should contain a value as a string representing the file path to a SAM
+        config file. Cannot deal with the entire SAM config json.
 
         ```
         files = {
@@ -139,39 +146,41 @@ def pysam(
     results: list[str]
         list of strings corresponding to pysam outputs to return.
         Pysam models such as `Pvwatts8` and `Pvsamv1` return hundreds of results.
-        So we can chose to take only the specified results while throwing away the others.
+        So we can chose to take only the specified results while throwing away the
+        others.
 
-        To grab only 'annual_energy' and 'ac' from the model results. 
+        To grab only 'annual_energy' and 'ac' from the model results.
 
         >>> results = ['annual_energy', 'ac']
 
-        This may cause some undesired behavior with geospatial calculations if the lengths of the results within the list are different. 
+        This may cause some undesired behavior with geospatial calculations if the
+        lengths of the results within the list are different.
 
     pitch_override: float
         override defined pitch from pv config file (fixed tilt systems only)
+
     tilt_override: float
         override defined tilt from pv config file (fixed tilt systems only)
 
     inspire_practical_tilt_pitch: bool
         use inspire practical considerations to limit/override defined pitch and tilt from SAM configs.
-        
 
     Returns
     -------
     pysam_res: dict
-        dictionary of outputs. Keys are result name and value is the corresponding result. 
-        If `results` is not specified, the dictionary will contain every calculation from the model.
+        dictionary of outputs. Keys are result name and value is the corresponding
+        result.
+        If `results` is not specified, the dictionary will contain every calculation
+        from the model.
     """
-
     try:
-        import PySAM
         import PySAM.Pvsamv1 as pv1
         import PySAM.Pvwattsv8 as pv8
-        import PySAM.Grid as Grid
-        import PySAM.Utilityrate5 as UtilityRate
-        import PySAM.Cashloan as Cashloan
     except ModuleNotFoundError:
-        print("pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM dependency")
+        print(
+            "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM \
+            dependency"
+        )
         return
 
     sr = solar_resource_dict(weather_df=weather_df, meta=meta)
@@ -189,28 +198,28 @@ def pysam(
     elif pv_model_default is None:
         pysam_model = model_module.new()
 
-        with open( config_files['pv'], 'r') as f:
-            pv_inputs = json.load( f )
+        with open(config_files["pv"], "r") as f:
+            pv_inputs = json.load(f)
 
         # these break the model when being loaded using InSpire doubleday configs
         # this is NREL-PySAM version dependent, these are problematic on 5.1.0
         bad_parameters = {
-            'adjust_constant', 
-            'adjust_en_timeindex', 
-            'adjust_en_periods', 
-            'adjust_timeindex', 
-            'adjust_periods', 
-            'dc_adjust_constant', 
-            'dc_adjust_en_timeindex', 
-            'dc_adjust_en_periods', 
-            'dc_adjust_timeindex', 
-            'dc_adjust_periods'
+            "adjust_constant",
+            "adjust_en_timeindex",
+            "adjust_en_periods",
+            "adjust_timeindex",
+            "adjust_periods",
+            "dc_adjust_constant",
+            "dc_adjust_en_timeindex",
+            "dc_adjust_en_periods",
+            "dc_adjust_timeindex",
+            "dc_adjust_periods",
         }
 
         subarrays = set()
 
         for k, v in pv_inputs.items():
-            if k not in ({'number_inputs', 'solar_resource_file'} | bad_parameters):
+            if k not in ({"number_inputs", "solar_resource_file"} | bad_parameters):
                 pysam_model.value(k, v)
 
                 # get all subarrays being used
@@ -253,7 +262,7 @@ def pysam(
 
     # Duplicate Columns in the dataframe seem to cause this issue
     # Error (-4) converting nested tuple 0 into row in matrix.
-    pysam_model.SolarResource.solar_resource_data = sr 
+    pysam_model.SolarResource.solar_resource_data = sr
     pysam_model.execute()
     outputs = pysam_model.Outputs.export()
 
@@ -283,7 +292,7 @@ def _handle_pysam_return(pysam_res_dict : dict, weather_df: pd.DataFrame, tilt: 
     timeseries_index = weather_df.index
 
     # redo this using numba?
-    distances = ground_irradiance[0][1:]
+    # distances = ground_irradiance[0][1:]
     ground_irradiance_values = da.from_array([row[1:] for row in ground_irradiance[1:]])
 
     single_location_ds = xr.Dataset(
@@ -338,6 +347,7 @@ INSPIRE_NSRDB_ATTRIBUTES = [
     "surface_albedo",
 ]
 
+
 scalar = ("gid",)
 temporal = ("gid", "time")
 spatio_temporal = ("gid", "time", "distance")
@@ -364,9 +374,6 @@ INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
     "ground_irradiance": spatio_temporal,
 }
 
-# TODO: should this gcr 
-# TODO: should this be in standards or design (or other)?
-# TODO: should this contain all of the parameters for optimal gcr and let us choose
 def optimal_gcr_pitch(latitude: float, cw: float = 2) -> tuple[float, float]:
     """
     determine optimal gcr and pitch for fixed tilt systems according to latitude and optimal GCR parameters for fixed tilt bifacial systems.
@@ -505,13 +512,16 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     result : inspirePysamReturn
         returns an custom class object so we can unpack it later.
     """
-
-    if (not isinstance(weather_df, pd.DataFrame) or not isinstance(meta, dict)):
-        raise ValueError(f"""
+    if not isinstance(weather_df, pd.DataFrame) or not isinstance(meta, dict):
+        raise ValueError(
+            f"""
             weather_df must be pandas DataFrame, meta must be dict.
             weather_df type : {type(weather_df)}
             meta type : {type(meta)}
         """)
+
+    #### there is no pitch/gcr output from the model so we might have to do other checks to see that this is being applied correctly
+    #### verify that our equations are correct. plot the world, view to see if practical applications have been applied.
 
     #### there is no pitch/gcr output from the model so we might have to do other checks to see that this is being applied correctly
     #### verify that our equations are correct. plot the world, view to see if practical applications have been applied.
@@ -564,41 +574,44 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
 
     return ds_result
 
+
 def solar_resource_dict(weather_df, meta):
-    """
-    Create a solar resource dict mapping from weather and metadata.
+    """Create a solar resource dict mapping from weather and metadata.
 
     Works on PVGIS and appears to work on NSRDB (NOT PSM3).
     """
-
     # weather_df = weather_df.reset_index(drop=True) # Probably dont need to do this
-    weather_df = utilities.add_time_columns_tmy(weather_df) # only supports hourly data
+    weather_df = utilities.add_time_columns_tmy(weather_df)  # only supports hourly data
 
     # enforce tmy scheme
     times = pd.date_range(start="2001-01-01", periods=8760, freq="1h")
-    
+
     # all options
     # lat,lon,tz,elev,year,month,hour,minute,gh,dn,df,poa,tdry,twet,tdew,rhum,pres,snow,alb,aod,wspd,wdir
     sr = {
-        'lat': meta['latitude'],
-        'lon': meta['longitude'],
-        'tz': meta['tz'] if 'tz' in meta.keys() else 0,
-        'elev': meta['altitude'],
-        'year': list(times.year), #list(weather_df['Year']),
-        'month': list(times.month),
-        'day': list(times.day),
-        'hour': list(times.hour),
-        'minute': list(times.minute),
-        'gh': list(weather_df['ghi']),
-        'dn': list(weather_df['dni']),
-        'df': list(weather_df['dhi']),
-        'wspd': list(weather_df['wind_speed']),
-        'tdry': list(weather_df['temp_air']),
-        'alb' : list(weather_df['albedo']) if 'albedo' in weather_df.columns.values else [0.2] * len(weather_df)
+        "lat": meta["latitude"],
+        "lon": meta["longitude"],
+        "tz": meta["tz"] if "tz" in meta.keys() else 0,
+        "elev": meta["altitude"],
+        "year": list(times.year),  # list(weather_df['Year']),
+        "month": list(times.month),
+        "day": list(times.day),
+        "hour": list(times.hour),
+        "minute": list(times.minute),
+        "gh": list(weather_df["ghi"]),
+        "dn": list(weather_df["dni"]),
+        "df": list(weather_df["dhi"]),
+        "wspd": list(weather_df["wind_speed"]),
+        "tdry": list(weather_df["temp_air"]),
+        "alb": (
+            list(weather_df["albedo"])
+            if "albedo" in weather_df.columns.values
+            else [0.2] * len(weather_df)
+        ),
     }
 
     # if we have wind direction then add it
-    if 'wind_direction' in weather_df.columns.values:
-        sr['wdir'] = list(weather_df['wind_direction']) 
+    if "wind_direction" in weather_df.columns.values:
+        sr["wdir"] = list(weather_df["wind_direction"])
 
     return sr 

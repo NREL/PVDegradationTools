@@ -1,3 +1,5 @@
+"""cli.py."""
+
 from pvdeg.standards import run_calc_standoff
 from pvdeg.humidity import run_module
 from gaps.cli import CLICommandFromFunction, make_cli
