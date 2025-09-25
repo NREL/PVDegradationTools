@@ -494,11 +494,14 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
 
 def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     """
-    read a material from materials.json and return the parameter dictionary. By default
-    it will look at water permeation, but any database can be used.
-    e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
-    If name=None it will return the Json file if item=None, or a list of specific fields
-    in each Json entry identified by item.
+    Read material from one of the materials databases and return parameter dictionary.
+
+    By default it will look at water permeation, but any database can be
+    used.
+    Databases available are fname ="AApermeation", fname="O2permeation",
+    fname="H2Opermeation", or fname="DegradationDatabase". If name=None it will return
+    the Json file if item=None, or a list of specific fields in each json entry
+    identified by item.
 
     Parameters
     ----------
@@ -567,7 +570,7 @@ def _add_material(
     fp=DATA_DIR,
     fname="O2permeation.json",
 ):
-    """Add a new material to the materials.json database.
+    """Add a new material to the materials database.
 
     Check the parameters for
     specific units. If material already exists, parameters will be updated.
@@ -595,14 +598,11 @@ def _add_material(
     fickian : (boolean)
         I have no idea what this means (unused)
     fp : (str)
-        file path to the materials.json file
+        file path to the json materials file
     fname : (str)
-        name of the materials.json file
+        name of the json materials file
     """
-    # TODO: test then delete commented code
-    # root = os.path.realpath(__file__)
-    # root = root.split(r'/')[:-1]
-    # OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
+
     fpath = os.path.join(fp, fname)
 
     material_dict = {

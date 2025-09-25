@@ -39,10 +39,11 @@ Breaking Changes
     - Variable `avg_psat` to `avg_water_saturation_pressure`
     - Variable `surface_outside` to `surface_relative`
     - Variable `RHfront_series` to `front_encapsulant`
+    - Variable `t` to `backsheet_thickness`
     - Function `front_encap()` to `front_encapsulant`
     - Function `Ce()` to `back_encapsulant_water_concentration`
     - Function `back_encap` to `back_encapsulant`
-  (:issue:`213`, :pull:`224`)
+  (:issue:`213`, :issue:`233`, :pull:`224`, :pull:`236`)
 
 
 Enhancements
@@ -76,6 +77,8 @@ Enhancements
     - :py:mod:`inspire_practical_pitch()` to calcuate tilt, pitch, and gcr for practically constrained systems according to :py:mod:`optimal_gcr_pitch()`
     - :py:mod:`inspire_ground_irradiance()` to calculate inter-row ground irradiance for the InSPIRE agrivoltaics irradiance dataset.
     - :py:mod:`solar_resource_dict()` to create solar_resource collections for SAM input from PVDeg weather and metadata.
+- Remove "materials.json" and all associated references. Users should now use the
+  "O2_permeation.json" database for oxygen permeation data. (:issue:`240`, :pull:`243`)
 
 Deprecations
 -------------
