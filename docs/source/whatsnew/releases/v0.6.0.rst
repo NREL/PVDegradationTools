@@ -72,6 +72,7 @@ Enhancements
   ``t`` is None, and no value is available in the specified material from the database.
   (:issue:`237`, :pull:`238`)
 
+
 Deprecations
 -------------
 - ``GeospatialScenario._get_geospatial_data()``

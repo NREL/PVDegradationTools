@@ -441,7 +441,7 @@ def back_encapsulant_water_concentration(
         For PET backsheet W017, Ea_p_b=55.4064573018373 [kJ/mol]
     backsheet_thickness : float
         Thickness of the backsheet [mm].
-        The suggested value for a PET backsheet_thickness=0.3 [mm]
+        The suggested value for a PET backsheet_thickness=0.3.
     So_e : float
         Encapsulant solubility prefactor in [g/cm³]
         So = 1.81390702[g/cm³] is the suggested value for EVA W001.
@@ -450,7 +450,7 @@ def back_encapsulant_water_concentration(
         Eas = 16.729[kJ/mol] is the suggested value for EVA W001.
     back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for EVA encapsulant is 0.46 mm
+        The suggested value for EVA encapsulant is 0.46mm
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
@@ -938,7 +938,7 @@ def module(
         Encapsulant diffusivity activation energy in [kJ/mol]
     back_encap_thickness : float
         Thickness of the backside encapsulant [mm].
-        The suggested value for EVA encapsulant  is 0.46 mm.
+        The suggested value for EVA encapsulant  is 0.46mm.
     backsheet : str
         This is the code number for the backsheet.
         The default is PET 'W017'.
