@@ -99,7 +99,7 @@ def test_module():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
-        t=0.3,
+        backsheet_thickness=0.3,
         back_encap_thickness=0.46,
     )
 
@@ -148,7 +148,7 @@ def test_module_with_params():
         wind_factor=0.33,
         Po_b=1e9,
         Ea_p_b=55.4,
-        t=0.3,
+        backsheet_thickness=0.3,
         So_e=1.8,
         Ea_s_e=16.7,
         Ea_d_e=38.1,
@@ -175,7 +175,7 @@ def test_module_edge_cases():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
-        t=0.3,
+        backsheet_thickness=0.3,
         back_encap_thickness=0.46,
     )
     assert isinstance(result, pd.DataFrame)
@@ -204,7 +204,7 @@ def test_backsheet():
     result = pvdeg.humidity.backsheet(rh_ambient,
                                       temp_ambient,
                                       temp_module,
-                                      t=0.3,
+                                      backsheet_thickness=0.3,
                                       back_encap_thickness=0.46,)
     # Should return a pandas Series and have same length as input
     assert result.tolist() == pytest.approx([24.535486, 31.149815, 38.113095], abs=1e-5)
@@ -291,7 +291,7 @@ def test_back_encapsulant_water_concentration_missing_t():
             rh_surface=rh_surface,
             Po_b=None,
             Ea_p_b=None,
-            t=None,
+            backsheet_thickness=None,
             backsheet="W017",
             back_encap_thickness=0.46,
         )
@@ -308,5 +308,5 @@ def test_back_encapsulant_water_concentration_missing_back_encap_thickness():
             Ea_p_b=None,
             back_encap_thickness=None,
             backsheet="W017",
-            t=0.3,
+            backsheet_thickness=0.3,
             )

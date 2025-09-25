@@ -890,7 +890,7 @@ def module(
     wind_factor=0.33,
     Po_b=None,
     Ea_p_b=None,
-    t=None,
+    backsheet_thickness=None,
     So_e=None,
     Ea_s_e=None,
     Ea_d_e=None,
