@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 import pvdeg
 from rex import Outputs
-import json
 import shutil
 import io
 import sys
@@ -60,8 +59,9 @@ def test_read_material_parameters():
     known_key = next(iter(data.keys()))
     params = ["name", "alias"]
     expected = {k: data[known_key].get(k, None) for k in params}
-    result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key,
-                                           parameters=params)
+    result = pvdeg.utilities.read_material(
+        pvdeg_file="O2permeation", key=known_key, parameters=params
+    )
     assert result == expected
 
 
@@ -73,8 +73,9 @@ def test_search_json_name():
     known_key = next(iter(data.keys()))
     name = data[known_key].get("name", None)
     if name:
-        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation",
-                                             name_or_alias=name)
+        result = pvdeg.utilities.search_json(
+            pvdeg_file="H2Opermeation", name_or_alias=name
+        )
         assert result == known_key
 
 
@@ -84,8 +85,9 @@ def test_search_json_alias():
     known_key = next(iter(data.keys()))
     alias = data[known_key].get("alias", None)
     if alias:
-        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation",
-                                             name_or_alias=alias)
+        result = pvdeg.utilities.search_json(
+            pvdeg_file="H2Opermeation", name_or_alias=alias
+        )
         assert result == known_key
 
 
@@ -159,8 +161,9 @@ def test__read_material_with_item():
     known_key = "W001"
     fields = ["Ead", "Do"]
     expected = {field: data[known_key][field] for field in fields}
-    full_result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation",
-                                                 item=fields)
+    full_result = pvdeg.utilities._read_material(
+        name=known_key, fname="H2Opermeation", item=fields
+    )
     # Filter result to only include the requested fields
     result = {field: full_result[field] for field in fields if field in full_result}
     assert result == expected
@@ -189,8 +192,8 @@ def test_get_kinetics():
     data : dict, from kinetic_parameters.json
     """
     data = load_json("kinetic_parameters.json")
-    result = pvdeg.utilities.get_kinetics('repins')
-    assert data['repins'] == result
+    result = pvdeg.utilities.get_kinetics("repins")
+    assert data["repins"] == result
 
 
 def test_gid_downsampling():
@@ -407,6 +410,7 @@ def test_tilt_azimuth_scan():
 
 def test_tilt_azimuth_scan_basic():
     """Test pvdeg.utilities.tilt_azimuth_scan with a dummy function."""
+
     def dummy_func(tilt, azimuth, **kwarg):
         return tilt + azimuth
 
