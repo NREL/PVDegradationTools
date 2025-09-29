@@ -81,7 +81,7 @@ books = [
     "jupyter-book",
 ]
 sam = [
-    "NREL-PySAM==5.1.0",
+    "NREL-PySAM==7.1.0",
 ]
 all = [
     "pvdeg[docs,test,books,sam]",
