@@ -492,7 +492,8 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-def _read_material(name=None, fname="H2Opermeation", item=None, fp=None, encoding="utf-8"):
+def _read_material(name=None, fname="H2Opermeation", item=None, fp=None,
+                   encoding="utf-8"):
     """
     Read material from one of the materials databases and return parameter dictionary.
 
