@@ -492,7 +492,7 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
+def _read_material(name=None, fname="H2Opermeation", item=None, fp=None, encoding="utf-8"):
     """
     Read material from one of the materials databases and return parameter dictionary.
 
@@ -517,6 +517,8 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     fp :(str)
         this is the file path to find the particular file, e.g "DATA_DIR". It must be
         specified if a predefined file is not used.
+    encoding : (str)
+        encoding to use when reading the JSON file, default is "utf-8"
 
     Returns:
     --------
@@ -526,12 +528,12 @@ def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
     """
 
     if fp is None:
-        with open(pvdeg_datafiles[fname]) as f:
+        with open(pvdeg_datafiles[fname], encoding=encoding) as f:
             data = json.load(f)
         f.close()
     else:
         fpath = os.path.join(fp, fname)
-        with open(fpath) as f:
+        with open(fpath, encoding=encoding) as f:
             data = json.load(f)
         f.close()
 
