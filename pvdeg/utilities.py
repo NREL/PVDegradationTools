@@ -1462,7 +1462,7 @@ def display_json(
         html += (
             f"<div>"
             f'<strong style="color: white;">{key}:</strong> '  # noqa
-            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231, E501
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231,E501,W505
             f'<div style="display: none;">{json_to_html(value)}</div>'  # noqa
             f"</div>"
         )
@@ -1611,6 +1611,8 @@ def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
         dataset with "latitude", "longitude" dimensions/coords in
         addition to original coords not including "gids"
     """
+
+    meta_df = meta_df.loc[ds_gids.gid]
 
     stacked = ds_gids.drop(["gid"])
 
