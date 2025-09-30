@@ -1211,7 +1211,6 @@ def fix_metadata(meta):
 
 
 # we want this to only exist for things that can be run on kestrel
-# moving away from hpc tools so this may not be useful in the future
 def nrel_kestrel_check():
     """Check if the user is on Kestrel HPC environment.
 
@@ -1233,13 +1232,13 @@ def nrel_kestrel_check():
     host = run(args=["hostname", "-f"], shell=False, capture_output=True, text=True)
     device_domain = ".".join(host.stdout.split(".")[-4:])[:-1]
 
+    msg = (
+        f"connected to {device_domain}"
+        f"not a node of {KESTREL_HOSTNAME}"
+    )
+
     if KESTREL_HOSTNAME != device_domain:
-        raise ConnectionError(
-            f"""
-            connected to {device_domain}
-            not a node of {KESTREL_HOSTNAME}")
-            """
-        )
+        raise ConnectionError(msg)
 
 
 def remove_scenario_filetrees(fp, pattern="pvd_job_*"):
