@@ -138,37 +138,6 @@ def test_display_json_fp():
         assert key in output
 
 
-def test__read_material_no_name():
-    """Test pvdeg.utilities._read_material with no name (should return full dict)."""
-    expected = load_json("H2Opermeation.json")
-    result = pvdeg.utilities._read_material(name=None, fname="H2Opermeation")
-    assert result == expected
-
-
-def test__read_material_with_name():
-    """Test pvdeg.utilities._read_material with a specific material name."""
-    data = load_json("H2Opermeation.json")
-    # Pick a known key from the file
-    known_key = next(iter(data.keys()))
-    expected = data[known_key]
-    result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation")
-    assert result == expected
-
-
-def test__read_material_with_item():
-    """Test pvdeg.utilities._read_material with item parameter (list of fields)."""
-    data = load_json("H2Opermeation.json")
-    known_key = "W001"
-    fields = ["Ead", "Do"]
-    expected = {field: data[known_key][field] for field in fields}
-    full_result = pvdeg.utilities._read_material(
-        name=known_key, fname="H2Opermeation", item=fields
-    )
-    # Filter result to only include the requested fields
-    result = {field: full_result[field] for field in fields if field in full_result}
-    assert result == expected
-
-
 def test_convert_tmy(tmp_path):
     """Test pvdeg.utilites.convert_tmy.
 
@@ -218,14 +187,6 @@ def test_get_kinetics_bad():
     res = pvdeg.utilities.get_kinetics(name=None)
 
     assert res == desired_output
-
-
-# DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
-def test_read_material_bad():
-    # no name case
-    data = load_json("H2Opermeation.json")
-    res = pvdeg.utilities._read_material(name=None)
-    assert res == data
 
 
 def test_add_material(tmp_path):
