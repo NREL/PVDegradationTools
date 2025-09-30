@@ -77,6 +77,10 @@ Enhancements
     - :py:mod:`inspire_practical_pitch()` to calcuate tilt, pitch, and gcr for practically constrained systems according to :py:mod:`optimal_gcr_pitch()`
     - :py:mod:`inspire_ground_irradiance()` to calculate inter-row ground irradiance for the InSPIRE agrivoltaics irradiance dataset.
     - :py:mod:`solar_resource_dict()` to create solar_resource collections for SAM input from PVDeg weather and metadata.
+- :py:func:`pvdeg.humidity.back_encapsulant_water_concentration` and
+  :py:func:`pvdeg.humidity.module` now raise ValueError if ``back_encap_thickness`` or
+  ``backsheet_thickness`` is None, and no value is available in the specified material
+  from the database. (:issue:`237`, :pull:`238`)
 - Remove "materials.json" and all associated references. Users should now use the
   "O2_permeation.json" database for oxygen permeation data. (:issue:`240`, :pull:`243`)
 
@@ -114,6 +118,7 @@ Testing
 -------
 - Added nbval-based notebook testing workflow to CI for validating tutorial and example
   notebooks (:issue:`179`, :pull:`184`)
+- Add tests for :py:func:`pvdeg.weather.get`. (pull:`249`)
 
 
 Contributors
