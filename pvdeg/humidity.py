@@ -214,16 +214,24 @@ def diffusivity_weighted_water(
         by the encapsulant diffusivity in [g/cm³].
     """
 
-    if So is None or Eas is None or Ead is None:
-        So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]["value"]
-        Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]["value"]
-        Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Ead"]["value"]
+    if So is None:
+        So = utilities.read_material(
+            key=encapsulant,
+            parameters=["So"],
+            pvdeg_file="H2Opermeation"
+        )["So"]
+    if Eas is None:
+        Eas = utilities.read_material(
+            key=encapsulant,
+            parameters=["Eas"],
+            pvdeg_file="H2Opermeation"
+        )["Eas"]
+    if Ead is None:
+        Ead = utilities.read_material(
+            key=encapsulant,
+            parameters=["Ead"],
+            pvdeg_file="H2Opermeation"
+        )["Ead"]
 
     # Get the relative humidity of the surface
     rh_surface = surface_relative(rh_ambient, temp_ambient, temp_module)
@@ -287,16 +295,25 @@ def front_encapsulant(
     front_encapsulant : pandas series (float)
         Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
-    if So is None or Eas is None or Ead is None:
-        So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]["value"]
-        Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]["value"]
-        Ead = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Ead"]["value"]
+    if So is None:
+        So = utilities.read_material(
+            key=encapsulant,
+            parameters=["So"],
+            pvdeg_file="H2Opermeation"
+        )["So"]
+    if Eas is None:
+        Eas = utilities.read_material(
+            key=encapsulant,
+            parameters=["Eas"],
+            pvdeg_file="H2Opermeation"
+        )["Eas"]
+    if Ead is None:
+        Ead = utilities.read_material(
+            key=encapsulant,
+            parameters=["Ead"],
+            pvdeg_file="H2Opermeation"
+        )["Ead"]
+
     diffuse_water = diffusivity_weighted_water(
         rh_ambient=rh_ambient,
         temp_ambient=temp_ambient,
@@ -340,13 +357,18 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
         Saturation of Water Concentration [g/cm³]
     """
 
-    if So is None or Eas is None:
-        So = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]["value"]
-        Eas = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]["value"]
+    if So is None:
+        So = utilities.read_material(
+            key=encapsulant,
+            parameters=["So"],
+            pvdeg_file="H2Opermeation"
+        )["So"]
+    if Eas is None:
+        Eas = utilities.read_material(
+            key=encapsulant,
+            parameters=["Eas"],
+            pvdeg_file="H2Opermeation"
+        )["Eas"]
 
     # Saturation of water concentration
     Csat = So * np.exp(-(Eas / (R_GAS * (273.15 + temp_module))))
@@ -487,42 +509,56 @@ def back_encapsulant_water_concentration(
     if not isinstance(rh_surface, np.ndarray):
         rh_surface = rh_surface.to_numpy()
 
-    if Po_b is None or Ea_p_b is None:
-        Po_b = utilities._read_material(
-            name=backsheet, fname="H2Opermeation", item=None, fp=None
-        )["Po"]["value"]
-        Ea_p_b = utilities._read_material(
-            name=backsheet, fname="H2Opermeation", item=None, fp=None
-        )["Eap"]["value"]
-        if backsheet_thickness is None:
-            if "t" in utilities._read_material(
-                name=backsheet, fname="H2Opermeation", item=None, fp=None
-            ):
-                backsheet_thickness = utilities._read_material(
-                    name=backsheet, fname="H2Opermeation", item=None, fp=None
-                )["t"]["value"]
-            else:
-                raise ValueError("backsheet_thickness must be specified as a float or "
-                                 "a backsheet material with a backsheet_thickness "
-                                 "available should be specified.")
-    if So_e is None or Ea_s_e is None:
-        So_e = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["So"]["value"]
-        Ea_s_e = utilities._read_material(
-            name=encapsulant, fname="H2Opermeation", item=None, fp=None
-        )["Eas"]["value"]
-        if back_encap_thickness is None:
-            if "t" in utilities._read_material(
-                name=encapsulant, fname="H2Opermeation", item=None, fp=None
-            ):
-                back_encap_thickness = utilities._read_material(
-                    name=encapsulant, fname="H2Opermeation", item=None, fp=None
-                )["t"]["value"]
-            else:
-                raise ValueError("back_encap_thickness must be specified as a float or "
-                                 "a backsheet material with a back_encap_thickness "
-                                 "available should be specified.")
+    if Po_b is None:
+        Po_b = utilities.read_material(
+            key=backsheet,
+            parameters=["Po"],
+            pvdeg_file="H2Opermeation"
+        )["Po"]
+    if Ea_p_b is None:
+        Ea_p_b = utilities.read_material(
+            key=backsheet,
+            parameters=["Eap"],
+            pvdeg_file="H2Opermeation"
+        )["Eap"]
+    if backsheet_thickness is None:
+        try:
+            backsheet_thickness = utilities.read_material(
+                key=backsheet,
+                parameters=["t"],
+                pvdeg_file="H2Opermeation"
+            )["t"]
+            if backsheet_thickness is None:
+                raise ValueError()
+        except (KeyError, ValueError):
+            raise ValueError("backsheet_thickness must be specified as a float or "
+                             "a backsheet material with a backsheet_thickness "
+                             "available should be specified.")
+    if So_e is None:
+        So_e = utilities.read_material(
+            key=encapsulant,
+            parameters=["So"],
+            pvdeg_file="H2Opermeation"
+        )["So"]
+    if Ea_s_e is None:
+        Ea_s_e = utilities.read_material(
+            key=encapsulant,
+            parameters=["Eas"],
+            pvdeg_file="H2Opermeation"
+        )["Eas"]
+    if back_encap_thickness is None:
+        try:
+            back_encap_thickness = utilities.read_material(
+                key=encapsulant,
+                parameters=["t"],
+                pvdeg_file="H2Opermeation"
+            )["t"]
+            if back_encap_thickness is None:
+                raise ValueError()
+        except (KeyError, ValueError):
+            raise ValueError("back_encap_thickness must be specified as a float or "
+                             "an encapsulant material with a back_encap_thickness "
+                             "available should be specified.")
     # Convert the parameters to the correct and convenient units
     WVTRo = Po_b / 100 / 100 / 24 / backsheet_thickness
     EaWVTR = Ea_p_b / R_GAS
