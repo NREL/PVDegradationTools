@@ -492,69 +492,6 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
-    """
-    Read material from one of the materials databases and return parameter dictionary.
-
-    By default it will look at water permeation, but any database can be
-    used.
-    Databases available are fname ="AApermeation", fname="O2permeation",
-    fname="H2Opermeation", or fname="DegradationDatabase". If name=None it will return
-    the Json file if item=None, or a list of specific fields in each json entry
-    identified by item.
-
-    Parameters
-    ----------
-    name : (str)
-        unique name of material in a given database
-    fname : (str)
-        this can be any custom file identified by this name and the filepath (fp), or
-        the just the shorthand defined in pvdeg_datafiles, i.e.
-        "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
-    item : (list)
-        this is a list of fields to return from a Json file if a specific record was not
-        searched for.
-    fp :(str)
-        this is the file path to find the particular file, e.g "DATA_DIR". It must be
-        specified if a predefined file is not used.
-
-    Returns:
-    --------
-    mat_dict : (dict)
-        dictionary of material parameters, or "not found" message, or a summary of all
-        entries with specific item entries.
-    """
-
-    if fp is None:
-        with open(pvdeg_datafiles[fname]) as f:
-            data = json.load(f)
-        f.close()
-    else:
-        fpath = os.path.join(fp, fname)
-        with open(fpath) as f:
-            data = json.load(f)
-        f.close()
-
-    if name is None:
-        if item is None:
-            mat_dict = data
-        else:
-            mat_dict = {
-                keys: {
-                    keyss: data[keys][keyss] for keyss in data[keys] if keyss in item
-                }
-                for keys in data
-                if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})
-                != {}
-            }
-    else:
-        try:
-            mat_dict = data[name]
-        except Exception:
-            mat_dict = ("Data for", name, "was not found in", fname + ".")
-    return mat_dict
-
-
 # currently this is only designed for Oxygen Permeation. It could easily be adapted for
 # all permeation data.
 def _add_material(
@@ -1535,7 +1472,7 @@ def read_material(
     parameters: list[str]
         parameters to grab from the file at index key. If none, will grab all items
         at index key. the elements in parameters must match the keys in the json exactly
-        or the output value for the specific key/parameter in the retunred dict will be
+        or the output value for the specific key/parameter in the returned dict will be
         `None`.
 
     Returns
