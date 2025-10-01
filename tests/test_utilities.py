@@ -309,8 +309,6 @@ def test_read_material_fp_override():
         "Po": {"name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937},
     }
 
-    from pvdeg import DATA_DIR
-
     # fp gets overridden by pvdeg_file
     template_material = pvdeg.utilities.read_material(
         pvdeg_file="O2permeation",
