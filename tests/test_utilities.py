@@ -40,7 +40,7 @@ DSETS = [
 
 def load_json(filename):
     fpath = os.path.join(DATA_DIR, filename)
-    with open(fpath) as f:
+    with open(fpath, encoding="utf-8") as f:
         return json.load(f)
 
 
