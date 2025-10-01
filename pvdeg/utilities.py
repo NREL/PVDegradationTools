@@ -1521,8 +1521,7 @@ def read_material_property(
     material_dict = read_material(
         pvdeg_file=pvdeg_file,
         fp=filepath,
-        key=key,
-        parameters=parameters,)
+        key=key,)
 
     if parameters:
         material_dict = {
