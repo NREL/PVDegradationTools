@@ -1483,7 +1483,7 @@ def read_material(
         except KeyError:
             raise KeyError(
                 f"{pvdeg_file} is not in pvdeg/data. Options are: "
-                f"{pvdeg_datafiles.keys()}"
+                " {pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r", encoding=encoding) as file:
