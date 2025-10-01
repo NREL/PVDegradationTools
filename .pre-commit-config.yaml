@@ -26,3 +26,4 @@ repos:
           - metadata.vscode
           - metadata.pydev
           - cell.metadata.execution_count
+          - application/vnd.microsoft.datawrangler.viewer.v0+json
