@@ -289,7 +289,7 @@ def test_read_material_normal():
     assert template_material == res
 
 
-def test_read_material_fewer_params():
+def test_read_material_property_select_params():
     res = {
         "name": "ST504",
         "Fickian": True,
@@ -302,7 +302,7 @@ def test_read_material_fewer_params():
     assert template_material == res
 
 
-def test_read_material_extra_params():
+def test_read_material_property_missing_params():
     res = {
         "namenotindict1": None,
         "namenotindict2": None,
@@ -317,7 +317,6 @@ def test_read_material_extra_params():
     assert template_material == res
 
 
-# pvdeg_file should override fp if both are provided
 def test_read_material_fp_override():
     res = {
         "name": "ST504",
@@ -357,7 +356,6 @@ def test_read_material_fp_override():
         },
     }
 
-    # fp gets overridden by pvdeg_file
     template_material = pvdeg.utilities.read_material(
         pvdeg_file="O2permeation",
         fp=os.path.join(DATA_DIR, "AApermeation.json"),
