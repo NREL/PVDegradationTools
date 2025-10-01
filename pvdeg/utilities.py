@@ -1452,6 +1452,7 @@ def read_material(
     pvdeg_file: str = None,
     fp: str = None,
     key: str = None,
+    encoding: str = "utf-8",
 ) -> dict:
     """Read material dictionary from a `pvdeg/data` file or JSON file path.
 
@@ -1468,6 +1469,8 @@ def read_material(
         key corresponding to specific material in the file. In the pvdeg files these
         have arbitrary names. Inspect the files or use `display_json` or `search_json`
         to identify the key for desired material.
+    encoding : (str)
+    encoding to use when reading the JSON file, default is "utf-8"
 
     Returns
     -------
@@ -1483,7 +1486,7 @@ def read_material(
                 " {pvdeg_datafiles.keys()}"
             )
 
-    with open(fp, "r") as file:
+    with open(fp, "r", encoding=encoding) as file:
         data = json.load(file)
 
     material_dict = data[key]
@@ -1521,7 +1524,8 @@ def read_material_property(
     material_dict = read_material(
         pvdeg_file=pvdeg_file,
         fp=filepath,
-        key=key,)
+        key=key,
+        )
 
     if parameters:
         material_dict = {
