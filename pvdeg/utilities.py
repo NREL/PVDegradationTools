@@ -1452,12 +1452,11 @@ def read_material(
     pvdeg_file: str = None,
     fp: str = None,
     key: str = None,
-    parameters: list[str] = None,
 ) -> dict:
-    """Read material parameters from a `pvdeg/data` file or JSON file path.
+    """Read material dictionary from a `pvdeg/data` file or JSON file path.
 
     Parameters
-    -----------
+    ----------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
@@ -1469,18 +1468,12 @@ def read_material(
         key corresponding to specific material in the file. In the pvdeg files these
         have arbitrary names. Inspect the files or use `display_json` or `search_json`
         to identify the key for desired material.
-    parameters: list[str]
-        parameters to grab from the file at index key. If none, will grab all items
-        at index key. the elements in parameters must match the keys in the json exactly
-        or the output value for the specific key/parameter in the returned dict will be
-        `None`.
 
     Returns
-    --------
+    -------
     material: dict
-        dictionary of material parameters from the seleted file at the index key.
+        dictionary of material parameters from the selected file at the index key.
     """
-    # these live in the `pvdeg/data` folder
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
@@ -1493,8 +1486,43 @@ def read_material(
     with open(fp, "r") as file:
         data = json.load(file)
 
-    # take subdict from file
     material_dict = data[key]
+    return material_dict
+
+
+def read_material_property(
+        pvdeg_file: str = None,
+        filepath: str = None,
+        key: str = None,
+        parameters: list[str] = None,
+    ) -> dict:
+    """Read material parameters from a `pvdeg/data` file or JSON file path.
+
+    Parameters
+    ----------
+    pvdeg_file: str
+        keyword for material json file in `pvdeg/data`. Options:
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
+    filepath: str
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are
+        provided.
+    key: str
+        key corresponding to specific material in the file. In the pvdeg files these
+        have arbitrary names. Inspect the files or use `display_json` or `search_json`
+        to identify the key for desired material.
+
+    Returns
+    -------
+    parameters: dict
+        dictionary of material parameters from the selected file at the index key.
+
+        """
+    material_dict = read_material(
+        pvdeg_file=pvdeg_file,
+        fp=filepath,
+        key=key,
+        parameters=parameters,)
 
     if parameters:
         material_dict = {
@@ -1509,8 +1537,7 @@ def read_material(
         }
     else:
         material_dict = {
-            k: v["value"] if isinstance(v, dict) else v
-            for k, v in material_dict.items()
-        }
-
+        k: v["value"] if isinstance(v, dict) else v
+        for k, v in material_dict.items()
+    }
     return material_dict
