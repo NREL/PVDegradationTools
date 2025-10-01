@@ -250,12 +250,36 @@ def test_read_material_normal():
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": True,
-        "Ead": {"name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.603},
-        "Do": {"name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.554153},
-        "Eas": {"name": "Solubility Activation Energy", "units": "kJ/mol", "value": -11.5918},
-        "So": {"name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.554366e-07},
-        "Eap": {"name": "Permeability Activation Energy", "units": "kJ/mol", "value": 34.2011},
-        "Po": {"name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937},
+        "Ead": {
+            "name": "Diffusivity Activation Energy",
+            "units": "kJ/mol",
+            "value": 47.603,
+        },
+        "Do": {
+            "name": "Diffusivity Prefactor",
+            "units": "cm²/s",
+            "value": 0.554153,
+        },
+        "Eas": {
+            "name": "Solubility Activation Energy",
+            "units": "kJ/mol",
+            "value": -11.5918,
+        },
+        "So": {
+            "name": "Solubility Prefactor",
+            "units": "g/cm³/atm",
+            "value": 9.554366e-07,
+        },
+        "Eap": {
+            "name": "Permeability Activation Energy",
+            "units": "kJ/mol",
+            "value": 34.2011,
+        },
+        "Po": {
+            "name": "Permeability Prefactor",
+            "units": "g*mm/m²/day/atm",
+            "value": 2128.8937,
+        },
     }
 
     template_material = pvdeg.utilities.read_material(
@@ -301,12 +325,36 @@ def test_read_material_fp_override():
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": True,
-        "Ead": {"name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.603},
-        "Do": {"name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.554153},
-        "Eas": {"name": "Solubility Activation Energy", "units": "kJ/mol", "value": -11.5918},
-        "So": {"name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.554366e-07},
-        "Eap": {"name": "Permeability Activation Energy", "units": "kJ/mol", "value": 34.2011},
-        "Po": {"name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937},
+        "Ead": {
+            "name": "Diffusivity Activation Energy",
+            "units": "kJ/mol",
+            "value": 47.603,
+        },
+        "Do": {
+            "name": "Diffusivity Prefactor",
+            "units": "cm²/s",
+            "value": 0.554153,
+        },
+        "Eas": {
+            "name": "Solubility Activation Energy",
+            "units": "kJ/mol",
+            "value": -11.5918,
+        },
+        "So": {
+            "name": "Solubility Prefactor",
+            "units": "g/cm³/atm",
+            "value": 9.554366e-07,
+        },
+        "Eap": {
+            "name": "Permeability Activation Energy",
+            "units": "kJ/mol",
+            "value": 34.2011,
+        },
+        "Po": {
+            "name": "Permeability Prefactor",
+            "units": "g*mm/m²/day/atm",
+            "value": 2128.8937,
+        },
     }
 
     # fp gets overridden by pvdeg_file

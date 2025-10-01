@@ -1470,7 +1470,7 @@ def read_material(
         have arbitrary names. Inspect the files or use `display_json` or `search_json`
         to identify the key for desired material.
     encoding : (str)
-    encoding to use when reading the JSON file, default is "utf-8"
+        encoding to use when reading the JSON file, default is "utf-8"
 
     Returns
     -------
@@ -1483,7 +1483,7 @@ def read_material(
         except KeyError:
             raise KeyError(
                 f"{pvdeg_file} is not in pvdeg/data. Options are: "
-                " {pvdeg_datafiles.keys()}"
+                f"{pvdeg_datafiles.keys()}"
             )
 
     with open(fp, "r", encoding=encoding) as file:
@@ -1494,11 +1494,11 @@ def read_material(
 
 
 def read_material_property(
-        pvdeg_file: str = None,
-        filepath: str = None,
-        key: str = None,
-        parameters: list[str] = None,
-    ) -> dict:
+    pvdeg_file: str = None,
+    filepath: str = None,
+    key: str = None,
+    parameters: list[str] = None,
+) -> dict:
     """Read material parameters from a `pvdeg/data` file or JSON file path.
 
     Parameters
@@ -1519,13 +1519,12 @@ def read_material_property(
     -------
     parameters: dict
         dictionary of material parameters from the selected file at the index key.
-
-        """
+    """
     material_dict = read_material(
         pvdeg_file=pvdeg_file,
         fp=filepath,
         key=key,
-        )
+    )
 
     if parameters:
         material_dict = {
@@ -1540,7 +1539,7 @@ def read_material_property(
         }
     else:
         material_dict = {
-        k: v["value"] if isinstance(v, dict) else v
-        for k, v in material_dict.items()
-    }
+            k: v["value"] if isinstance(v, dict) else v
+            for k, v in material_dict.items()
+        }
     return material_dict
