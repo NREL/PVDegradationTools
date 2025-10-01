@@ -54,12 +54,12 @@ def test_read_material_basic():
 
 
 def test_read_material_parameters():
-    """Test pvdeg.utilities.read_material returns only requested parameters."""
+    """Test pvdeg.utilities.read_material_property returns only requested parameters."""
     data = load_json("O2permeation.json")
     known_key = next(iter(data.keys()))
     params = ["name", "alias"]
     expected = {k: data[known_key].get(k, None) for k in params}
-    result = pvdeg.utilities.read_material(
+    result = pvdeg.utilities.read_material_property(
         pvdeg_file="O2permeation", key=known_key, parameters=params
     )
     assert result == expected
@@ -250,12 +250,12 @@ def test_read_material_normal():
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": True,
-        "Ead": 47.603,
-        "Do": 0.554153,
-        "Eas": -11.5918,
-        "So": 9.554366e-07,
-        "Eap": 34.2011,
-        "Po": 2128.8937,
+        "Ead": {"name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.603},
+        "Do": {"name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.554153},
+        "Eas": {"name": "Solubility Activation Energy", "units": "kJ/mol", "value": -11.5918},
+        "So": {"name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.554366e-07},
+        "Eap": {"name": "Permeability Activation Energy", "units": "kJ/mol", "value": 34.2011},
+        "Po": {"name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937},
     }
 
     template_material = pvdeg.utilities.read_material(
@@ -271,7 +271,7 @@ def test_read_material_fewer_params():
         "Fickian": True,
     }
 
-    template_material = pvdeg.utilities.read_material(
+    template_material = pvdeg.utilities.read_material_property(
         pvdeg_file="O2permeation", key="OX002", parameters=["name", "Fickian"]
     )
 
@@ -284,7 +284,7 @@ def test_read_material_extra_params():
         "namenotindict2": None,
     }
 
-    template_material = pvdeg.utilities.read_material(
+    template_material = pvdeg.utilities.read_material_property(
         pvdeg_file="O2permeation",
         key="OX002",
         parameters=["namenotindict1", "namenotindict2"],
@@ -301,12 +301,12 @@ def test_read_material_fp_override():
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": True,
-        "Ead": 47.603,
-        "Do": 0.554153,
-        "Eas": -11.5918,
-        "So": 9.554366e-07,
-        "Eap": 34.2011,
-        "Po": 2128.8937,
+        "Ead": {"name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.603},
+        "Do": {"name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.554153},
+        "Eas": {"name": "Solubility Activation Energy", "units": "kJ/mol", "value": -11.5918},
+        "So": {"name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.554366e-07},
+        "Eap": {"name": "Permeability Activation Energy", "units": "kJ/mol", "value": 34.2011},
+        "Po": {"name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937},
     }
 
     from pvdeg import DATA_DIR
