@@ -24,4 +24,5 @@ repos:
           - metadata.vscode
           - metadata.pydev
           - cell.metadata.execution_count
+          - --extra-output-types
           - application/vnd.microsoft.datawrangler.viewer.v0+json
