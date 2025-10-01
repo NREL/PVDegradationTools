@@ -20,7 +20,6 @@ repos:
         files: '\.ipynb$'
         args:
           - --extra-keys
-          - metadata.kernelspec.display_name
           - metadata.language_info
           - metadata.vscode
           - metadata.pydev
