@@ -215,19 +215,19 @@ def diffusivity_weighted_water(
     """
 
     if So is None:
-        So = utilities.read_material(
+        So = utilities.read_material_property(
             key=encapsulant,
             parameters=["So"],
             pvdeg_file="H2Opermeation"
         )["So"]
     if Eas is None:
-        Eas = utilities.read_material(
+        Eas = utilities.read_material_property(
             key=encapsulant,
             parameters=["Eas"],
             pvdeg_file="H2Opermeation"
         )["Eas"]
     if Ead is None:
-        Ead = utilities.read_material(
+        Ead = utilities.read_material_property(
             key=encapsulant,
             parameters=["Ead"],
             pvdeg_file="H2Opermeation"
@@ -296,19 +296,19 @@ def front_encapsulant(
         Relative Humidity of the photovoltaic module  frontside encapsulant. [%]
     """
     if So is None:
-        So = utilities.read_material(
+        So = utilities.read_material_property(
             key=encapsulant,
             parameters=["So"],
             pvdeg_file="H2Opermeation"
         )["So"]
     if Eas is None:
-        Eas = utilities.read_material(
+        Eas = utilities.read_material_property(
             key=encapsulant,
             parameters=["Eas"],
             pvdeg_file="H2Opermeation"
         )["Eas"]
     if Ead is None:
-        Ead = utilities.read_material(
+        Ead = utilities.read_material_property(
             key=encapsulant,
             parameters=["Ead"],
             pvdeg_file="H2Opermeation"
@@ -358,13 +358,13 @@ def csat(temp_module, So=None, Eas=None, encapsulant="W001"):
     """
 
     if So is None:
-        So = utilities.read_material(
+        So = utilities.read_material_property(
             key=encapsulant,
             parameters=["So"],
             pvdeg_file="H2Opermeation"
         )["So"]
     if Eas is None:
-        Eas = utilities.read_material(
+        Eas = utilities.read_material_property(
             key=encapsulant,
             parameters=["Eas"],
             pvdeg_file="H2Opermeation"
@@ -510,20 +510,20 @@ def back_encapsulant_water_concentration(
         rh_surface = rh_surface.to_numpy()
 
     if Po_b is None:
-        Po_b = utilities.read_material(
+        Po_b = utilities.read_material_property(
             key=backsheet,
             parameters=["Po"],
             pvdeg_file="H2Opermeation"
         )["Po"]
     if Ea_p_b is None:
-        Ea_p_b = utilities.read_material(
+        Ea_p_b = utilities.read_material_property(
             key=backsheet,
             parameters=["Eap"],
             pvdeg_file="H2Opermeation"
         )["Eap"]
     if backsheet_thickness is None:
         try:
-            backsheet_thickness = utilities.read_material(
+            backsheet_thickness = utilities.read_material_property(
                 key=backsheet,
                 parameters=["t"],
                 pvdeg_file="H2Opermeation"
@@ -535,20 +535,20 @@ def back_encapsulant_water_concentration(
                              "a backsheet material with a backsheet_thickness "
                              "available should be specified.")
     if So_e is None:
-        So_e = utilities.read_material(
+        So_e = utilities.read_material_property(
             key=encapsulant,
             parameters=["So"],
             pvdeg_file="H2Opermeation"
         )["So"]
     if Ea_s_e is None:
-        Ea_s_e = utilities.read_material(
+        Ea_s_e = utilities.read_material_property(
             key=encapsulant,
             parameters=["Eas"],
             pvdeg_file="H2Opermeation"
         )["Eas"]
     if back_encap_thickness is None:
         try:
-            back_encap_thickness = utilities.read_material(
+            back_encap_thickness = utilities.read_material_property(
                 key=encapsulant,
                 parameters=["t"],
                 pvdeg_file="H2Opermeation"
