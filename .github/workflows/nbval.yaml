@@ -27,19 +27,6 @@ jobs:
           "Tools - Edge Seal Oxygen Ingress.ipynb",
           "Van't Hoff Degradation Model.ipynb",
           "Geospatial - Local Scenario.ipynb",
-          # "API Call Required - PYSam.ipynb",
-          # "Removed store.py Required - load_pvgis_distributed.ipynb",
-          # "API Call Required - load_nsrdb_distributed.ipynb",
-          # "HPC Connection Required - Geospatial_world_map.ipynb",
-          # "HPC Connection Required - DuraMAT Live Demo.ipynb",
-          # "HPC Connection Required - Scenario - Geographical Features.ipynb",
-          # "HPC Connection Required - Scenario - Geospatial.ipynb",
-          # "HPC Connection Required - Scenario - Non-uniform Mountain Prefferential Downselect.ipynb",
-          # "HPC Connection Required - Scenario - Single Location.ipynb",
-          # "HPC Connection Required - Scenario - Temperatrure.ipynb",
-          # "HPC Connection Required - Tools - Module Standoff for IEC TS 63126.ipynb",
-          # "HPC Connection Required - LETID - Outdoor Geospatial Demo.ipynb",
-          # "HPC Connection Required - Geospatial Templates.ipynb",
         ]
 
     steps:
@@ -57,6 +44,9 @@ jobs:
         pip install nbval
         pip install global_land_mask dotenv imageio nrel-pysam
     - name: Run notebook and check output
+      env:
+        api_key: "user@mail.com"
+        email: "DEMO_KEY"
       run: |
         # --nbval-sanitize-with: pre-process text to remove irrelevant differences
         pytest --nbval \
@@ -78,3 +68,42 @@ jobs:
       with:
         name: executed_notebook_${{ matrix.notebook-file }}
         path: tutorials_and_tools/tutorials_and_tools/artifacts
+
+  notebook-testbook-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        notebook-file: [
+          "API Call Required - PYSam.ipynb",
+          # "Removed store.py Required - load_pvgis_distributed.ipynb",
+          "API Call Required - load_nsrdb_distributed.ipynb",
+          "HPC Connection Required - Geospatial_world_map.ipynb",
+          "HPC Connection Required - DuraMAT Live Demo.ipynb",
+          "HPC Connection Required - Scenario - Geographical Features.ipynb",
+          "HPC Connection Required - Scenario - Geospatial.ipynb",
+          "HPC Connection Required - Scenario - Non-uniform Mountain Prefferential Downselect.ipynb",
+          "HPC Connection Required - Scenario - Single Location.ipynb",
+          "HPC Connection Required - Scenario - Temperatrure.ipynb",
+          "HPC Connection Required - Tools - Module Standoff for IEC TS 63126.ipynb",
+          "HPC Connection Required - LETID - Outdoor Geospatial Demo.ipynb",
+          "HPC Connection Required - Geospatial Templates.ipynb",
+        ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install notebook environment
+      run: |
+        python -m pip install --upgrade pip wheel
+        pip install --timeout=300 \
+            -r tutorials_and_tools/requirements.txt
+        pip install --timeout=300 -e .[test]
+        pip install testbook
+        pip install global_land_mask dotenv imageio nrel-pysam
+    - name: Run notebook with testbook and monkeypatching
+      run: |
+        python notebooks_testbook.py "tutorials_and_tools/tutorials_and_tools/${{ matrix.notebook-file }}"
