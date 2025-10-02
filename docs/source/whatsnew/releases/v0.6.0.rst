@@ -108,7 +108,9 @@ Bug Fixes
   - Improve code consistency
   (:issue:`177`, :pull:`178`)
 - Clean up and fix bugs in notebooks. (:issue:`179`, :pull:`184`)
-
+- Resolves non-deterministic source ambiguity when picking NSRDB TMY files from Kestrel when using ``weather.get(..., TMY=True, geospatial=True)``.
+  - PVDeg will always use the most recent version.
+  - Added new ``kestrel_nsrdb_fnames`` attribute to returned weather dataset for traceability.
 
 Dependencies
 ------------
