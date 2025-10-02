@@ -610,7 +610,7 @@ def ini_h5_geospatial(fps):
 
 
 def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
-    """Get a list of NSRDB files for a given satellite and year.
+    """Get a sorted list of NSRDB files for a given satellite and year.
 
     Parameters
     ----------
@@ -656,7 +656,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
         nsrdb_fp = os.path.join(
             hpc_fp, sat_map[satellite], "*_{}*.h5".format(names.lower())
         )
-        nsrdb_fnames = glob.glob(nsrdb_fp)
+        nsrdb_fnames = sorted(glob.glob(nsrdb_fp))
 
     if len(nsrdb_fnames) == 0:
         raise FileNotFoundError(
@@ -768,10 +768,14 @@ def get_NSRDB(
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
 
         if isinstance(names, str) and names.lower() in ["tmy", "tmy3"]:
-            nsrdb_fnames = nsrdb_fnames[-1:]  # maintain as list with last element
+            # maintain as list with last element of sorted list
+            nsrdb_fnames = nsrdb_fnames[-1:]  
 
         weather_ds, meta_df = ini_h5_geospatial(nsrdb_fnames)
+        
+        weather_ds = weather_ds.assign_attrs({"kestrel_nsrdb_fnames": nsrdb_fnames})
 
+        # select desired weather attributes
         if attributes is not None:
             weather_ds = weather_ds[attributes]
 
