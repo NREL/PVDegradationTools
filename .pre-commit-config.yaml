@@ -13,16 +13,16 @@ repos:
     rev: 23.11.0
     hooks:
     -   id: black
--   repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
-    hooks:
-      - id: nbstripout
-        files: '\.ipynb$'
-        args:
-          - --extra-keys
-          - metadata.language_info
-          - metadata.vscode
-          - metadata.pydev
-          - cell.metadata.execution_count
-          - --extra-output-types
-          - application/vnd.microsoft.datawrangler.viewer.v0+json
+# -   repo: https://github.com/kynan/nbstripout
+#     rev: 0.8.1
+#     hooks:
+#       - id: nbstripout
+#         files: '\.ipynb$'
+#         args:
+#           - --extra-keys
+#           - metadata.language_info
+#           - metadata.vscode
+#           - metadata.pydev
+#           - cell.metadata.execution_count
+#           - --extra-output-types
+#           - application/vnd.microsoft.datawrangler.viewer.v0+json
