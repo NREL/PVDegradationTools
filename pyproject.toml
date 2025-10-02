@@ -76,12 +76,13 @@ test = [
     "pytest-cov",
     "nbval",
     "scikit-learn",
+    "NREL-PySAM==5.1.0",
 ]
 books = [
     "jupyter-book",
 ]
 sam = [
-    "NREL-PySAM==5.1.0",
+    "NREL-PySAM",
 ]
 all = [
     "pvdeg[docs,test,books,sam]",
