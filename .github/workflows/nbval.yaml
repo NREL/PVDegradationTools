@@ -2,7 +2,7 @@ name: nbval
 
 on:
   pull_request:
-    types: [opened, ready_for_review, review_requested]
+    types: [opened, ready_for_review, review_requested]  # test
 
 jobs:
   notebook-check:
