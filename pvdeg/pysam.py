@@ -156,14 +156,11 @@ def pysam(
         This may cause some undesired behavior with geospatial calculations if the
         lengths of the results within the list are different.
 
-    pitch_override: float
-        override defined pitch from pv config file (fixed tilt systems only)
-
-    tilt_override: float
-        override defined tilt from pv config file (fixed tilt systems only)
-
     practical_pitch_tilt_considerations: bool
-        use inspire practical considerations to limit/override defined pitch and tilt from SAM configs.
+        Use inspire practical considerations to limit/override defined pitch and tilt from SAM configs.
+
+        Calculates optimal GCR using `pvdeg.utilities.optimal_gcr_pitch` for fixed tilt bifacial systems.
+        Imposes a minimum pitch of 3.8m and maximum pitch of 12m.
 
     Returns
     -------
