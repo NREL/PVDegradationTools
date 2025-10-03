@@ -1019,7 +1019,7 @@ def module(
             **weather_kwargs,
         )
 
-    if temp_model is None:
+    if temp_module is None:
         temp_module = temperature.module(
             weather_df=weather_df,
             meta=meta,
