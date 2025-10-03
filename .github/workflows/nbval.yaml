@@ -10,22 +10,6 @@ jobs:
       SANITIZE_CFG: "nbval_sanitization_rules.cfg"
       NOTEBOOK_LIST: |
         "1 - Basics, Humidity, Design.ipynb"
-        # "2 - Degradation.ipynb"
-        # "3 - Spectral Degradation.ipynb"
-        # "4 - Weather Database Access.ipynb"
-        # "ASTM Live Demo.ipynb"
-        # "B-O LID - Accelerated Test.ipynb"
-        # "Custom-Functions-Nopython.ipynb"
-        # "LETID - Accelerated Test.ipynb"
-        # "LETID - Outdoor LETID.ipynb"
-        # "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb"
-        # "LETID - Passivated Wafer.ipynb"
-        # "Monte Carlo - Arrhenius.ipynb"
-        # "Monte Carlo - Standoff.ipynb"
-        # "Pysam - Single Location.ipynb"
-        # "Tools - Edge Seal Oxygen Ingress.ipynb"
-        # "Van't Hoff Degradation Model.ipynb"
-        # "Geospatial - Local Scenario.ipynb"
 
     steps:
       - uses: actions/checkout@v4
