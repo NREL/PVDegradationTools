@@ -1604,7 +1604,7 @@ def _load_gcr_from_config(config_files: dict):
     return data["subarray1_gcr"]
 
 
-def optimal_gcr_pitch(
+def optimal_gcr_pitch_bifacial_fixed_tilt(
     latitude: float, cw: float = 2
 ) -> tuple[float, float]:
     """
@@ -1701,7 +1701,7 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
         gcr for a fixed tilt system with practical considerations [unitless]
     """
 
-    gcr_optimal, pitch_optimal = optimal_gcr_pitch(latitude=latitude, cw=cw)
+    gcr_optimal, pitch_optimal = optimal_gcr_pitch_bifacial_fixed_tilt(latitude=latitude, cw=cw)
 
     pitch_ceil = min(pitch_optimal, 12)     # 12 m pitch ceiling
     pitch_practical = max(pitch_ceil, 3.8)  # 3.8m pitch floor
