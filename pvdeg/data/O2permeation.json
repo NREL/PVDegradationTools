@@ -1,6 +1,6 @@
 {
     "OX000": {
-        "comment": "This data is for oxygen permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm²/s]. So is in [g/cm³/atm]. Po is in[g*mm/m²/day/atm]."
+        "comment": "This data is for oxygen permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm²/s]. So is in [g/cm³/atm]. Po is in[g·mm/m²/day/atm]."
     },
     "OX001": {
         "name": "Tedlar",
@@ -13,7 +13,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -0.0272266 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.0003594 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 30.2107 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 441.26 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 441.26 }
     },
     "OX002": {
         "name": "ST504",
@@ -26,7 +26,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -11.5918 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.554366e-07 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 34.2011 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 2128.8937 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 2128.8937 }
     },
     "OX003": {
         "name": "EVA",
@@ -39,7 +39,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 16.6314948252219 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.136034525059804 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 49.1083457348515 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 528718258.338532 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 528718258.338532 }
     },
     "OX004": {
         "name": "AAA polyamide backsheet",
@@ -53,7 +53,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -0.947566422 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 7.81445e-06 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 36.47021886 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 1627722.989 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 1627722.989 }
     },
     "OX005": {
         "name": "Helioseal_101_dry",
@@ -67,7 +67,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -3.528965263 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 5.25558996546881e-05 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 41.48370621 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 1530700.085 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 1530700.085 }
     },
     "OX006": {
         "name": "Helioseal_101_wet",
@@ -81,7 +81,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -5.398392306 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 1.58555e-05 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 45.35763741 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 5101898.064 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 5101898.064 }
     },
     "OX007": {
         "name": "LPO3_dry",
@@ -95,7 +95,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 3.507719187 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.000543049 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 44.5738773 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 3287750.401 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 3287750.401 }
     },
     "OX008": {
         "name": "LPO3_wet",
@@ -109,7 +109,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -2.129673846 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 9.19588e-05 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 46.60221855 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 8344245.628 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 8344245.628 }
     },
     "OX009": {
         "name": "Nagase_dry",
@@ -123,7 +123,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 2.574465974 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.000433787 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 50.11162064 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 42076035.42 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 42076035.42 }
     },
     "OX010": {
         "name": "Nagase_wet",
@@ -137,7 +137,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 3.706124657 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.001037698 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 45.80541287 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 8725784.224 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 8725784.224 }
     },
     "OX011": {
         "name": "Oppanol_B_200",
@@ -150,7 +150,7 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -0.418217328 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.000129043 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 44.77087169 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 8138979.958 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 8138979.958 }
     },
     "OX012": {
         "name": "EVA",
@@ -158,8 +158,8 @@
         "contributor": "Michael Kempe",
         "source": "Urban Weber, Ralf Eiden, Christine Strubel, Thorsten Soegding, Markus Heiss, Peter Zachmann, Kurt Nattermann, Harry Engelmann, Annelene Dethlefsen, Norbert Lenck, Acetic Acid Production, Migration and Corrosion Effects in Ethylene-Vinyl-Acetate-(EVA-)Based PV Modules, 27th European Photovoltaic Solar Energy Conference and Exhibition.",
         "comment": "Extracted from Figure 10 of Weber et al. The activation energy does not exactly match that in the published work (25.4 kJ/mol). I did this because I wanted to include the prefactor.",
-        "Ead": { "name": "", "units": "kJ/mol", "value": 28.1814557950317 },
-        "Do": { "name": "", "units": "cm²/s", "value": 0.0331146659105106 }
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 28.1814557950317 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0331146659105106 }
     },
     "OX013": {
         "name": "polyolefin elastomer (POE)",
@@ -173,6 +173,6 @@
         "Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 6.33958717324394 },
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.00148313008211379 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 39.2779774417758 },
-        "Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day/atm", "value": 12931378.0376762 }
+        "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 12931378.0376762 }
     }
 }
