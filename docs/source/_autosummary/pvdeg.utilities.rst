@@ -28,6 +28,7 @@ pvdeg.utilities
       pvdeg.utilities.get_kinetics
       pvdeg.utilities.get_state_bbox
       pvdeg.utilities.gid_downsampling
+      pvdeg.utilities.gids_dataset_to_coords_dataset
       pvdeg.utilities.linear_normalize
       pvdeg.utilities.merge_sparse
       pvdeg.utilities.meta_as_dict
@@ -118,6 +119,13 @@ pvdeg.utilities
    .. _sphx_glr_backref_pvdeg.utilities.gid_downsampling:
 
    .. minigallery:: pvdeg.utilities.gid_downsampling
+       :add-heading:
+
+   .. autofunction:: gids_dataset_to_coords_dataset
+
+   .. _sphx_glr_backref_pvdeg.utilities.gids_dataset_to_coords_dataset:
+
+   .. minigallery:: pvdeg.utilities.gids_dataset_to_coords_dataset
        :add-heading:
 
    .. autofunction:: linear_normalize

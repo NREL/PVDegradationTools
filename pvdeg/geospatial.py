@@ -1,12 +1,15 @@
 """Collection of classes and functions for geospatial analysis."""
 
-from pvdeg import utilities
+from pvdeg import (
+    utilities,
+)
 
 import xarray as xr
 import dask.array as da
 import pandas as pd
 import numpy as np
 from dask.distributed import Client, LocalCluster
+from dask.delayed import Delayed
 from scipy.interpolate import griddata
 from copy import deepcopy
 
@@ -17,7 +20,7 @@ import cartopy.io.shapereader as shpreader
 from collections.abc import Callable
 import cartopy.feature as cfeature
 
-from typing import Tuple
+from typing import Tuple, Union
 from shapely import LineString, MultiLineString
 
 
@@ -77,42 +80,8 @@ def start_dask(hpc=None):
 
     client = Client(cluster)
     print("Dashboard:", client.dashboard_link)
-    # client.wait_for_workers(n_workers=1)
 
     return client
-
-
-# rename this?
-# and combine into a single function with _df_from_arbitrary, this ds_from_arbitray isnt
-# really doing anything anymore
-# we only want ds_from_arbitrary and then convert to ds, but if the input is a dataset
-# already then we dont want to anything
-# def _ds_from_arbitrary(res, func):
-#     """
-#     Convert an arbitrary return type to xarray.Dataset.
-#     """
-
-#     ######## STRUCTURAL #########
-#     # functions can just return xr.Dataset to take advantage of geospatial
-#     # this should not be required to implement a new geospatial function
-
-#     if isinstance(res, xr.Dataset):
-#         return res
-
-
-#     # if isinstance(res, pysam.inspirePysamReturn):
-#     #     return pysam._handle_pysam_return(res)
-#     # add more conditionals if we have special cases
-#     # or add general case for mixed return dimensions: HARD
-
-#     # handles collections with elements of same shapes
-#     df = _df_from_arbitrary(res=res, func=func)
-#     ds = xr.Dataset.from_dataframe(df)
-
-#     if not df.index.name:
-#         ds = ds.isel(index=0, drop=True)
-
-#     return ds
 
 
 def _df_from_arbitrary(res, func):
@@ -163,26 +132,25 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     ds_res : xarray.Dataset
         Dataset with results for a single gid.
     """
-    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), not
-    # a permanent fix
-    # hopefully this isn't too slow, what is causing this? how meta is being read
-    # from dataset? @ martin?
+    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}),
+    # not the best fix
     if type(meta_gid["latitude"]) is dict:
         meta_gid = utilities.fix_metadata(meta_gid)
 
-    # set time index here? is there any reason the weather shouldn't always have only
-    # pd.datetime index? @ martin?
+    # check for multiindex and time index
     df_weather = ds_gid.to_dataframe()
-    if isinstance(
-        df_weather.index, pd.MultiIndex
-    ):  # check for multiindex and convert to just time index, don't know what was
-        # causing this
+    if isinstance(df_weather.index, pd.MultiIndex):
         df_weather = df_weather.reset_index().set_index("time")
 
+    # HARD FORCE non-nullable numpy dtypes in dask worker(avoid arrow error)
+    # df_weather = df_weather.astype(
+    #     {col: np.asarray(df_weather[col]).dtype for col in df_weather.columns},
+    #     copy=False
+    # )
+    df_weather.index = np.asarray(df_weather.index.values, dtype="datetime64[ns]")
+
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
-    # res is the type returned by func
-    # can be float, tuple, list, dataframe, dataset, etc.
-    # need to convert it to a dataset
+    # res is of function return type, can be float, tuple, list, dataframe, dataset, etc
 
     if isinstance(res, xr.Dataset):
         return res
@@ -227,11 +195,23 @@ def calc_block(weather_ds_block, future_meta_df, func, func_kwargs):
     return res
 
 
-def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
-    """Apply a function to each gid of a weather dataset.
+def analysis(
+    weather_ds: xr.Dataset,
+    meta_df: pd.DataFrame,
+    func: Callable,
+    template: xr.Dataset = None,
+    preserve_gid_dim: bool = False,
+    compute: bool = True,
+    **func_kwargs,
+) -> Union[xr.Dataset, Delayed]:
+    """
+    Applies a function to each gid of a weather dataset. `analysis`
+    will attempt to create a template using `geospatial.auto_template`.
+    If this process fails you will have to provide a geospatial template
+    to the template argument.
 
-    `analysis` will attempt to
-    create a template using `geospatial.auto_template`. If this process fails you will
+    `analysis` will attempt to create a template using
+    `geospatial.auto_template`. If this process fails you will
     have to provide a geospatial template to the template argument.
 
     ValueError: <function-name> cannot be autotemplated. create a template manually
@@ -247,40 +227,42 @@ def analysis(weather_ds, meta_df, func, template=None, **func_kwargs):
         Function to apply to weather data.
     template : xarray.Dataset
         Template for output data.
+    preserve_gid_dim : bool, optional
+        Expert setting. If True, preserves the 'gid' dimension
+        and prevents expansion to latitude/longitude coordinates.
+        Other dimensions such as time and distance are unaffected.
+        Default is False.
+    compute: bool, optional
+        Expert setting. If False, builds lazy computation graph without execution.
+        This is useful for building into larger dask pipelines.
+        Default is True: Values will be computed when this function is called.
     func_kwargs : dict
         Keyword arguments to pass to func.
 
     Returns
     -------
-    ds_res : xarray.Dataset
+    ds_res : xarray.Dataset | dask.delayed.Delayed
         Dataset with results for a block of gids.
     """
     if template is None:
         template = auto_template(func=func, ds_gids=weather_ds)
 
-    # future_meta_df = client.scatter(meta_df)
     kwargs = {"func": func, "future_meta_df": meta_df, "func_kwargs": func_kwargs}
 
-    stacked = weather_ds.map_blocks(
-        calc_block, kwargs=kwargs, template=template
-    ).compute()
+    stacked = weather_ds.map_blocks(calc_block, kwargs=kwargs, template=template)
 
-    # lats = stacked.latitude.values.flatten()
-    # lons = stacked.longitude.values.flatten()
-    stacked = stacked.drop(["gid"])
-    # stacked = stacked.drop_vars(['latitude', 'longitude'])
-    # stacked.coords["gid"] = pd.MultiIndex.from_arrays(
-    #     [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
-    # )
-    mindex_obj = pd.MultiIndex.from_arrays(
-        [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
+    if compute is True:
+        stacked = stacked.compute()
+
+    if preserve_gid_dim is True:
+        return stacked
+
+    coords_res = utilities.gids_dataset_to_coords_dataset(
+        ds_gids=stacked,
+        meta_df=meta_df
     )
-    mindex_coords = xr.Coordinates.from_pandas_multiindex(mindex_obj, "gid")
-    stacked = stacked.assign_coords(mindex_coords)
 
-    stacked = stacked.drop_duplicates("gid")
-    res = stacked.unstack("gid")  # , sparse=True
-    return res
+    return coords_res
 
 
 def output_template(

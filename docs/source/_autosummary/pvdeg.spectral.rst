@@ -20,6 +20,8 @@ pvdeg.spectral
 
       
       pvdeg.spectral.poa_irradiance
+      pvdeg.spectral.poa_irradiance_fixed
+      pvdeg.spectral.poa_irradiance_tracker
       pvdeg.spectral.solar_position
 
    
@@ -41,6 +43,20 @@ pvdeg.spectral
    .. _sphx_glr_backref_pvdeg.spectral.poa_irradiance:
 
    .. minigallery:: pvdeg.spectral.poa_irradiance
+       :add-heading:
+
+   .. autofunction:: poa_irradiance_fixed
+
+   .. _sphx_glr_backref_pvdeg.spectral.poa_irradiance_fixed:
+
+   .. minigallery:: pvdeg.spectral.poa_irradiance_fixed
+       :add-heading:
+
+   .. autofunction:: poa_irradiance_tracker
+
+   .. _sphx_glr_backref_pvdeg.spectral.poa_irradiance_tracker:
+
+   .. minigallery:: pvdeg.spectral.poa_irradiance_tracker
        :add-heading:
 
    .. autofunction:: solar_position

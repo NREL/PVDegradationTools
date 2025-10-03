@@ -81,6 +81,9 @@ books = [
     "jupyter-book",
 ]
 sam = [
+    "NREL-PySAM",
+]
+inspire = [
     "NREL-PySAM==5.1.0",
 ]
 all = [
