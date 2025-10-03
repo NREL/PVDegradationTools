@@ -1629,7 +1629,7 @@ def optimal_gcr_pitch(
     Parameters
     ------------
     latitude: float
-        latitude [deg]
+        latitude [°]
     cw: float
         collector width [m]
 
@@ -1676,25 +1676,25 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
     We cannot use the optimal pitch due to certain real world restrictions
     so we will apply some constraints.
 
-    We are using latitude tilt but we cannot use tilts > 40 deg,
-    due to racking constraints, cap at 40 deg for latitudes above 40 deg.
+    We are using latitude tilt but we cannot use tilts > 40°,
+    due to racking constraints, cap at 40° for latitudes above 40°.
 
     pitch minimum: 3.8 m
     pitch maximum:  12 m
 
-    tilt max: 40 deg (latitude tilt)
+    tilt max: 40° (latitude tilt)
 
     Parameters
     ----------
     latitude: float
-        latitude [deg]
+        latitude [°]
     cw: float
         collector width [m]
 
     Returns
     -------
     tilt: float
-        tilt for a fixed tilt system with practical considerations [deg]
+        tilt for a fixed tilt system with practical considerations [°]
     pitch: float
         pitch for a fixed tilt system with practical consideration [m]
     gcr: float
