@@ -277,7 +277,7 @@ def test_read_material_normal():
         },
         "Po": {
             "name": "Permeability Prefactor",
-            "units": "g*mm/m²/day/atm",
+            "units": "g·mm/m²/day/atm",
             "value": 2128.8937,
         },
     }
@@ -351,7 +351,7 @@ def test_read_material_fp_override():
         },
         "Po": {
             "name": "Permeability Prefactor",
-            "units": "g*mm/m²/day/atm",
+            "units": "g·mm/m²/day/atm",
             "value": 2128.8937,
         },
     }
