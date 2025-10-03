@@ -253,7 +253,6 @@ def analysis(
     if template is None:
         template = auto_template(func=func, ds_gids=weather_ds)
 
-    # future_meta_df = client.scatter(meta_df)
     kwargs = {"func": func, "future_meta_df": meta_df, "func_kwargs": func_kwargs}
 
     stacked = weather_ds.map_blocks(calc_block, kwargs=kwargs, template=template)
@@ -264,16 +263,12 @@ def analysis(
     if preserve_gid_dim is True:
         return stacked
 
-    stacked = stacked.drop(["gid"])
-    mindex_obj = pd.MultiIndex.from_arrays(
-        [meta_df["latitude"], meta_df["longitude"]], names=["latitude", "longitude"]
+    coords_res = utilities.gids_dataset_to_coords_dataset(
+        ds_gids=stacked,
+        meta_df=meta_df
     )
-    mindex_coords = xr.Coordinates.from_pandas_multiindex(mindex_obj, "gid")
-    stacked = stacked.assign_coords(mindex_coords)
 
-    stacked = stacked.drop_duplicates("gid")
-    res = stacked.unstack("gid")  # , sparse=True
-    return res
+    return coords_res
 
 
 def output_template(
