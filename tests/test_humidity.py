@@ -120,6 +120,8 @@ def test_module_basic():
         wind_factor=0.33,
         encapsulant="W002",
         backsheet="W002",
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
     )
     # Check output type and columns
     assert isinstance(result, pd.DataFrame)
