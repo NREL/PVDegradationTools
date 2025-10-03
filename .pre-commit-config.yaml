@@ -19,4 +19,4 @@ repos:
       - id: nb-clean
             args:
         - --preserve-cell-outputs
-        - --preserve-notebook-metadata # only preserve top level metadata
+        - --remove-all-notebook-metadata # only preserve top level metadata
