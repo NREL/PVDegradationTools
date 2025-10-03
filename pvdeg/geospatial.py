@@ -168,10 +168,6 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     if not df.index.name:
         ds_res = ds_res.isel(index=0, drop=True)
 
-    # WILL BREAK ON NON-NUMERIC TYPES
-    # desired = {name: np.float64 for name in ds_res.data_vars}
-    # ds_res = ds_res.astype(desired)
-
     return ds_res
 
 
