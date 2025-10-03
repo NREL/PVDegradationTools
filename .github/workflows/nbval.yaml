@@ -59,29 +59,3 @@ jobs:
           pytest --nbval \
                  --nbval-sanitize-with "$SANITIZE_CFG" \
                  "${FULL_PATHS[@]}"
-
-      - name: Create and Convert notebooks to HTML for artifacts
-        run: |
-          # Read the environment variable string into a shell array
-          mapfile -t NOTEBOOKS < <(echo "$NOTEBOOK_LIST")
-
-          mkdir -p "$NOTEBOOK_DIR"/artifacts
-
-          # Move into the directory to simplify jupyter nbconvert paths
-          cd "$NOTEBOOK_DIR"
-
-          for notebook in "${NOTEBOOKS[@]}"; do
-            NOTEBOOK_NAME="${notebook//\"/}"
-            echo "Converting notebook: $NOTEBOOK_NAME"
-            jupyter nbconvert --to html --execute \
-                              --ExecutePreprocessor.timeout=600 \
-                              --allow-errors \
-                              --output "artifacts/${NOTEBOOK_NAME}.html" \
-                              "$NOTEBOOK_NAME"
-          done
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: executed_notebooks
-          path: "${{ env.NOTEBOOK_DIR }}/artifacts"
