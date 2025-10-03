@@ -9,6 +9,24 @@ jobs:
     env:
       NOTEBOOK_DIR: "tutorials_and_tools/tutorials_and_tools"
       SANITIZE_CFG: "nbval_sanitization_rules.cfg"
+      NOTEBOOK_LIST: |
+        "1 - Basics, Humidity, Design.ipynb"
+        "2 - Degradation.ipynb"
+        "3 - Spectral Degradation.ipynb"
+        "4 - Weather Database Access.ipynb"
+        "ASTM Live Demo.ipynb"
+        "B-O LID - Accelerated Test.ipynb"
+        "Custom-Functions-Nopython.ipynb"
+        "LETID - Accelerated Test.ipynb"
+        "LETID - Outdoor LETID.ipynb"
+        "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb"
+        "LETID - Passivated Wafer.ipynb"
+        "Monte Carlo - Arrhenius.ipynb"
+        "Monte Carlo - Standoff.ipynb"
+        "Pysam - Single Location.ipynb"
+        "Tools - Edge Seal Oxygen Ingress.ipynb"
+        "Van't Hoff Degradation Model.ipynb"
+        "Geospatial - Local Scenario.ipynb"
 
     steps:
       - uses: actions/checkout@v4
@@ -21,58 +39,50 @@ jobs:
       - name: Install notebook environment
         run: |
           python -m pip install --upgrade pip wheel
-          # Install primary dependencies
           pip install --timeout=300 -r tutorials_and_tools/requirements.txt
           pip install --timeout=300 -e .[test]
-          # Install nbval and other specific tools
           pip install nbval global_land_mask dotenv imageio nrel-pysam
           pip install nbconvert[webpdf]
 
-      - name: Run all notebooks with nbval
+      - name: Run listed notebooks with nbval
         run: |
-          # The command below finds all .ipynb files in the NOTEBOOK_DIR and runs them
-          # in a single pytest invocation.
+          # Read the environment variable string into a shell array
+          mapfile -t NOTEBOOKS < <(echo "$NOTEBOOK_LIST")
+
+          # Prepend the NOTEBOOK_DIR path to each notebook name
+          mapfile -t FULL_PATHS < <(for notebook in "${NOTEBOOKS[@]}"; do
+             NOTEBOOK_NAME="${notebook//\"/}"
+             echo "$NOTEBOOK_DIR/$NOTEBOOK_NAME"
+          done)
+
+          # Execute a single pytest command with all full paths as arguments
+          echo "Testing the following notebooks: ${FULL_PATHS[*]}"
           pytest --nbval \
                  --nbval-sanitize-with "$SANITIZE_CFG" \
-                 "$NOTEBOOK_DIR"
+                 "${FULL_PATHS[@]}"
 
       - name: Create and Convert notebooks to HTML for artifacts
         run: |
-          NOTEBOOKS=(
-            "1 - Basics, Humidity, Design.ipynb"
-            "2 - Degradation.ipynb"
-            "3 - Spectral Degradation.ipynb"
-            "4 - Weather Database Access.ipynb"
-            "ASTM Live Demo.ipynb"
-            "B-O LID - Accelerated Test.ipynb"
-            "Custom-Functions-Nopython.ipynb"
-            "LETID - Accelerated Test.ipynb"
-            "LETID - Outdoor LETID.ipynb"
-            "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb"
-            "LETID - Passivated Wafer.ipynb"
-            "Monte Carlo - Arrhenius.ipynb"
-            "Monte Carlo - Standoff.ipynb"
-            "Pysam - Single Location.ipynb"
-            "Tools - Edge Seal Oxygen Ingress.ipynb"
-            "Van't Hoff Degradation Model.ipynb"
-            "Geospatial - Local Scenario.ipynb"
-          )
+          # Read the environment variable string into a shell array
+          mapfile -t NOTEBOOKS < <(echo "$NOTEBOOK_LIST")
 
           mkdir -p "$NOTEBOOK_DIR"/artifacts
+
+          # Move into the directory to simplify jupyter nbconvert paths
           cd "$NOTEBOOK_DIR"
 
           for notebook in "${NOTEBOOKS[@]}"; do
-            echo "Converting notebook: $notebook"
+            NOTEBOOK_NAME="${notebook//\"/}"
+            echo "Converting notebook: $NOTEBOOK_NAME"
             jupyter nbconvert --to html --execute \
                               --ExecutePreprocessor.timeout=600 \
                               --allow-errors \
-                              --output "artifacts/${notebook}.html" \
-                              "$notebook"
+                              --output "artifacts/${NOTEBOOK_NAME}.html" \
+                              "$NOTEBOOK_NAME"
           done
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: executed_notebooks
-          # path to the directory containing all the generated HTML files
           path: "${{ env.NOTEBOOK_DIR }}/artifacts"
