@@ -99,6 +99,8 @@ def test_module():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
     )
 
     # Check approximate equality for all columns
@@ -173,6 +175,8 @@ def test_module_edge_cases():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
     )
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3
@@ -197,7 +201,11 @@ def test_backsheet():
     rh_ambient = pd.Series([40, 60, 80])
     temp_ambient = pd.Series([20, 25, 30])
     temp_module = pd.Series([25, 30, 35])
-    result = pvdeg.humidity.backsheet(rh_ambient, temp_ambient, temp_module)
+    result = pvdeg.humidity.backsheet(rh_ambient,
+                                      temp_ambient,
+                                      temp_module,
+                                      backsheet_thickness=0.3,
+                                      back_encap_thickness=0.46,)
     # Should return a pandas Series and have same length as input
     assert result.tolist() == pytest.approx([24.535486, 31.149815, 38.113095], abs=1e-5)
 
@@ -272,3 +280,33 @@ def test_backsheet_from_encap():
     result = pvdeg.humidity.backsheet_from_encap(rh_back_encap, rh_surface_outside)
     expected = pd.Series([30, 50, 70])
     np.testing.assert_allclose(result, expected, atol=1e-8)
+
+
+def test_back_encapsulant_water_concentration_missing_t():
+    temp_module = pd.Series([25, 30, 35])
+    rh_surface = pd.Series([50, 55, 60])
+    with pytest.raises(ValueError, match="backsheet_thickness must be specified"):
+        pvdeg.humidity.back_encapsulant_water_concentration(
+            temp_module=temp_module,
+            rh_surface=rh_surface,
+            Po_b=None,
+            Ea_p_b=None,
+            backsheet_thickness=None,
+            backsheet="W017",
+            back_encap_thickness=0.46,
+        )
+
+
+def test_back_encapsulant_water_concentration_missing_back_encap_thickness():
+    temp_module = pd.Series([25, 30, 35])
+    rh_surface = pd.Series([50, 55, 60])
+    with pytest.raises(ValueError, match="back_encap_thickness must be specified"):
+        pvdeg.humidity.back_encapsulant_water_concentration(
+            temp_module=temp_module,
+            rh_surface=rh_surface,
+            Po_b=None,
+            Ea_p_b=None,
+            back_encap_thickness=None,
+            backsheet="W017",
+            backsheet_thickness=0.3,
+            )
