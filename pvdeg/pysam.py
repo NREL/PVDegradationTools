@@ -15,6 +15,7 @@ from pvdeg.utilities import (
     practical_gcr_pitch_bifiacial_fixed_tilt,
     add_time_columns_tmy
 )
+from pvdeg import logger
 
 INSPIRE_NSRDB_ATTRIBUTES = [
     "air_temperature",
@@ -213,7 +214,7 @@ def pysam(
         import PySAM.Pvsamv1 as pv1
         import PySAM.Pvwattsv8 as pv8
     except ModuleNotFoundError:
-        print(
+        logger.info(
             "pysam not found. run `pip install pvdeg[sam]` to install the NREL-PySAM \
             dependency"
         )
@@ -278,8 +279,8 @@ def pysam(
     if not results:
         return outputs
 
-    print("gcr used")
-    print(pysam_model.value("subarray1_gcr"))
+    logger.info("gcr used")
+    logger.info(pysam_model.value("subarray1_gcr"))
 
     pysam_res = {key: outputs[key] for key in results}
     return pysam_res
@@ -290,8 +291,8 @@ def _apply_practical_pitch_tilt(pysam_model, meta: dict, subarrays: set[str]) ->
     Apply practical pitch/tilt constraints to all subarrays on the model.
     Mutates `pysam_model` in-place. Raises the same errors as the inlined code.
     """
-    print("overriding pitch with practical considerations")
-    print(f"subarrays {subarrays}")
+    logger.info("overriding pitch with practical considerations")
+    logger.info(f"subarrays {subarrays}")
 
     # Build parameter name lists for all discovered subarrays
     param_latitude_tilt = [f"{s}_tilt_eq_lat" for s in subarrays]
@@ -301,7 +302,7 @@ def _apply_practical_pitch_tilt(pysam_model, meta: dict, subarrays: set[str]) ->
 
     # Disable latitude-equals-tilt if set anywhere
     if any(pysam_model.value(name) != 0 for name in param_latitude_tilt):
-        print(
+        logger.info(
             'config defined latitude tilt defined for one of the subarrays, '
             'disabling config latitude tilt'
             '(will be set later using practical consideration)'
@@ -444,12 +445,12 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     pratical_considerations_setups = ["06", "07", "08", "09"]
     # vertical tilt (fixed spacing) 10
 
-    print(f"config file string: {config_files['pv']} -- debug")
+    logger.info(f"config file string: {config_files['pv']} -- debug")
 
     cw = 2  # collector width 2 [m]
     pratical_consideration = False
     if any(setup in config_files["pv"] for setup in pratical_considerations_setups):
-        print(
+        logger.info(
             "setup with practical consieration detected, "
             "using pysam inspire_practical_consideration_pitch_tilt=True"
         )
@@ -461,17 +462,16 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
     # why would this be not in
     # this should check in "10" is in the config files
     elif "10" in config_files["pv"]:
-        print("using config 10 with vertical fixed tilt.")
+        logger.info("using config 10 with vertical fixed tilt.")
         gcr_used = _load_gcr_from_config(config_files=config_files)
-        print(f"gcr used: {gcr_used}")
+        logger.info(f"gcr used: {gcr_used}")
         pitch_used = cw / gcr_used
         tilt_used = 90.0
 
     # conf 01- 05 using tracking, default gcr from pysam config
     elif any(setup in config_files["pv"] for setup in tracking_setups):
-        print("SAT scenario, using -999.0 as tilt fill value")
+        logger.info("SAT scenario, using -999.0 as tilt fill value")
         gcr_used = _load_gcr_from_config(config_files=config_files)
-        # print(f"gcr used: {gcr_used}")
         pitch_used = cw / gcr_used
         # tracking doesnt have fixed tilt (use placeholder instead)
         tilt_used = -999.0
