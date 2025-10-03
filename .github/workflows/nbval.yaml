@@ -1,8 +1,7 @@
 name: nbval
 
-on:
-  pull_request:
-    types: [opened, ready_for_review, review_requested]
+on: [pull_request]
+
 jobs:
   notebook-check:
     runs-on: ubuntu-latest
