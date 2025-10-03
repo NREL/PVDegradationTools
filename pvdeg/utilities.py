@@ -492,66 +492,6 @@ def convert_tmy(file_in, file_out="h5_from_tmy.h5"):
         )
 
 
-def _read_material(name=None, fname="H2Opermeation", item=None, fp=None):
-    """
-    read a material from materials.json and return the parameter dictionary. By default
-    it will look at water permeation, but any database can be used.
-    e.g. fname ="AApermeation", fname="O2permeation" or fname="DegradationDatabase"
-    If name=None it will return the Json file if item=None, or a list of specific fields
-    in each Json entry identified by item.
-
-    Parameters
-    ----------
-    name : (str)
-        unique name of material in a given database
-    fname : (str)
-        this can be any custom file identified by this name and the filepath (fp), or
-        the just the shorthand defined in pvdeg_datafiles, i.e.
-        "AApermeation", "H2Opermeation", "O2permeation", or "DegradationDatabase".
-    item : (list)
-        this is a list of fields to return from a Json file if a specific record was not
-        searched for.
-    fp :(str)
-        this is the file path to find the particular file, e.g "DATA_DIR". It must be
-        specified if a predefined file is not used.
-
-    Returns:
-    --------
-    mat_dict : (dict)
-        dictionary of material parameters, or "not found" message, or a summary of all
-        entries with specific item entries.
-    """
-
-    if fp is None:
-        with open(pvdeg_datafiles[fname]) as f:
-            data = json.load(f)
-        f.close()
-    else:
-        fpath = os.path.join(fp, fname)
-        with open(fpath) as f:
-            data = json.load(f)
-        f.close()
-
-    if name is None:
-        if item is None:
-            mat_dict = data
-        else:
-            mat_dict = {
-                keys: {
-                    keyss: data[keys][keyss] for keyss in data[keys] if keyss in item
-                }
-                for keys in data
-                if ({keyss: data[keys][keyss] for keyss in data[keys] if keyss in item})
-                != {}
-            }
-    else:
-        try:
-            mat_dict = data[name]
-        except Exception:
-            mat_dict = ("Data for", name, "was not found in", fname + ".")
-    return mat_dict
-
-
 # currently this is only designed for Oxygen Permeation. It could easily be adapted for
 # all permeation data.
 def _add_material(
@@ -567,7 +507,7 @@ def _add_material(
     fp=DATA_DIR,
     fname="O2permeation.json",
 ):
-    """Add a new material to the materials.json database.
+    """Add a new material to the materials database.
 
     Check the parameters for
     specific units. If material already exists, parameters will be updated.
@@ -595,14 +535,11 @@ def _add_material(
     fickian : (boolean)
         I have no idea what this means (unused)
     fp : (str)
-        file path to the materials.json file
+        file path to the json materials file
     fname : (str)
-        name of the materials.json file
+        name of the json materials file
     """
-    # TODO: test then delete commented code
-    # root = os.path.realpath(__file__)
-    # root = root.split(r'/')[:-1]
-    # OUT_FILE = os.path.join('/', *root, 'data', 'materials.json')
+
     fpath = os.path.join(fp, fname)
 
     material_dict = {
@@ -1451,7 +1388,7 @@ def display_json(
         html += (
             f"<div>"
             f'<strong style="color: white;">{key}:</strong> '  # noqa
-            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231, E501
+            f"<span onclick=\"this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'\" style=\"cursor: pointer; color: white;\">&#9660;</span>"  # noqa: E702,E231,E501,W505
             f'<div style="display: none;">{json_to_html(value)}</div>'  # noqa
             f"</div>"
         )
@@ -1515,12 +1452,12 @@ def read_material(
     pvdeg_file: str = None,
     fp: str = None,
     key: str = None,
-    parameters: list[str] = None,
+    encoding: str = "utf-8",
 ) -> dict:
-    """Read material parameters from a `pvdeg/data` file or JSON file path.
+    """Read material dictionary from a `pvdeg/data` file or JSON file path.
 
     Parameters
-    -----------
+    ----------
     pvdeg_file: str
         keyword for material json file in `pvdeg/data`. Options:
         >>> "AApermeation", "H2Opermeation", "O2permeation"
@@ -1532,18 +1469,14 @@ def read_material(
         key corresponding to specific material in the file. In the pvdeg files these
         have arbitrary names. Inspect the files or use `display_json` or `search_json`
         to identify the key for desired material.
-    parameters: list[str]
-        parameters to grab from the file at index key. If none, will grab all items
-        at index key. the elements in parameters must match the keys in the json exactly
-        or the output value for the specific key/parameter in the retunred dict will be
-        `None`.
+    encoding : (str)
+        encoding to use when reading the JSON file, default is "utf-8"
 
     Returns
-    --------
+    -------
     material: dict
-        dictionary of material parameters from the seleted file at the index key.
+        dictionary of material parameters from the selected file at the index key.
     """
-    # these live in the `pvdeg/data` folder
     if pvdeg_file:
         try:
             fp = pvdeg_datafiles[pvdeg_file]
@@ -1553,11 +1486,45 @@ def read_material(
                 " {pvdeg_datafiles.keys()}"
             )
 
-    with open(fp, "r") as file:
+    with open(fp, "r", encoding=encoding) as file:
         data = json.load(file)
 
-    # take subdict from file
     material_dict = data[key]
+    return material_dict
+
+
+def read_material_property(
+    pvdeg_file: str = None,
+    filepath: str = None,
+    key: str = None,
+    parameters: list[str] = None,
+) -> dict:
+    """Read material parameters from a `pvdeg/data` file or JSON file path.
+
+    Parameters
+    ----------
+    pvdeg_file: str
+        keyword for material json file in `pvdeg/data`. Options:
+        >>> "AApermeation", "H2Opermeation", "O2permeation"
+    filepath: str
+        file path to material parameters json with same schema as material parameters
+        json files in `pvdeg/data`. `pvdeg_file` will override `fp` if both are
+        provided.
+    key: str
+        key corresponding to specific material in the file. In the pvdeg files these
+        have arbitrary names. Inspect the files or use `display_json` or `search_json`
+        to identify the key for desired material.
+
+    Returns
+    -------
+    parameters: dict
+        dictionary of material parameters from the selected file at the index key.
+    """
+    material_dict = read_material(
+        pvdeg_file=pvdeg_file,
+        fp=filepath,
+        key=key,
+    )
 
     if parameters:
         material_dict = {
@@ -1575,5 +1542,4 @@ def read_material(
             k: v["value"] if isinstance(v, dict) else v
             for k, v in material_dict.items()
         }
-
     return material_dict
