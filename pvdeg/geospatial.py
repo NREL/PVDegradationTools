@@ -132,31 +132,25 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     ds_res : xarray.Dataset
         Dataset with results for a single gid.
     """
-    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), not
-    # a permanent fix
-    # hopefully this isn't too slow, what is causing this? how meta is being read
-    # from dataset? @ martin?
+    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), 
+    # not the best fix
     if type(meta_gid["latitude"]) is dict:
         meta_gid = utilities.fix_metadata(meta_gid)
 
-    # set time index here?
-    # is a reason the weather shouldn't always have pd.datetime index?
-    # check for multiindex and convert to just time index
+    # check for multiindex and time index
     df_weather = ds_gid.to_dataframe()
     if isinstance(df_weather.index, pd.MultiIndex):
         df_weather = df_weather.reset_index().set_index("time")
 
-    # HARD FORCE non-nullable numpy dtypes (avoid arrow error)
-    df_weather = df_weather.astype(
-        {col: np.asarray(df_weather[col]).dtype for col in df_weather.columns},
-        copy=False
-    )
+    # HARD FORCE non-nullable numpy dtypes in dask worker(avoid arrow error)
+    # df_weather = df_weather.astype(
+    #     {col: np.asarray(df_weather[col]).dtype for col in df_weather.columns},
+    #     copy=False
+    # )
     df_weather.index = np.asarray(df_weather.index.values, dtype="datetime64[ns]")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
-    # res is the type returned by func
-    # can be float, tuple, list, dataframe, dataset, etc.
-    # need to convert it to a dataset
+    # res is of function return type, can be float, tuple, list, dataframe, dataset, etc.
 
     if isinstance(res, xr.Dataset):
         return res
