@@ -1591,6 +1591,7 @@ def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
     res = stacked.unstack("gid")
     return res
 
+
 def _load_gcr_from_config(config_files: dict):
     """
     dictionary containg 'pv' key
@@ -1669,7 +1670,9 @@ def optimal_gcr_pitch_bifacial_fixed_tilt(
     return gcr, pitch
 
 
-def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, float]:
+def practical_gcr_pitch_bifiacial_fixed_tilt(
+    latitude: float, cw: float
+) -> tuple[float, float, float]:
     """
     Calculate pitch for fixed tilt systems for InSPIRE Agrivoltaics Irradiance Dataset.
 
@@ -1701,7 +1704,9 @@ def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, f
         gcr for a fixed tilt system with practical considerations [unitless]
     """
 
-    gcr_optimal, pitch_optimal = optimal_gcr_pitch_bifacial_fixed_tilt(latitude=latitude, cw=cw)
+    gcr_optimal, pitch_optimal = optimal_gcr_pitch_bifacial_fixed_tilt(
+        latitude=latitude, cw=cw
+    )
 
     pitch_ceil = min(pitch_optimal, 12)     # 12 m pitch ceiling
     pitch_practical = max(pitch_ceil, 3.8)  # 3.8m pitch floor

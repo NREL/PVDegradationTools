@@ -5,15 +5,54 @@ Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
 
 import dask.array as da
 import pandas as pd
-from pvdeg.utilities import _load_gcr_from_config, inspire_practical_pitch
 import xarray as xr
 import numpy as np
 import json
 
-from pvdeg import (
-    weather,
-    utilities,
+from pvdeg import weather
+from pvdeg.utilities import (
+    _load_gcr_from_config,
+    practical_gcr_pitch_bifiacial_fixed_tilt,
+    add_time_columns_tmy
 )
+
+INSPIRE_NSRDB_ATTRIBUTES = [
+    "air_temperature",
+    "wind_speed",
+    "wind_direction",
+    "dhi",
+    "ghi",
+    "dni",
+    "relative_humidity",
+    "surface_albedo",
+]
+
+
+scalar = ("gid",)
+temporal = ("gid", "time")
+spatio_temporal = ("gid", "time", "distance")
+
+INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
+    "tilt": scalar,
+    "pitch": scalar,
+    "annual_poa": scalar,
+    "annual_energy": scalar,
+
+    "dhi": temporal,
+    "ghi": temporal,
+    "dni": temporal,
+    "albedo": temporal,
+    "temp_air": temporal,
+    "wind_speed": temporal,
+    "wind_direction": temporal,
+    "relative_humidity": temporal,
+    "subarray1_poa_front" : temporal,
+    "subarray1_poa_rear" : temporal,
+    "subarray1_celltemp" : temporal,
+    "subarray1_dc_gross" : temporal,
+
+    "ground_irradiance": spatio_temporal,
+}
 
 
 def pysam(
@@ -245,6 +284,7 @@ def pysam(
     pysam_res = {key: outputs[key] for key in results}
     return pysam_res
 
+
 def _apply_practical_pitch_tilt(pysam_model, meta: dict, subarrays: set[str]) -> None:
     """
     Apply practical pitch/tilt constraints to all subarrays on the model.
@@ -256,14 +296,15 @@ def _apply_practical_pitch_tilt(pysam_model, meta: dict, subarrays: set[str]) ->
     # Build parameter name lists for all discovered subarrays
     param_latitude_tilt = [f"{s}_tilt_eq_lat" for s in subarrays]
     param_tracker_mode = [f"{s}_track_mode" for s in subarrays]
-    param_tilt         = [f"{s}_tilt" for s in subarrays]
-    param_gcr          = [f"{s}_gcr" for s in subarrays]
+    param_tilt = [f"{s}_tilt" for s in subarrays]
+    param_gcr = [f"{s}_gcr" for s in subarrays]
 
     # Disable latitude-equals-tilt if set anywhere
     if any(pysam_model.value(name) != 0 for name in param_latitude_tilt):
         print(
             'config defined latitude tilt defined for one of the subarrays, '
-            'disabling config latitude tilt (will be set later using practical consideration)'
+            'disabling config latitude tilt'
+            '(will be set later using practical consideration)'
         )
         for name in param_latitude_tilt:
             pysam_model.value(name, 0)
@@ -283,7 +324,7 @@ def _apply_practical_pitch_tilt(pysam_model, meta: dict, subarrays: set[str]) ->
         )
 
     # collector width of 2m for the inspire scenarios
-    tilt_prac, pitch_prac, gcr_prac = inspire_practical_pitch(
+    tilt_prac, pitch_prac, gcr_prac = practical_gcr_pitch_bifiacial_fixed_tilt(
         latitude=meta["latitude"], cw=2
     )
 
@@ -361,45 +402,6 @@ def _handle_pysam_return(
     return single_location_ds
 
 
-INSPIRE_NSRDB_ATTRIBUTES = [
-    "air_temperature",
-    "wind_speed",
-    "wind_direction",
-    "dhi",
-    "ghi",
-    "dni",
-    "relative_humidity",
-    "surface_albedo",
-]
-
-
-scalar = ("gid",)
-temporal = ("gid", "time")
-spatio_temporal = ("gid", "time", "distance")
-
-INSPIRE_GEOSPATIAL_TEMPLATE_SHAPES = {
-    "tilt": scalar,
-    "pitch": scalar,
-    "annual_poa": scalar,
-    "annual_energy": scalar,
-
-    "dhi": temporal,
-    "ghi": temporal,
-    "dni": temporal,
-    "albedo": temporal,
-    "temp_air": temporal,
-    "wind_speed": temporal,
-    "wind_direction": temporal,
-    "relative_humidity": temporal,
-    "subarray1_poa_front" : temporal,
-    "subarray1_poa_rear" : temporal,
-    "subarray1_celltemp" : temporal,
-    "subarray1_dc_gross" : temporal,
-
-    "ground_irradiance": spatio_temporal,
-}
-
-
 def inspire_ground_irradiance(weather_df, meta, config_files):
     """
     Get ground irradiance array and annual poa irradiance
@@ -452,7 +454,7 @@ def inspire_ground_irradiance(weather_df, meta, config_files):
             "using pysam inspire_practical_consideration_pitch_tilt=True"
         )
         pratical_consideration = True
-        tilt_used, pitch_used, gcr_used = inspire_practical_pitch(
+        tilt_used, pitch_used, gcr_used = practical_gcr_pitch_bifiacial_fixed_tilt(
             latitude=meta['latitude'], cw=cw
         )
 
@@ -503,7 +505,7 @@ def solar_resource_dict(weather_df, meta):
 
     Works on PVGIS and kestrel NSRDB (NOT PSM3 NSRDB from NSRDB api).
     """
-    weather_df = utilities.add_time_columns_tmy(weather_df)  # only supports hourly data
+    weather_df = add_time_columns_tmy(weather_df)  # only supports hourly data
 
     # enforce tmy scheme
     times = pd.date_range(start="2001-01-01", periods=8760, freq="1h")

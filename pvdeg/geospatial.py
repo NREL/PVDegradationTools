@@ -132,7 +132,7 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     ds_res : xarray.Dataset
         Dataset with results for a single gid.
     """
-    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}), 
+    # meta gid was appearing with ('lat' : {gid, lat}, 'long' : {gid : long}),
     # not the best fix
     if type(meta_gid["latitude"]) is dict:
         meta_gid = utilities.fix_metadata(meta_gid)
@@ -150,7 +150,7 @@ def calc_gid(ds_gid, meta_gid, func, **kwargs):
     df_weather.index = np.asarray(df_weather.index.values, dtype="datetime64[ns]")
 
     res = func(weather_df=df_weather, meta=meta_gid, **kwargs)
-    # res is of function return type, can be float, tuple, list, dataframe, dataset, etc.
+    # res is of function return type, can be float, tuple, list, dataframe, dataset, etc
 
     if isinstance(res, xr.Dataset):
         return res

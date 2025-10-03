@@ -2,6 +2,7 @@ import pvdeg
 
 import builtins
 import os
+import pvdeg.utilities
 import xarray as xr
 import pandas as pd
 from pathlib import Path
@@ -51,7 +52,7 @@ def test_pysam_results_list_conf0():
         },
         pv_model="pvsamv1",
         results=["annual_energy"],
-        inspire_practical_pitch_tilt=True,
+        practical_pitch_tilt_considerations=True,
     )
 
     assert res == {'annual_energy': 53062.51753616376}
@@ -81,7 +82,7 @@ def test_pysam_inspire_practical_tilt():
             "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
         },
         pv_model="pvsamv1",
-        inspire_practical_pitch_tilt=True,
+        practical_pitch_tilt_considerations=True,
     )
 
     # use latitude tilt under 40 deg N latitude
@@ -97,7 +98,7 @@ def test_pysam_inspire_practical_tilt():
             "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
         },
         pv_model="pvsamv1",
-        inspire_practical_pitch_tilt=True,
+        practical_pitch_tilt_considerations=True,
     )
 
     # latitude point is above 40 deg N
@@ -111,7 +112,7 @@ def test_pysam_inspire_practical_tilt():
             "pv": os.path.join(pvdeg.TEST_DATA_DIR, Path("SAM/08/08_pvsamv1.json"))
         },
         pv_model="pvsamv1",
-        inspire_practical_pitch_tilt=False,
+        practical_pitch_tilt_considerations=False,
     )
 
     # flag is set to false, ignore practical considerations
@@ -153,10 +154,10 @@ def test_inspire_configs_pitches():
         if conf in tracking:
             # tracking, we leave the pitch unchanged from the original sam config
             assert res_mid_lat.pitch.item() == (
-                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+                pvdeg.utilities._load_gcr_from_config(config_files=config_files) / cw
             )  # use original pitch
             assert res_high_lat.pitch.item() == (
-                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+                pvdeg.utilities._load_gcr_from_config(config_files=config_files) / cw
             )  # use original pitch
 
             # tracking does not have fixed tilt
@@ -165,7 +166,7 @@ def test_inspire_configs_pitches():
 
         elif conf in fixed:
             #
-            tilt, pitch, gcr = pvdeg.pysam.inspire_practical_pitch(
+            tilt, pitch, gcr = pvdeg.utilities.inspire_practical_pitch(
                 latitude=geo_meta["latitude"], cw=cw
             )
 
@@ -177,10 +178,10 @@ def test_inspire_configs_pitches():
 
         elif conf in fixed_vertical:
             assert res_mid_lat.pitch.item() == (
-                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+                pvdeg.utilities._load_gcr_from_config(config_files=config_files) / cw
             )  # use original pitch
             assert res_high_lat.pitch.item() == (
-                pvdeg.pysam.load_gcr_from_config(config_files=config_files) / cw
+                pvdeg.utilities._load_gcr_from_config(config_files=config_files) / cw
             )  # use original pitch
 
             assert res_mid_lat.tilt == 90  # fixed vertical tilt
