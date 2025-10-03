@@ -1046,6 +1046,7 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
         "attributes": [],
         "map_variables": True,
         "geospatial": False,
+        "find_meta": True,
     }
     weather_arg.update(kwargs)  # Will default to the kwargs passed to the function.
 
