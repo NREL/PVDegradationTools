@@ -3,6 +3,7 @@
 Produced to support Inspire Agrivoltaics: https://openei.org/wiki/InSPIRE
 """
 
+import logging
 import dask.array as da
 import pandas as pd
 import xarray as xr
@@ -15,7 +16,8 @@ from pvdeg.utilities import (
     practical_gcr_pitch_bifiacial_fixed_tilt,
     add_time_columns_tmy
 )
-from pvdeg import logger
+
+logger = logging.getLogger(__name__)
 
 INSPIRE_NSRDB_ATTRIBUTES = [
     "air_temperature",
