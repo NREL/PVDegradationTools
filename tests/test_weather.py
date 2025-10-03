@@ -9,6 +9,7 @@ import pandas as pd
 import pvdeg
 import pytest
 import xarray as xr
+import pathlib
 from pvdeg.weather import map_meta
 from pvdeg import TEST_DATA_DIR
 
@@ -261,10 +262,7 @@ def test_get_pvgis():
 def test_get_psm3():
     location = (39.7555, -105.2211)  # Golden area
     weather_df, meta = pvdeg.weather.get(
-        database="PSM3",
-        id=location,
-        api_key="DEMO_KEY",
-        email="user@mail.com"
+        database="PSM3", id=location, api_key="DEMO_KEY", email="user@mail.com"
     )
 
     assert isinstance(weather_df, pd.DataFrame)
@@ -288,20 +286,15 @@ def test_get_geospatial_not_implemented():
 
 
 def test_get_meta_mapping():
-    _, meta = pvdeg.weather.read(
-        file_in=FILES["psm3"],
-        file_type="csv"
-        )
+    _, meta = pvdeg.weather.read(file_in=FILES["psm3"], file_type="csv")
     assert "tz" in meta and "Time Zone" not in meta
     assert "altitude" in meta and "Elevation" not in meta
 
 
 def test_get_local_file():
     weather_df, meta = pvdeg.weather.get(
-        database="local",
-        id=0,  # dummy gid
-        file=FILES["psm3"]
-        )
+        database="local", id=0, file=FILES["psm3"]  # dummy gid
+    )
     assert isinstance(weather_df, pd.DataFrame)
     assert isinstance(meta, dict)
     assert len(weather_df) > 0
@@ -317,6 +310,7 @@ def test_get_nsrdb_fnames_tmy(monkeypatch):
         return UNSORTED_TMY_DIR
 
     import glob
+
     monkeypatch.setattr(glob, "glob", fake_glob)
 
     files, hsds = pvdeg.weather.get_NSRDB_fnames(
@@ -329,11 +323,14 @@ def test_get_nsrdb_fnames_tmy(monkeypatch):
     assert hsds is False
     assert files == SORTED_TMY_DIR
     # pattern must match HPC + Americas + *_tmy*.h5
-    assert called["pattern"] == "/datasets/NSRDB/current/*_tmy*.h5"
+    # assert called["pattern"] == "/datasets/NSRDB/current/*_tmy*.h5"
+    path = called["pattern"]
+    assert pathlib.Path(path).as_posix() == "/datasets/NSRDB/current/*_tmy*.h5"
 
 
 def test_get_NSRDB_ds_has_kestrel_nsrdb_fnames_tmy(monkeypatch):
     """For TMY, get_NSRDB should store only the last element of the sorted list."""
+
     # Fake get_NSRDB_fnames to return UNSORTED list + hsds flag
     def fake_get_NSRDB_fnames(satellite, names, NREL_HPC):
         assert satellite == "Americas"
@@ -368,6 +365,7 @@ def test_get_NSRDB_ds_has_kestrel_nsrdb_fnames_tmy(monkeypatch):
 
 def test_get_NSRDB_ds_has_kestrel_nsrdb_fnames_year(monkeypatch):
     """For a specific year, get_NSRDB should store the full sorted list."""
+
     def fake_get_NSRDB_fnames(satellite, names, NREL_HPC):
         assert satellite == "Americas"
         assert names == 2024
