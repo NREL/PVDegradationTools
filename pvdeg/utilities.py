@@ -1590,3 +1590,128 @@ def gids_dataset_to_coords_dataset(ds_gids: xr.Dataset, meta_df: pd.DataFrame):
     stacked = stacked.drop_duplicates("gid")
     res = stacked.unstack("gid")
     return res
+
+def _load_gcr_from_config(config_files: dict):
+    """
+    dictionary containg 'pv' key
+    """
+
+    import json
+
+    with open(config_files["pv"], 'r') as fp:
+        data = json.load(fp)
+
+    return data["subarray1_gcr"]
+
+
+def optimal_gcr_pitch(
+    latitude: float, cw: float = 2
+) -> tuple[float, float]:
+    """
+    Determine optimal gcr and pitch for fixed tilt systems according
+    to latitude and optimal GCR parameters for fixed tilt bifacial systems.
+
+    .. math::
+
+        GCR = \frac{P}{1 + e^{-k(\alpha - \alpha_0)}} + GCR_0
+
+    Inter-row energy yield loss 5% Bifacial Parameters:
+
+    +-----------+--------+-----------+
+    | Parameter | Value  | Units     |
+    +===========+========+===========+
+    | P         | 0.560  | unitless  |
+    | K         | 0.133  | 1/°       |
+    | α₀        | 40.2   | °         |
+    | GCR₀      | 0.70   | unitless  |
+    +-----------+--------+-----------+
+
+    Parameters
+    ------------
+    latitude: float
+        latitude [deg]
+    cw: float
+        collector width [m]
+
+    Returns
+    --------
+    gcr: float
+        optimal ground coverage ratio [unitless]
+    pitch: float
+        optimal pitch [m]
+
+    References
+    -----------
+    Erin M. Tonita, Annie C.J. Russell, Christopher E. Valdivia, Karin Hinzer,
+    Optimal ground coverage ratios for tracked, fixed-tilt, and vertical photovoltaic
+    systems for latitudes up to 75°N,
+    Solar Energy,
+    Volume 258,
+    2023,
+    Pages 8-15,
+    ISSN 0038-092X,
+    https://doi.org/10.1016/j.solener.2023.04.038.
+    (https://www.sciencedirect.com/science/article/pii/S0038092X23002682)
+
+    Optimal GCR from Equation 4
+    Parameters from Table 1
+    """
+
+    p = -0.560
+    k = 0.133
+    alpha_0 = 40.2
+    gcr_0 = 0.70
+
+    # optimal gcr
+    gcr = ((p) / (1 + np.exp(-k * (latitude - alpha_0)))) + gcr_0
+
+    pitch = cw / gcr
+    return gcr, pitch
+
+
+def inspire_practical_pitch(latitude: float, cw: float) -> tuple[float, float, float]:
+    """
+    Calculate pitch for fixed tilt systems for InSPIRE Agrivoltaics Irradiance Dataset.
+
+    We cannot use the optimal pitch due to certain real world restrictions
+    so we will apply some constraints.
+
+    We are using latitude tilt but we cannot use tilts > 40 deg,
+    due to racking constraints, cap at 40 deg for latitudes above 40 deg.
+
+    pitch minimum: 3.8 m
+    pitch maximum:  12 m
+
+    tilt max: 40 deg (latitude tilt)
+
+    Parameters
+    ----------
+    latitude: float
+        latitude [deg]
+    cw: float
+        collector width [m]
+
+    Returns
+    -------
+    tilt: float
+        tilt for a fixed tilt system with practical considerations [deg]
+    pitch: float
+        pitch for a fixed tilt system with practical consideration [m]
+    gcr: float
+        gcr for a fixed tilt system with practical considerations [unitless]
+    """
+
+    gcr_optimal, pitch_optimal = optimal_gcr_pitch(latitude=latitude, cw=cw)
+
+    pitch_ceil = min(pitch_optimal, 12)     # 12 m pitch ceiling
+    pitch_practical = max(pitch_ceil, 3.8)  # 3.8m pitch floor
+
+    if not (3.8 <= pitch_practical <= 12):
+        raise ValueError("calculated practical pitch is outside range [3.8m, 12m]")
+
+    tilt_practical = min(latitude, 40)
+
+    # practical gcr from practical pitch
+    gcr_practical = cw / pitch_practical
+
+    return float(tilt_practical), float(pitch_practical), float(gcr_practical)
