@@ -13,10 +13,4 @@ repos:
     rev: 23.11.0
     hooks:
     -   id: black
--   repo: https://github.com/srstevenson/nb-clean
-    rev: 4.0.1
-    hooks:
-    -   id: nb-clean
-        args:
-        -   --preserve-cell-outputs
-        -   --remove-all-notebook-metadata # only preserve top level metadata
+
