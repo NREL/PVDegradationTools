@@ -1,11 +1,11 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+exclude: '^docs/source/'
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
     -   id: trailing-whitespace
-    -   id: end-of-file-fixer
     -   id: check-yaml
     -   id: check-added-large-files
         args: ["--maxkb=2000"]
@@ -13,10 +13,10 @@ repos:
     rev: 23.11.0
     hooks:
     -   id: black
-  - repo: https://github.com/srstevenson/nb-clean
+-   repo: https://github.com/srstevenson/nb-clean
     rev: 4.0.1
     hooks:
-      - id: nb-clean
-            args:
-        - --preserve-cell-outputs
-        - --remove-all-notebook-metadata # only preserve top level metadata
+    -   id: nb-clean
+        args:
+        -   --preserve-cell-outputs
+        -   --remove-all-notebook-metadata # only preserve top level metadata
