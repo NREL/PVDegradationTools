@@ -89,8 +89,8 @@ jobs:
 
       - name: Set batch notebooks
         run: |
-          # Convert the ALL_NOTEBOOKS env var into an array
-          readarray -t ALL_NOTEBOOK_ARRAY < <(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$')
+          # Convert the ALL_NOTEBOOKS env var into an array, handling quoted strings properly
+          readarray -t ALL_NOTEBOOK_ARRAY < <(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$' | sed 's/^"\(.*\)"$/\1/')
 
           # Calculate batch size (5 notebooks per batch)
           BATCH_SIZE=5
@@ -106,21 +106,23 @@ jobs:
             fi
           done
 
-          # Convert array to string format for environment variable
-          printf -v NOTEBOOKS_STRING '"%s" ' "${BATCH_NOTEBOOKS[@]}"
-          echo "NOTEBOOKS=($NOTEBOOKS_STRING)" >> $GITHUB_ENV
+          # Convert array to newline-separated format for environment variable
+          printf '%s\n' "${BATCH_NOTEBOOKS[@]}" > /tmp/batch_notebooks.txt
+          echo "BATCH_NOTEBOOKS_FILE=/tmp/batch_notebooks.txt" >> $GITHUB_ENV
 
           echo "Batch $BATCH_NUM will process notebooks: ${BATCH_NOTEBOOKS[*]}"
 
       - name: Run batch notebooks with nbval
         run: |
-          # Parse the NOTEBOOKS environment variable into an array
-          eval "NOTEBOOK_ARRAY=$NOTEBOOKS"
+          # Read notebooks from file to handle spaces properly
+          readarray -t NOTEBOOK_ARRAY < "$BATCH_NOTEBOOKS_FILE"
 
           # Prepend the NOTEBOOK_DIR path to each notebook name
           FULL_PATHS=()
           for notebook in "${NOTEBOOK_ARRAY[@]}"; do
-            FULL_PATHS+=("$NOTEBOOK_DIR/$notebook")
+            if [ -n "$notebook" ]; then  # Skip empty lines
+              FULL_PATHS+=("$NOTEBOOK_DIR/$notebook")
+            fi
           done
 
           # Execute pytest with the batch of notebooks
