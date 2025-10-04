@@ -176,9 +176,16 @@ jobs:
 
       - name: Set batch notebooks
         run: |
+          # Debug: Show what we received
+          echo "Debug: BATCH_ASSIGNMENTS content:"
+          echo "$BATCH_ASSIGNMENTS"
+          echo "Debug: Looking for BATCH_${{ matrix.batch }}"
+
           # Extract notebook assignment for this specific batch
           BATCH_NUM=${{ matrix.batch }}
-          BATCH_LINE=$(echo "$BATCH_ASSIGNMENTS" | grep "BATCH_${BATCH_NUM}:")
+          BATCH_LINE=$(echo "$BATCH_ASSIGNMENTS" | grep "BATCH_${BATCH_NUM}:" || echo "")
+
+          echo "Debug: Found batch line: '$BATCH_LINE'"
 
           if [ -z "$BATCH_LINE" ]; then
             echo "No notebooks assigned to batch $BATCH_NUM"
@@ -189,6 +196,14 @@ jobs:
 
           # Extract notebooks from the assignment (format: BATCH_X:notebook1|notebook2|notebook3)
           NOTEBOOK_STRING=$(echo "$BATCH_LINE" | cut -d':' -f2-)
+          echo "Debug: Extracted notebook string: '$NOTEBOOK_STRING'"
+
+          if [ -z "$NOTEBOOK_STRING" ]; then
+            echo "Empty notebook string for batch $BATCH_NUM"
+            echo "BATCH_NOTEBOOKS_FILE=/tmp/empty_batch.txt" >> $GITHUB_ENV
+            touch /tmp/empty_batch.txt
+            exit 0
+          fi
 
           # Convert pipe-separated list to array
           IFS='|' read -ra BATCH_NOTEBOOKS <<< "$NOTEBOOK_STRING"
