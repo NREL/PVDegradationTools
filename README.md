@@ -1,4 +1,5 @@
-<img src="docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg" width="600">  
+<img src="https://raw.githubusercontent.com/NREL/PVDegradationTools/refs/heads/main/docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg" width="600">
+
 
 <table>
 <tr>
@@ -108,6 +109,23 @@ Install with:
 For developer installation, clone the repository, navigate to the folder location and install as:
 
     pip install -e .[all]
+
+Running jupyter notebooks using anaconda prompt
+===============================================
+
+Note that in order to run notebooks cleanly and validate outputs, use the following
+commands to run either one notebook:
+
+    jupyter nbconvert --to notebook --execute --inplace "tutorials_and_tools/
+    tutorials_and_tools/Monte Carlo - Arrhenius.ipynb"
+
+or all notebooks inside the tutorials and tools folder:
+
+   jupyter nbconvert --to notebook --execute --inplace "tutorials_and_tools/
+   tutorials_and_tools/*.ipynb"
+
+This avoids formatting issues that may arise depending on your own local environment
+or IDE.
 
 
 License

@@ -1,19 +1,19 @@
 {
     "W000": {
-	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm^2/s]. So is in [g/cm^3/atm]. Po is in[g*mm/m^2/day/atm]."
-    },	
+	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm²/s]. So is in [g/cm³]. Po is in[g·mm/m²/day]. t is in [mm]."
+    },
     "W001": {
 		"name": "Ethylene Vinyl Acetate",
 		"alias": "EVA",
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 38.139966396438,
-		"Do": 2.31097881676966,
-		"Eas": 16.7286220351073,
-		"So": 1.81390701967487,
-		"Eap": 55.1578532714609,
-		"Po": 40728267519.3687
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 38.139966396438 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 2.31097881676966 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 16.7286220351073 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.81390701967487 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 55.1578532714609 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 40728267519.3687 }
     },
     "W002": {
 		"name": "AAA polyamide",
@@ -21,12 +21,13 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 61.4781422330562,
-		"Do": 25790.6020262449,
-		"Eas": 5.88752263485353,
-		"So": 0.00982242435416737,
-		"Eap": 67.3656648679097,
-		"Po": 5559396276.60964
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 61.4781422330562 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 257.906020262449 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5.88752263485353 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0982242435416737 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 66.9611315410624 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 189338932521.637 },
+		"t": { "name": "Thickness", "units": "mm", "value": 0.32 }
     },
     "W003": {
 		"name": "Coveme",
@@ -34,12 +35,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 47.5191721120378,
-		"Do": 1.31884541208636,
-		"Eas": 11.3377908247284,
-		"So": 0.53540550732342,
-		"Eap": 58.8569629367662,
-		"Po": 6100851717.55522
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.5191721120378 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 1.31884541208636 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.3377908247284 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.53540550732342 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 58.8569629367662 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 6100851717.55522 }
     },
     "W004": {
 		"name": "VHB 5952",
@@ -47,12 +48,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 40.475393230961,
-		"Do": 5.15098921079005,
-		"Eas": 24.0739064517654,
-		"So": 53.2748284093228,
-		"Eap": 60.901412990104,
-		"Po": 568214581700.165
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 40.475393230961 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 5.15098921079005 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 24.0739064517654 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 53.2748284093228 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 60.901412990104 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 568214581700.165 }
     },
     "W005": {
 		"name": "polyethylene-co-propylene-co-dienemonomer, BRP-C",
@@ -60,8 +61,8 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": false,
-		"Eap": 70.2425215496216,
-		"Po": 1172612706438.09
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 70.2425215496216 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1172612706438.09 }
     },
     "W006": {
 		"name": "Surlyn Jura Sol",
@@ -69,12 +70,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 75.4121720881285,
-		"Do": 154974.658649818,
-		"Eas": 9.99311553453843,
-		"So": 0.0977288489337781,
-		"Eap": 85.4052876226669,
-		"Po": 130857076832418
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 75.4121720881285 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 154974.658649818 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 9.99311553453843 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0977288489337781 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 85.4052876226669 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 130857076832418 }
     },
     "W007": {
 		"name": "Etimex Aliphatic Thermoplastic Polyurethane",
@@ -82,12 +83,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 46.6619594980869,
-		"Do": 40.519181381529,
-		"Eas": 15.5365130880537,
-		"So": 7.32769870722261,
-		"Eap": 62.1984725861406,
-		"Po": 2565322730154.57
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 46.6619594980869 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 40.519181381529 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 15.5365130880537 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 7.32769870722261 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 62.1984725861406 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 2565322730154.57 }
     },
     "W008": {
 		"name": "DC8130",
@@ -95,12 +96,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 28.1623441487961,
-		"Do": 0.227897610675968,
-		"Eas": 33.1670750044397,
-		"So": 35.4782891686019,
-		"Eap": 61.3294191532358,
-		"Po": 69858005751.8966
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 28.1623441487961 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.227897610675968 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 33.1670750044397 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 35.4782891686019 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 61.3294191532358 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 69858005751.8966 }
     },
     "W009": {
 		"name": "DC8100",
@@ -108,12 +109,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 28.1852705713259,
-		"Do": 0.257519752522143,
-		"Eas": 39.4868955730458,
-		"So": 384.109387459489,
-		"Eap": 67.6721661443716,
-		"Po": 854632118015.993
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 28.1852705713259 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.257519752522143 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 39.4868955730458 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 384.109387459489 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 67.6721661443716 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 854632118015.993 }
     },
     "W010": {
 		"name": "Kapton, poly-oxydiphenylene-pyromellitimide",
@@ -121,12 +122,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 42.1628275544937,
-		"Do": 0.072278801585473,
-		"Eas": 0.0557102138739842,
-		"So": 0.0477773591873675,
-		"Eap": 42.2185377683678,
-		"Po": 29836427.8894415
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 42.1628275544937 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.072278801585473 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 0.0557102138739842 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0477773591873675 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 42.2185377683678 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 29836427.8894415 }
     },
     "W011": {
 		"name": "Black PVC",
@@ -134,12 +135,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 47.7114059610274,
-		"Do": 23.2489268221605,
-		"Eas": 28.487677226357,
-		"So": 140.417948734924,
-		"Eap": 76.1990831873844,
-		"Po": 28205855550629.2
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.7114059610274 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 23.2489268221605 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 28.487677226357 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 140.417948734924 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 76.1990831873844 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 28205855550629.2 }
     },
     "W012": {
 		"name": "Clear PVC",
@@ -147,12 +148,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 33.0286897557188,
-		"Do": 0.11657610009133,
-		"Eas": 32.9939505587882,
-		"So": 938.977273863745,
-		"Eap": 66.022640314507,
-		"Po": 945754346834.7
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 33.0286897557188 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.11657610009133 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 32.9939505587882 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 938.977273863745 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 66.022640314507 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 945754346834.7 }
     },
     "W013": {
 		"name": "Korad",
@@ -160,12 +161,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 42.4224039909835,
-		"Do": 0.956288845632073,
-		"Eas": 10.6522537288649,
-		"So": 1.11499446980146,
-		"Eap": 105.22742596998,
-		"Po": 3221320046147540000
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 42.4224039909835 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.956288845632073 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 10.6522537288649 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.11499446980146 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 105.22742596998 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 3221320046147540000 }
     },
     "W014": {
 		"name": "Tefzel, poly ethylene-co-tetrafluoroethylene",
@@ -173,12 +174,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 33.7546691720749,
-		"Do": 0.0575761569695952,
-		"Eas": 25.938348818962,
-		"So": 7.27712808189267,
-		"Eap": 59.693017991037,
-		"Po": 3620065553.835
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 33.7546691720749 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0575761569695952 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 25.938348818962 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 7.27712808189267 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 59.693017991037 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 3620065553.835 }
     },
     "W015": {
 		"name": "Poly Ethylene Napthlate",
@@ -186,12 +187,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 51.5636742115708,
-		"Do": 0.995529692337746,
-		"Eas": 5.6178949378191,
-		"So": 0.0812436914344898,
-		"Eap": 57.1815691493899,
-		"Po": 698807581.673712
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 51.5636742115708 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.995529692337746 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5.6178949378191 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0812436914344898 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 57.1815691493899 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 698807581.673712 }
     },
     "W016": {
 		"name": "Polyethylene Terepthalate, Mylar-D",
@@ -199,12 +200,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 47.3213251145397,
-		"Do": 0.789003134561549,
-		"Eas": 7.32378069811026,
-		"So": 0.157203671680748,
-		"Eap": 54.64510581265,
-		"Po": 1071655399.18682
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.3213251145397 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.789003134561549 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.32378069811026 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.157203671680748 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 54.64510581265 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1071655399.18682 }
     },
     "W017": {
 		"name": "Polyethylene Terepthalate, ST504",
@@ -212,12 +213,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 49.1988088587438,
-		"Do": 1.43136116146877,
-		"Eas": 6.20764844309352,
-		"So": 0.106698381856152,
-		"Eap": 55.4064573018373,
-		"Po": 1319534666.90318
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 49.1988088587438 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 1.43136116146877 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 6.20764844309352 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.106698381856152 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 55.4064573018373 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1319534666.90318 }
     },
     "W018": {
 		"name": " Bisphenol-A-polycarbonate, Lexan",
@@ -225,12 +226,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 31.7570673066821,
-		"Do": 0.0177602090081197,
-		"Eas": 13.4503885886312,
-		"So": 1.21057375762911,
-		"Eap": 45.2074558953133,
-		"Po": 185760371.133255
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 31.7570673066821 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0177602090081197 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 13.4503885886312 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.21057375762911 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 45.2074558953133 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 185760371.133255 }
     },
     "W019": {
 		"name": "Poly Vinyl Butral, S-LEC Sekisui, and Saflex Solutia",
@@ -238,12 +239,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 46.4649618478522,
-		"Do": 11.348179731181,
-		"Eas": 11.0777370890654,
-		"So": 2.49156416313226,
-		"Eap": 57.5426989369177,
-		"Po": 244293562958.356
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 46.4649618478522 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 11.348179731181 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.0777370890654 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 2.49156416313226 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 57.5426989369177 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 244293562958.356 }
     },
     "W020": {
 		"name": "Old DNP",
@@ -251,8 +252,8 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": false,
-		"Eap": 76.289572026034,
-		"Po": 6823263083472.16
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 76.289572026034 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 6823263083472.16 }
     },
     "W021": {
 		"name": "Vectran",
@@ -260,12 +261,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 50.403918892528,
-		"Do": 0.245942251282737,
-		"Eas": 5.45301564748205,
-		"So": 0.0110622546832953,
-		"Eap": 55.8569345400101,
-		"Po": 23506639.0940679
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 50.403918892528 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.245942251282737 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5.45301564748205 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0110622546832953 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 55.8569345400101 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 23506639.0940679 }
     },
     "W022": {
 		"name": "Tedlar",
@@ -273,12 +274,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 58.71570389177,
-		"Do": 113.525567785916,
-		"Eas": 11.7711932387872,
-		"So": 0.983373347442546,
-		"Eap": 70.4868971305571,
-		"Po": 964552472184.541
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 58.71570389177 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 113.525567785916 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.7711932387872 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.983373347442546 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 70.4868971305571 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 964552472184.541 }
     },
     "W023": {
 		"name": "White Aclar",
@@ -286,12 +287,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 79.5113791145642,
-		"Do": 10210.1659418952,
-		"Eas": 7.86738905205556,
-		"So": 0.0439563961280766,
-		"Eap": 84.5436362084746,
-		"Po": 1492039875944.98
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 79.5113791145642 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 10210.1659418952 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.86738905205556 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0439563961280766 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 84.5436362084746 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1492039875944.98 }
     },
     "W024": {
 		"name": "Clear Aclar",
@@ -299,12 +300,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 96.5385865449266,
-		"Do": 4172967.14420414,
-		"Eas": -12.3825598156611,
-		"So": 0.000027596664527881,
-		"Eap": 84.1560267292654,
-		"Po": 994982178508.989
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 96.5385865449266 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 4172967.14420414 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -12.3825598156611 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.000027596664527881 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 84.1560267292654 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 994982178508.989 }
     },
     "W025": {
 		"name": "VHB 5047",
@@ -312,12 +313,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 45.4752522219199,
-		"Do": 9.43827604933472,
-		"Eas": 9.11207059308869,
-		"So": 0.250698026382274,
-		"Eap": 54.5873228150086,
-		"Po": 20443598018.0867
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 45.4752522219199 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 9.43827604933472 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 9.11207059308869 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.250698026382274 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 54.5873228150086 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 20443598018.0867 }
     },
     "W026": {
 		"name": "DC184",
@@ -325,12 +326,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 26.8491404589422,
-		"Do": 0.343040484423659,
-		"Eas": 11.1779225188289,
-		"So": 0.0804559994699917,
-		"Eap": 38.0270629777712,
-		"Po": 238461105.884911
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 26.8491404589422 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.343040484423659 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.1779225188289 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0804559994699917 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 38.0270629777712 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 238461105.884911 }
     },
     "W027": {
 		"name": "RTV615",
@@ -338,12 +339,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael Kempe, Modeling of rates of moisture ingress into photovoltaic modules, Solar Energy Materials & Solar Cells 90 (2006) 2720-2738, https://doi.org/10.1016/j.solmat.2006.04.002, and Michael Kempe, Control of Moisture Ingress into Photovoltaic Modules, 31st IEEE PVSC (2005)",
 		"Fickian": true,
-		"Ead": 20.9155783983994,
-		"Do": 0.0690375841285242,
-		"Eas": 21.0756724360529,
-		"So": 1.76185388295796,
-		"Eap": 41.7698885456015,
-		"Po": 960496070.761543
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 20.9155783983994 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0690375841285242 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 21.0756724360529 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.76185388295796 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 41.7698885456015 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 960496070.761543 }
     },
     "W028": {
 		"name": "Viton Matte",
@@ -352,12 +353,12 @@
 		"source": "unpublished measurements",
 		"comment": "This material is not Fickian. The values here are only approximate",
 		"Fickian": false,
-		"Ead": 71.7616886120477,
-		"Do": 45455.3486405086,
-		"Eas": 1.48200499250495,
-		"So": 0.0209145982407652,
-		"Eap": 73.2436936045527,
-		"Po": 8213878264695.76
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 71.7616886120477 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 45455.3486405086 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 1.48200499250495 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0209145982407652 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 73.2436936045527 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 8213878264695.76 }
     },
     "W029": {
 		"name": "Viton Gloss",
@@ -366,12 +367,12 @@
 		"source": "unpublished measurements",
 		"comment": "This material is not Fickian. The values here are only approximate",
 		"Fickian": false,
-		"Ead": 56.2460834706032,
-		"Do": 159.982701698288,
-		"Eas": 20.8063496388738,
-		"So": 26.9834933677011,
-		"Eap": 77.052433109477,
-		"Po": 37297948350723.4
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 56.2460834706032 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 159.982701698288 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 20.8063496388738 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 26.9834933677011 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 77.052433109477 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 37297948350723.4 }
     },
     "W030": {
 		"name": "DNP 2777",
@@ -380,12 +381,12 @@
 		"source": "unpublished measurements",
 		"comment": "This material is only Fickian below 60°C.",
 		"Fickian": true,
-		"Ead": 52.9307054899144,
-		"Do": 522.890286460457,
-		"Eas": 24.5569461831493,
-		"So": 1.55969827001173,
-		"Eap": 79.8681296790924,
-		"Po": 15797483966534.5
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 52.9307054899144 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 522.890286460457 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 24.5569461831493 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.55969827001173 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 79.8681296790924 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 15797483966534.5 }
     },
     "W031": {
 		"name": "Stevens PV251 Aliphatic TPU",
@@ -393,12 +394,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 50.7463326496412,
-		"Do": 74.7749648984175,
-		"Eas": 6.43899102763906,
-		"So": 0.249811154526706,
-		"Eap": 57.1853236772803,
-		"Po": 161391919486.761
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 50.7463326496412 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 74.7749648984175 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 6.43899102763906 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.249811154526706 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 57.1853236772803 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 161391919486.761 }
     },
     "W032": {
 		"name": "Dupont PV5300 Ionomer",
@@ -407,12 +408,12 @@
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"comment": "This material is only Fickian below 60°C.",
 		"Fickian": true,
-		"Ead": 55.6235810319235,
-		"Do": 15.3609038875224,
-		"Eas": 19.5076706534681,
-		"So": 17.7889361215936,
-		"Eap": 75.1312516853916,
-		"Po": 2360915752536.64
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 55.6235810319235 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 15.3609038875224 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 19.5076706534681 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 17.7889361215936 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 75.1312516853916 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 2360915752536.64 }
     },
     "W033": {
 		"name": "Dupont PV5200 Polyvinylbutral",
@@ -420,12 +421,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Arrelaine A. Dameron, and Matthew O. Reese, Evaluation of moisture ingress from the perimeter of photovoltiac modules, Progress in Photovoltaics: Research and Applications (2013), https://doi.org/10.1002/pip.2374",
 		"Fickian": true,
-		"Ead": 51.8830902457148,
-		"Do": 84.5134211271644,
-		"Eas": 7.95997669491685,
-		"So": 0.520484700621351,
-		"Eap": 59.8430669406317,
-		"Po": 380055824874.932
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 51.8830902457148 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 84.5134211271644 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.95997669491685 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.520484700621351 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 59.8430669406317 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 380055824874.932 }
     },
     "W034": {
 		"name": "Steven PV301",
@@ -433,12 +434,12 @@
 		"contributor": "Michael Kempe",
 		"source": "unpublished measurements",
 		"Fickian": true,
-		"Ead": 44.2414356094982,
-		"Do": 4.32928261563764,
-		"Eas": 9.90384118622532,
-		"So": 0.931312935440451,
-		"Eap": 54.1452767957236,
-		"Po": 34835762025.6838
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 44.2414356094982 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 4.32928261563764 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 9.90384118622532 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.931312935440451 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 54.1452767957236 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 34835762025.6838 }
     },
     "W035": {
 		"name": "DNP PV-FS CVF2B, below 40°C",
@@ -447,12 +448,12 @@
 		"source": "unpublished measurements",
 		"comment": "This material has a different temperature dependence above and below 40°C. This dataset is for temperatures below 40°C.",
 		"Fickian": true,
-		"Ead": 47.0710454631315,
-		"Do": 141.699562362163,
-		"Eas": 32.9594855649241,
-		"So": 28.2464642413457,
-		"Eap": 80.0307511425333,
-		"Po": 34584496473583.9
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 47.0710454631315 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 141.699562362163 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 32.9594855649241 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 28.2464642413457 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 80.0307511425333 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 34584496473583.9 }
     },
     "W036": {
 		"name": "DNP PV-FS CVF2B, above 40°C",
@@ -461,12 +462,12 @@
 		"source": "unpublished measurements",
 		"comment": "This material has a different temperature dependence above and below 40°C. This dataset is for temperatures above 40°C.",
 		"Fickian": true,
-		"Ead": 31.0493901943036,
-		"Do": 0.387375018071262,
-		"Eas": 37.154683534443,
-		"So": 133.267171135261,
-		"Eap": 68.2040737287465,
-		"Po": 446034581223.792
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 31.0493901943036 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.387375018071262 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 37.154683534443 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 133.267171135261 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 68.2040737287465 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 446034581223.792 }
     },
     "W037": {
 		"name": "PIB Lee Yang Wilusz",
@@ -474,7 +475,7 @@
 		"contributor": "Michael Kempe",
 		"source": "B. L. Lee, T. W. Yang, and E. Wilusz, Moisture Effects on Isobutylene-Isoprene Copolymer-Based Composite Barrier. I: Moisture Diffusion and Detection, POLYMER ENGINEERING AND SCIENCE, MID-MAY 1996, Vol. 36, NO. 9",
 		"Fickian": true,
-		"Ead": 66.7749676968273
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 66.7749676968273 }
     },
     "W038": {
 		"name": "PIB Helioseal matrix only",
@@ -482,12 +483,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Dhananjay Panchagade, Matthew O. Reese, and Arrelaine A. Dameron, Modeling moisture ingress through polyisobutylene-based edge-seals,Progress in Photovoltaics: Research and Applications (2014), https://doi.org/10.1002/pip.2465",
 		"Fickian": true,
-		"Ead": 54.8,
-		"Do": 4.39,
-		"Eas": 5,
-		"So": 0.0321759557733088,
-		"Eap": 59.8,
-		"Po": 1220421132.09929
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 54.8 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 4.39 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0321759557733088 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 59.8 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1220421132.09929 }
     },
     "W039": {
 		"name": "PIB Quanex LPO-3 ",
@@ -495,12 +496,12 @@
 		"contributor": "Michael Kempe",
 		"source": "Michael D. Kempe, Dylan L. Nobles, Lori Postak, and Jose Alonzo Calderon, Moisture ingress prediction in polyisobutylene-based edge seal with molecular sieve desiccant,Progress in Photovoltaics: Research and Applications (2014), https://doi.org/10.1002/pip.2947",
 		"Fickian": true,
-		"Ead": 55,
-		"Do": 50,
-		"Eas": 7.5,
-		"So": 0.052,
-		"Eap": 62.5,
-		"Po": 22464000000
+		"Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 55 },
+		"Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 50 },
+		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.5 },
+		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.052 },
+		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 62.5 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 22464000000 }
     },
     "W040": {
 		"name": "EVA",
@@ -508,7 +509,7 @@
 		"contributor": "Michael Kempe",
 		"source": "Urban Weber, Ralf Eiden, Christine Strubel, Thorsten Soegding, Markus Heiss, Peter Zachmann, Kurt Nattermann, Harry Engelmann, Annelene Dethlefsen, Norbert Lenck, Acetic Acid Production, Migration and Corrosion Effects in Ethylene-Vinyl-Acetate-(EVA-)Based PV Modules, 27th European Photovoltaic Solar Energy Conference and Exhibition.",
 		"comment": "Extracted from Figure 10 of Weber et al. The activation energy does not exactly match that in the published work (22.7 kJ/mol). I did this because I wanted to include the prefactor.",
-        "Ead": 28.0325960835163,
-        "Do": 0.0347563378698928
+        "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 28.0325960835163 },
+        "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0347563378698928 }
     }
 }

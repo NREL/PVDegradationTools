@@ -1,0 +1,243 @@
+name: nbval
+
+on: [pull_request]
+
+env:
+  BATCH_SIZE: 4
+
+jobs:
+  calculate-batches:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      notebooks: ${{ steps.set-matrix.outputs.notebooks }}
+      batch_assignments: ${{ steps.set-matrix.outputs.batch_assignments }}
+    env:
+      # Notebooks with estimated runtime in seconds (format: "notebook:runtime")
+      ALL_NOTEBOOKS: |
+        "1 - Basics, Humidity, Design.ipynb:10"
+        "2 - Degradation.ipynb:5"
+        "3 - Spectral Degradation.ipynb:5"
+        "4 - Weather Database Access.ipynb:15"
+        "ASTM Live Demo.ipynb:10"
+        "B-O LID - Accelerated Test.ipynb:10"
+        "Custom-Functions-Nopython.ipynb:30"
+        "LETID - Accelerated Test.ipynb:120"
+        "LETID - Outdoor LETID.ipynb:30"
+        "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb:45"
+        "LETID - Passivated Wafer.ipynb:80"
+        "Monte Carlo - Arrhenius.ipynb:180"
+        "Monte Carlo - Standoff.ipynb:30"
+        "Pysam - Single Location.ipynb:25"
+        "Tools - Edge Seal Oxygen Ingress.ipynb:15"
+        "Van't Hoff Degradation Model.ipynb:5"
+        "Geospatial - Local Scenario.ipynb:1"
+    steps:
+      - name: Calculate batch matrix
+        id: set-matrix
+        run: |
+          # Parse notebooks with runtimes and create balanced batches
+          readarray -t NOTEBOOK_ENTRIES < <(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$' | sed 's/^"\(.*\)"$/\1/')
+
+          # Calculate total runtime and target runtime per batch
+          TOTAL_RUNTIME=0
+          declare -a NOTEBOOKS=()
+          declare -a RUNTIMES=()
+
+          for entry in "${NOTEBOOK_ENTRIES[@]}"; do
+            notebook=$(echo "$entry" | cut -d':' -f1)
+            runtime=$(echo "$entry" | cut -d':' -f2)
+            NOTEBOOKS+=("$notebook")
+            RUNTIMES+=("$runtime")
+            TOTAL_RUNTIME=$((TOTAL_RUNTIME + runtime))
+          done
+
+          NOTEBOOK_COUNT=${#NOTEBOOKS[@]}
+          BATCH_COUNT=$(( (NOTEBOOK_COUNT + BATCH_SIZE - 1) / BATCH_SIZE ))
+          TARGET_RUNTIME=$((TOTAL_RUNTIME / BATCH_COUNT))
+
+          echo "Total notebooks: $NOTEBOOK_COUNT, Total runtime: ${TOTAL_RUNTIME}sec ($(($TOTAL_RUNTIME/60))min)"
+          echo "Target runtime per batch: ${TARGET_RUNTIME}sec ($(($TARGET_RUNTIME/60))min) across $BATCH_COUNT batches"
+
+          # Create batches using greedy load balancing algorithm
+          declare -a BATCH_RUNTIMES=()
+          declare -a BATCH_ASSIGNMENTS=()
+
+          # Initialize batch runtimes and assignments
+          for (( i = 0; i < BATCH_COUNT; i++ )); do
+            BATCH_RUNTIMES[$i]=0
+            BATCH_ASSIGNMENTS[$i]=""
+          done
+
+          # Create notebook-runtime pairs and sort by runtime (descending)
+          declare -a SORTED_INDICES=()
+          for (( i = 0; i < NOTEBOOK_COUNT; i++ )); do
+            SORTED_INDICES[$i]=$i
+          done
+
+          # Simple bubble sort by runtime (descending)
+          for (( i = 0; i < NOTEBOOK_COUNT - 1; i++ )); do
+            for (( j = 0; j < NOTEBOOK_COUNT - i - 1; j++ )); do
+              if [ ${RUNTIMES[${SORTED_INDICES[$j]}]} -lt ${RUNTIMES[${SORTED_INDICES[$((j+1))]}]} ]; then
+                # Swap indices
+                temp=${SORTED_INDICES[$j]}
+                SORTED_INDICES[$j]=${SORTED_INDICES[$((j+1))]}
+                SORTED_INDICES[$((j+1))]=$temp
+              fi
+            done
+          done
+
+          # Assign notebooks to batches using greedy algorithm (assign to least loaded batch)
+          for idx in "${SORTED_INDICES[@]}"; do
+            # Find batch with minimum runtime
+            min_batch=0
+            min_runtime=${BATCH_RUNTIMES[0]}
+            for (( b = 1; b < BATCH_COUNT; b++ )); do
+              if [ ${BATCH_RUNTIMES[$b]} -lt $min_runtime ]; then
+                min_runtime=${BATCH_RUNTIMES[$b]}
+                min_batch=$b
+              fi
+            done
+
+            # Assign notebook to the least loaded batch
+            if [ -n "${BATCH_ASSIGNMENTS[$min_batch]}" ]; then
+              BATCH_ASSIGNMENTS[$min_batch]="${BATCH_ASSIGNMENTS[$min_batch]}|${NOTEBOOKS[$idx]}"
+            else
+              BATCH_ASSIGNMENTS[$min_batch]="${NOTEBOOKS[$idx]}"
+            fi
+            BATCH_RUNTIMES[$min_batch]=$((${BATCH_RUNTIMES[$min_batch]} + ${RUNTIMES[$idx]}))
+          done
+
+          # Output batch assignments and pass notebooks via output
+          echo "Batch assignments:"
+          for (( b = 0; b < BATCH_COUNT; b++ )); do
+            echo "Batch $((b+1)): ${BATCH_RUNTIMES[$b]}sec ($((${BATCH_RUNTIMES[$b]}/60))min) - ${BATCH_ASSIGNMENTS[$b]//|/, }"
+          done
+
+          # Generate matrix and pass batch assignments as output
+          BATCHES="["
+          for i in $(seq 1 $BATCH_COUNT); do
+            if [ $i -gt 1 ]; then
+              BATCHES="$BATCHES,"
+            fi
+            BATCHES="$BATCHES$i"
+          done
+          BATCHES="$BATCHES]"
+
+          echo "matrix={\"batch\":$BATCHES}" >> $GITHUB_OUTPUT
+          echo "notebooks<<EOF" >> $GITHUB_OUTPUT
+          echo "$ALL_NOTEBOOKS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Pass batch assignments for use in notebook-check job (base64 encoded to avoid multiline issues)
+          BATCH_ASSIGNMENTS_STRING=""
+          for (( b = 0; b < BATCH_COUNT; b++ )); do
+            if [ $b -gt 0 ]; then
+              BATCH_ASSIGNMENTS_STRING="${BATCH_ASSIGNMENTS_STRING};"
+            fi
+            BATCH_ASSIGNMENTS_STRING="${BATCH_ASSIGNMENTS_STRING}BATCH$((b+1)):${BATCH_ASSIGNMENTS[$b]}"
+          done
+
+          # Encode the assignments string in base64 to safely pass through GitHub Actions
+          ENCODED_ASSIGNMENTS=$(echo "$BATCH_ASSIGNMENTS_STRING" | base64 -w 0)
+          echo "batch_assignments=$ENCODED_ASSIGNMENTS" >> $GITHUB_OUTPUT
+
+          echo "Will create $BATCH_COUNT balanced batches for $NOTEBOOK_COUNT notebooks"
+
+  notebook-check:
+    needs: calculate-batches
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.calculate-batches.outputs.matrix) }}
+    env:
+      NOTEBOOK_DIR: "tutorials_and_tools/tutorials_and_tools"
+      SANITIZE_CFG: "nbval_sanitization_rules.cfg"
+      ALL_NOTEBOOKS: ${{ needs.calculate-batches.outputs.notebooks }}
+      BATCH_ASSIGNMENTS: ${{ needs.calculate-batches.outputs.batch_assignments }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('tutorials_and_tools/requirements.txt', 'pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install notebook environment
+        run: |
+          python -m pip install --upgrade pip wheel
+          pip install --timeout=300 -r tutorials_and_tools/requirements.txt
+          pip install --timeout=300 -e .[test]
+          pip install nbval global_land_mask dotenv imageio nrel-pysam
+          pip install nbconvert[webpdf]
+
+      - name: Set batch notebooks
+        run: |
+          # Decode batch assignments from base64
+          DECODED_ASSIGNMENTS=$(echo "$BATCH_ASSIGNMENTS" | base64 -d)
+
+          # Debug: Show what we received
+          echo "Debug: BATCH_ASSIGNMENTS (encoded): $BATCH_ASSIGNMENTS"
+          echo "Debug: BATCH_ASSIGNMENTS (decoded): $DECODED_ASSIGNMENTS"
+          echo "Debug: Looking for batch ${{ matrix.batch }}"
+
+          # Extract notebook assignment for this specific batch
+          BATCH_NUM=${{ matrix.batch }}
+          BATCH_LINE=$(echo "$DECODED_ASSIGNMENTS" | tr ';' '\n' | grep "BATCH${BATCH_NUM}:" || echo "")
+
+          echo "Debug: Found batch line: '$BATCH_LINE'"
+
+          if [ -z "$BATCH_LINE" ]; then
+            echo "No notebooks assigned to batch $BATCH_NUM"
+            echo "BATCH_NOTEBOOKS_FILE=/tmp/empty_batch.txt" >> $GITHUB_ENV
+            touch /tmp/empty_batch.txt
+            exit 0
+          fi
+
+          # Extract notebooks from the assignment (format: BATCHX:notebook1|notebook2|notebook3)
+          NOTEBOOK_STRING=$(echo "$BATCH_LINE" | cut -d':' -f2-)
+          echo "Debug: Extracted notebook string: '$NOTEBOOK_STRING'"
+
+          if [ -z "$NOTEBOOK_STRING" ]; then
+            echo "Empty notebook string for batch $BATCH_NUM"
+            echo "BATCH_NOTEBOOKS_FILE=/tmp/empty_batch.txt" >> $GITHUB_ENV
+            touch /tmp/empty_batch.txt
+            exit 0
+          fi
+
+          # Convert pipe-separated list to array
+          IFS='|' read -ra BATCH_NOTEBOOKS <<< "$NOTEBOOK_STRING"
+
+          # Write notebooks to file for next step
+          printf '%s\n' "${BATCH_NOTEBOOKS[@]}" > /tmp/batch_notebooks.txt
+          echo "BATCH_NOTEBOOKS_FILE=/tmp/batch_notebooks.txt" >> $GITHUB_ENV
+
+          echo "Batch $BATCH_NUM will process ${#BATCH_NOTEBOOKS[@]} notebooks: ${BATCH_NOTEBOOKS[*]}"
+
+      - name: Run batch notebooks with nbval
+        run: |
+          # Read notebooks from file to handle spaces properly
+          readarray -t NOTEBOOK_ARRAY < "$BATCH_NOTEBOOKS_FILE"
+
+          # Prepend the NOTEBOOK_DIR path to each notebook name
+          FULL_PATHS=()
+          for notebook in "${NOTEBOOK_ARRAY[@]}"; do
+            if [ -n "$notebook" ]; then  # Skip empty lines
+              FULL_PATHS+=("$NOTEBOOK_DIR/$notebook")
+            fi
+          done
+
+          # Execute pytest with the batch of notebooks
+          echo "Testing batch ${{ matrix.batch }} notebooks: ${FULL_PATHS[*]}"
+          pytest --nbval \
+                 --nbval-sanitize-with "$SANITIZE_CFG" \
+                 "${FULL_PATHS[@]}"

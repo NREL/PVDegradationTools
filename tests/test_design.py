@@ -1,8 +1,7 @@
-"""
-Using pytest to create unit tests for pvdeg
+"""Using pytest to create unit tests for pvdeg.
 
-to run unit tests, run pytest from the command line in the pvdeg directory
-to run coverage tests, run py.test --cov-report term-missing --cov=pvdeg
+to run unit tests, run pytest from the command line in the pvdeg directory to run
+coverage tests, run py.test --cov-report term-missing --cov=pvdeg
 """
 
 import os
@@ -16,8 +15,10 @@ PSM, META = weather.read(PSM_FILE, "psm")
 def test_edge_seal_ingress_rate():
     # test calculation for constant k
 
-    psat, avg_psat = humidity.psat(PSM.get("dew_point"))
-    k = design.edge_seal_ingress_rate(avg_psat=avg_psat)
+    water_saturation_pressure, avg_water_saturation_pressure = (
+        humidity.water_saturation_pressure(PSM.get("dew_point"))
+    )
+    k = design.edge_seal_ingress_rate(avg_water_saturation_pressure)
     assert k == pytest.approx(0.00096, abs=0.000005)
 
 

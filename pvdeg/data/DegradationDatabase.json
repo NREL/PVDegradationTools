@@ -1,210 +1,323 @@
 {
-    "D001": {
-        "DataEntryPerson": "Michael Kempe",
-        "EquationType": "Arrhenius",
-        "Equation": "R_D=R_0*e^(-E_a/(R*T_K ))",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Units: "%/h"        },
-        "E_a": {            Units: "kJ/mol"        },    },
-    "D002": {
-        "DataEntryPerson": "Weston Wall",
-        "SourceTitle": "Error Analyses and Associated Risk for Accelerated Weathering Results/2009 Presentation",
-        "Authors": "Richard M. Fischer, Warren D. Ketola",
-        "Reference": "R. M. Fischer and W. D. Ketola, "Error Analyses and Associated Risk for Accelerated Weathering Results," Third International Service Life Symposium, Sedona, AZ February 2004, 2004.",
-        "KeyWords": "Gloss, color shift, cracking, gloss loss, fluorescence loss, retroreflectance loss, adhesive transfer (clean removal), shrinkage, yellowing",
-        "Material": "Paints and Coatings",
-        "EquationType": "Vant_Hoff_TOW_Schwarzchild",
-        "Equation": "R_D=R_0*G^x (1/(b+m*TOW))(T_f^(T/10) )",
-        "R_D": {},
-        "R_0": {            Units: "%/h"        },
-        "x": {            Value: 0.64,            STDEV: 0.64        },
-        "b": {            Value: 1.07,            STDEV: 0.11        },
-        "m": {            Value: -0.000028,            STDEV: 0.0000488        },
-        "T_f": {            Value: 1.41,            STDEV: 0.23        },    },
-    "D003": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1002/.pip1172",
-        "SourceTitle": "Life Prediction for CIGS Solar Modules",
-        "Authors": "D.J. Coyle, H.A. Blaydes, R.S. Northey, J.E. Pickett, K.R. Nagarkar, R.A. Zhao, and J.O. Gardner",
-        "Reference": "Coyle, D. J., et al. (2011). "Life prediction for CIGS solar modules part 2: degradation kinetics, accelerated testing, and encapsulant effects." Progress in Photovoltaics: Research and Applications.",
-        "KeyWords": "Temperature, humidity, CIGS, Moisture ingress, thin film",
-        "Material": "CIGS",
-        "Degradation": "CIGS_Efficiency, ITO_ECA0",
-        "EquationType": "Arrhenius_BET4",
-        "Equation": "R_D=R_0*e^(-E_a/(R*T_K )) (RH/(1-RH+E))",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Value: 845000000            Units: "%/h"        },
-        "E_a": {            Value: 33.472            Units: "kJ/mol"        },
-        "E": {            Value: 0.04        },    },
-    "D004": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1002/.pip1173",
-        "SourceTitle": "Life Prediction for CIGS Solar Modules",
-        "Authors": "D.J. Coyle, H.A. Blaydes, R.S. Northey, J.E. Pickett, K.R. Nagarkar, R.A. Zhao, and J.O. Gardner",
-        "Reference": "Coyle, D. J., et al. (2011). "Life prediction for CIGS solar modules part 2: degradation kinetics, accelerated testing, and encapsulant effects." Progress in Photovoltaics: Research and Applications.",
-        "KeyWords": "Temperature, humidity, CIGS, Moisture ingress, thin film",
-        "Material": "CIGS",
-        "Degradation": "CIGS_Efficiency, ITO_ECA1",
-        "EquationType": "Arrhenius_BET5",
-        "Equation": "R_D=R_0*e^(-E_a/(R*T_K )) (RH/(1-RH+E))",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Value: 73000000000000            Units: "%/h"        },
-        "E_a": {            Value: 67.3624            Units: "kJ/mol"        },
-        "E": {            Value: 0.04        },    },
-    "D005": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1002/.pip1174",
-        "SourceTitle": "Life Prediction for CIGS Solar Modules",
-        "Authors": "D.J. Coyle, H.A. Blaydes, R.S. Northey, J.E. Pickett, K.R. Nagarkar, R.A. Zhao, and J.O. Gardner",
-        "Reference": "Coyle, D. J., et al. (2011). "Life prediction for CIGS solar modules part 2: degradation kinetics, accelerated testing, and encapsulant effects." Progress in Photovoltaics: Research and Applications.",
-        "KeyWords": "Temperature, humidity, CIGS, Moisture ingress, thin film",
-        "Material": "CIGS",
-        "Degradation": "CIGS_Efficiency, AZO",
-        "EquationType": "Arrhenius_BET6",
-        "Equation": "R_D=R_0*e^(-E_a/(R*T_k )) (RH/(1-RH+E))",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Value: 1.1E+17            Units: "%/h"        },
-        "E_a": {            Value: 78.6592            Units: "kJ/mol"        },
-        "E": {            Value: 0.04        },    },
-    "D006": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1109/PVSC45281.2020.9300357",
-        "SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
-        "Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
-        "Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        "KeyWords": "Humidity, Irradiance,",
-        "Material": "Flexible Frontsheet, Frontsheet Coatings",
-        "Degradation": "UV Cut On",
-        "EquationType": "Arrhenius_RH_Irradiance",
-        "Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Units: "%/h"        },
-        "E_a": {            Value: 35.3,            STDEV: 8.9            Units: "kJ/mol"        },
-        "n": {},
-        "p": {            Value: 0.37,            STDEV: 0.26        },    },
-    "D007": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1109/PVSC45281.2020.9300357",
-        "SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
-        "Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
-        "Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        "KeyWords": "Humidity, Irradiance",
-        "Material": "Flexible Frontsheet, Frontsheet Coatings",
-        "Degradation": "UV Transmittance 310nm-350nm",
-        "EquationType": "Arrhenius_RH_Irradiance",
-        "Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Units: "%/h"        },
-        "E_a": {            Value: 53.2,            STDEV: 16.6            Units: "kJ/mol"        },
-        "n": {},
-        "p": {            Value: 0.45,            STDEV: 0.24        },    },
-    "D008": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1109/PVSC45281.2020.9300357",
-        "SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
-        "Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
-        "Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        "KeyWords": "Humidity, Irradiance",
-        "Material": "Flexible Frontsheet, Frontsheet Coatings",
-        "Degradation": "Yellowness index",
-        "EquationType": "Arrhenius_RH_Irradiance",
-        "Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Units: "%/h"        },
-        "E_a": {            Value: 40.4,            STDEV: 22.5            Units: "kJ/mol"        },
-        "n": {},
-        "p": {            Value: 0.5,            STDEV: 0.25        },    },
-    "D009": {
-        "DataEntryPerson": "Weston Wall",
-        "DOI": "10.1109/PVSC45281.2020.9300357",
-        "SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
-        "Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
-        "Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
-        "KeyWords": "Humidity, Irradiance",
-        "Material": "Flexible Frontsheet, Frontsheet Coatings",
-        "Degradation": "SPQEWT",
-        "EquationType": "Arrhenius_RH_Irradiance",
-        "Equation": "R_D=R_0*RH^n*G_340^P*e^(-E_a/K_(b*T_K ) )",
-        "R_D": {            Units: "%/h"        },
-        "R_0": {            Units: "%/h"        },
-        "E_a": {            Value: 30.7,            STDEV: 23.5            Units: "kJ/mol"        },
-        "n": {},
-        "p": {            Value: 0.53,            STDEV: 0.22        },    },
+    "D001":	{"DataEntryPerson": "Michael Kempe",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"units": "%/h"},
+        	"E_a": {"units": "kJ/mol"}},
+    "D002":	{"DataEntryPerson": "Weston Wall",
+        	"SourceTitle": "Error Analyses and Associated Risk for Accelerated Weathering Results/2009 Presentation",
+        	"Authors": "Richard M. Fischer, Warren D. Ketola",
+        	"Reference": "R. M. Fischer and W. D. Ketola, 'Error Analyses and Associated Risk for Accelerated Weathering Results,' Third International Service Life Symposium, Sedona, AZ February 2004, 2004.",
+        	"KeyWords": "Gloss, color shift, cracking, gloss loss, fluorescence loss, retroreflectance loss, adhesive transfer (clean removal), shrinkage, yellowing",
+        	"Material": "Paints and Coatings",
+        	"EquationType": "Vant_Hoff_TOW_Schwarzchild",
+        	"Equation": "R_D=R_0\\cdot G^P \\left( \\frac{1}{b+m\\cdot TOW} \\right) \\cdot  T_f^{ \\frac{T}{10}}",
+        	"R_D": {},
+        	"R_0": {"units": "%/h"},
+        	"x": {"value": 0.64,
+             	"stdev": 0.20},
+        	"b": {"value": 1.07,
+             	"stdev": 0.11},
+        	"m": {"value": -0.000028,
+             	"stdev": 0.0000488},
+        	"T_f":{"value": 1.41,
+               	"stdev": 0.23}},
+    "D003": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1002/.pip1172",
+        	"SourceTitle": "Life Prediction for CIGS Solar Modules",
+        	"Authors": "D.J. Coyle, H.A. Blaydes, R.S. Northey, J.E. Pickett, K.R. Nagarkar, R.A. Zhao, and J.O. Gardner",
+        	"Reference": "Coyle, D. J., et al. (2011). 'Life prediction for CIGS solar modules part 2: degradation kinetics, accelerated testing, and encapsulant effects.' Progress in Photovoltaics: Research and Applications.",
+        	"KeyWords": "Temperature, humidity, CIGS, Moisture ingress, thin film",
+        	"Material": "CIGS",
+        	"Degradation": "CIGS_Efficiency, ITO_ECA0",
+        	"EquationType": "Arrhenius_BET4",
+        	"Equation": "R_D=R_0\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) } \\cdot \\left( \\frac{RH}{1-RH+E} \\right)",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"value": 845000000,
+            	"units": "%/h"},
+        	"E_a": {"value": 33.472,
+            	"units": "kJ/mol"},
+        	"E": {"value": 0.04}},
+    "D004": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1002/.pip1173",
+        	"SourceTitle": "Life Prediction for CIGS Solar Modules",
+        	"Authors": "D.J. Coyle, H.A. Blaydes, R.S. Northey, J.E. Pickett, K.R. Nagarkar, R.A. Zhao, and J.O. Gardner",
+        	"Reference": "Coyle, D. J., et al. (2011). 'Life prediction for CIGS solar modules part 2: degradation kinetics, accelerated testing, and encapsulant effects.' Progress in Photovoltaics: Research and Applications.",
+        	"KeyWords": "Temperature, humidity, CIGS, Moisture ingress, thin film",
+        	"Material": "CIGS",
+        	"Degradation": "CIGS_Efficiency, ITO_ECA1",
+        	"EquationType": "Arrhenius_BET5",
+        	"Equation": "R_D=R_0\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) } \\cdot \\left( \\frac{RH}{1-RH+E} \\right)",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"value": 73000000000000,
+            	"units": "%/h"},
+        	"E_a": {"value": 67.3624,
+            	"units": "kJ/mol"},
+        	"E": {"value": 0.04}},
+    "D005": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1002/.pip1174",
+        	"SourceTitle": "Life Prediction for CIGS Solar Modules",
+        	"Authors": "D.J. Coyle, H.A. Blaydes, R.S. Northey, J.E. Pickett, K.R. Nagarkar, R.A. Zhao, and J.O. Gardner",
+        	"Reference": "Coyle, D. J., et al. (2011). 'Life prediction for CIGS solar modules part 2: degradation kinetics, accelerated testing, and encapsulant effects.' Progress in Photovoltaics: Research and Applications.",
+        	"KeyWords": "Temperature, humidity, CIGS, Moisture ingress, thin film",
+        	"Material": "CIGS",
+        	"Degradation": "CIGS_Efficiency, AZO",
+        	"EquationType": "Arrhenius_BET6",
+        	"Equation": "R_D=R_0\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) } \\cdot \\left( \\frac{RH}{1-RH+E} \\right)",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"value": 1.1E+17,
+            	"units": "%/h"},
+        	"E_a": {"value": 78.6592,
+            	"units": "kJ/mol"},
+        	"E": {"value": 0.04}},
+    "D006": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1109/PVSC45281.2020.9300357",
+        	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
+        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
+        	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
+        	"KeyWords": "humidity, irradiance, frontsheet, UV cut-on",
+        	"Material": "Flexible Frontsheet, Frontsheet Coatings",
+        	"Degradation": "UV Cut On",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot RH^n\\cdot G_{340}^P\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"units": "%/h"},
+        	"E_a": {"value": 35.3,
+            	"stdev": 8.9,
+            	"units": "kJ/mol"},
+        	"n": {},
+        	"p": {"value": 0.37,
+            	"stdev": 0.26}},
+    "D007": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1109/PVSC45281.2020.9300357",
+        	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
+        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
+        	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
+        	"KeyWords": "humidity, irradiance, frontsheet, ultraviolet, transmittance",
+        	"Material": "Flexible Frontsheet, Frontsheet Coatings",
+        	"Degradation": "UV Transmittance 310nm-350nm",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot RH^n\\cdot G_{340}^P\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"units": "%/h"},
+        	"E_a": {"value": 53.2,
+            	"stdev": 16.6,
+            	"units": "kJ/mol"},
+        	"n": {},
+        	"p": {"value": 0.45,
+            	"stdev": 0.24}},
+    "D008": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1109/PVSC45281.2020.9300357",
+        	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
+        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
+        	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
+        	"KeyWords": "humidity, irradiance, yellowness, yellowness index",
+        	"Material": "Flexible Frontsheet, Frontsheet Coatings",
+        	"Degradation": "yellowness_index",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot RH^n\\cdot G_{340}^P\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"units": "%/h"},
+        	"E_a": {"value": 40.4,
+            	"stdev": 22.5,
+            	"units": "kJ/mol"},
+        	"n": {},
+        	"p": {"value": 0.5,
+            	"stdev": 0.25}},
+    "D009": {"DataEntryPerson": "Weston Wall",
+        	"DOI": "10.1109/PVSC45281.2020.9300357",
+        	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
+        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
+        	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
+        	"KeyWords": "humidity, irradiance, frontsheet, transmittance",
+        	"Material": "Flexible Frontsheet, Frontsheet Coatings",
+        	"Degradation": "SPQEWT",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot RH^n\\cdot G_{340}^P\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"units": "%/h"},
+        	"E_a": {"value": 30.7,
+            	"stdev": 23.5,
+            	"units": "kJ/mol"},
+        	"n": {},
+        	"p": {"value": 0.53,
+            	"stdev": 0.22}},
     "D010": {
         "DataEntryPerson": "Jada Swailes",
         "DateEntered": "3/21/2023",
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, Polycarbonate, Polyarylate, Aryl Ester, Aromatic Polyester, Hydrolysis",
-        "Material": "PC",
+        "KeyWords": "PC, humidity, hydrothermal, polycarbonate, polyarylate, aryl ester, aromatic polyester, hydrolysis",
+        "Material": "Bisphenol-A polycarbonate (PC)",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
-        "t_fail": {            Units: "days"        },
-        "ln(A)": {            Value: 24.9,            STDEV: 3.2        },
-        "E_a": {            Value: 92,            STDEV: 9.6            Units: "kJ/mol"        },    },
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_{fail}=R_0\\cdot \\frac {e^{ \\left( \\frac{E_a}{R\\cdot T_K } \\right) }}{RH^2}",
+        "t_fail": {
+            "units": "days"
+        },
+        "R_0": {
+            "value": 6.52E+10,
+            "units": "days"
+        },
+        "ln(R_0)": {
+            "value": 24.9,
+            "stdev": 1.6,
+            "units": "ln(days)"
+        },
+        "E_a": {
+            "value": 92,
+            "stdev": 4.8,
+            "units": "kJ/mol"
+        },
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
+        }
+    },
     "D011": {
         "DataEntryPerson": "Jada Swailes",
         "DateEntered": "3/21/2023",
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, PET ,Polyarylate, Aryl Ester, Aromatic Polyester, Hydrolysis, Poly(ethylene terephthalate)",
-        "Material": "PET-A,B,C",
+        "KeyWords": "PET, humidity, hydrothermal, polyester, PET, polyarylate, aryl ester, aromatic polyester, hydrolysis, poly(ethylene terephthalate)",
+        "Material": "poly(ethylene terephthalate), Average of three materials, PET-A,B,C",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
-        "t_fail": {            Units: "days"        },
-        "ln(A)": {            Value: 39.3,            STDEV: 2.2        },
-        "E_a": {            Value: 129,            STDEV: 6.7            Units: "kJ/mol"        },    },
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_{fail}=R_0\\cdot \\frac {e^{ \\left( \\frac{E_a}{R\\cdot T_K } \\right) }}{RH^2}",
+        "t_fail": {
+            "units": "days"
+        },
+        "R_0": {
+            "value": 1.689E+17,
+            "units": "days"
+        },
+        "ln(R_0)": {
+            "value": 39.3,
+            "stdev": 1.1,
+            "units": "ln(days)"
+        },
+        "E_a": {
+            "value": 129,
+            "stdev": 3.35,
+            "units": "kJ/mol"
+        },
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
+        }
+    },
     "D012": {
         "DataEntryPerson": "Jada Swailes",
         "DateEntered": "3/21/2023",
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, PET, Polyarylate, Aryl Ester, Aromatic Polyester, Hydrolysis, Poly(ethylene terephthalate)",
-        "Material": "PET-D",
+        "KeyWords": "PET, humidity, hydrothermal, polyester, pET, aryl ester, aromatic polyester, hydrolysis, poly(ethylene terephthalate)",
+        "Material": "poly(ethylene terephthalate), PET-D",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
-        "t_fail": {            Units: "days"        },
-        "ln(A)": {            Value: 38.9,            STDEV: 2        },
-        "E_a": {            Value: 128,            STDEV: 5.9            Units: "kJ/mol"        },    },
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation. This is the time to failure for the PET-D material.",
+        "EquationType": "arrhenius",
+        "Equation": "t_{fail}=R_0\\cdot \\frac {e^{ \\left( \\frac{E_a}{R\\cdot T_K } \\right) }}{RH^2}",
+        "t_fail": {
+            "units": "days"
+        },
+        "R_0": {
+            "value": 7.835E+16,
+            "units": "days"
+        },
+        "ln(R_0)": {
+            "value": 38.9,
+            "stdev": 1,
+            "units": "ln(days)"
+        },
+        "E_a": {
+            "value": 128,
+            "stdev": 2.95,
+            "units": "kJ/mol"
+        },
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
+        }
+    },
     "D013": {
         "DataEntryPerson": "Jada Swailes",
         "DateEntered": "3/21/2023",
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, Polyarylate, Aryl Ester, Aromatic Polyester, Resorcinol Polyarylate, Hydrolysis",
-        "Material": "RPA-A",
+        "KeyWords": "RPA, resorcinol polyarylate, humidity, hydrothermal, polyester, polyarylate, aryl ester, aromatic polyester, hydrolysis",
+        "Material": "resorcinol polyarylate (RPA-A)",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
-        "t_fail": {            Units: "days"        },
-        "ln(A)": {            Value: 31.8,            STDEV: 3.7        },
-        "E_a": {            Value: 105,            STDEV: 10.9            Units: "kJ/mol"        },    },
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_{fail}=R_0\\cdot \\frac {e^{ \\left( \\frac{E_a}{R\\cdot T_K } \\right) }}{RH^2}",
+        "t_fail": {
+            "units": "days"
+        },
+        "R_0": {
+            "value": 6.4649E+13,
+            "units": "days"
+        },
+        "ln(R_0)": {
+            "value": 31.8,
+            "stdev": 1.85,
+            "units": "ln(days)"
+        },
+        "E_a": {
+            "value": 105,
+            "stdev": 5.45,
+            "units": "kJ/mol"
+        },
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
+        }
+    },
     "D014": {
         "DataEntryPerson": "Jada Swailes",
         "DateEntered": "3/21/2023",
         "DOI": "10.1016/j.polymdegradstab.2013.04.001",
         "SourceTitle": "Pickett  Coyle Hydrolysis Kinetics of condensation polymers under humidity aging conditions.pdf",
         "Authors": "James E. Pickett, Dennis J. Coyle",
-        "KeyWords": "Humidity, Hydrothermal, Polyester, Polyarylate, Aryl Ester, Aromatic Polyester, Resorcinol Polyarylate, Hydrolysis",
+        "KeyWords": "Humidity, hydrothermal, polyester, polyarylate, aryl ester, aromatic polyester, resorcinol polyarylate, hydrolysis",
         "Material": "RPA-B,C",
         "Degradation": "Hydrolysis",
-        "Comments": "data from Table 5",
-        "EquationType": "Arrhenius_tfail_RH",
-        "Equation": "t_fail=e^(E_a/(ln(A)*R*T_K))/(RH^2)",
-        "t_fail": {            Units: "days"        },
-        "ln(A)": {            Value: 30,            STDEV: 4        },
-        "E_a": {            Value: 102,            STDEV: 12.1            Units: "kJ/mol"        },    },
+        "Comments": "RH is a fraction between 0 and 1. Data from Table 5. The paper provided variability for a 95% confidence interval which was divided by 2 to get the standard deviation.",
+        "EquationType": "arrhenius",
+        "Equation": "t_{fail}=R_0\\cdot \\frac {e^{ \\left( \\frac{E_a}{R\\cdot T_K } \\right) }}{RH^2}",
+        "t_fail": {
+            "units": "days"
+        },
+        "ln(R_0)": {
+            "value": 30,
+            "stdev": 2,
+            "units": "ln(days)"
+        },
+        "R_0": {
+            "value": 198626E+44,
+            "units": "days"
+        },
+        "E_a": {
+            "value": 102,
+            "stdev": 6.05,
+            "units": "kJ/mol"
+        },
+        "n": {
+            "value": 2,
+            "stdev": 0,
+            "units": "NA"
+        }
+    },
     "D015": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "3/27/2023",
@@ -217,41 +330,87 @@
         "Degradation": "Optical Transmittance In-Situ measurement",
         "Comments": "LED Light at 550nm",
         "EquationType": "Perovskite_1",
-        "Equation": "R_D=R_(0,WPO)*e^(-E_(a,WPO)/(k_b*T_K ))*((P_(O_2 )*P_(H_2 O)*G_550^.07 ))/(1+K_2W*P_(O_2 ) (1+K_3W*G_550^0.7 ))^2 +R_(0,DPO)*e^(-E_(a,DPO)/(k_b*T_K ))*((P_(O_2 )*G_550^0.7 ))/(1+K_2D*P_(O_2 ) (1+K_3D*G_550^0.7 ))^2 +R_(0, hum)*e^(-(E_a^hum)/(k_b*T_K ))*P_(H_2 O)*G_550^0.7+R_(0,therm)*e^(-(E_a^therm)/(k_b*T_K ))",
-        "R_D": {            Units: "mol/(m^2*s)"        },
-        "R_0,WPO": {            Value: 3.16E-25            Units: "mol/(m^2*s*kpa^2 )*(photons/(m^2*s))^(-0.7)"        },
-        "E_a,WPO": {            Value: -8.6827            Units: "kJ/mol"        },
-        "K_2W": {            Value: 0.0044            Units: "1/kPa"        },
-        "K_3W": {            Value: 4.32E-15            Units: "(photons/(m^2*s))^(-0.7)"        },
-        "R_0,DPO": {            Value: 5.45E-15            Units: "mol/(m^2*s*kpa )*(photons/(m^2*s))^(-0.7)"        },
-        "E_a,DPO": {            Value: 59.82            Units: "kJ/mol"        },
-        "K_2D": {            Value: 0.00328            Units: "1/kPa"        },
-        "K_3D": {            Value: 6.97E-15            Units: "(photons/(m^2*s))^(-0.7)"        },
-        "R_0,hum": {            Value: 9.2E-22            Units: "mol/(m^2*s*kpa)*(photons/(m^2*s))^(-0.7)"        },
-        "E_a^hum": {            Value: 19.3            Units: "kJ/mol"        },
-        "E_a^therm": {            Value: 43.42            Units: "kJ/mol"        },
-        "R_0,therm": {            Value: 0.00041            Units: "mol/(m^2*s)"        },    },
-    "D016": {
-        "DataEntryPerson": "Weston Wall",
-        "DateEntered": "4/7/2023",
-        "DOI": "10.1002/pip.2908",
-        "SourceTitle": "Evaluation and modeling of the potential effects of a module manufacturing anomaly",
-        "Authors": "Michael D Kempe, Dirk C Jordan",
-        "Reference": "Kempe MD, Jordan DC. Evaluation and modeling of the potential effects of a module manufacturing anomaly. Prog Photovolt Res Appl. 2017. https://doi.org/ 10.1002/pip.2908",
-        "KeyWords": "Damp Heat, Durability, Kinetics, Manufacturing Quality, Reliability, Solder Flux, Metallization contact resistance",
-        "Material": "multi-crystalline Silicon",
-        "Degradation": "Fill Factor",
-        "Comments": "Degradation of metallization contact to the cell due to flux",
-        "EquationType": "FF_Arrhenius",
-        "Equation": "FF_t=FF_0*(1-A_i/A_o*(1-e^(-e^((B_1-B_2/(k_b*T_K )-B_3*RH)) ) ))",
-        "FF": {            Units: "%"        },
-        "B_1": {            Value: 14.7,            STDEV: 4.4        },
-        "B_2": {            Value: 76.22,            STDEV: 0.135            Units: "kJ/mol"        },
-        "B_3": {            Value: -0.005,            STDEV: 0.012            Units: "1/%"        },
-        "A": {            Value: 0.073,            STDEV: 0.02        },
-        "Corr-B_1-B_2": 0.985,
-        "Corr-B_1-B_3": 0.216,
-        "Corr-B_2-B_3": 0.0452,    },
+        "Equation": "R_D=R_{0,WPO}\\cdot e^{ \\left( \\frac{-E_{a,WPO}}{R\\cdot T_K } \\right) } \\cdot \\left< \\frac{P_{O_2}\\cdot P_{H_2 O}\\cdot G_{550}^{0.7} }{ \\left[ 1+K_{2W}\\cdot P_{O_2} \\left(1+K_{3W}\\cdot G_{550}^{0.7} \\right) \\right]^2}  \\right> +R_{0,DPO}\\cdot e^ {\\left( \\frac{-E_{a,DPO}}{R\\cdot T_K} \\right) } \\cdot \\frac{P_{O_2} \\cdot G_{550}^{0.7} }{1+K_{2D}\\cdot P_{O_2} \\cdot \\left( 1+K_3D\\cdot G_{550}^{0.7}  \\right)} +R_{0,hum}\\cdot e^ { \\left( \\frac {-E_a^{hum}}{R\\cdot T_K } \\right) } \\cdot P_{H_2 O}\\cdot G_{550}^{0.7}+R_{0,therm}\\cdot e^{ \\left( \\frac{-E_a^{therm}}{R\\cdot T_K } \\right) }",
+        "R_D": {
+            "units": "mol/(m^2Â·s)"
+        },
+        "R_0,WPO": {
+            "value": 3.16E-25,
+            "units": "mol/(m^2Â·sÂ·kpa^2 )Â·(photons/(m^2Â·s))^(-0.7)"
+        },
+        "E_a,WPO": {
+            "value": -8.6827,
+            "units": "kJ/mol"
+        },
+        "K_2W": {
+            "value": 0.0044,
+            "units": "1/kPa"
+        },
+        "K_3W": {
+            "value": 4.32E-15,
+            "units": "(photons/(m^2Â·s))^(-0.7)"
+        },
+        "R_0,DPO": {
+            "value": 5.45E-15,
+            "units": "mol/(m^2Â·sÂ·kpa )Â·(photons/(m^2Â·s))^(-0.7)"
+        },
+        "E_a,DPO": {
+            "value": 59.82,
+            "units": "kJ/mol"
+        },
+        "K_2D": {
+            "value": 0.00328,
+            "units": "1/kPa"
+        },
+        "K_3D": {
+            "value": 6.97E-15,
+            "units": "(photons/(m^2Â·s))^(-0.7)"
+        },
+        "R_0,hum": {
+            "value": 9.2E-22,
+            "units": "mol/(m^2Â·sÂ·kpa)Â·(photons/(m^2Â·s))^(-0.7)"
+        },
+        "E_a^hum": {
+            "value": 19.3,
+            "units": "kJ/mol"
+        },
+        "E_a^therm": {
+            "value": 43.42,
+            "units": "kJ/mol"
+        },
+        "R_0,therm": {
+            "value": 0.00041,
+            "units": "mol/(m^2Â·s)"
+        }
+    },
+    "D016": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "4/7/2023",
+        	"DOI": "10.1002/pip.2908",
+        	"SourceTitle": "Evaluation and modeling of the potential effects of a module manufacturing anomaly",
+        	"Authors": "Michael D Kempe, Dirk C Jordan",
+        	"Reference": "Kempe MD, Jordan DC. Evaluation and modeling of the potential effects of a module manufacturing anomaly. Prog Photovolt Res Appl. 2017. https://doi.org/10.1002/pip.2908",
+        	"KeyWords": "Damp Heat, Durability, Kinetics, Manufacturing Quality, Reliability, Solder Flux, Metallization contact resistance",
+        	"Material": "multi-crystalline Silicon",
+        	"Degradation": "Fill Factor",
+        	"Comments": "Degradation of metallization contact to the cell due to flux",
+        	"EquationType": "FF_Arrhenius",
+        	"Equation": "FF_t=FF_0\\cdot \\left( 1- \\frac{A_i}{A_o} \\cdot \\left< 1-e^{\\left[ -e^{\\left( B_1- \\frac{B_2}{R\\cdot T_K }-B_3\\cdot RH \\right) \\cdot t } \\right] } \\right> \\right)",
+        	"FF": {"units": "%"},
+        	"B_1": {
+            	"value": 14.7,
+            	"stdev": 4.4},
+        	"B_2": {
+            	"value": 76.22,
+            	"stdev": 0.135,
+            	"units": "kJ/mol"},
+        	"B_3": {"value": -0.005,
+            	"stdev": 0.012,
+            	"units": "1/%"},
+        	"A": {"value": 0.073,
+            	"stdev": 0.02},
+        	"Corr-B_1-B_2": 0.985,
+        	"Corr-B_1-B_3": 0.216,
+        	"Corr-B_2-B_3": 0.0452},
     "D017": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "4/17/2023",
@@ -261,105 +420,172 @@
         "Material": "Connectors",
         "Degradation": "Wet insulation resistance < 400Mohm",
         "EquationType": "Arrhenius_Connector",
-        "Equation": "R_D=R_(0, thermal)*e^(-E_(a,thermal)/(k_b*T_K ))+R_(0, Hydrolysis)*RH^m*e^(-E_(a,hydrolysis)/(k_b*T_K ))+R_(0, PhotoDegr)*G^n*e^(-E_(a,PhotoDegr)/(k_b*T_K ))",
+        "Equation": "R_D=R_{0,T} \\cdot e^ {\\left( \\frac {-E_{a,T}}{R\\cdot T_K } \\right)}+R_{0,H}\\cdot RH^n\\cdot e^{ \\left( \\frac{-E_{a,H}}{R\\cdot T_K } \\right) }+R_{0,P}\\cdot G^P\\cdot e^{ \\left( \\frac {-E_{a,P}}{R\\cdot T_K } \\right) }",
         "R_D": {},
-        "R_0,thermal": {},
-        "E_a, thermal": {},
-        "R_0, Hydrolysis": {},
-        "m": {},
-        "E_a, Hydrolysis": {},
-        "R_0, PhotoDegr": {},
+        "R_0,T": {},
+        "E_a,T": {},
+        "R_0,H": {},
         "n": {},
-        "E_a, PhotDegr": {},    },
+        "E_a,H": {},
+        "R_0,P": {},
+        "p": {},
+        "E_a,P": {}
+    },
     "D018": {
         "DataEntryPerson": "Jada Swailes",
         "DateEntered": "4/14/2023",
         "DOI": "10.1016/j.solmat.2011.02.013",
         "SourceTitle": "An Arrhenius approach to estimating organic photovoltaic module weathering acceleration factors",
-        "Authors": "Olivier Haillant, David Dumbleton, Allen Zielnik",
-    },
+        "Authors": "Olivier Haillant, David Dumbleton, Allen Zielnik"
+
+    },
     "D019": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "4/27/2023",
         "DOI": "10.1109/JPHOTOV.2018.2850527",
-        "SourceTitle": "Quantification of Environmental Effects on PV Module Degradation: A Physics-Based DataDriven Modeling Method",
+        "SourceTitle": "Quantification of Environmental Effects on PV Module Degradation: A Physics-Based Data Driven Modeling Method",
         "Authors": "Arun Bala Subramaniyan, Rong Pan, Joseph Kuitche, GovindaSamy TamizhMani",
-        "Reference": "A. Bala Subramaniyan, R. Pan, J. Kuitche and G. TamizhMani, "Quantification of Environmental Effects on PV Module Degradation: A Physics-Based Data-Driven Modeling Method," in IEEE Journal of Photovoltaics, vol. 8, no. 5, pp. 1289-1296, Sept. 2018, doi: 10.1109/JPHOTOV.2018.2850527.",
+        "Reference": "A. Bala Subramaniyan, R. Pan, J. Kuitche and G. TamizhMani, 'Quantification of Environmental Effects on PV Module Degradation: A Physics-Based Data-Driven Modeling Method,' in IEEE Journal of Photovoltaics, vol. 8, no. 5, pp. 1289-1296, Sept. 2018, doi: 10.1109/JPHOTOV.2018.2850527.",
         "KeyWords": "Outdoor, mono-crystalline Silicon, effeciency,  Cumulative effects model",
         "Material": "mono-Crystalline Silicon",
         "Degradation": "Overall power generated",
         "Comments": "Uncertainties given using 95% confidence interval",
         "EquationType": "Arrhenius_Coffin_Manson_Peck",
-        "Equation": "R_D=B_0*e^(-B_1/(K_b*T_K ))*(T_Delta)^(B_2 )*(UV_Daily)^(B_3 )*(RH_Daily)?^(B_4 )",
-        "R_D": {            Units: "%/year"        },
-        "R_0": {            Value: 0.35,            STDEV: 0.037            Units: "1/sec"        },
-        "E_a": {            Value: 67.5,            STDEV: 7.25            Units: "kJ/mol"        },
-        "m": {            Value: 2.41,            STDEV: 0.03        },
-        "p": {            Value: 0.75,            STDEV: 0.04375        },
-        "n": {            Value: 1.52,            STDEV: 0.063        },    },
+        "Equation": "R_D=B_0\\cdot e^{\\left( \\frac{-B_1}{R\\cdot T_K}\\right)}\\cdot Î”T^{B_2} \\cdot UV_{Daily}^{B_3}\\cdot {RH_{Daily}}^{B_4}",
+        "R_D": {
+            "units": "%/year"
+        },
+        "R_0": {
+            "value": 0.35,
+            "stdev": 0.037,
+            "units": "1/sec"
+        },
+        "E_a": {
+            "value": 67.5,
+            "stdev": 7.25,
+            "units": "kJ/mol"
+        },
+        "m": {
+            "value": 2.41,
+            "stdev": 0.03
+        },
+        "p": {
+            "value": 0.75,
+            "stdev": 0.04375
+        },
+        "n": {
+            "value": 1.52,
+            "stdev": 0.063
+        }
+    },
     "D020": {
         "DataEntryPerson": "Weston Wall",
         "DOI": "10.1109/PVSC45281.2020.9300638",
-        "SourceTitle": "Failure modes of polyolefin encapsulated double glass modules and corresponding degradation modeling – Part 1 optical durability",
-        "Authors": "Ben X. J. Yu, Ruirui Lv, Jean-Nicolas Jaubert, Guoqiang Xing, Julien Dupuis, Eric Sandre, Christophe Dugué, Gilles Goaer",
-        "Reference": "B. X. J. Yu et al., "Failure modes of polyolefin encapsulated double glass modules and corresponding degradation modeling — Part 1 optical durability," 2020 47th IEEE Photovoltaic Specialists Conference (PVSC), Calgary, AB, Canada, 2020, pp. 1002-1007, doi: 10.1109/PVSC45281.2020.9300638.",
+        "SourceTitle": "Failure modes of polyolefin encapsulated double glass modules and corresponding degradation modeling: Part 1 optical durability",
+        "Authors": "Ben X. J. Yu, Ruirui Lv, Jean-Nicolas Jaubert, Guoqiang Xing, Julien Dupuis, Eric Sandre, Christophe Dugue, Gilles Goaer",
+        "Reference": "B. X. J. Yu et al., 'Failure modes of polyolefin encapsulated double glass modules and corresponding degradation modeling: Part 1 optical durability,' 2020 47th IEEE Photovoltaic Specialists Conference (PVSC), Calgary, AB, Canada, 2020, pp. 1002-1007, doi: 10.1109/PVSC45281.2020.9300638.",
         "KeyWords": "Bifacial, Encapsulants, Delamination, Yellowing, Sevice Life predication",
-        "Material": "Encapsulents, (POE, TPO, EVA)",
-    },
+        "Material": "Encapsulents, (POE, TPO, EVA)"
+
+    },
     "D021": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "5/15/2023",
         "DOI": "10.1109/PVSC.2018.8547944",
         "SourceTitle": "Acceleration Factor Modeling for Degradation Rate Prediction of Photovoltaic Encapsulant Discoloration",
         "Authors": "Archana Sinha, Shantanu Pore, Arun Balasubramaniyan, GovindaSamy TamizhMani",
-        "Reference": "A. Sinha, S. Pore, A. Balasubramaniyan and G. TamizhMani, "Acceleration Factor Modeling for Degradation Rate Prediction of Photovoltaic Encapsulant Discoloration," 2018 IEEE 7th World Conference on Photovoltaic Energy Conversion (WCPEC) (A Joint Conference of 45th IEEE PVSC, 28th PVSEC & 34th EU PVSEC), Waikoloa, HI, USA, 2018, pp. 1342-1346, doi: 10.1109/PVSC.2018.8547944.",
+        "Reference": "A. Sinha, S. Pore, A. Balasubramaniyan and G. TamizhMani, 'Acceleration Factor Modeling for Degradation Rate Prediction of Photovoltaic Encapsulant Discoloration,' 2018 IEEE 7th World Conference on Photovoltaic Energy Conversion (WCPEC) (A Joint Conference of 45th IEEE PVSC, 28th PVSEC & 34th EU PVSEC), Waikoloa, HI, USA, 2018, pp. 1342-1346, doi: 10.1109/PVSC.2018.8547944.",
         "KeyWords": "Acceleration Factor, Arrhenius, degradation rate, encapsulant discoloration, Lifetime prediction",
         "Material": "EVA Encapsulent, Si-cells",
         "Degradation": "Encapsulent Discoloration, Isc loss",
-        "EquationType": "Modified_Arrhenius_G",
-        "Equation": "??_??=??_0*??^??*??^(??_??/(??*??_K ))",
-        "R_D": {            Value: 0.1            Units: "%/year"        },
-        "E_a": {            Value: 29.91            Units: "kJ/mol"        },
+        "EquationType": "arrhenius",
+        "Equation": "R_D=R_0\\cdot G^p\\cdot e^{\\left( \\frac{E_a}{R\\cdot T_K} \\right)}",
+        "R_D": {
+            "value": 0.1,
+            "units": "%/year"
+        },
+        "E_a": {
+            "value": 29.91,
+            "units": "kJ/mol"
+        },
         "p": {},
-        "R_0": {},    },
+        "R_0": {}
+    },
     "D022": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "5/15/2023",
         "DOI": "10.1002/apmc.1994.052160108",
         "SourceTitle": "The kinetics and mechanism of polyethylene photo-oxidation",
-        "Authors": "J. J. C. Cruz-Pinto, M. E. S. Carvalho, J. F. A. Ferreira",
-        "Reference": "Cruz Pinto, José Joaquim & Carvalho, M. & Ferreira, J.. (2003). The kinetics and mechanism of polyethylene photo-oxidation. Die Angewandte Makromolekulare Chemie. 216. 113 - 133. 10.1002/apmc.1994.052160108. ",
+        "Authors": "J. J. C. Cruz-Pinto, M. E. S. Carvalho, J. F. A. Ferreira",
+        "Reference": "Cruz Pinto, Jose Joaquim & Carvalho, M. & Ferreira, J.. (2003). The kinetics and mechanism of polyethylene photo-oxidation. Die Angewandte Makromolekulare Chemie. 216. 113 - 133. 10.1002/apmc.1994.052160108. ",
         "KeyWords": "Polyethylene, Photoxidation, Weathering, Mechanism, Kinetics",
         "Material": "Polyethylene",
         "Degradation": "Photoxidation",
         "EquationType": "Arrhenius_G_DeltaT",
-        "Equation": "R_D=R_0*G*e^(-E_a/(R*T_K ))*?T_K",
-        "E_a": {            Value: 58.24            Units: "kJ/mol"        },
-        "R_D": {            Units: "%/hour"        },
-        "R_0": {},    },
+        "Equation": "R_D=R_0\\cdot G\\cdot e^{\\left( \\frac{E_a}{R\\cdot T_K} \\right)}\\cdot Î”T",
+        "E_a": {
+            "value": 58.24,
+            "units": "kJ/mol"
+        },
+        "R_D": {
+            "units": "%/hour"
+        },
+        "R_0": {}
+    },
     "D024": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "5/26/2023",
         "DOI": "doi:10.1109/JPHOTOV.2020.3025240",
         "SourceTitle": "Temporary Recovery of the Defect Responsible for Light- and Elevated Temperature-Induced Degradation: Insights Into the Physical Mechanisms Behind LeTID",
-        "Authors": "Wolfram Kwapil, Jonas Schön, Tim Niewelt, and Martin C. Schubert",
-        "Reference": "W. Kwapil et al., IEEE J. Photovoltaics, vol. 10, no. 6, pp. 1591–1603, 2020, doi: 10.1109/JPHOTOV.2020.3025240.",
+        "Authors": "Wolfram Kwapil, Jonas Schon, Tim Niewelt, and Martin C. Schubert",
+        "Reference": "W. Kwapil et al., IEEE J. Photovoltaics, vol. 10, no. 6, pp. 1591-1603, 2020, doi: 10.1109/JPHOTOV.2020.3025240.",
         "KeyWords": "Degradation, Defect reactions, light- and elevated temperature-induced degradation, LeTID, model, silicon defects.",
         "Material": "mc-Si cells",
         "Degradation": "LeTID",
         "Comments": "Cell_200Micron",
         "EquationType": "LeTID",
-        "v_ab": {            Value: 33000000            Units: "(cm^3x)/s"        },
-        "v_ba": {            Value: 4.7E-25            Units: "(cm^3x)/s"        },
-        "v_bc": {            Value: 13100000            Units: "(cm^3x)/s"        },
-        "v_cb": {            Value: 0            Units: "(cm^3x)/s"        },
-        "E_(a, ab)": {            Value: 78.7895            Units: "kJ/mol"        },
-        "E_(a, ba)": {            Value: -110.9653            Units: "kJ/mol"        },
-        "E_(a, bc)": {            Value: 84.0442            Units: "kJ/mol"        },
-        "E_(a, cb)": {            Value: 0            Units: "kJ/mol"        },
-        "x_ab": {            Value: 1        },
-        "x_ba": {            Value: 1.7        },
-        "x_bc": {            Value: 1.2        },    },
+        "v_ab": {
+            "value": 33000000,
+            "units": "(cm^3x)/s"
+        },
+        "v_ba": {
+            "value": 4.7E-25,
+            "units": "(cm^3x)/s"
+        },
+        "v_bc": {
+            "value": 13100000,
+            "units": "(cm^3x)/s"
+        },
+        "v_cb": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "E_(a, ab)": {
+            "value": 78.7895,
+            "units": "kJ/mol"
+        },
+        "E_(a, ba)": {
+            "value": -110.9653,
+            "units": "kJ/mol"
+        },
+        "E_(a, bc)": {
+            "value": 84.0442,
+            "units": "kJ/mol"
+        },
+        "E_(a, cb)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "x_ab": {
+            "value": 1
+        },
+        "x_ba": {
+            "value": 1.7
+        },
+        "x_bc": {
+            "value": 1.2
+        }
+    },
     "D025": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "6/8/2023",
@@ -372,86 +598,188 @@
         "Degradation": "LeTID",
         "Comments": "Cell_200Micron",
         "EquationType": "LeTID",
-        "v_ab": {            Value: 46700000            Units: "(cm^3x)/s"        },
-        "v_ba": {            Value: 4.7E-25            Units: "(cm^3x)/s"        },
-        "v_bc": {            Value: 19900000            Units: "(cm^3x)/s"        },
-        "v_cb": {            Value: 0            Units: "(cm^3x)/s"        },
-        "E_(a, ab)": {            Value: 78.7895            Units: "kJ/mol"        },
-        "E_(a, ba)": {            Value: -110.9653            Units: "kJ/mol"        },
-        "E_(a, bc)": {            Value: 84.0442            Units: "kJ/mol"        },
-        "E_(a, cb)": {            Value: 0            Units: "kJ/mol"        },
-        "x_ab": {            Value: 1        },
-        "x_ba": {            Value: 1.7        },
-        "x_bc": {            Value: 1.2        },    },
+        "v_ab": {
+            "value": 46700000,
+            "units": "(cm^3x)/s"
+        },
+        "v_ba": {
+            "value": 4.7E-25,
+            "units": "(cm^3x)/s"
+        },
+        "v_bc": {
+            "value": 19900000,
+            "units": "(cm^3x)/s"
+        },
+        "v_cb": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "E_(a, ab)": {
+            "value": 78.7895,
+            "units": "kJ/mol"
+        },
+        "E_(a, ba)": {
+            "value": -110.9653,
+            "units": "kJ/mol"
+        },
+        "E_(a, bc)": {
+            "value": 84.0442,
+            "units": "kJ/mol"
+        },
+        "E_(a, cb)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "x_ab": {
+            "value": 1
+        },
+        "x_ba": {
+            "value": 1.7
+        },
+        "x_bc": {
+            "value": 1.2
+        }
+    },
     "D026": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "6/8/2023",
         "DOI": "doi:10.1016/j.solmat.2017.08.007",
         "SourceTitle": "Light-induced lifetime degradation in high-performance multicrystalline silicon: Detailed kinetics of the defect activation",
-        "Authors": "Dennis Bredemeier, Dominic Walter, Jan Schmidt",
-        "Reference": "D. Bredemeier et al., Sol. Energy Mater. Sol. Cells, vol. 173, pp. 2–5, 2017, doi: 10.1016/j.solmat.2017.08.007.",
+        "Authors": "Dennis Bredemeier, Dominic Walter, Jan Schmidt",
+        "Reference": "D. Bredemeier et al., Sol. Energy Mater. Sol. Cells, vol. 173, pp. 2-5, 2017, doi: 10.1016/j.solmat.2017.08.007.",
         "KeyWords": "multi-Si, LeTID, ",
         "Material": "multi-Si",
         "Degradation": "LeTID",
         "Comments": "ab158micronwafer_bc200microncell",
         "EquationType": "LeTID",
-        "v_ab": {            Value: 937000000            Units: "(cm^3x)/s"        },
-        "v_ba": {            Value: 0            Units: "(cm^3x)/s"        },
-        "v_bc": {            Value: 21500000            Units: "(cm^3x)/s"        },
-        "v_cb": {            Value: 0            Units: "(cm^3x)/s"        },
-        "E_(a, ab)": {            Value: 85.8775            Units: "kJ/mol"        },
-        "E_(a, ba)": {            Value: 0            Units: "kJ/mol"        },
-        "E_(a, bc)": {            Value: 90.7021            Units: "kJ/mol"        },
-        "E_(a, cb)": {            Value: 0            Units: "kJ/mol"        },
-        "x_ab": {            Value: 1        },
-        "x_ba": {            Value: 1.7        },
-        "x_bc": {            Value: 1.2        },    },
+        "v_ab": {
+            "value": 937000000,
+            "units": "(cm^3x)/s"
+        },
+        "v_ba": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "v_bc": {
+            "value": 21500000,
+            "units": "(cm^3x)/s"
+        },
+        "v_cb": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "E_(a, ab)": {
+            "value": 85.8775,
+            "units": "kJ/mol"
+        },
+        "E_(a, ba)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "E_(a, bc)": {
+            "value": 90.7021,
+            "units": "kJ/mol"
+        },
+        "E_(a, cb)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "x_ab": {
+            "value": 1
+        },
+        "x_ba": {
+            "value": 1.7
+        },
+        "x_bc": {
+            "value": 1.2
+        }
+    },
     "D027": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "6/9/2023",
         "DOI": "doi:10.1109/JPHOTOV.2021.3078367",
         "SourceTitle": "The Influence of Minority Carrier Density on Degradation and Regeneration Kinetics in Multicrystalline Silicon Wafers",
-        "Authors": "Guro Marie Wyller, Marie Syre Wiig, Ida Due-Sørensen, Rune Søndenå",
-        "Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878–889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
+        "Authors": "Guro Marie Wyller, Marie Syre Wiig, Ida Due-Sorensen, Rune Sondena",
+        "Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878-889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
         "KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
         "Material": "p-type mc-Si Perc",
         "Degradation": "LeTID",
         "Comments": "wafer_180micron",
         "EquationType": "LeTID",
-        "v_ab": {            Value: 1900000000000            Units: "(cm^3x)/s"        },
-        "v_ba": {            Value: 0            Units: "(cm^3x)/s"        },
-        "v_bc": {            Value: 0.284            Units: "(cm^3x)/s"        },
-        "v_cb": {            Value: 0            Units: "(cm^3x)/s"        },
-        "E_(a, ab)": {            Value: 133.1584,            STDEV: 13.5088            Units: "kJ/mol"        },
-        "E_(a, ba)": {            Value: 0            Units: "kJ/mol"        },
-        "E_(a, bc)": {            Value: 54.0353,            STDEV: 11.579            Units: "kJ/mol"        },
-        "E_(a, cb)": {            Value: 0            Units: "kJ/mol"        },
-        "x_ab": {            Value: 1        },
-        "x_ba": {            Value: 1.7        },
-        "x_bc": {            Value: 1.2        },    },
-    "D028": {
-        "DataEntryPerson": "Weston Wall",
-        "DateEntered": "6/9/2023",
-        "DOI": "doi:10.1109/JPHOTOV.2021.3078368",
-        "SourceTitle": "The Influence of Minority Carrier Density on Degradation and Regeneration Kinetics in Multicrystalline Silicon Wafers",
-        "Authors": "Guro Marie Wyller, Marie Syre Wiig, Ida Due-Sørensen, Rune Søndenå",
-        "Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878–889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
-        "KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
-        "Material": "p-type mc-Si Perc",
-        "Degradation": "LeTID",
-        "Comments": "wafer_200micron",
-        "EquationType": "LeTID",
-        "v_ab": {            Value: 483000            Units: "(cm^3x)/s"        },
-        "v_ba": {            Value: 0            Units: "(cm^3x)/s"        },
-        "v_bc": {            Value: 0            Units: "(cm^3x)/s"        },
-        "v_cb": {            Value: 0            Units: "(cm^3x)/s"        },
-        "E_(a, ab)": {            Value: 64.0704            Units: "kJ/mol"        },
-        "E_(a, ba)": {            Value: 0            Units: "kJ/mol"        },
-        "E_(a, bc)": {            Value: 90.7986            Units: "kJ/mol"        },
-        "E_(a, cb)": {            Value: 0            Units: "kJ/mol"        },
-        "x_ab": {            Value: 1        },
-        "x_ba": {            Value: 1.7        },
-        "x_bc": {            Value: 1.2        },    },
+        "v_ab": {
+            "value": 1900000000000,
+            "units": "(cm^3x)/s"
+        },
+        "v_ba": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "v_bc": {
+            "value": 0.284,
+            "units": "(cm^3x)/s"
+        },
+        "v_cb": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "E_(a, ab)": {
+            "value": 133.1584,
+            "stdev": 13.5088,
+            "units": "kJ/mol"
+        },
+        "E_(a, ba)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "E_(a, bc)": {
+            "value": 54.0353,
+            "stdev": 11.579,
+            "units": "kJ/mol"
+        },
+        "E_(a, cb)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "x_ab": {
+            "value": 1
+        },
+        "x_ba": {
+            "value": 1.7
+        },
+        "x_bc": {
+            "value": 1.2
+        }
+    },
+    "D028": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "6/9/2023",
+        	"DOI": "doi:10.1109/JPHOTOV.2021.3078368",
+        	"SourceTitle": "The Influence of Minority Carrier Density on Degradation and Regeneration Kinetics in Multicrystalline Silicon Wafers",
+        	"Authors": "Guro Marie Wyller, Marie Syre Wiig, Ida Due-Sorensen, Rune Sondena",
+        	"Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878-889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
+        	"KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
+        	"Material": "p-type mc-Si Perc",
+        	"Degradation": "LeTID",
+        	"Comments": "wafer_200micron",
+        	"EquationType": "LeTID",
+        	"v_ab": {"value": 483000,
+            	"units": "(cm^3x)/s"},
+        	"v_ba": {"value": 0,
+            	"units": "(cm^3x)/s"},
+        	"v_bc": {"value": 0,
+            	"units": "(cm^3x)/s"},
+        	"v_cb": {"value": 0,
+            	"units": "(cm^3x)/s"},
+        	"E_(a, ab)": {"value": 64.0704,
+            	"units": "kJ/mol"},
+        	"E_(a, ba)": {"value": 0,
+            	"units": "kJ/mol"},
+        	"E_(a, bc)": {"value": 90.7986,
+            	"units": "kJ/mol"},
+        	"E_(a, cb)": {"value": 0,
+            	"units": "kJ/mol"        },
+        	"x_ab": {"value": 1},
+        	"x_ba": {"value": 1.7},
+        	"x_bc": {"value": 1.2}},
     "D029": {
         "DataEntryPerson": "Weston Wall",
         "DateEntered": "6/12/2023",
@@ -464,43 +792,151 @@
         "Degradation": "LeTID",
         "Comments": "wafer_152micron",
         "EquationType": "LeTID",
-        "v_ab": {            Value: 483000            Units: "(cm^3x)/s"        },
-        "v_ba": {            Value: 0            Units: "(cm^3x)/s"        },
-        "v_bc": {            Value: 0            Units: "(cm^3x)/s"        },
-        "v_cb": {            Value: 0            Units: "(cm^3x)/s"        },
-        "E_(a, ab)": {            Value: 75.2364,            STDEV: 8.7            Units: "kJ/mol"        },
-        "E_(a, ba)": {            Value: 0            Units: "kJ/mol"        },
-        "E_(a, bc)": {            Value: 59.8248,            STDEV: 8.7            Units: "kJ/mol"        },
-        "E_(a, cb)": {            Value: 0            Units: "kJ/mol"        },
-        "x_ab": {            Value: 1        },
-        "x_ba": {            Value: 1.7        },
-        "x_bc": {            Value: 1.2        },    },
-    "D030": {
-        "DataEntryPerson": "Weston Wall",
-        "DateEntered": "6/15/2023",
-        "DOI": "10.1007/3-540-61218-1_6",
-        "SourceTitle": "Wavelength sensitivity in polymer photodegradation",
-        "Authors": "Anthony L Andrady",
-        "Reference": "Andrady, A.L. (1997). Wavelength sensitivity in polymer photodegradation. In: Polymer Analysis Polymer Physics. Advances in Polymer Science, vol 128. Springer, Berlin, Heidelberg. https://doi.org/10.1007/3-540-61218-1_6",
-        "KeyWords": "Photodegradation, Vinyl Chloride, Activation Spectrum, Action Spectrum",
-        "Material": "Naturally Occuring Polymers, Synthetic Polymers",
-        "Degradation": "Photodegradation",
-        "EquationType": "Activation Spectrum",
-        "Equation": "Activation Spectrum=(E_L)*(R_0*e^(-B_g*L))",
-        "E_L": {},
-        "R_0": {},
-        "B_g": {},
-        "L": {},    },
-    "D031": {
-        "DataEntryPerson": "Weston Wall",
-        "DateEntered": "6/16/2023",
-        "SourceTitle": "A Characterization of the Relationship Between Light Intensity and Degradation Rate for Weathering Durability",
-        "Authors": "Henry K. Hardcastle",
-        "KeyWords": "Durability, EMMA, Degradation Rate",
-        "Material": "Polycarbonate",
-        "Degradation": "Yellowness index",
-        "EquationType": "Arrhenius_Schwarzchild_340",
-        "Equation": "R_D=R_0*?G_340?^P*e^(E_a/(R*T_K ))",
-        "R_D": {            Units: "YI/s"        },
-        "P": {            Value: -4.655        },
-        "E_a": {            Value: 3704            Units: "kJ/mol"        },    }}
+        "v_ab": {
+            "value": 483000,
+            "units": "(cm^3x)/s"
+        },
+        "v_ba": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "v_bc": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "v_cb": {
+            "value": 0,
+            "units": "(cm^3x)/s"
+        },
+        "E_(a, ab)": {
+            "value": 75.2364,
+            "stdev": 8.7,
+            "units": "kJ/mol"
+        },
+        "E_(a, ba)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "E_(a, bc)": {
+            "value": 59.8248,
+            "stdev": 8.7,
+            "units": "kJ/mol"
+        },
+        "E_(a, cb)": {
+            "value": 0,
+            "units": "kJ/mol"
+        },
+        "x_ab": {
+            "value": 1
+        },
+        "x_ba": {
+            "value": 1.7
+        },
+        "x_bc": {
+            "value": 1.2
+        }
+    },
+    "D030": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "6/15/2023",
+        	"DOI": "10.1007/3-540-61218-1_6",
+        	"SourceTitle": "Wavelength sensitivity in polymer photodegradation",
+        	"Authors": "Anthony L Andrady",
+        	"Reference": "Andrady, A.L. (1997). Wavelength sensitivity in polymer photodegradation. In: Polymer Analysis Polymer Physics. Advances in Polymer Science, vol 128. Springer, Berlin, Heidelberg. https://doi.org/10.1007/3-540-61218-1_6",
+        	"KeyWords": "Photodegradation, Vinyl Chloride, Activation Spectrum, Action Spectrum",
+        	"Material": "Naturally Occuring Polymers, Synthetic Polymers",
+        	"Degradation": "Photodegradation",
+        	"EquationType": "Activation Spectrum",
+        	"Equation": "Activation Spectrum={E_L}\\cdot R_0\\cdot e^{\\left( -B_g\\cdot Î» \\right)}",
+        	"E_L": {},
+        	"R_0": {},
+        	"B_g": {},
+        	"L": {}},
+    "D031": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "6/16/2023",
+        	"SourceTitle": "A Characterization of the Relationship Between Light Intensity and Degradation Rate for Weathering Durability",
+        	"Authors": "Henry K. Hardcastle",
+        	"KeyWords": "Durability, EMMA, Degradation Rate",
+        	"Material": "Polycarbonate",
+        	"Degradation": "Yellowness index",
+        	"EquationType": "Arrhenius",
+        	"Equation": "R_D=R_0\\cdot G_{340}^P\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {
+                "units": "YI/s"},
+        	"p": {
+                "value": 0.89},
+        	"E_a": {
+            	"units": "kJ/mol"}},
+ 	"D032": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "6/16/2023",
+        	"DOI": "10.4229/EUPVSEC20142014-5CO.5.4",
+        	"SourceTitle": "PV AGING MODEL APPLIED TO SEVERAL METEOROLOGICAL CONDITIONS",
+        	"Authors": "BenoÃ®t Braisaz1 , ChloÃ© Duchayne, Mike Van Iseghem, Khalid Radouane",
+        	"Reference": "Braisaz, B., et al. (2014). PV aging model applied to several meteorological conditions.",
+        	"KeyWords": "Aging, Damp heat, Outdoor, PV modeling, Models, PV module, degradation rate, Activation Energy, PID, cracks, UV",
+        	"Material": "Double Diode module",
+        	"Degradation": "Damp Heat Corrosion Model",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot RH^n\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {},
+        	"R_0": {},
+        	"n": {"value": 2},
+        	"E_a": {"value": 127.3689,
+            	"units": "kJ/mol"}},
+    "D033": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "6/8/2023",
+        	"DOI": "doi:10.1016/j.solmat.2017.08.007",
+        	"SourceTitle": "Light-induced lifetime degradation in high-performance multicrystalline silicon: Detailed kinetics of the defect activation",
+        	"Authors": "Dennis Bredemeier, Dominic Walter, Jan Schmidt",
+        	"Reference": "D. Bredemeier et al., Sol. Energy Mater. Sol. Cells, vol. 173, pp. 2-5, 2017, doi: 10.1016/j.solmat.2017.08.007.",
+        	"KeyWords": "multi-Si, LeTID, ",
+        	"Material": "multi-Si",
+        	"Degradation": "LeTID",
+        	"Comments": "ab158micronwafer_bc200microncell",
+        	"EquationType": "LeTID",
+        	"x_ab": {"value": 1}},
+    "D034": {
+        	"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "6/9/2023",
+        	"DOI": "doi:10.1109/JPHOTOV.2021.3078368",
+        	"SourceTitle": "The Influence of Minority Carrier Density on Degradation and Regeneration Kinetics in Multicrystalline Silicon Wafers",
+        	"Authors": "Guro Marie Wyller, Marie Syre Wiig, Ida Due-SÃ¸rensen, Rune SÃ¸ndenÃ¥",
+        	"Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878-889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
+        	"KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
+        	"Material": "p-type mc-Si Perc",
+        	"Degradation": "LeTID",
+        	"Comments": "wafer_200micron",
+        	"EquationType": "LeTID",
+        	"x_bc": {"value": 1.2}},
+    "D035": {"DataEntryPerson": "Weston Wall",
+        	"DateEntered": "5/26/2023",
+        	"DOI": "doi:10.1109/JPHOTOV.2020.3025240",
+        	"SourceTitle": "Temporary Recovery of the Defect Responsible for Light- and Elevated Temperature-Induced Degradation: Insights Into the Physical Mechanisms Behind LeTID",
+        	"Authors": "Wolfram Kwapil, Jonas SchÃ¶n, Tim Niewelt, and Martin C. Schubert",
+        	"Reference": "W. Kwapil et al., IEEE J. Photovoltaics, vol. 10, no. 6, pp. 1591-1603, 2020, doi: 10.1109/JPHOTOV.2020.3025240.",
+        	"KeyWords": "Degradation, Defect reactions, light- and elevated temperature-induced degradation, LeTID, model, silicon defects.",
+        	"Material": "mc-Si cells",
+        	"Degradation": "LeTID",
+        	"Comments": "Cell_200Micron",
+        	"EquationType": "LeTID",
+        	"x_ba": {"value": 1.7}},
+    "D036": {"DataEntryPerson": "Michael Kempe",
+        	"DateEntered": "2/14/2025",
+        	"DOI": "10.1109/PVSC45281.2020.9300357",
+        	"SourceTitle": "Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets",
+        	"Authors": "Michael D Kempe, Peter Hacke, Joshua Morse, Michael Owen-Bellini, Derek Holsapple, Trevor Lockman, Samantha Hoang, David Okawa, Tamir Lance, Hoi Hong Ng",
+        	"Reference": "Kempe, M. D., et al. (2020). Highly Accelerated UV Stress Testing for Transparent Flexible Frontsheets. 2020 47th IEEE Photovoltaic Specialists Conference (PVSC).",
+        	"KeyWords": "Humidity, Irradiance, reciprocity",
+        	"Material": "Flexible Frontsheet, Frontsheet Coatings",
+        	"Degradation": "UV Cut On, UV Transmittance 310nm-350nm, Yellowness index, SPQEWT",
+        	"EquationType": "arrhenius",
+        	"Equation": "R_D=R_0\\cdot RH^n\\cdot G_{340}^P\\cdot e^{ \\left( \\frac{-E_a}{R\\cdot T_K } \\right) }",
+        	"R_D": {"units": "%/h"},
+        	"R_0": {"units": "%/h"},
+        	"E_a": {"value": 38.7,
+            	"stdev": 21.7,
+            	"units": "kJ/mol"},
+        	"n": {},
+        	"p": {"value": 0.49,
+            	"stdev": 0.22},
+        	"Corr-E_a-P":{"value": -0.606}}
+}

@@ -41,7 +41,8 @@ from pvdeg import DATA_DIR
 
 
 # This information helps with debugging and getting support :)
-import sys, platform
+import sys
+import platform
 
 print("Working on a ", platform.system(), platform.release())
 print("Python version ", sys.version)
@@ -131,7 +132,7 @@ rh_chamber = 15
 # arrhenius activation energy (kj/mol)
 Ea = 40
 
-rh_surface = pvdeg.humidity.surface_outside(
+rh_surface = pvdeg.humidity.surface_relative(
     rh_ambient=WEATHER["relative_humidity"],
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_module,
@@ -184,7 +185,7 @@ irr_weighted_avg_v = pvdeg.degradation.IwaVantHoff(weather_df=WEATHER, meta=META
 # In[8]:
 
 
-rh_surface = pvdeg.humidity.surface_outside(
+rh_surface = pvdeg.humidity.surface_relative(
     rh_ambient=WEATHER["relative_humidity"],
     temp_ambient=WEATHER["temp_air"],
     temp_module=temp_module,

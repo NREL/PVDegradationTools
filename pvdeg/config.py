@@ -1,9 +1,6 @@
-""" Configuration file for pvdeg package
-"""
+"""Configuration file for pvdeg package."""
 
 from pathlib import Path
-import sys
-import os
 
 # Specify module directories
 PVDEG_DIR = Path(__file__).parent
@@ -11,7 +8,7 @@ REPO_NAME = __name__
 DATA_DIR = PVDEG_DIR / "data"
 TEST_DIR = PVDEG_DIR.parent / "tests"
 TEST_DATA_DIR = PVDEG_DIR.parent / "tests" / "data"
- 
+
 # downloader target directory
 METOROLOGICAL_DOWNLOAD_PATH = Path.home() / "PVDeg-Meteorological"
 

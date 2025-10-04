@@ -9,4 +9,3 @@ agreement and sign this declaration.
 Signed,
 
 Tobin Ford https://github.com/tobin-ford
-

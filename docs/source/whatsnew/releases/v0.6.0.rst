@@ -1,0 +1,137 @@
+v0.6.0 (2025-08-13)
+===================
+
+Breaking Changes
+----------------
+- Update dependency requirements:
+  - pvlib-python: was ==0.10.3, now >=0.12.0
+  - numpy: was ==1.26.4, now >1.19.3
+  - scipy: was <1.14.0, now >1.6.0
+  (:issue:`103`, :pull:`163`)
+- Remove deprecated `vertical_poa` function from `pysam.py` and related (incorrect)
+  reference to `standards.vertical_poa` in `geospatial.py`. (:issue:`167`, :pull:`174`)
+- Replaced ambiguous variable name `l` in
+  :py:func`pvdeg.collection.collection_probability` with `diffusion_length` to enhance
+  code readability and maintainability. (:issue:`198`, :pull:`199`)
+- Replace print messages for failure or succesful addition of objects (location, job...)
+  with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
+- Remove deprecated `pvdeg.store` module. (:issue:`168`, :pull:`180`)
+- Refactored and cleaned up `:py:mod:pvdeg.humiditiy` by removing unused functions,
+  improving docstrings, and standardizing physical constants. Full details are as
+  follows:
+    - Remove unused helper function `_ambient()`
+    - Remove `_diffusivity_numerator()` and `_diffusivity_denominator()` helper
+      functionsby refactoring them into `_diffusivity_weighted_water()`
+    - Remove legacy comments and commented out code
+    - Clean and streamlined docstrings, for example removing redundant docstring from
+      helper functions
+    - Improve function docstrings
+    - Introduce a module level constant `R_GAS` for the universal gas constant and
+      replaced all hardcoded instances of the gas constant (0.00831446261815324) with
+      `R_GAS`
+    - Add `Ead` argument to `front_encapsulant` to enable user to specify custom
+      material fully, previous behaviour enforced the `Ead` value for EVA material
+    - Improve argument handling in `front_encapsulant` to include check for presence of
+      `Ead`. (:issue:`202`, :pull:`212`)
+- Rename several variable and function names in :py:mod:`pvdeg.humidity` to improve
+  code clarity and maintainability. Full details are as follows:
+    - Variable `psat` and function `psat()` to `water_saturation_pressure`
+    - Variable `avg_psat` to `avg_water_saturation_pressure`
+    - Variable `surface_outside` to `surface_relative`
+    - Variable `RHfront_series` to `front_encapsulant`
+    - Variable `t` to `backsheet_thickness`
+    - Function `front_encap()` to `front_encapsulant`
+    - Function `Ce()` to `back_encapsulant_water_concentration`
+    - Function `back_encap` to `back_encapsulant`
+  (:issue:`213`, :issue:`233`, :pull:`224`, :pull:`236`)
+
+
+Enhancements
+------------
+- Change ``GeospatialScenario.get_geospatial_data()`` to a ``@property``, now use
+``GeospatialScenario.geospatial_data``
+- Change ``GeospatialScenario.coords_tonumpy()`` to a ``@property``, now use
+``GeospatialScenario.coords``
+- Refactor ``META_MAP`` in :py:mod:`pvdeg.weather` to module-level constant
+  (:pull:`182`)
+- Update pytest workflow to cancel in-progress runs for the same branch in favour of
+  running on the latest commit. (:pull:`191`)
+- Add support for pandas dataframes to :py:mod:`pvdeg.weather.map_meta()` (:pull:`193`)
+- Add a new GitHub Actions workflow to automatically run flake8 for linting on pull
+  requests (:issue:`164`, :pull:`165`)
+- Lint codebase for PEP8 compliance (:pull:`166`, :pull:`175`, :pull:`196`)
+- Change default for ``find_meta`` argument in :py:func:`pvdeg.weather.read` to
+  ``False`` to avoid unnecessary network calls when reading local files. (:pull:`223`)
+- Add `"name"`, `"units"`, and `"value"` fields to the materials JSON databases
+  `AApermeation.json`, `H2Opermeation.json`, and `O2permeation.json`.
+  (:issue:`211`, :pull:`224`)
+- Add new (public) function :py:mod:`pvdeg.humidity` to calculate relative humidity from
+  air temperature and dew point temperature. (:issue:`227`, :pull:`228`)
+- :py:func:`pvdeg.humidity.back_encapsulant_water_concentration` and
+  :py:func:`pvdeg.humidity.module` now raise ValueError if ``back_encap_thickness`` or
+  ``backsheet_thickness`` is None, and no value is available in the specified material
+  from the database. (:issue:`237`, :pull:`238`)
+- Remove "materials.json" and all associated references. Users should now use the
+  "O2_permeation.json" database for oxygen permeation data. (:issue:`240`, :pull:`243`)
+- Remove private function ``pvdeg.utilities_read_material`` and replace all usage with
+  the existing public function :py:func:`pvdeg.utilities.read_material()` for improved
+  API clarity and maintainability. (:issue:`256`, :pull:`257`)
+- Refactor material database access: separate functionality into two distinct public
+  functions:
+    - :py:func:`pvdeg.utilities.read_material` returns the full material dictionary,
+      including metadata
+    - :py:func:`pvdeg.utilities.read_material_property` returns a flattened dictionary
+      of parameter values for computation.
+  This change clarifies the distinction between retrieving raw material data and
+  extracting parameter values for use in calculations. (:issue:`256`, :pull:`257`)
+- Update pre-commit hooks and add github workflow (:pull:`267`)
+
+
+Deprecations
+-------------
+- ``GeospatialScenario._get_geospatial_data()``
+- ``GeospatialScenario.getValidRegions()``
+- ``GeospatialScenario.gids_tonumpy()``
+- ``GeospatialScenario.gids_tolist()``
+- Deprecate `see_added` argument, and associated UserWarning for succesful addition of
+  objects, in several :py:mod:`~pvdeg.scenario` functions. (:pull:`192`)
+
+
+Bug Fixes
+---------
+- ``v0.5.0`` incorrectly claimed that ``GeospatialScenario`` was moved to
+  ``pvdeg/geospatialscenario.py``. Completed the move.
+- Code cleanup and standardization in :py:mod:`pvdeg.degradation` module:
+  - Improve readability of mathematical expressions
+  - Refactor redundant helper functions
+  - Update docstrings
+  - Remove unused functions and variables
+  - Improve code consistency
+  (:issue:`177`, :pull:`178`)
+- Clean up and fix bugs in notebooks. (:issue:`179`, :pull:`184`)
+- Resolves non-deterministic source ambiguity when picking NSRDB TMY files from Kestrel when using ``weather.get(..., TMY=True, geospatial=True)``.
+  - PVDeg will always use the most recent version.
+  - Added new ``kestrel_nsrdb_fnames`` attribute to returned weather dataset for traceability.
+
+Dependencies
+------------
+- Update aiohttp from 3.10.11 to 3.12.14 for improved security and performance
+  (:pull:`185`)
+- Update NREL-PySAM dependency from 5.1.0 to the newest version to leverage latest
+  features and improvements. (:issue:`254`, :pull:`255`)
+
+
+Testing
+-------
+- Added nbval-based notebook testing workflow to CI for validating tutorial and example
+  notebooks (:issue:`179`, :pull:`184`, :pull:`268`)
+- Add tests for :py:func:`pvdeg.weather.get`. (pull:`249`)
+
+
+Contributors
+------------
+- Rajiv Daxini (:ghuser:`RDaxini`)
+- Tobin Ford (:ghuser:`tobin-ford`)
+- Maxx Millstein (:ghuser:`maxx-mill`)
+- Mike Kempe (:ghuser:`MDKempe`)
+- Martin Springer (:ghuser:`martin-springer`)
