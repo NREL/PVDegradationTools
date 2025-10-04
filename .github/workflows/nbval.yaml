@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      notebooks: ${{ steps.set-matrix.outputs.notebooks }}
     env:
       ALL_NOTEBOOKS: |
         "1 - Basics, Humidity, Design.ipynb"
@@ -35,9 +36,20 @@ jobs:
           BATCH_SIZE=5
           BATCH_COUNT=$(( (NOTEBOOK_COUNT + BATCH_SIZE - 1) / BATCH_SIZE ))
 
-          # Generate matrix array [1, 2, 3, ...]
-          BATCHES=$(seq 1 $BATCH_COUNT | jq -R . | jq -s .)
+          # Generate matrix array [1, 2, 3, ...] as proper JSON
+          BATCHES="["
+          for i in $(seq 1 $BATCH_COUNT); do
+            if [ $i -gt 1 ]; then
+              BATCHES="$BATCHES,"
+            fi
+            BATCHES="$BATCHES$i"
+          done
+          BATCHES="$BATCHES]"
+
           echo "matrix={\"batch\":$BATCHES}" >> $GITHUB_OUTPUT
+          echo "notebooks<<EOF" >> $GITHUB_OUTPUT
+          echo "$ALL_NOTEBOOKS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
           echo "Will create $BATCH_COUNT batches for $NOTEBOOK_COUNT notebooks"
 
   notebook-check:
@@ -49,25 +61,7 @@ jobs:
     env:
       NOTEBOOK_DIR: "tutorials_and_tools/tutorials_and_tools"
       SANITIZE_CFG: "nbval_sanitization_rules.cfg"
-      # Central notebook list - easy to add new notebooks here
-      ALL_NOTEBOOKS: |
-        "1 - Basics, Humidity, Design.ipynb"
-        "2 - Degradation.ipynb"
-        "3 - Spectral Degradation.ipynb"
-        "4 - Weather Database Access.ipynb"
-        "ASTM Live Demo.ipynb"
-        "B-O LID - Accelerated Test.ipynb"
-        "Custom-Functions-Nopython.ipynb"
-        "LETID - Accelerated Test.ipynb"
-        "LETID - Outdoor LETID.ipynb"
-        "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb"
-        "LETID - Passivated Wafer.ipynb"
-        "Monte Carlo - Arrhenius.ipynb"
-        "Monte Carlo - Standoff.ipynb"
-        "Pysam - Single Location.ipynb"
-        "Tools - Edge Seal Oxygen Ingress.ipynb"
-        "Van't Hoff Degradation Model.ipynb"
-        "Geospatial - Local Scenario.ipynb"
+      ALL_NOTEBOOKS: ${{ needs.calculate-batches.outputs.notebooks }}
 
     steps:
       - uses: actions/checkout@v4
