@@ -84,6 +84,7 @@ Enhancements
       of parameter values for computation.
   This change clarifies the distinction between retrieving raw material data and
   extracting parameter values for use in calculations. (:issue:`256`, :pull:`257`)
+- Update pre-commit hooks and add github workflow (:pull:`267`)
 
 
 Deprecations
