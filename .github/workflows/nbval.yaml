@@ -129,10 +129,10 @@ jobs:
           echo "$ALL_NOTEBOOKS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          # Pass batch assignments for use in notebook-check job
+          # Pass batch assignments for use in notebook-check job (simple format)
           echo "batch_assignments<<EOF" >> $GITHUB_OUTPUT
           for (( b = 0; b < BATCH_COUNT; b++ )); do
-            echo "BATCH_$((b+1)):${BATCH_ASSIGNMENTS[$b]}"
+            echo "BATCH$((b+1)):${BATCH_ASSIGNMENTS[$b]}"
           done
           echo "EOF" >> $GITHUB_OUTPUT
 
@@ -179,11 +179,11 @@ jobs:
           # Debug: Show what we received
           echo "Debug: BATCH_ASSIGNMENTS content:"
           echo "$BATCH_ASSIGNMENTS"
-          echo "Debug: Looking for BATCH_${{ matrix.batch }}"
+          echo "Debug: Looking for batch ${{ matrix.batch }}"
 
-          # Extract notebook assignment for this specific batch
+          # Extract notebook assignment for this specific batch (simplified format: BATCHX:notebooks)
           BATCH_NUM=${{ matrix.batch }}
-          BATCH_LINE=$(echo "$BATCH_ASSIGNMENTS" | grep "BATCH_${BATCH_NUM}:" || echo "")
+          BATCH_LINE=$(echo "$BATCH_ASSIGNMENTS" | grep "BATCH${BATCH_NUM}:" || echo "")
 
           echo "Debug: Found batch line: '$BATCH_LINE'"
 
@@ -194,7 +194,7 @@ jobs:
             exit 0
           fi
 
-          # Extract notebooks from the assignment (format: BATCH_X:notebook1|notebook2|notebook3)
+          # Extract notebooks from the assignment (format: BATCHX:notebook1|notebook2|notebook3)
           NOTEBOOK_STRING=$(echo "$BATCH_LINE" | cut -d':' -f2-)
           echo "Debug: Extracted notebook string: '$NOTEBOOK_STRING'"
 
