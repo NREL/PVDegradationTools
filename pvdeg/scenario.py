@@ -280,8 +280,9 @@ class Scenario:
             Options : ``sol_position``, ``tilt``, ``azimuth``, ``sky_model``
         """
         try:
-            mat_params = utilities.read_material_property(pvdeg_file=material_file,
-                                                          key=material)
+            mat_params = utilities.read_material_property(
+                pvdeg_file=material_file, key=material
+            )
 
             old_modules = [mod["module_name"] for mod in self.modules]
             if module_name in old_modules:

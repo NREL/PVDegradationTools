@@ -29,4 +29,3 @@ jobs:
     - name: Run flake8 on changed files only
       run: |
         git diff origin/$GITHUB_BASE_REF HEAD -- "*.py" | flake8 --config=.flake8 --diff
-

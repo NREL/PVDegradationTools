@@ -1531,9 +1531,7 @@ def read_material_property(
             k: (
                 material_dict[k]["value"]
                 if k in material_dict and isinstance(material_dict[k], dict)
-                else material_dict[k]
-                if k in material_dict
-                else None
+                else material_dict[k] if k in material_dict else None
             )
             for k in parameters
         }
