@@ -2,6 +2,9 @@ name: nbval
 
 on: [pull_request]
 
+env:
+  BATCH_SIZE: 4
+
 jobs:
   calculate-batches:
     runs-on: ubuntu-latest
@@ -33,7 +36,6 @@ jobs:
         run: |
           # Count notebooks
           NOTEBOOK_COUNT=$(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$' | wc -l)
-          BATCH_SIZE=5
           BATCH_COUNT=$(( (NOTEBOOK_COUNT + BATCH_SIZE - 1) / BATCH_SIZE ))
 
           # Generate matrix array [1, 2, 3, ...] as proper JSON
@@ -69,7 +71,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Cache pip dependencies
         uses: actions/cache@v4
@@ -92,8 +94,7 @@ jobs:
           # Convert the ALL_NOTEBOOKS env var into an array, handling quoted strings properly
           readarray -t ALL_NOTEBOOK_ARRAY < <(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$' | sed 's/^"\(.*\)"$/\1/')
 
-          # Calculate batch size (5 notebooks per batch)
-          BATCH_SIZE=4
+          # Use workflow-level BATCH_SIZE (4 notebooks per batch)
           BATCH_NUM=${{ matrix.batch }}
           START_INDEX=$(( (BATCH_NUM - 1) * BATCH_SIZE ))
           END_INDEX=$(( START_INDEX + BATCH_SIZE - 1 ))
