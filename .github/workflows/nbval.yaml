@@ -13,24 +13,24 @@ jobs:
       notebooks: ${{ steps.set-matrix.outputs.notebooks }}
       batch_assignments: ${{ steps.set-matrix.outputs.batch_assignments }}
     env:
-      # Notebooks with estimated runtime in minutes (format: "notebook:runtime")
+      # Notebooks with estimated runtime in seconds (format: "notebook:runtime")
       ALL_NOTEBOOKS: |
-        "1 - Basics, Humidity, Design.ipynb:1"
-        "2 - Degradation.ipynb:1"
-        "3 - Spectral Degradation.ipynb:1"
-        "4 - Weather Database Access.ipynb:1"
-        "ASTM Live Demo.ipynb:2"
-        "B-O LID - Accelerated Test.ipynb:5"
-        "Custom-Functions-Nopython.ipynb:2"
-        "LETID - Accelerated Test.ipynb:5"
-        "LETID - Outdoor LETID.ipynb:5"
-        "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb:5"
-        "LETID - Passivated Wafer.ipynb:4"
-        "Monte Carlo - Arrhenius.ipynb:12"
-        "Monte Carlo - Standoff.ipynb:10"
-        "Pysam - Single Location.ipynb:5"
-        "Tools - Edge Seal Oxygen Ingress.ipynb:3"
-        "Van't Hoff Degradation Model.ipynb:4"
+        "1 - Basics, Humidity, Design.ipynb:10"
+        "2 - Degradation.ipynb:5"
+        "3 - Spectral Degradation.ipynb:5"
+        "4 - Weather Database Access.ipynb:15"
+        "ASTM Live Demo.ipynb:10"
+        "B-O LID - Accelerated Test.ipynb:10"
+        "Custom-Functions-Nopython.ipynb:30"
+        "LETID - Accelerated Test.ipynb:120"
+        "LETID - Outdoor LETID.ipynb:30"
+        "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb:45"
+        "LETID - Passivated Wafer.ipynb:80"
+        "Monte Carlo - Arrhenius.ipynb:180"
+        "Monte Carlo - Standoff.ipynb:30"
+        "Pysam - Single Location.ipynb:25"
+        "Tools - Edge Seal Oxygen Ingress.ipynb:15"
+        "Van't Hoff Degradation Model.ipynb:5"
         "Geospatial - Local Scenario.ipynb:1"
     steps:
       - name: Calculate batch matrix
@@ -56,8 +56,8 @@ jobs:
           BATCH_COUNT=$(( (NOTEBOOK_COUNT + BATCH_SIZE - 1) / BATCH_SIZE ))
           TARGET_RUNTIME=$((TOTAL_RUNTIME / BATCH_COUNT))
 
-          echo "Total notebooks: $NOTEBOOK_COUNT, Total runtime: ${TOTAL_RUNTIME}min"
-          echo "Target runtime per batch: ${TARGET_RUNTIME}min across $BATCH_COUNT batches"
+          echo "Total notebooks: $NOTEBOOK_COUNT, Total runtime: ${TOTAL_RUNTIME}sec ($(($TOTAL_RUNTIME/60))min)"
+          echo "Target runtime per batch: ${TARGET_RUNTIME}sec ($(($TARGET_RUNTIME/60))min) across $BATCH_COUNT batches"
 
           # Create batches using greedy load balancing algorithm
           declare -a BATCH_RUNTIMES=()
@@ -111,7 +111,7 @@ jobs:
           # Output batch assignments and pass notebooks via output
           echo "Batch assignments:"
           for (( b = 0; b < BATCH_COUNT; b++ )); do
-            echo "Batch $((b+1)): ${BATCH_RUNTIMES[$b]}min - ${BATCH_ASSIGNMENTS[$b]//|/, }"
+            echo "Batch $((b+1)): ${BATCH_RUNTIMES[$b]}sec ($((${BATCH_RUNTIMES[$b]}/60))min) - ${BATCH_ASSIGNMENTS[$b]//|/, }"
           done
 
           # Generate matrix and pass batch assignments as output
