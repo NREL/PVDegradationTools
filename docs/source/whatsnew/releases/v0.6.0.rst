@@ -116,6 +116,8 @@ Dependencies
 ------------
 - Update aiohttp from 3.10.11 to 3.12.14 for improved security and performance
   (:pull:`185`)
+- Update NREL-PySAM dependency from 5.1.0 to the newest version to leverage latest
+  features and improvements. (:issue:`254`, :pull:`255`)
 
 
 Testing
