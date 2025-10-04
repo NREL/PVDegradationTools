@@ -129,12 +129,18 @@ jobs:
           echo "$ALL_NOTEBOOKS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          # Pass batch assignments for use in notebook-check job (simple format)
-          echo "batch_assignments<<EOF" >> $GITHUB_OUTPUT
+          # Pass batch assignments for use in notebook-check job (base64 encoded to avoid multiline issues)
+          BATCH_ASSIGNMENTS_STRING=""
           for (( b = 0; b < BATCH_COUNT; b++ )); do
-            echo "BATCH$((b+1)):${BATCH_ASSIGNMENTS[$b]}"
+            if [ $b -gt 0 ]; then
+              BATCH_ASSIGNMENTS_STRING="${BATCH_ASSIGNMENTS_STRING};"
+            fi
+            BATCH_ASSIGNMENTS_STRING="${BATCH_ASSIGNMENTS_STRING}BATCH$((b+1)):${BATCH_ASSIGNMENTS[$b]}"
           done
-          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Encode the assignments string in base64 to safely pass through GitHub Actions
+          ENCODED_ASSIGNMENTS=$(echo "$BATCH_ASSIGNMENTS_STRING" | base64 -w 0)
+          echo "batch_assignments=$ENCODED_ASSIGNMENTS" >> $GITHUB_OUTPUT
 
           echo "Will create $BATCH_COUNT balanced batches for $NOTEBOOK_COUNT notebooks"
 
@@ -176,14 +182,17 @@ jobs:
 
       - name: Set batch notebooks
         run: |
+          # Decode batch assignments from base64
+          DECODED_ASSIGNMENTS=$(echo "$BATCH_ASSIGNMENTS" | base64 -d)
+
           # Debug: Show what we received
-          echo "Debug: BATCH_ASSIGNMENTS content:"
-          echo "$BATCH_ASSIGNMENTS"
+          echo "Debug: BATCH_ASSIGNMENTS (encoded): $BATCH_ASSIGNMENTS"
+          echo "Debug: BATCH_ASSIGNMENTS (decoded): $DECODED_ASSIGNMENTS"
           echo "Debug: Looking for batch ${{ matrix.batch }}"
 
-          # Extract notebook assignment for this specific batch (simplified format: BATCHX:notebooks)
+          # Extract notebook assignment for this specific batch
           BATCH_NUM=${{ matrix.batch }}
-          BATCH_LINE=$(echo "$BATCH_ASSIGNMENTS" | grep "BATCH${BATCH_NUM}:" || echo "")
+          BATCH_LINE=$(echo "$DECODED_ASSIGNMENTS" | tr ';' '\n' | grep "BATCH${BATCH_NUM}:" || echo "")
 
           echo "Debug: Found batch line: '$BATCH_LINE'"
 
