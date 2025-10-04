@@ -121,8 +121,8 @@ commands to run either one notebook:
 
 or all notebooks inside the tutorials and tools folder:
 
-   jupyter nbconvert --to notebook --execute --inplace "tutorials_and_tools/
-   tutorials_and_tools/*.ipynb"
+    jupyter nbconvert --to notebook --execute --inplace "tutorials_and_tools/
+    tutorials_and_tools/*.ipynb"
 
 This avoids formatting issues that may arise depending on your own local environment
 or IDE.
@@ -157,4 +157,4 @@ If you use this functions in a published work, please cite:
 
 And/or the specific release from Zenodo:
 
-	Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Mark Campanelli, Derek M Holsapple, Kevin Anderson, Michael Kempe. (2024). NREL/PVDegradationTools: 0.3.2 (0.3.2). Zenodo. https://doi.org/10.5281/zenodo.11123249
+	Martin Springer, Tobin Ford, Rajiv Daxini, Matthew Brown, Silvana Ovaitt, Joseph Karas, Mark Campanelli, Derek M Holsapple, Kevin Anderson, Michael Kempe. (2025). NREL/PVDegradationTools: 0.6.1 (0.6.1). Zenodo. https://doi.org/10.5281/zenodo.17265988

@@ -3,7 +3,7 @@
 
 title: PVDEG Tutorials
 author: Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Michael Kempe
-logo: PVD_logo.png
+logo: ../docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg
 
 # Auto-exclude files not in the toc
 only_build_toc_files        : true
