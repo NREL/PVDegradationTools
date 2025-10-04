@@ -3,12 +3,54 @@ name: nbval
 on: [pull_request]
 
 jobs:
-  notebook-check:
+  calculate-batches:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      ALL_NOTEBOOKS: |
+        "1 - Basics, Humidity, Design.ipynb"
+        "2 - Degradation.ipynb"
+        "3 - Spectral Degradation.ipynb"
+        "4 - Weather Database Access.ipynb"
+        "ASTM Live Demo.ipynb"
+        "B-O LID - Accelerated Test.ipynb"
+        "Custom-Functions-Nopython.ipynb"
+        "LETID - Accelerated Test.ipynb"
+        "LETID - Outdoor LETID.ipynb"
+        "LETID - Outdoor Scenario Based on Accelerated Test Result.ipynb"
+        "LETID - Passivated Wafer.ipynb"
+        "Monte Carlo - Arrhenius.ipynb"
+        "Monte Carlo - Standoff.ipynb"
+        "Pysam - Single Location.ipynb"
+        "Tools - Edge Seal Oxygen Ingress.ipynb"
+        "Van't Hoff Degradation Model.ipynb"
+        "Geospatial - Local Scenario.ipynb"
+    steps:
+      - name: Calculate batch matrix
+        id: set-matrix
+        run: |
+          # Count notebooks
+          NOTEBOOK_COUNT=$(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$' | wc -l)
+          BATCH_SIZE=5
+          BATCH_COUNT=$(( (NOTEBOOK_COUNT + BATCH_SIZE - 1) / BATCH_SIZE ))
+
+          # Generate matrix array [1, 2, 3, ...]
+          BATCHES=$(seq 1 $BATCH_COUNT | jq -R . | jq -s .)
+          echo "matrix={\"batch\":$BATCHES}" >> $GITHUB_OUTPUT
+          echo "Will create $BATCH_COUNT batches for $NOTEBOOK_COUNT notebooks"
+
+  notebook-check:
+    needs: calculate-batches
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.calculate-batches.outputs.matrix) }}
     env:
       NOTEBOOK_DIR: "tutorials_and_tools/tutorials_and_tools"
       SANITIZE_CFG: "nbval_sanitization_rules.cfg"
-      NOTEBOOK_LIST: |
+      # Central notebook list - easy to add new notebooks here
+      ALL_NOTEBOOKS: |
         "1 - Basics, Humidity, Design.ipynb"
         "2 - Degradation.ipynb"
         "3 - Spectral Degradation.ipynb"
@@ -43,19 +85,44 @@ jobs:
           pip install nbval global_land_mask dotenv imageio nrel-pysam
           pip install nbconvert[webpdf]
 
-      - name: Run listed notebooks with nbval
+      - name: Set batch notebooks
         run: |
-          # Read the environment variable string into a shell array
-          mapfile -t NOTEBOOKS < <(echo "$NOTEBOOK_LIST")
+          # Convert the ALL_NOTEBOOKS env var into an array
+          readarray -t ALL_NOTEBOOK_ARRAY < <(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$')
+
+          # Calculate batch size (5 notebooks per batch)
+          BATCH_SIZE=5
+          BATCH_NUM=${{ matrix.batch }}
+          START_INDEX=$(( (BATCH_NUM - 1) * BATCH_SIZE ))
+          END_INDEX=$(( START_INDEX + BATCH_SIZE - 1 ))
+
+          # Extract notebooks for this batch
+          BATCH_NOTEBOOKS=()
+          for i in $(seq $START_INDEX $END_INDEX); do
+            if [ $i -lt ${#ALL_NOTEBOOK_ARRAY[@]} ]; then
+              BATCH_NOTEBOOKS+=("${ALL_NOTEBOOK_ARRAY[$i]}")
+            fi
+          done
+
+          # Convert array to string format for environment variable
+          printf -v NOTEBOOKS_STRING '"%s" ' "${BATCH_NOTEBOOKS[@]}"
+          echo "NOTEBOOKS=($NOTEBOOKS_STRING)" >> $GITHUB_ENV
+
+          echo "Batch $BATCH_NUM will process notebooks: ${BATCH_NOTEBOOKS[*]}"
+
+      - name: Run batch notebooks with nbval
+        run: |
+          # Parse the NOTEBOOKS environment variable into an array
+          eval "NOTEBOOK_ARRAY=$NOTEBOOKS"
 
           # Prepend the NOTEBOOK_DIR path to each notebook name
-          mapfile -t FULL_PATHS < <(for notebook in "${NOTEBOOKS[@]}"; do
-             NOTEBOOK_NAME="${notebook//\"/}"
-             echo "$NOTEBOOK_DIR/$NOTEBOOK_NAME"
-          done)
+          FULL_PATHS=()
+          for notebook in "${NOTEBOOK_ARRAY[@]}"; do
+            FULL_PATHS+=("$NOTEBOOK_DIR/$notebook")
+          done
 
-          # Execute a single pytest command with all full paths as arguments
-          echo "Testing the following notebooks: ${FULL_PATHS[*]}"
+          # Execute pytest with the batch of notebooks
+          echo "Testing batch ${{ matrix.batch }} notebooks: ${FULL_PATHS[*]}"
           pytest --nbval \
                  --nbval-sanitize-with "$SANITIZE_CFG" \
                  "${FULL_PATHS[@]}"
