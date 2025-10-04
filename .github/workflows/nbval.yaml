@@ -93,7 +93,7 @@ jobs:
           readarray -t ALL_NOTEBOOK_ARRAY < <(echo "$ALL_NOTEBOOKS" | sed 's/^[[:space:]]*//' | grep -v '^$' | sed 's/^"\(.*\)"$/\1/')
 
           # Calculate batch size (5 notebooks per batch)
-          BATCH_SIZE=5
+          BATCH_SIZE=4
           BATCH_NUM=${{ matrix.batch }}
           START_INDEX=$(( (BATCH_NUM - 1) * BATCH_SIZE ))
           END_INDEX=$(( START_INDEX + BATCH_SIZE - 1 ))
