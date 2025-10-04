@@ -11,7 +11,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Please provide a minimal example to reproduce the issue 
+Please provide a minimal example to reproduce the issue
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

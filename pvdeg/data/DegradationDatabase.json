@@ -206,7 +206,7 @@
             "value": 129,
             "stdev": 3.35,
             "units": "kJ/mol"
-        },        
+        },
         "n": {
             "value": 2,
             "stdev": 0,
@@ -241,7 +241,7 @@
             "value": 128,
             "stdev": 2.95,
             "units": "kJ/mol"
-        },        
+        },
         "n": {
             "value": 2,
             "stdev": 0,
@@ -276,7 +276,7 @@
             "value": 105,
             "stdev": 5.45,
             "units": "kJ/mol"
-        },        
+        },
         "n": {
             "value": 2,
             "stdev": 0,
@@ -311,7 +311,7 @@
             "value": 102,
             "stdev": 6.05,
             "units": "kJ/mol"
-        },        
+        },
         "n": {
             "value": 2,
             "stdev": 0,

@@ -171,9 +171,12 @@ def calculate_jsc_from_tau_cp(
 
     # 3. calc c.p. for emitter, depletion region, and base
     cp_emitter = collection_probability(
-        emitter_depth, thickness=w_emitter, s=s_emitter, diffusion_length=l_emitter,
-        d=d_emitter
-        )
+        emitter_depth,
+        thickness=w_emitter,
+        s=s_emitter,
+        diffusion_length=l_emitter,
+        d=d_emitter,
+    )
     cp_emitter = np.flip(cp_emitter)
     emitter_depth = np.flip((-emitter_depth + np.max(emitter_depth)))
 
