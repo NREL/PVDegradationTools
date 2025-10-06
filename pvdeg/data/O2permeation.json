@@ -174,20 +174,54 @@
         "So": { "name": "Solubility Prefactor", "units": "g/cm³/atm", "value": 0.00148313008211379 },
         "Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 39.2779774417758 },
         "Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day/atm", "value": 12931378.0376762 }
+    },
+   "OX116" : {
+        "name": "Low Density Polyethylene, UBE Industries Ltd., UBE C200, 0.920 g/cm3, MI=1, 116 MRad of exposure",
+        "alias": "PE-0-116Mrad",
+        "cotributor": "Aidan Wesley",
+        "source": "Tadao, S.; Yasuaki, Y. Diffusion and solubility of oxygen in γ-ray irradiated polymer insulation materials. JAERI 1986, 1299, 68.",
+        "DOI": "31911?",
+        "Fickian": true,
+        "comment": " All values obtained from a temperature series of diffusivity and solubility using a non-linear regression optimizing the summation of the percent error in the estimation of the summation of the logarithm of permeability, the logarithm of diffusivity, and the logarithm of the solubility. This was accomplished using the JMP software package. ",
+        "Corr_lnSo_lnDo": 0.6878,
+        "Corr_lnSo_Eas": 0.9995,
+        "Corr_lnSo_EaD": 0.7017,
+        "Corr_lnDo_Eas": 0.6944,
+        "Corr_lnDo_EaD": 0.9987,
+        "Corr_Eas_EaD": 0.7079,
+        "So": { "name": "Solubility Prefactor","units":"g/cm³/atm", "value": 6.18217000276466E-05},
+        "lnSo": { "name": "Permeability Prefactor","units": "ln(g/cm³/atm)", "value": -9.691256122, "stdev": 0.93704615},
+        "Do": { "name": "Solubility Prefactor","units":"cm²/s", "value": 0.674972301342308},
+        "lnDo": { "name": "Permeability Prefactor","units": "ln(cm²/s)", "value": -0.393083624, "stdev": 0.54587312},
+        "Eas": { "name": "Solubility Activation Energy","units":"kJ/mol", "value": 0.000000000001660292},
+        "EaD": { "name": "Diffusivity Activation Energy","units":"kJ/mol", "value": 34.772447838},
+        "Po": { "name": "Permeability Prefactor","units":"g·mm/m²/day/atm", "value": 0.000417279351405545},
+        "lnPo": { "name": "Permeability Prefactor","units": "ln(g·mm/m²/day/atm)", "value": -7.78175465300595, "stdev": 9.69922470910224},
+        "Eap": { "name": "Permeability Activation Energy","units": "kJ/mol", "value": 34.7724478380017, "stdev": 1.22122198637267}
+    },
+  "OX200" : {
+        "name": "Low Density Polyethylene, UBE Industries Ltd., UBE C200, 0.920 g/cm3, MI=1, 200 MRad of exposure",
+        "alias": "PE-0-200rad",
+        "cotributor": "Aidan Wesley",
+        "source": "Tadao, S.; Yasuaki, Y. Diffusion and solubility of oxygen in γ-ray irradiated polymer insulation materials. JAERI 1986, 1299, 68.",
+        "DOI": "31911?",
+        "Fickian": true,
+        "comment": " All values obtained from a temperature series of diffusivity and solubility using a non-linear regression optimizing the summation of the percent error in the estimation of the summation of the logarithm of permeability, the logarithm of diffusivity, and the logarithm of the solubility. This was accomplished using the JMP software package. ",
+        "Corr_EaD_Do": -0.999185553657248,
+        "Corr_EaD_So": -1,
+        "Corr_EaP_Po": -0.999185553657248,
+        "Corr_lnDo_So": -1,
+        "So": { "name": "Solubility Prefactor","units":"g/cm³/atm", "value": 0.000058877792, "stdev": 0.05},
+        "lnSo": { "name": "Solubility Prefactor","units": "ln(g/cm³/atm)", "value": -9.691256122 },
+        "Do": { "name": "Permeability Prefactor","units":"cm²/s", "value": 0.149393669043405},
+        "lnDo": { "name": "Permeability Prefactor","units": "ln(cm²/s)", "value": -1.90117038306213, "stdev": 0.344743479548327},
+        "Eas": { "name": "Solubility Prefactor","units":"kJ/mol", "value": 0},
+        "EaD": { "name": "Diffusivity Activation Energy","units":"kJ/mol", "value": 31.6124938819758},
+        "Po": { "name": "Permeability Prefactor","units":"g·mm/m²/day/atm", "value": 8.79596937205444E-05},
+        "lnPo": { "name": "Permeability Prefactor","units": "ln(g·mm/m²/day/atm)", "value": -9.33863187431488, "stdev": 0.344743479548327},
+        "Eap": { "name": "Permeability Activation Energy","units": "kJ/mol", "value": 31.6124938819758, "stdev": 31.6124938819758}
     }
 
-"name:
-"name:
-"name:
-"name:
-"name:
-"name:
 
+     
 
-
-
-
-
-
-
-}
