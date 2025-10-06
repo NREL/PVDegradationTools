@@ -541,9 +541,9 @@
         "Reference": "W. Kwapil et al., IEEE J. Photovoltaics, vol. 10, no. 6, pp. 1591-1603, 2020, doi: 10.1109/JPHOTOV.2020.3025240.",
         "KeyWords": "Degradation, Defect reactions, light- and elevated temperature-induced degradation, LeTID, model, silicon defects.",
         "Material": "mc-Si cells",
-        "Degradation": "LeTID",
+        "Degradation": "letid",
         "Comments": "Cell_200Micron",
-        "EquationType": "LeTID",
+        "EquationType": "letid",
         "v_ab": {
             "value": 33000000,
             "units": "(cm^3x)/s"
@@ -595,9 +595,9 @@
         "Reference": "I. Repins et al., MRS Bulletin, 2023. doi: 10.1557/s43577-022-00438-8.",
         "KeyWords": "LeTID, Indoor, Outdoor",
         "Material": "p-Si Cells",
-        "Degradation": "LeTID",
+        "Degradation": "letid",
         "Comments": "Cell_200Micron",
-        "EquationType": "LeTID",
+        "EquationType": "letid",
         "v_ab": {
             "value": 46700000,
             "units": "(cm^3x)/s"
@@ -649,9 +649,9 @@
         "Reference": "D. Bredemeier et al., Sol. Energy Mater. Sol. Cells, vol. 173, pp. 2-5, 2017, doi: 10.1016/j.solmat.2017.08.007.",
         "KeyWords": "multi-Si, LeTID, ",
         "Material": "multi-Si",
-        "Degradation": "LeTID",
+        "Degradation": "letid",
         "Comments": "ab158micronwafer_bc200microncell",
-        "EquationType": "LeTID",
+        "EquationType": "letid",
         "v_ab": {
             "value": 937000000,
             "units": "(cm^3x)/s"
@@ -703,9 +703,9 @@
         "Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878-889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
         "KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
         "Material": "p-type mc-Si Perc",
-        "Degradation": "LeTID",
+        "Degradation": "letid",
         "Comments": "wafer_180micron",
-        "EquationType": "LeTID",
+        "EquationType": "letid",
         "v_ab": {
             "value": 1900000000000,
             "units": "(cm^3x)/s"
@@ -758,9 +758,9 @@
         	"Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878-889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
         	"KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
         	"Material": "p-type mc-Si Perc",
-        	"Degradation": "LeTID",
+        	"Degradation": "letid",
         	"Comments": "wafer_200micron",
-        	"EquationType": "LeTID",
+        	"EquationType": "letid",
         	"v_ab": {"value": 483000,
             	"units": "(cm^3x)/s"},
         	"v_ba": {"value": 0,
@@ -789,9 +789,9 @@
         "Reference": "A. Graf, et al., AIP Conference Proceedings, vol. 2147, no. 1, p. 140003, 2019, doi: 10.1063/1.5123890.",
         "KeyWords": "Si, Boron Doped, LeTID, Degradation",
         "Material": "Si, CZ FZ grown",
-        "Degradation": "LeTID",
+        "Degradation": "letid",
         "Comments": "wafer_152micron",
-        "EquationType": "LeTID",
+        "EquationType": "letid",
         "v_ab": {
             "value": 483000,
             "units": "(cm^3x)/s"
@@ -890,9 +890,9 @@
         	"Reference": "D. Bredemeier et al., Sol. Energy Mater. Sol. Cells, vol. 173, pp. 2-5, 2017, doi: 10.1016/j.solmat.2017.08.007.",
         	"KeyWords": "multi-Si, LeTID, ",
         	"Material": "multi-Si",
-        	"Degradation": "LeTID",
+        	"Degradation": "letid",
         	"Comments": "ab158micronwafer_bc200microncell",
-        	"EquationType": "LeTID",
+        	"EquationType": "letid",
         	"x_ab": {"value": 1}},
     "D034": {
         	"DataEntryPerson": "Weston Wall",
@@ -903,9 +903,9 @@
         	"Reference": "G. Wyller et al., IEEE J. Photovoltaics, vol. 11, no. 4, pp. 878-889, 2021, doi: 10.1109/JPHOTOV.2021.3078367.",
         	"KeyWords": "p-type mc-Si Perc, Degradation, LeTID, Hydrogen Involvement",
         	"Material": "p-type mc-Si Perc",
-        	"Degradation": "LeTID",
+        	"Degradation": "letid",
         	"Comments": "wafer_200micron",
-        	"EquationType": "LeTID",
+        	"EquationType": "letid",
         	"x_bc": {"value": 1.2}},
     "D035": {"DataEntryPerson": "Weston Wall",
         	"DateEntered": "5/26/2023",
@@ -915,9 +915,9 @@
         	"Reference": "W. Kwapil et al., IEEE J. Photovoltaics, vol. 10, no. 6, pp. 1591-1603, 2020, doi: 10.1109/JPHOTOV.2020.3025240.",
         	"KeyWords": "Degradation, Defect reactions, light- and elevated temperature-induced degradation, LeTID, model, silicon defects.",
         	"Material": "mc-Si cells",
-        	"Degradation": "LeTID",
+        	"Degradation": "letid",
         	"Comments": "Cell_200Micron",
-        	"EquationType": "LeTID",
+        	"EquationType": "letid",
         	"x_ba": {"value": 1.7}},
     "D036": {"DataEntryPerson": "Michael Kempe",
         	"DateEntered": "2/14/2025",
@@ -942,7 +942,7 @@
 
     "D037": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 46700000.0,
         "v_ba": 4.7e-25,
         "v_bc": 19900000.0,
@@ -971,7 +971,7 @@
     },
     "D038": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 46700000.0,
         "v_ba": 4.7e-25,
         "v_bc": 19900000.0,
@@ -1000,7 +1000,7 @@
     },
     "D039": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 33000000.0,
         "v_ba": 4.7e-25,
         "v_bc": 13100000.0,
@@ -1029,7 +1029,7 @@
     },
     "D040": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 937000000.0,
         "v_ba": 0.0,
         "v_bc": 21500000.0,
@@ -1058,7 +1058,7 @@
     },
     "D041": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 1900000000000.0,
         "v_ba": 0.0,
         "v_bc": 0.284,
@@ -1087,7 +1087,7 @@
     },
     "D042": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 483000.0,
         "v_ba": 0.0,
         "v_bc": 0.0,
@@ -1116,7 +1116,7 @@
     },
     "D043": {
         "DataEntryPerson": "Rajiv (Dax) Daxini",
-        "mechanism": "LETID",
+        "mechanism": "letid",
         "v_ab": 483000.0,
         "v_ba": 0.0,
         "v_bc": 0.0,
