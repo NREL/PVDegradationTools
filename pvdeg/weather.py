@@ -237,9 +237,11 @@ def get(
             temp_air = weather_df["temp_air"]
             dew_point = weather_df.get("dew_point")
             if dew_point is None or temp_air is None:
-                raise ValueError('Cannot calculate "relative_humidity": one of'
-                                 '"dew_point" or "temp_air" column not found in'
-                                 'DataFrame.')
+                raise ValueError(
+                    'Cannot calculate "relative_humidity": one of'
+                    '"dew_point" or "temp_air" column not found in'
+                    "DataFrame."
+                )
             weather_df["relative_humidity"] = humidity.relative(temp_air, dew_point)
             print(
                 "\r",
@@ -609,7 +611,7 @@ def ini_h5_geospatial(fps):
 
 
 def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
-    """Get a list of NSRDB files for a given satellite and year.
+    """Get a sorted list of NSRDB files for a given satellite and year.
 
     Parameters
     ----------
@@ -662,6 +664,7 @@ def get_NSRDB_fnames(satellite, names, NREL_HPC=False, **_):
             "Couldn't find NSRDB input files! \nSearched for: '{}'".format(nsrdb_fp)
         )
 
+    nsrdb_fnames = sorted(nsrdb_fnames)
     return nsrdb_fnames, hsds
 
 
@@ -767,10 +770,14 @@ def get_NSRDB(
         nsrdb_fnames, hsds = get_NSRDB_fnames(satellite, names, NREL_HPC)
 
         if isinstance(names, str) and names.lower() in ["tmy", "tmy3"]:
-            nsrdb_fnames = nsrdb_fnames[-1:]  # maintain as list with last element
+            # maintain as list with last element of sorted list
+            nsrdb_fnames = nsrdb_fnames[-1:]
 
         weather_ds, meta_df = ini_h5_geospatial(nsrdb_fnames)
 
+        weather_ds = weather_ds.assign_attrs({"kestrel_nsrdb_fnames": nsrdb_fnames})
+
+        # select desired weather attributes
         if attributes is not None:
             weather_ds = weather_ds[attributes]
 
@@ -1046,6 +1053,7 @@ def get_anywhere(database="PSM3", id=None, **kwargs):
         "attributes": [],
         "map_variables": True,
         "geospatial": False,
+        "find_meta": True,
     }
     weather_arg.update(kwargs)  # Will default to the kwargs passed to the function.
 

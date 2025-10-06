@@ -61,7 +61,8 @@ def test_water_saturation_pressure_mean():
     weather dataframe and meta dictionary
     """
     water_saturation_pressure_avg = pvdeg.humidity.water_saturation_pressure(
-        temp=WEATHER["temp_air"])
+        temp=WEATHER["temp_air"]
+    )
     assert water_saturation_pressure_avg[1] == pytest.approx(0.47607, abs=5e-5)
     assert water_saturation_pressure_avg[0][0] == pytest.approx(0.469731, abs=5e-5)
     assert water_saturation_pressure_avg[0][1] == pytest.approx(0.465908, abs=5e-5)
@@ -78,7 +79,8 @@ def test_water_saturation_pressure_individual_points():
     weather dataframe and meta dictionary
     """
     water_saturation_pressure = pvdeg.humidity.water_saturation_pressure(
-        temp=WEATHER["temp_air"], average=False)
+        temp=WEATHER["temp_air"], average=False
+    )
     assert water_saturation_pressure[0] == pytest.approx(0.469731, abs=5e-5)
     assert water_saturation_pressure[1] == pytest.approx(0.465908, abs=5e-5)
     assert water_saturation_pressure[2] == pytest.approx(0.462112, abs=5e-5)
@@ -99,13 +101,16 @@ def test_module():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
     )
 
     # Check approximate equality for all columns
     assert result.shape == rh_expected.shape
     for col in rh_expected.columns:
-        np.testing.assert_allclose(result[col].values, rh_expected[col].values,
-                                   rtol=1e-3, atol=1e-3)
+        np.testing.assert_allclose(
+            result[col].values, rh_expected[col].values, rtol=1e-3, atol=1e-3
+        )
 
 
 def test_module_basic():
@@ -118,6 +123,8 @@ def test_module_basic():
         wind_factor=0.33,
         encapsulant="W002",
         backsheet="W002",
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
     )
     # Check output type and columns
     assert isinstance(result, pd.DataFrame)
@@ -158,14 +165,17 @@ def test_module_with_params():
 
 def test_module_edge_cases():
     """Test pvdeg.humidity.module with edge case input (extreme weather values)."""
-    weather_df = pd.DataFrame({
-        "relative_humidity": [0, 100, 50],
-        "temp_air": [-20, 50, 25],
-        "wind_speed": [0, 10, 5],
-        "ghi": [0, 1000, 500],
-        "dni": [0, 900, 400],
-        "dhi": [0, 100, 100],
-    }, index=pd.date_range("2020-01-01", periods=3, freq="H"))
+    weather_df = pd.DataFrame(
+        {
+            "relative_humidity": [0, 100, 50],
+            "temp_air": [-20, 50, 25],
+            "wind_speed": [0, 10, 5],
+            "ghi": [0, 1000, 500],
+            "dni": [0, 900, 400],
+            "dhi": [0, 100, 100],
+        },
+        index=pd.date_range("2020-01-01", periods=3, freq="H"),
+    )
     meta = {"latitude": 40, "longitude": -105, "altitude": 1600}
     result = pvdeg.humidity.module(
         weather_df,
@@ -173,6 +183,8 @@ def test_module_edge_cases():
         temp_model="sapm",
         conf="open_rack_glass_glass",
         wind_factor=0.33,
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
     )
     assert isinstance(result, pd.DataFrame)
     assert result.shape[0] == 3
@@ -197,7 +209,13 @@ def test_backsheet():
     rh_ambient = pd.Series([40, 60, 80])
     temp_ambient = pd.Series([20, 25, 30])
     temp_module = pd.Series([25, 30, 35])
-    result = pvdeg.humidity.backsheet(rh_ambient, temp_ambient, temp_module)
+    result = pvdeg.humidity.backsheet(
+        rh_ambient,
+        temp_ambient,
+        temp_module,
+        backsheet_thickness=0.3,
+        back_encap_thickness=0.46,
+    )
     # Should return a pandas Series and have same length as input
     assert result.tolist() == pytest.approx([24.535486, 31.149815, 38.113095], abs=1e-5)
 
@@ -210,8 +228,9 @@ def test_dew_yield():
     wind_speed = pd.Series([1, 2, 3])
     n = pd.Series([4, 5, 3])
     # Call dew_yield function
-    result = pvdeg.humidity.dew_yield(elevation=1, dry_bulb=temp_air,
-                                      dew_point=dew_point, wind_speed=wind_speed, n=n)
+    result = pvdeg.humidity.dew_yield(
+        elevation=1, dry_bulb=temp_air, dew_point=dew_point, wind_speed=wind_speed, n=n
+    )
     # Check result type and shape
     assert result.tolist() == pytest.approx([0.332943, 0.316928, 0.358373], abs=1e-6)
 
@@ -221,8 +240,9 @@ def test_diffusivity_weighted_water_basic():
     rh_ambient = pd.Series([50, 55, 60])
     temp_ambient = pd.Series([20, 22, 24])
     temp_module = pd.Series([25, 27, 29])
-    result = pvdeg.humidity.diffusivity_weighted_water(rh_ambient, temp_ambient,
-                                                       temp_module)
+    result = pvdeg.humidity.diffusivity_weighted_water(
+        rh_ambient, temp_ambient, temp_module
+    )
     assert result == pytest.approx(0.0009117307352906477, abs=1e-9)
 
 
@@ -234,9 +254,9 @@ def test_diffusivity_weighted_water_with_params():
     So = 1.8
     Eas = 16.7
     Ead = 38.1
-    result = pvdeg.humidity.diffusivity_weighted_water(rh_ambient, temp_ambient,
-                                                       temp_module, So=So, Eas=Eas,
-                                                       Ead=Ead)
+    result = pvdeg.humidity.diffusivity_weighted_water(
+        rh_ambient, temp_ambient, temp_module, So=So, Eas=Eas, Ead=Ead
+    )
     assert result == pytest.approx(0.0006841420183438176, abs=1e-9)
 
 
@@ -266,9 +286,40 @@ def test_ceq():
 
 # Unit tests for backsheet_from_encap
 
+
 def test_backsheet_from_encap():
     rh_back_encap = pd.Series([40, 60, 80])
     rh_surface_outside = pd.Series([20, 40, 60])
     result = pvdeg.humidity.backsheet_from_encap(rh_back_encap, rh_surface_outside)
     expected = pd.Series([30, 50, 70])
     np.testing.assert_allclose(result, expected, atol=1e-8)
+
+
+def test_back_encapsulant_water_concentration_missing_t():
+    temp_module = pd.Series([25, 30, 35])
+    rh_surface = pd.Series([50, 55, 60])
+    with pytest.raises(ValueError, match="backsheet_thickness must be specified"):
+        pvdeg.humidity.back_encapsulant_water_concentration(
+            temp_module=temp_module,
+            rh_surface=rh_surface,
+            Po_b=None,
+            Ea_p_b=None,
+            backsheet_thickness=None,
+            backsheet="W017",
+            back_encap_thickness=0.46,
+        )
+
+
+def test_back_encapsulant_water_concentration_missing_back_encap_thickness():
+    temp_module = pd.Series([25, 30, 35])
+    rh_surface = pd.Series([50, 55, 60])
+    with pytest.raises(ValueError, match="back_encap_thickness must be specified"):
+        pvdeg.humidity.back_encapsulant_water_concentration(
+            temp_module=temp_module,
+            rh_surface=rh_surface,
+            Po_b=None,
+            Ea_p_b=None,
+            back_encap_thickness=None,
+            backsheet="W017",
+            backsheet_thickness=0.3,
+        )

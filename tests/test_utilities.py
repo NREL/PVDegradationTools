@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 import pvdeg
 from rex import Outputs
-import json
 import shutil
 import io
 import sys
@@ -41,7 +40,7 @@ DSETS = [
 
 def load_json(filename):
     fpath = os.path.join(DATA_DIR, filename)
-    with open(fpath) as f:
+    with open(fpath, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -55,13 +54,14 @@ def test_read_material_basic():
 
 
 def test_read_material_parameters():
-    """Test pvdeg.utilities.read_material returns only requested parameters."""
+    """Test pvdeg.utilities.read_material_property returns only requested parameters."""
     data = load_json("O2permeation.json")
     known_key = next(iter(data.keys()))
     params = ["name", "alias"]
     expected = {k: data[known_key].get(k, None) for k in params}
-    result = pvdeg.utilities.read_material(pvdeg_file="O2permeation", key=known_key,
-                                           parameters=params)
+    result = pvdeg.utilities.read_material_property(
+        pvdeg_file="O2permeation", key=known_key, parameters=params
+    )
     assert result == expected
 
 
@@ -73,8 +73,9 @@ def test_search_json_name():
     known_key = next(iter(data.keys()))
     name = data[known_key].get("name", None)
     if name:
-        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation",
-                                             name_or_alias=name)
+        result = pvdeg.utilities.search_json(
+            pvdeg_file="H2Opermeation", name_or_alias=name
+        )
         assert result == known_key
 
 
@@ -84,8 +85,9 @@ def test_search_json_alias():
     known_key = next(iter(data.keys()))
     alias = data[known_key].get("alias", None)
     if alias:
-        result = pvdeg.utilities.search_json(pvdeg_file="H2Opermeation",
-                                             name_or_alias=alias)
+        result = pvdeg.utilities.search_json(
+            pvdeg_file="H2Opermeation", name_or_alias=alias
+        )
         assert result == known_key
 
 
@@ -134,36 +136,6 @@ def test_display_json_fp():
         data = json.load(f)
     for key in list(data.keys())[:2]:
         assert key in output
-
-
-def test__read_material_no_name():
-    """Test pvdeg.utilities._read_material with no name (should return full dict)."""
-    expected = load_json("H2Opermeation.json")
-    result = pvdeg.utilities._read_material(name=None, fname="H2Opermeation")
-    assert result == expected
-
-
-def test__read_material_with_name():
-    """Test pvdeg.utilities._read_material with a specific material name."""
-    data = load_json("H2Opermeation.json")
-    # Pick a known key from the file
-    known_key = next(iter(data.keys()))
-    expected = data[known_key]
-    result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation")
-    assert result == expected
-
-
-def test__read_material_with_item():
-    """Test pvdeg.utilities._read_material with item parameter (list of fields)."""
-    data = load_json("H2Opermeation.json")
-    known_key = "W001"
-    fields = ["Ead", "Do"]
-    expected = {field: data[known_key][field] for field in fields}
-    full_result = pvdeg.utilities._read_material(name=known_key, fname="H2Opermeation",
-                                                 item=fields)
-    # Filter result to only include the requested fields
-    result = {field: full_result[field] for field in fields if field in full_result}
-    assert result == expected
 
 
 def test_convert_tmy(tmp_path):
@@ -215,14 +187,6 @@ def test_get_kinetics_bad():
     res = pvdeg.utilities.get_kinetics(name=None)
 
     assert res == desired_output
-
-
-# DEPRECATE WITH THE OLD FUNCTION _read_material, replaced by read_material
-def test_read_material_bad():
-    # no name case
-    data = load_json("H2Opermeation.json")
-    res = pvdeg.utilities._read_material(name=None)
-    assert res == data
 
 
 def test_add_material(tmp_path):
@@ -286,12 +250,36 @@ def test_read_material_normal():
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": True,
-        "Ead": 47.603,
-        "Do": 0.554153,
-        "Eas": -11.5918,
-        "So": 9.554366e-07,
-        "Eap": 34.2011,
-        "Po": 2128.8937,
+        "Ead": {
+            "name": "Diffusivity Activation Energy",
+            "units": "kJ/mol",
+            "value": 47.603,
+        },
+        "Do": {
+            "name": "Diffusivity Prefactor",
+            "units": "cm²/s",
+            "value": 0.554153,
+        },
+        "Eas": {
+            "name": "Solubility Activation Energy",
+            "units": "kJ/mol",
+            "value": -11.5918,
+        },
+        "So": {
+            "name": "Solubility Prefactor",
+            "units": "g/cm³/atm",
+            "value": 9.554366e-07,
+        },
+        "Eap": {
+            "name": "Permeability Activation Energy",
+            "units": "kJ/mol",
+            "value": 34.2011,
+        },
+        "Po": {
+            "name": "Permeability Prefactor",
+            "units": "g·mm/m²/day/atm",
+            "value": 2128.8937,
+        },
     }
 
     template_material = pvdeg.utilities.read_material(
@@ -301,26 +289,26 @@ def test_read_material_normal():
     assert template_material == res
 
 
-def test_read_material_fewer_params():
+def test_read_material_property_select_params():
     res = {
         "name": "ST504",
         "Fickian": True,
     }
 
-    template_material = pvdeg.utilities.read_material(
+    template_material = pvdeg.utilities.read_material_property(
         pvdeg_file="O2permeation", key="OX002", parameters=["name", "Fickian"]
     )
 
     assert template_material == res
 
 
-def test_read_material_extra_params():
+def test_read_material_property_missing_params():
     res = {
         "namenotindict1": None,
         "namenotindict2": None,
     }
 
-    template_material = pvdeg.utilities.read_material(
+    template_material = pvdeg.utilities.read_material_property(
         pvdeg_file="O2permeation",
         key="OX002",
         parameters=["namenotindict1", "namenotindict2"],
@@ -329,7 +317,6 @@ def test_read_material_extra_params():
     assert template_material == res
 
 
-# pvdeg_file should override fp if both are provided
 def test_read_material_fp_override():
     res = {
         "name": "ST504",
@@ -337,17 +324,38 @@ def test_read_material_fp_override():
         "contributor": "Michael Kempe",
         "source": "unpublished measurements",
         "Fickian": True,
-        "Ead": 47.603,
-        "Do": 0.554153,
-        "Eas": -11.5918,
-        "So": 9.554366e-07,
-        "Eap": 34.2011,
-        "Po": 2128.8937,
+        "Ead": {
+            "name": "Diffusivity Activation Energy",
+            "units": "kJ/mol",
+            "value": 47.603,
+        },
+        "Do": {
+            "name": "Diffusivity Prefactor",
+            "units": "cm²/s",
+            "value": 0.554153,
+        },
+        "Eas": {
+            "name": "Solubility Activation Energy",
+            "units": "kJ/mol",
+            "value": -11.5918,
+        },
+        "So": {
+            "name": "Solubility Prefactor",
+            "units": "g/cm³/atm",
+            "value": 9.554366e-07,
+        },
+        "Eap": {
+            "name": "Permeability Activation Energy",
+            "units": "kJ/mol",
+            "value": 34.2011,
+        },
+        "Po": {
+            "name": "Permeability Prefactor",
+            "units": "g·mm/m²/day/atm",
+            "value": 2128.8937,
+        },
     }
 
-    from pvdeg import DATA_DIR
-
-    # fp gets overridden by pvdeg_file
     template_material = pvdeg.utilities.read_material(
         pvdeg_file="O2permeation",
         fp=os.path.join(DATA_DIR, "AApermeation.json"),
@@ -407,6 +415,7 @@ def test_tilt_azimuth_scan():
 
 def test_tilt_azimuth_scan_basic():
     """Test pvdeg.utilities.tilt_azimuth_scan with a dummy function."""
+
     def dummy_func(tilt, azimuth, **kwarg):
         return tilt + azimuth
 

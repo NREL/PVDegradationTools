@@ -1,6 +1,6 @@
 {
     "W000": {
-	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm²/s]. So is in [g/cm³]. Po is in[g*mm/m²/day]. t is in [mm]."
+	 "comment": "This data is for water permeation parameters. The activation energies are in [kJ/mol]. Do is in [cm²/s]. So is in [g/cm³]. Po is in[g·mm/m²/day]. t is in [mm]."
     },
     "W001": {
 		"name": "Ethylene Vinyl Acetate",
@@ -13,7 +13,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 16.7286220351073 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.81390701967487 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 55.1578532714609 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 40728267519.3687 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 40728267519.3687 }
     },
     "W002": {
 		"name": "AAA polyamide",
@@ -26,7 +26,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5.88752263485353 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0982242435416737 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 66.9611315410624 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 189338932521.637 },
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 189338932521.637 },
 		"t": { "name": "Thickness", "units": "mm", "value": 0.32 }
     },
     "W003": {
@@ -40,7 +40,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.3377908247284 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.53540550732342 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 58.8569629367662 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 6100851717.55522 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 6100851717.55522 }
     },
     "W004": {
 		"name": "VHB 5952",
@@ -53,7 +53,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 24.0739064517654 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 53.2748284093228 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 60.901412990104 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 568214581700.165 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 568214581700.165 }
     },
     "W005": {
 		"name": "polyethylene-co-propylene-co-dienemonomer, BRP-C",
@@ -62,7 +62,7 @@
 		"source": "unpublished measurements",
 		"Fickian": false,
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 70.2425215496216 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 1172612706438.09 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1172612706438.09 }
     },
     "W006": {
 		"name": "Surlyn Jura Sol",
@@ -75,7 +75,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 9.99311553453843 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0977288489337781 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 85.4052876226669 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 130857076832418 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 130857076832418 }
     },
     "W007": {
 		"name": "Etimex Aliphatic Thermoplastic Polyurethane",
@@ -88,7 +88,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 15.5365130880537 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 7.32769870722261 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 62.1984725861406 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 2565322730154.57 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 2565322730154.57 }
     },
     "W008": {
 		"name": "DC8130",
@@ -101,7 +101,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 33.1670750044397 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 35.4782891686019 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 61.3294191532358 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 69858005751.8966 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 69858005751.8966 }
     },
     "W009": {
 		"name": "DC8100",
@@ -114,7 +114,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 39.4868955730458 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 384.109387459489 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 67.6721661443716 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 854632118015.993 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 854632118015.993 }
     },
     "W010": {
 		"name": "Kapton, poly-oxydiphenylene-pyromellitimide",
@@ -127,7 +127,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 0.0557102138739842 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0477773591873675 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 42.2185377683678 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 29836427.8894415 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 29836427.8894415 }
     },
     "W011": {
 		"name": "Black PVC",
@@ -140,7 +140,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 28.487677226357 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 140.417948734924 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 76.1990831873844 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 28205855550629.2 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 28205855550629.2 }
     },
     "W012": {
 		"name": "Clear PVC",
@@ -153,7 +153,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 32.9939505587882 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 938.977273863745 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 66.022640314507 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 945754346834.7 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 945754346834.7 }
     },
     "W013": {
 		"name": "Korad",
@@ -166,7 +166,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 10.6522537288649 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.11499446980146 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 105.22742596998 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 3221320046147540000 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 3221320046147540000 }
     },
     "W014": {
 		"name": "Tefzel, poly ethylene-co-tetrafluoroethylene",
@@ -179,7 +179,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 25.938348818962 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 7.27712808189267 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 59.693017991037 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 3620065553.835 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 3620065553.835 }
     },
     "W015": {
 		"name": "Poly Ethylene Napthlate",
@@ -192,7 +192,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5.6178949378191 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0812436914344898 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 57.1815691493899 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 698807581.673712 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 698807581.673712 }
     },
     "W016": {
 		"name": "Polyethylene Terepthalate, Mylar-D",
@@ -205,7 +205,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.32378069811026 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.157203671680748 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 54.64510581265 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 1071655399.18682 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1071655399.18682 }
     },
     "W017": {
 		"name": "Polyethylene Terepthalate, ST504",
@@ -218,7 +218,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 6.20764844309352 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.106698381856152 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 55.4064573018373 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 1319534666.90318 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1319534666.90318 }
     },
     "W018": {
 		"name": " Bisphenol-A-polycarbonate, Lexan",
@@ -231,7 +231,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 13.4503885886312 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.21057375762911 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 45.2074558953133 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 185760371.133255 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 185760371.133255 }
     },
     "W019": {
 		"name": "Poly Vinyl Butral, S-LEC Sekisui, and Saflex Solutia",
@@ -244,7 +244,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.0777370890654 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 2.49156416313226 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 57.5426989369177 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 244293562958.356 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 244293562958.356 }
     },
     "W020": {
 		"name": "Old DNP",
@@ -253,7 +253,7 @@
 		"source": "unpublished measurements",
 		"Fickian": false,
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 76.289572026034 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 6823263083472.16 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 6823263083472.16 }
     },
     "W021": {
 		"name": "Vectran",
@@ -266,7 +266,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5.45301564748205 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0110622546832953 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 55.8569345400101 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 23506639.0940679 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 23506639.0940679 }
     },
     "W022": {
 		"name": "Tedlar",
@@ -279,7 +279,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.7711932387872 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.983373347442546 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 70.4868971305571 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 964552472184.541 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 964552472184.541 }
     },
     "W023": {
 		"name": "White Aclar",
@@ -292,7 +292,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.86738905205556 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0439563961280766 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 84.5436362084746 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 1492039875944.98 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1492039875944.98 }
     },
     "W024": {
 		"name": "Clear Aclar",
@@ -305,7 +305,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": -12.3825598156611 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.000027596664527881 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 84.1560267292654 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 994982178508.989 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 994982178508.989 }
     },
     "W025": {
 		"name": "VHB 5047",
@@ -318,7 +318,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 9.11207059308869 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.250698026382274 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 54.5873228150086 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 20443598018.0867 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 20443598018.0867 }
     },
     "W026": {
 		"name": "DC184",
@@ -331,7 +331,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 11.1779225188289 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0804559994699917 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 38.0270629777712 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 238461105.884911 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 238461105.884911 }
     },
     "W027": {
 		"name": "RTV615",
@@ -344,7 +344,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 21.0756724360529 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.76185388295796 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 41.7698885456015 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 960496070.761543 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 960496070.761543 }
     },
     "W028": {
 		"name": "Viton Matte",
@@ -358,7 +358,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 1.48200499250495 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0209145982407652 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 73.2436936045527 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 8213878264695.76 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 8213878264695.76 }
     },
     "W029": {
 		"name": "Viton Gloss",
@@ -372,7 +372,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 20.8063496388738 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 26.9834933677011 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 77.052433109477 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 37297948350723.4 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 37297948350723.4 }
     },
     "W030": {
 		"name": "DNP 2777",
@@ -386,7 +386,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 24.5569461831493 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 1.55969827001173 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 79.8681296790924 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 15797483966534.5 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 15797483966534.5 }
     },
     "W031": {
 		"name": "Stevens PV251 Aliphatic TPU",
@@ -399,7 +399,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 6.43899102763906 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.249811154526706 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 57.1853236772803 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 161391919486.761 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 161391919486.761 }
     },
     "W032": {
 		"name": "Dupont PV5300 Ionomer",
@@ -413,7 +413,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 19.5076706534681 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 17.7889361215936 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 75.1312516853916 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 2360915752536.64 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 2360915752536.64 }
     },
     "W033": {
 		"name": "Dupont PV5200 Polyvinylbutral",
@@ -426,7 +426,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.95997669491685 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.520484700621351 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 59.8430669406317 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 380055824874.932 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 380055824874.932 }
     },
     "W034": {
 		"name": "Steven PV301",
@@ -439,7 +439,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 9.90384118622532 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.931312935440451 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 54.1452767957236 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 34835762025.6838 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 34835762025.6838 }
     },
     "W035": {
 		"name": "DNP PV-FS CVF2B, below 40°C",
@@ -453,7 +453,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 32.9594855649241 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 28.2464642413457 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 80.0307511425333 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 34584496473583.9 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 34584496473583.9 }
     },
     "W036": {
 		"name": "DNP PV-FS CVF2B, above 40°C",
@@ -467,7 +467,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 37.154683534443 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 133.267171135261 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 68.2040737287465 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 446034581223.792 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 446034581223.792 }
     },
     "W037": {
 		"name": "PIB Lee Yang Wilusz",
@@ -488,7 +488,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 5 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.0321759557733088 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 59.8 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 1220421132.09929 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 1220421132.09929 }
     },
     "W039": {
 		"name": "PIB Quanex LPO-3 ",
@@ -501,7 +501,7 @@
 		"Eas": { "name": "Solubility Activation Energy", "units": "kJ/mol", "value": 7.5 },
 		"So": { "name": "Solubility Prefactor", "units": "g/cm³", "value": 0.052 },
 		"Eap": { "name": "Permeability Activation Energy", "units": "kJ/mol", "value": 62.5 },
-		"Po": { "name": "Permeability Prefactor", "units": "g*mm/m²/day", "value": 22464000000 }
+		"Po": { "name": "Permeability Prefactor", "units": "g·mm/m²/day", "value": 22464000000 }
     },
     "W040": {
 		"name": "EVA",
@@ -513,4 +513,3 @@
         "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.0347563378698928 }
     }
 }
-

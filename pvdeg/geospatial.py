@@ -995,8 +995,8 @@ def interpolate_analysis(
     )  # probably a nicer way to do this
 
     grid_lat, grid_lon = np.mgrid[
-        df["latitude"].min(): df["latitude"].max(): resolution,
-        df["longitude"].min(): df["longitude"].max(): resolution,
+        df["latitude"].min() : df["latitude"].max() : resolution,
+        df["longitude"].min() : df["longitude"].max() : resolution,
     ]
 
     grid_z = griddata(data[:, 0:2], data[:, 2], xi=(grid_lat, grid_lon), method=method)

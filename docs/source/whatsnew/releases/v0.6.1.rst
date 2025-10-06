@@ -1,0 +1,13 @@
+v0.6.1 (2025-10-04)
+===================
+
+Bug Fixes
+---------
+- Include 0.6.0 changes in the whatsnew.
+- Fix formatting in README.md
+- Update logo in tutorials_and_tools/_config.yml
+
+
+Contributors
+------------
+- Martin Springer (:ghuser:`martin-springer`)

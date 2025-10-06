@@ -138,8 +138,8 @@ weather_db = 'PSM3'
 weather_id = (33.4484, -112.0740)
 weather_arg = {'api_key': NREL_API_KEY,
                'email': 'user@mail.com',
-               'names': '2021',   # tmy is another common option; right now requesting only 2021 data 
-               'attributes': [],  # grabs all. to select, could be 'air_temperature', 'dew_point', 'dhi', 
+               'names': '2021',   # tmy is another common option; right now requesting only 2021 data
+               'attributes': [],  # grabs all. to select, could be 'air_temperature', 'dew_point', 'dhi',
                # 'dni', 'ghi', 'surface_albedo', 'surface_pressure', 'wind_direction', 'wind_speed'
                'map_variables': True,
                'leap_day': False}
