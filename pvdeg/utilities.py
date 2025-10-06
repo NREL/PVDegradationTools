@@ -74,7 +74,7 @@ def meta_as_dict(rec):
     return {name: rec[name].item() for name in rec.dtype.names}
 
 
-def get_kinetics(name=None, fname="DegradationDatabase.json"):
+def get_kinetics(name=None, fname="DegradationDatabase.json", encoding="utf-8"):
     """Return a list of LETID/B-O LID kinetic parameters from DegradationDatabase.json.
 
     Parameters
@@ -82,15 +82,15 @@ def get_kinetics(name=None, fname="DegradationDatabase.json"):
     name : str
         unique name of kinetic parameter set. If None, returns a list of the possible
         options.
-
+    encoding : str
+        file encoding format, default is 'utf-8'
     Returns
     -------
     parameter_dict : (dict)
         dictionary of kinetic parameters
     """
     fpath = os.path.join(DATA_DIR, fname)
-
-    with open(fpath) as f:
+    with open(fpath, encoding="utf-8") as f:
         data = json.load(f)
 
     # TODO: rewrite to use exception handling
