@@ -120,7 +120,7 @@ def carrier_factor(
         Dictionary of mechanism parameters.
         These are typically taken from literature studies of transtions in the 3-state
         model. They allow for calculation the excess carrier density of literature
-        experiments (dn_lit). Parameters are coded in 'kinetic_parameters.json'.
+        experiments (dn_lit). Parameters are coded in 'DegradationDatabase.json'.
 
     dn_lit : numeric, default None
         Optional, supply in lieu of a complete set of mechanism_params if experimental

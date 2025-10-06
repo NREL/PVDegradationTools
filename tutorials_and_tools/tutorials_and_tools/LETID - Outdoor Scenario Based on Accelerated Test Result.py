@@ -339,7 +339,7 @@ nA_0 = 100
 nB_0 = 0
 nC_0 = 0
 
-mechanism_params = utilities.get_kinetics("repins")
+mechanism_params = utilities.get_kinetics('D037')
 
 timesteps[["NA", "NB", "NC", "tau"]] = (
     np.nan
@@ -695,7 +695,7 @@ plt.show()
 # In[39]:
 
 
-mechanism_params = "repins"
+mechanism_params = 'D037'
 
 letid.calc_letid_outdoors(
     tau_0,

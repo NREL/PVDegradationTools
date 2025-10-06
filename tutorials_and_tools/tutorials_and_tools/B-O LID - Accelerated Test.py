@@ -125,7 +125,7 @@ utilities.get_kinetics()
 # In[9]:
 
 
-mechanism_params = utilities.get_kinetics("bo-lid")
+mechanism_params = utilities.get_kinetics("D054")
 print(mechanism_params)
 
 

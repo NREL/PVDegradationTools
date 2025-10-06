@@ -78,7 +78,7 @@ def test_tau_now():
 
 def test_k_ij():
     # from LETID - Passivated Wafer.ipynb
-    mechanism_params = utilities.get_kinetics("repins")
+    mechanism_params = utilities.get_kinetics('D037')
     temperature = 49  # °C
 
     result = letid.k_ij(
@@ -97,7 +97,7 @@ def test_carrier_factor():
     meas_jsc = 40
     wafer_thickness = 180  # um
     s_rear = 90
-    mechanism_params = utilities.get_kinetics("repins")
+    mechanism_params = utilities.get_kinetics('D037')
 
     result = letid.carrier_factor(
         tau,
@@ -117,7 +117,7 @@ def test_carrier_factor_wafer():
     # from LETID - Passivated Wafer.ipynb
     wafer_thickness = 180  # um
     tau = 350  # us, lifetime of the wafer for demonstration purposes
-    mechanism_params = utilities.get_kinetics("repins")
+    mechanism_params = utilities.get_kinetics('D037')
     injection = 0.5  #
     transition = "bc"  # for this example we'll look at the B -> C transition
 
@@ -142,7 +142,7 @@ def test_calc_dn():
     # from LETID - Passivated Wafer.ipynb
     transition = "bc"  # for this example we'll look at the B -> C transition
 
-    mechanism_params = utilities.get_kinetics("repins")
+    mechanism_params = utilities.get_kinetics('D037')
     meas_tau = mechanism_params[f"tau_{transition}"]
     meas_temp = mechanism_params[f"temperature_{transition}"]
     meas_temp = convert_temperature(meas_temp, "K", "C")
@@ -304,7 +304,7 @@ def test_calc_letid_outdoors():
     nA_0 = 100
     nB_0 = 0
     nC_0 = 0
-    mechanism_params = "repins"
+    mechanism_params = 'D037'
 
     generation_df = pd.read_excel(
         os.path.join(DATA_DIR, "PVL_GenProfile.xlsx"), header=0
@@ -342,7 +342,7 @@ def test_calc_letid_lab():
 
     injection = 0.1
     temperature = 75
-    mechanism_params = "repins"
+    mechanism_params = 'D037'
 
     result = letid.calc_letid_lab(
         tau_0,

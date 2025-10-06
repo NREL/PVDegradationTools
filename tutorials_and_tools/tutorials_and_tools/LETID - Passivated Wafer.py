@@ -80,7 +80,7 @@ j_gen = collection.generation_current(generation, depth)
 # In[3]:
 
 
-mechanism_params = utilities.get_kinetics("repins")
+mechanism_params = utilities.get_kinetics('D037')
 injection = 0.5  #
 
 
@@ -175,7 +175,7 @@ nA_0 = 100
 nB_0 = 0
 nC_0 = 0
 
-mechanism_params = utilities.get_kinetics("repins")
+mechanism_params = utilities.get_kinetics('D037')
 print(mechanism_params)
 
 

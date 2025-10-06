@@ -86,6 +86,8 @@ Enhancements
   extracting parameter values for use in calculations. (:issue:`256`, :pull:`257`)
 - Update pre-commit hooks and add github workflow (:pull:`267`)
 
+- Removed `kinetic_parameters.json` and merged parameters into
+  'DegradationDatabase.json`. (:issue:`176`, :pull:`248`)
 
 Deprecations
 -------------

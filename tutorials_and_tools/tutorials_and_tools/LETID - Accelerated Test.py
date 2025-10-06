@@ -133,7 +133,7 @@ utilities.get_kinetics()
 # In[12]:
 
 
-mechanism_params = utilities.get_kinetics("repins")
+mechanism_params = utilities.get_kinetics('D037')
 print(mechanism_params)
 
 
@@ -357,5 +357,5 @@ plt.show()
 
 
 letid.calc_letid_lab(
-    tau_0, tau_deg, wafer_thickness, s_rear, nA_0, nB_0, nC_0, 0.1, 75, "repins"
+    tau_0, tau_deg, wafer_thickness, s_rear, nA_0, nB_0, nC_0, 0.1, 75, 'D037'
 )
