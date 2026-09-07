@@ -3,7 +3,7 @@ v0.3.3 (2024-05-06)
 
 Bug Fixes
 ---------
-* Fix logo path in documenation
+* Fix logo path in documentation
 
 Documentation
 -------------

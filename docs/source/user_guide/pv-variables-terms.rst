@@ -52,7 +52,7 @@ Stressor Parameters
       - Quantum Yield
       -
     * - BPT_K
-      - Black Pannel Temperature
+      - Black Panel Temperature
       - [K]
     
 

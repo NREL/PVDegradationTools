@@ -4,7 +4,7 @@ Geospatial 🌍
 =============
 
 Geospatial data is time based data that maps to a location on Earth. PVDeg supports single site and geospatial analyses using meteorological and solar radiation data,
-such as Typical meteorological year (TMY) data. This can be used to extrapolate the perfomance of PV systems over many years beacause it is statistically representative of
+such as Typical meteorological year (TMY) data. This can be used to extrapolate the performance of PV systems over many years because it is statistically representative of
 weather conditions given a typical year. PVDeg collects an arbitrary amount of location specific meteorological and solar radiation data to run geospatial analyses.
 
 These datasets are multidimensional, with time and location as coordinates. These data come from :ref:`NSRDB` and :ref:`PVGIS` and can commonly be expressed in two ways.
@@ -40,7 +40,7 @@ This is explained in `Geospatial Templates`_
 Multi-dimensional inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^
 - ``weather_ds`` is an ``xarray.Dataset`` with coordinates/dimensions of ``time`` and ``gid``.
-- ``meta_df`` is a ``pandas.DataFrame`` consisting of a row of data, extracting a single row yeilds a dictionary with metadata attributes for the specific location.
+- ``meta_df`` is a ``pandas.DataFrame`` consisting of a row of data, extracting a single row yields a dictionary with metadata attributes for the specific location.
 
 Looking at ``weather_ds``, we generally want to get one of the tall rectangles shown in the figure. To do this we only need to index by ``gid``.
 This will get a "slice" that contains all of the weather data for that location for the length of the dataset (usually 1 year).
@@ -58,7 +58,7 @@ This can be unpacked to the standard python dictionary (``dict``) taken by ``pvd
     :width: 50%
     :alt:
 
-In this context, gids serve purely as indexes, gid a in ``weather_ds`` coresponds to index a in ``meta_df``. No other information can be reliabily derived from gids.
+In this context, gids serve purely as indexes, gid a in ``weather_ds`` corresponds to index a in ``meta_df``. No other information can be reliably derived from gids.
 
 Multi-dimensional output
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -138,11 +138,11 @@ Manual Templating Example I
 ----------------------------
 
 Creating manual templates is one of the most complicated parts of ``pvdeg``. We will use ``geospatial.output_template`` to tell ``pvdeg`` how to go from the multi-dimensional inputs to a multi-dimensional output.
-We have do to this because the dimensions are chaning. Refer to the sketch in `Multi-dimensional output`_.
+We have do to this because the dimensions are changing. Refer to the sketch in `Multi-dimensional output`_.
 
 Lets examine some functions, comprehensive examples are the best way to illustrate this process.
 
-We will start by creating templates for functions that support auto-templating. If you run the code below or use the auto-templating approches shown above, the result will be identical.
+We will start by creating templates for functions that support auto-templating. If you run the code below or use the auto-templating approaches shown above, the result will be identical.
 
 A simple function that has auto-templating is ``pvdeg.standards.standoff``. The docstring is shown below.
 
@@ -173,7 +173,7 @@ enforce the tuple requirement. Adding a comma forces python to interpret the par
 Next, we will create a template using this shapes dictionary and the ``weather_ds``. The parameters may be misleadly named as ``ds_gids`` but this is the same as ``weather_ds`` in ``geospatial.analysis``.
 
 ``geo_weather`` and ``geo_meta`` are placeholders for the geospatial weather and metadata that we would generally have in this scenario. It is not possible to generate an output template without providing the
-geospatial weather data beacause the function needs to know how many entries it needs to make along the ``gid`` axis in this case.
+geospatial weather data because the function needs to know how many entries it needs to make along the ``gid`` axis in this case.
 
 .. code-block:: Python
 
@@ -205,7 +205,7 @@ Thus our output will have a time axis and show look like the ``ds_res`` as a cub
     :width: 100%
     :alt:
 
-This is an oversimplification but each column in the cube represets a ``pandas.DataFrame`` result with columns represeting each return value and a ``pd.DatetimeIndex``. The columns will be named as follows.
+This is an oversimplification but each column in the cube represents a ``pandas.DataFrame`` result with columns representing each return value and a ``pd.DatetimeIndex``. The columns will be named as follows.
 
 - "RH_surface_outside"
 - "RH_front_encap"

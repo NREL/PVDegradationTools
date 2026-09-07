@@ -56,7 +56,7 @@ Enhancements
     - Expert options added to `pvdeg.geospatial.analysis`. Details are as follows:
     - `preserve_gid_dim` optional boolean flag. Keeps model outputs in ``gid`` dimension
       rather than converting to ``latitude``, ``longitude`` domain.
-    - `compute` optional boolean flag. Prevents eager computation inside of anlysis
+    - `compute` optional boolean flag. Prevents eager computation inside of analysis
       function.
       ``analysis(..., compute=False)`` will return a ``dask.Delayed`` object which can
       be used to build a task graph.
@@ -66,7 +66,7 @@ Enhancements
   - Add new (public) functions as follows:
     - :py:mod:`pvdeg.pysam.pysam()` to run SAM simulations.
     - :py:mod:`optimal_gcr_pitch()` to calculate optimal gcr and pitch for fixed tilt bifacial systems according to latitude and optimal GCR parameters.
-    - :py:mod:`inspire_practical_pitch()` to calcuate tilt, pitch, and gcr for practically constrained systems according to :py:mod:`optimal_gcr_pitch()`
+    - :py:mod:`inspire_practical_pitch()` to calculate tilt, pitch, and gcr for practically constrained systems according to :py:mod:`optimal_gcr_pitch()`
     - :py:mod:`inspire_ground_irradiance()` to calculate inter-row ground irradiance for the InSPIRE agrivoltaics irradiance dataset.
     - :py:mod:`solar_resource_dict()` to create solar_resource collections for SAM input from PVDeg weather and metadata.
 

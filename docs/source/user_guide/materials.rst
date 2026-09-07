@@ -6,7 +6,7 @@ Materials Storage and Access
 PVDeg contains a library of material parameters suitable for estimating the durability of materials and components.
 
 
-These material parameters and other relevant information sit in a directiory at ``PVDegradationTools/pvdeg/data``.
+These material parameters and other relevant information sit in a directory at ``PVDegradationTools/pvdeg/data``.
 
 This location can be quickly accessed through a special variable as shown below.
 
@@ -31,7 +31,7 @@ There are many files in this directory. We will generally be interested in one o
 - `H2Opermeation.json <H2Opermeation_>`_ (water permeation parameters)
 - `O2permeation.json <O2permeation_>`_ (oxygen permeation parameters)
 - kinetic_parameters.json (letid/bolid parameters)
-- DegradationDatabase.json (degredation models)
+- DegradationDatabase.json (degradation models)
 
 Material Parameters
 ------------------------------------

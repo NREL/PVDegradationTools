@@ -3,7 +3,7 @@
 Monte Carlo
 ===========
 
-Monte Carlo simulations are a mathematical technique used to predict possible outcomes on an uncertain event. Pvdeg uses pv modeling constants as variables to preform Monte Carlo simulations. These parameters include but are not limited to R_0	Frequency factor, prefactor, 
+Monte Carlo simulations are a mathematical technique used to predict possible outcomes on an uncertain event. Pvdeg uses pv modeling constants as variables to perform Monte Carlo simulations. These parameters include but are not limited to R_0	Frequency factor, prefactor, 
 
 *Add non-exhaustive list of possible monte carlo variables*
 
@@ -49,7 +49,7 @@ To create uncorrelated samples the ``corr`` parameter of ``pvdeg.montecarlo.gene
 
 3rd Party Samples/Data
 ^^^^^^^^^^^^^^^^^^^^^^
-If you have another prefered way of creating samples to use in a Monte Carlo simulation you can bypass the previous steps. The samples DataFrame must have appropriate column names that match the target function's arguments.  
+If you have another preferred way of creating samples to use in a Monte Carlo simulation you can bypass the previous steps. The samples DataFrame must have appropriate column names that match the target function's arguments.  
 
 Running A Monte Carlo Simulation
 --------------------------------
