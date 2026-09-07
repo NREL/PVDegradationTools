@@ -17,7 +17,7 @@ The NSRDB is produced by NREL and combines multiple datasets but we are most con
 and aerosol properties, then fed into a radiative transfer model. Learn more about the NSRDB `here <https://nsrdb.nlr.gov/about/what-is-the-nsrdb#:~:text=The%20PSM%20is%20a%20two-step%20physical%20modeling%20process%2C,%28Xie%20et%20al.%2C%202016%29%2C%20in%20the%20subsequent%20step.>`_.
 
 The NSRDB is free to use but requires an api-key and email. See :ref:`NSRDB_API_Key` for more information.
-For our purposes, the api is limited to 1000 requests per day, although you can request a batch download via email with a singificantly higher rate limit (not recommended for PVDeg).
+For our purposes, the api is limited to 1000 requests per day, although you can request a batch download via email with a significantly higher rate limit (not recommended for PVDeg).
 
 Flowchart showing the dataflow from satellite to solar radiation measurement.
 
@@ -26,7 +26,7 @@ Flowchart showing the dataflow from satellite to solar radiation measurement.
 
 `<https://nsrdb.nlr.gov/about/what-is-the-nsrdb>`_
 
-NSRDB data are seperated by satellite/model source. Each dataset is shown below, much of the PVDeg project uses the *Americas* data.
+NSRDB data are separated by satellite/model source. Each dataset is shown below, much of the PVDeg project uses the *Americas* data.
 
 .. image::  meteorological-data-details/nsrdb_global_coverage.jpg
     :alt: NSRDB data sources, image missing
@@ -46,7 +46,7 @@ PVGIS is free to use and does NOT require an api-key. It has a rate limit of 30 
 The PVDeg tutorials and examples use two datasets, `NSRDB`_ and `PVGIS`_. These are serially complete data including meteorological data and solar radiation (irradiance) measurements.
 The methodology for these datasets varies but both are gridded geospatial datasets with similar attributes.
 
-PVGIS data are seperated by satellite/model source. Visit the links below for more information about the datasets.
+PVGIS data are separated by satellite/model source. Visit the links below for more information about the datasets.
 
 - `PVGIS 5.2 <https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-52_en>`_
 - `PVGIS 5.3 <https://joint-research-centre.ec.europa.eu/photovoltaic-geographical-information-system-pvgis/pvgis-releases/pvgis-53_en>`_
@@ -91,13 +91,13 @@ Accelerated Downloads
 
 ``PVDeg`` provides tools for the accelerated downloading of meteorological data outside of HPC environments. This is particularly useul for ``PVGIS`` which allows us to download up to
 30 locations per second of tmy data. Due to the single-threaded nature of Python, we are traditionally limited to 1 request at a time. Often, ``PVGIS`` takes 2-3 seconds per location.
-This cumulates in massive download times for large datasets. We can use ``Dask`` for parallelization to greatly accellerate this process and approach the 30 requests per second rate limit.
+This cumulates in massive download times for large datasets. We can use ``Dask`` for parallelization to greatly accelerate this process and approach the 30 requests per second rate limit.
 
 ..
     .. image::  meteorological-data-letails/parallel-download.svg
         :alt: parallel downloading visualization
 
-We can see that abstract potential speedup offered by parallelization. It is easy to utilize this funtionality as provided by ``pvdeg.weather.weather_distributed``.
+We can see that abstract potential speedup offered by parallelization. It is easy to utilize this functionality as provided by ``pvdeg.weather.weather_distributed``.
 
 .. autofunction:: pvdeg.weather.weather_distributed
    :no-index:

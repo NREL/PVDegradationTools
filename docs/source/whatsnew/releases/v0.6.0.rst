@@ -13,7 +13,7 @@ Breaking Changes
 - Replaced ambiguous variable name `l` in
   :py:func`pvdeg.collection.collection_probability` with `diffusion_length` to enhance
   code readability and maintainability. (:issue:`198`, :pull:`199`)
-- Replace print messages for failure or succesful addition of objects (location, job...)
+- Replace print messages for failure or successful addition of objects (location, job...)
   with try/except blocks and warnings in :py:mod:`~pvdeg.scenario`. (:pull:`192`)
 - Remove deprecated `pvdeg.store` module. (:issue:`168`, :pull:`180`)
 - Refactored and cleaned up `:py:mod:pvdeg.humiditiy` by removing unused functions,
@@ -96,7 +96,7 @@ Deprecations
 - ``GeospatialScenario.getValidRegions()``
 - ``GeospatialScenario.gids_tonumpy()``
 - ``GeospatialScenario.gids_tolist()``
-- Deprecate `see_added` argument, and associated UserWarning for succesful addition of
+- Deprecate `see_added` argument, and associated UserWarning for successful addition of
   objects, in several :py:mod:`~pvdeg.scenario` functions. (:pull:`192`)
 
 
