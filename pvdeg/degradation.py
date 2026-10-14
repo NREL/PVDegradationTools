@@ -1,17 +1,17 @@
 """Collection of functions for degradation calculations."""
 
+import warnings
+import copy
 import numpy as np
 import pandas as pd
-from typing import Union
+from typing import Union, Optional
 from pvdeg import humidity
+import pvlib
 
-from . import (
-    temperature,
-    spectral,
-    decorators,
-)
+from . import temperature, spectral, decorators, utilities
 
 R_GAS = 0.00831446261815324  # Gas Constant in [kJ/mol*K]
+kB_eV = 8.617333e-5  # eV/K
 
 
 def _extract_param(parameters, key, default=None):
@@ -932,7 +932,7 @@ def vecArrhenius(
     poa_global = poa_global[mask]
     module_temp = module_temp[mask]
 
-    ea_scaled = ea / 8.31446261815324e-03
+    ea_scaled = ea / R_GAS
     R0 = np.exp(lnr0)
     poa_global_scaled = poa_global / 1000
 
@@ -945,3 +945,865 @@ def vecArrhenius(
         )
 
     return degradation / len(poa_global)
+
+
+def perovskite_degradation(
+    weather_df: pd.DataFrame = None,
+    meta: dict = None,
+    component: str = "total",
+    I_in: float = 1.59e21,
+    P_O2: float = 21.2,
+    P_H2O: pd.Series = None,
+    parameters: dict = None,
+) -> pd.Series:
+    """Compute MAPbI3 perovskite degradation rate using the full kinetic model in [1].
+
+    The net degradation rate is the sum of four terms:
+
+    .. math::
+
+        r = r_{WPO} + r_{DPO} + r_{hum} + r_{therm}
+
+    where:
+
+    .. math::
+
+        r_{WPO} = k_{0,WPO} \\exp\\!\\left(\\frac{-E_{A,WPO}}{R T_K}\\right)
+                  \\frac{P_{O_2} P_{H_2O} I_{in}^{0.7}}
+                       {\\left[1 + K_{2W} P_{O_2}(1 + K_{3W} I_{in}^{0.7})\\right]^2}
+
+        r_{DPO} = k_{0,DPO} \\exp\\!\\left(\\frac{-E_{A,DPO}}{R T_K}\\right)
+                  \\frac{P_{O_2} I_{in}^{0.7}}
+                       {1 + K_{2D} P_{O_2}(1 + K_{3D} I_{in}^{0.7})}
+
+        r_{hum} = k_{0,hum} \\exp\\!\\left(\\frac{-E_A^{hum}}{R T_K}\\right)
+                  P_{H_2O}\\, I_{in}^{0.7}
+
+        r_{therm} = k_{0,therm} \\exp\\!\\left(\\frac{-E_A^{therm}}{R T_K}\\right)
+
+    All rate constants and activation energies are taken directly from Table 3
+    and SI §14 of [1], and are stored in ``DegradationDatabase.json`` entry D015.
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data with a time index.  Required column: ``'temp_air'`` [°C].
+        Column ``'relative_humidity'`` [%] is required for the WPO and r_hum
+        terms; if absent a ValueError is raised.
+    meta : dict
+        Location metadata.  Not used directly; kept for pipeline compatibility.
+    component : str, default ``"total"``
+        Which component of the rate to return:
+
+        - ``"total"``   — full model: :math:`r_{WPO} + r_{DPO} + r_{hum} + r_{therm}`
+        - ``"WPO"``     — water-accelerated photooxidation term
+        - ``"DPO"``     — dry photooxidation term
+        - ``"r_hum"``   — humidity-induced minority pathway
+        - ``"r_therm"`` — thermal minority pathway
+
+    I_in : float, default ``1.59e21``
+        Incident above-bandgap photon flux :math:`I_{in}` [photons m⁻² s⁻¹].
+        The model uses :math:`n \\propto I_{in}^{0.7}` as the
+        electron-activity proxy. Default value corresponds to 1 sun of AM1.5G
+        above-bandgap photon flux.
+    P_O2 : float, default ``21.2``
+        Oxygen partial pressure :math:`P_{O_2}` [kPa].
+        Default value corresponds to ambient air at sea level.
+    P_H2O : pd.Series, optional
+        Water vapour partial pressure [kPa], time-indexed.  If provided it is
+        used directly and ``'relative_humidity'`` is not required in
+        ``weather_df``.  Compute with ``pvdeg.humidity.water_vapor_pressure``
+        for use as an upstream pipeline job.
+    parameters : dict, optional
+        Parameter overrides. Any key present here takes precedence over the hardcoded
+        default. Entry matches D015 keys; retrieve the full D015 parameter set with
+        ``pvdeg.utilities.get_kinetics("D015")``.
+
+    Returns
+    -------
+    pd.Series
+        Time-indexed degradation rate [mol m⁻² s⁻¹].
+
+    Notes
+    -----
+    The minority pathways (:math:`r_{hum}`, :math:`r_{therm}`) are explicitly
+    parameterised in SI §14 of [1].  The paper notes that these are rough
+    approximations (they contribute ≪ 5 % of total degradation under typical
+    outdoor conditions) and that further work is required for more complete modelling of
+    those pathways.
+
+    References
+    ----------
+    [1] Siegler et al. (2022) *J. Am. Chem. Soc.* 144 (12), 5552–5561.
+        doi: 10.1021/jacs.2c00391
+    """
+
+    VALID_COMPONENTS = ("total", "WPO", "DPO", "r_hum", "r_therm")
+    if component not in VALID_COMPONENTS:
+        raise ValueError(
+            f"component must be one of {VALID_COMPONENTS}, got '{component}'"
+        )
+    if weather_df is None:
+        raise ValueError("weather_df is required")
+
+    T_K = weather_df["temp_air"] + 273.15  # °C → K
+
+    p = parameters or {}
+
+    # WPO (water-accelerated photooxidation, humid-air column)
+    k0_WPO = p.get("k_0,WPO", 3.16e-25)
+    E_A_WPO = p.get("E_A,WPO", -8.6827)
+    K_2W = p.get("K_2W", 4.40e-3)
+    K_3W = p.get("K_3W", 4.32e-15)
+
+    # DPO (dry photooxidation, dry-air column)
+    k0_DPO = p.get("k_0,DPO", 5.45e-15)
+    E_A_DPO = p.get("E_A,DPO", 59.82)
+    K_2D = p.get("K_2D", 3.28e-3)
+    K_3D = p.get("K_3D", 6.97e-15)
+
+    # Humidity-induced degradation
+    k0_hum = p.get("k_0,hum", 9.2e-22)
+    E_A_hum = p.get("E_A^hum", 19.3)
+
+    # Thermal decomposition
+    k0_therm = p.get("k_0,therm", 4.1e-4)
+    E_A_therm = p.get("E_A^therm", 43.42)
+
+    # Electron-activity proxy: n ∝ I_in^0.7
+    n = I_in**0.7
+
+    # Water-vapour partial pressure P_H2O [kPa] = (RH/100) × P_sat
+    if P_H2O is None:
+        if "relative_humidity" in weather_df.columns:
+            rh = weather_df["relative_humidity"]
+            P_sat, _ = humidity.water_saturation_pressure(weather_df["temp_air"])
+            P_H2O = (rh / 100.0) * P_sat
+        else:
+            raise ValueError(
+                "'relative_humidity' missing in weather_df and P_H2O not given"
+            )
+
+    r_WPO = (
+        k0_WPO
+        * np.exp(-E_A_WPO / (R_GAS * T_K))
+        * (P_O2 * P_H2O * n)
+        / (1.0 + K_2W * P_O2 * (1.0 + K_3W * n)) ** 2
+    )
+
+    r_DPO = (
+        k0_DPO
+        * np.exp(-E_A_DPO / (R_GAS * T_K))
+        * (P_O2 * n)
+        / (1.0 + K_2D * P_O2 * (1.0 + K_3D * n))
+    )
+
+    r_hum = k0_hum * np.exp(-E_A_hum / (R_GAS * T_K)) * P_H2O * n
+
+    r_therm = k0_therm * np.exp(-E_A_therm / (R_GAS * T_K))
+
+    components = {
+        "WPO": r_WPO,
+        "DPO": r_DPO,
+        "r_hum": r_hum,
+        "r_therm": r_therm,
+    }
+
+    if component == "total":
+        rate = r_WPO + r_DPO + r_hum + r_therm
+    else:
+        rate = components[component]
+
+    rate.name = f"perovskite_degradation_{component}"
+    return rate
+
+
+def perovskite_degradation_factor(
+    weather_df: pd.DataFrame,
+    meta: dict = None,
+    Ea_fast: float = 0.248,
+    Ea_slow: float = 0.243,
+    k0_fast: float = 0.56,
+    k0_slow: float = 0.48,
+    A1: float = 0.25,
+    A2: float = 0.70,
+    B: float = 0.05,
+    gamma: float = 1.0,
+    I_ref: float = 1200.0,
+    NOCT: float = 48.0,
+    poa=None,
+    parameters: dict = None,
+) -> pd.Series:
+    """Compute the cumulative collection efficiency (CE) degradation factor using the
+    Arrhenius + power-law model of Orooji et al. (2026), parameterised from Zhao et al.
+    (2022).
+
+    The model tracks how collection efficiency evolves over time due to
+    combined temperature- and light-induced degradation [1].  At each hourly
+    timestep *i*, a degradation factor is computed:
+
+    .. math::
+
+        k(T_i, I_i) = k_0 \\cdot \\exp\\!\\left(\\frac{-E_a}{k_B T_i}\\right)
+                      \\cdot \\left(\\frac{I_i}{I_{ref}}\\right)^{\\gamma}
+
+        DF(i) = A_1 \\exp(-k_{fast}(T_i, I_i) \\cdot 1\\text{h})
+              + A_2 \\exp(-k_{slow}(T_i, I_i) \\cdot 1\\text{h}) + B
+
+        DF_{total}(t) = \\prod_{i=1}^{t} DF(i)
+
+    The cell temperature is estimated via the NOCT model:
+
+    .. math::
+
+        T_{cell} = T_{air} + \\frac{NOCT - 20}{800} \\cdot G_{POA}
+
+    Degradation is zero at night (:math:`I_i = 0`, :math:`\\gamma > 0`).
+
+    Default parameters reproduce the uncapped CsPbI3 device from [2] as used in
+    [1].  They are stored in ``DegradationDatabase.json`` entry **D046** and can
+    be retrieved with ``pvdeg.utilities.get_kinetics("D046")``.
+
+    .. note::
+
+        The default ``k0_fast`` / ``k0_slow`` values are calibrated to reproduce
+        ``T90,Agg`` ≈ 1440 h under ISOS-L2 (85 °C, 1200 W m⁻², the Zhao
+        reference intensity ``I_ref``) as reported by
+        [1].  ``A1``, ``A2``, ``B`` are estimated from the biexponential fit
+        shape in Fig. 3A of [2].  Exact fitted coefficients appear in the Zhao
+        supplementary; re-fit these parameters to your own device data for
+        quantitative predictions.
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data with at least ``'temp_air'`` [°C].
+    meta : dict, optional
+        Location metadata.  Required when ``poa`` is not provided.
+    Ea_fast : float, default 0.248
+        Activation energy for the fast degradation process [eV].
+    Ea_slow : float, default 0.243
+        Activation energy for the slow degradation process [eV].
+    k0_fast : float, default 0.56
+        Arrhenius pre-exponential for the fast process [h⁻¹] evaluated at
+        ``I_ref``.
+    k0_slow : float, default 0.48
+        Arrhenius pre-exponential for the slow process [h⁻¹] evaluated at
+        ``I_ref``.
+    A1 : float, default 0.25
+        Amplitude of the fast exponential in the biexponential decay.
+        Must satisfy ``A1 + A2 + B = 1``.
+    A2 : float, default 0.70
+        Amplitude of the slow exponential.
+    B : float, default 0.05
+        Residual stable fraction (long-term plateau).
+    gamma : float, default 1.0
+        Light-intensity exponent.  ``gamma=1`` → linear scaling with irradiance;
+        ``gamma=0`` → temperature-only (no light dependence).
+    I_ref : float, default 1200.0
+        Reference irradiance [W m⁻²] at which ``k0`` values were measured.
+    NOCT : float, default 48.0
+        Nominal Operating Cell Temperature [°C].
+    poa : pd.Series or pd.DataFrame, optional
+        Plane-of-array global irradiance [W m⁻²].  If a DataFrame is passed,
+        ``'poa_global'`` is used.  Computed from ``weather_df`` and ``meta``
+        via :func:`pvdeg.spectral.poa_irradiance` when not provided.
+    parameters : dict, optional
+        Flat parameter dict (e.g. from ``pvdeg.utilities.get_kinetics("D046")``).
+        Keys present here override the corresponding keyword arguments.
+
+    Returns
+    -------
+    pd.Series
+        Time-indexed cumulative degradation factor ``DF_total`` (dimensionless).
+        Starts near 1.0 and decreases monotonically toward ``B`` as degradation
+        accumulates.  Multiply by ``CE_0`` to obtain absolute CE at each hour.
+
+    References
+    ----------
+    [1] Orooji et al. (2026) *EES Solar*. doi: 10.1039/d6el00021e
+    [2] Zhao et al. (2022) *Science* 377, 307–310. doi: 10.1126/science.abn5679
+    """
+    if weather_df is None:
+        raise ValueError("weather_df is required")
+
+    # Override defaults from parameter dict (flat key-value from get_kinetics)
+    if parameters is not None:
+        Ea_fast = parameters.get("Ea_fast", Ea_fast)
+        Ea_slow = parameters.get("Ea_slow", Ea_slow)
+        k0_fast = parameters.get("k0_fast", k0_fast)
+        k0_slow = parameters.get("k0_slow", k0_slow)
+        A1 = parameters.get("A1", A1)
+        A2 = parameters.get("A2", A2)
+        B = parameters.get("B", B)
+        gamma = parameters.get("gamma", gamma)
+        I_ref = parameters.get("I_ref", I_ref)
+
+    if abs(A1 + A2 + B - 1.0) > 1e-6:
+        raise ValueError(
+            f"A1 + A2 + B must equal 1.0 (got {A1} + {A2} + {B} = {A1 + A2 + B:.6f})"  # noqa
+        )
+
+    # POA irradiance
+    if poa is None:
+        poa_df = spectral.poa_irradiance(weather_df, meta)
+        G = poa_df["poa_global"]
+    elif isinstance(poa, pd.DataFrame):
+        G = poa["poa_global"]
+    else:
+        G = poa
+
+    G = G.clip(lower=0.0)
+
+    # Cell temperature via NOCT model [K]
+    T_cell_K = (weather_df["temp_air"] + (NOCT - 20.0) / 800.0 * G) + 273.15
+
+    # Irradiance ratio (zero at night → no degradation when gamma > 0)
+    I_ratio_gamma = (G / I_ref).clip(lower=0.0) ** gamma
+
+    # Hourly degradation rates [h⁻¹]
+    k_fast_h = k0_fast * np.exp(-Ea_fast / (kB_eV * T_cell_K)) * I_ratio_gamma
+    k_slow_h = k0_slow * np.exp(-Ea_slow / (kB_eV * T_cell_K)) * I_ratio_gamma
+
+    # Per-hour degradation factors (biexponential, Eq. 9 of [1])
+    DF_hourly = A1 * np.exp(-k_fast_h) + A2 * np.exp(-k_slow_h) + B
+
+    # Cumulative product → DF_total(t)
+    DF_total = DF_hourly.cumprod()
+    DF_total.name = "perovskite_degradation_factor"
+    return DF_total
+
+
+def degraded_power_ratio(
+    weather_df: pd.DataFrame,
+    meta: dict,
+    ce_factor: pd.Series,
+    I_sc_ref: float = 0.022,
+    I_0_ref: float = 1e-13,
+    R_s: float = 0.5,
+    R_sh: float = 5000.0,
+    n_diode: float = 1.5,
+    alpha_isc: float = 5e-4,
+    G_ref: float = 1000.0,
+    T_ref: float = 25.0,
+    poa=None,
+    temp_cell: pd.Series = None,
+    temp_model: str = "sapm",
+    conf: str = "open_rack_glass_polymer",
+    wind_factor: float = 0.33,
+) -> dict:
+    """Compute the aggregated power ratio PR_Agg and T90,Agg for a degrading
+    single-junction perovskite solar cell.
+
+    Degradation is applied to the photocurrent via the CE factor:
+
+    .. math::
+
+        I_L^{deg}(t) = I_{sc,ref} \\cdot \\frac{G(t)}{G_{ref}}
+                       \\cdot [1 + \\alpha_{ISC}(T_{cell}(t) - T_{ref})]
+                       \\cdot CE_{factor}(t)
+
+    The maximum power point is computed at each hour using the pvlib single-diode
+    model [1].  The aggregated power ratio is:
+
+    .. math::
+
+        PR_{Agg}(t) = \\frac{\\sum_{i=1}^{t} P_{deg}(i)}{\\sum_{i=1}^{t} P_{ref}(i)}
+
+    ``T90,Agg`` is the first hour at which ``PR_Agg`` drops below 0.90.
+
+    Default single-diode parameters correspond to a generic single-junction
+    perovskite cell with ≈20 % PCE (1 cm² area).  Provide device-specific values
+    for quantitative predictions.
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data with at least ``'temp_air'`` [°C] and wind columns.
+    meta : dict
+        Location metadata (latitude, longitude, altitude, timezone).
+    ce_factor : pd.Series
+        Time-indexed CE degradation factor (0–1) from
+        :func:`perovskite_degradation_factor`.
+    I_sc_ref : float, default 0.022
+        Short-circuit current at STC [A].  Default: 22 mA (1 cm² perovskite cell).
+    I_0_ref : float, default 1e-13
+        Dark saturation current [A].
+    R_s : float, default 0.5
+        Series resistance [Ω].
+    R_sh : float, default 5000.0
+        Shunt resistance [Ω].
+    n_diode : float, default 1.5
+        Diode ideality factor.
+    alpha_isc : float, default 5e-4
+        Temperature coefficient of I_sc [K⁻¹].
+    G_ref : float, default 1000.0
+        Reference irradiance [W m⁻²].
+    T_ref : float, default 25.0
+        Reference temperature [°C].
+    poa : pd.Series or pd.DataFrame, optional
+        Plane-of-array global irradiance [W m⁻²].  Computed when not provided.
+    temp_cell : pd.Series, optional
+        Pre-computed cell/module temperature [°C], time-indexed.  When provided
+        the internal ``pvdeg.temperature.module()`` call is skipped.  Useful for
+        controlled-environment simulations (e.g. ISOS-L2) or when ``meta`` does
+        not contain ``'wind_height'``.
+    temp_model : str, default ``"sapm"``
+        pvlib temperature model for module temperature (ignored if ``temp_cell``
+        is given).
+    conf : str, default ``"open_rack_glass_polymer"``
+        Module mounting configuration (ignored if ``temp_cell`` is given).
+    wind_factor : float, default 0.33
+        Wind-speed height correction exponent (ignored if ``temp_cell`` is given).
+
+    Returns
+    -------
+    dict with keys:
+
+    ``"PR_Agg"`` : pd.Series
+        Cumulative aggregated power ratio (time-indexed).
+    ``"T90_Agg_hours"`` : float or None
+        Hours until PR_Agg first drops below 0.90, or ``None`` if not reached.
+    ``"power_degraded"`` : pd.Series
+        Hourly maximum power of the degraded cell [W].
+    ``"power_reference"`` : pd.Series
+        Hourly maximum power of the non-degraded reference cell [W].
+
+    References
+    ----------
+    [1] pvlib: https://pvlib-python.readthedocs.io
+    [2] Orooji et al. (2026) *EES Solar*. doi: 10.1039/d6el00021e
+    """
+    if weather_df is None:
+        raise ValueError("weather_df is required")
+    if ce_factor is None:
+        raise ValueError("ce_factor is required")
+
+    # Align ce_factor to weather_df.index — raises if any timestamps are missing
+    if not ce_factor.index.equals(weather_df.index):
+        ce_factor = ce_factor.reindex(weather_df.index)
+        if ce_factor.isna().any():
+            raise ValueError(
+                "ce_factor is missing values for some timestamps in weather_df.index."
+                "Ensure ce_factor covers the full time range of weather_df."
+            )
+
+    # POA irradiance
+    if poa is None:
+        poa_df = spectral.poa_irradiance(weather_df, meta)
+    elif isinstance(poa, pd.Series):
+        poa_df = pd.DataFrame({"poa_global": poa}, index=poa.index)
+    else:
+        poa_df = poa
+
+    G = poa_df["poa_global"].clip(lower=0.0)
+
+    # Module / cell temperature [°C]
+    if temp_cell is not None:
+        if not temp_cell.index.equals(weather_df.index):
+            temp_cell = temp_cell.reindex(weather_df.index)
+            if temp_cell.isna().any():
+                raise ValueError(
+                    "temp_cell is missing values for some timestamps in"
+                    " weather_df.index. Ensure temp_cell covers the full time range of"
+                    " weather_df."
+                )
+        T_cell_C = temp_cell.to_numpy()
+    else:
+        T_mod = temperature.module(
+            weather_df,
+            meta,
+            poa=poa_df,
+            temp_model=temp_model,
+            conf=conf,
+            wind_factor=wind_factor,
+        )
+        T_cell_C = T_mod.values
+    T_cell_K = T_cell_C + 273.15
+
+    # nNsVth: thermal voltage × ideality × Ns=1 [V]
+    nNsVth = n_diode * kB_eV * T_cell_K
+
+    # Photocurrent scaled by irradiance and temperature
+    T_delta = T_cell_C - T_ref
+    I_L_ref = np.clip(
+        I_sc_ref * (G.values / G_ref) * (1.0 + alpha_isc * T_delta), 0.0, None
+    )
+    I_L_deg = np.clip(I_L_ref * ce_factor.to_numpy(), 0.0, None)
+
+    # Maximum power via pvlib single-diode (vectorised).
+    # Suppress the scipy RuntimeWarning that arises when G=0.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        sd_ref = pvlib.pvsystem.singlediode(
+            I_L_ref, I_0_ref, R_s, R_sh, nNsVth, method="lambertw"
+        )
+        sd_deg = pvlib.pvsystem.singlediode(
+            I_L_deg, I_0_ref, R_s, R_sh, nNsVth, method="lambertw"
+        )
+
+    P_ref = pd.Series(
+        np.asarray(sd_ref["p_mp"]), index=weather_df.index, name="power_reference"
+    )
+    P_deg = pd.Series(
+        np.asarray(sd_deg["p_mp"]), index=weather_df.index, name="power_degraded"
+    )
+
+    # Cumulative aggregated power ratio
+    cum_ref = P_ref.cumsum()
+    cum_deg = P_deg.cumsum()
+    PR_Agg = cum_deg / cum_ref.where(cum_ref > 0)
+    PR_Agg.name = "PR_Agg"
+
+    # T90,Agg: first timestep where PR_Agg < 0.90
+    below_90 = PR_Agg.index[PR_Agg < 0.90]
+    if len(below_90) > 0:
+        try:
+            T90_Agg_hours = (below_90[0] - PR_Agg.index[0]).total_seconds() / 3600.0
+        except AttributeError:
+            # Non-datetime index: fall back to positional count (assumes hourly)
+            T90_Agg_hours = float(PR_Agg.index.get_loc(below_90[0]))
+    else:
+        T90_Agg_hours = None
+
+    return {
+        "PR_Agg": PR_Agg,
+        "T90_Agg_hours": T90_Agg_hours,
+        "power_degraded": P_deg,
+        "power_reference": P_ref,
+    }
+
+
+def degraded_power_ratio_tandem(
+    weather_df: pd.DataFrame,
+    meta: dict,
+    ce_factor: pd.Series,
+    tandem_template,
+    jsc_top_ref: float = 20.76,
+    jsc_bot_ref: float = 20.76,
+    alpha_isc_top: float = 5e-4,
+    alpha_isc_bot: float = 5e-4,
+    G_ref: float = 1000.0,
+    T_ref: float = 25.0,
+    poa=None,
+    temp_cell: pd.Series = None,
+    temp_model: str = "sapm",
+    conf: str = "open_rack_glass_polymer",
+    wind_factor: float = 0.33,
+    jsc_top_ref_ma: Optional[float] = None,
+    jsc_bot_ref_ma: Optional[float] = None,
+) -> dict:
+    """Compute PR_Agg and T90,Agg for a degrading perovskite/Si tandem device
+    using PVCircuit.
+
+    This function is the tandem counterpart to :func:`degraded_power_ratio`.
+    The collection-efficiency degradation factor is applied to the top-cell
+    photocurrent only, while the bottom-cell photocurrent remains undegraded by
+    CE (both still scale with irradiance and temperature):
+
+    .. math::
+
+        J_{top,deg}(t) = J_{top,ref}(t) \\cdot CE_{factor}(t)
+
+    Inputs ``jsc_*_ref`` are in mA/cm² and internally converted to A/cm²
+    before assignment to PVCircuit junction ``Jext``.
+
+    Parameters
+    ----------
+    weather_df : pd.DataFrame
+        Weather data with a DateTimeIndex.
+    meta : dict
+        Location metadata used when ``poa`` or ``temp_cell`` are not provided.
+    ce_factor : pd.Series
+        Time-indexed CE degradation factor (0-1), typically from
+        :func:`perovskite_degradation_factor`.
+    tandem_template : pvcircuit.Multi2T
+        PVCircuit tandem template device (copied internally for reference and
+        degraded simulations).
+    jsc_top_ref : float, default 20.76
+        Top-cell reference short-circuit current density [mA/cm²] at
+        ``G_ref`` and ``T_ref``.
+    jsc_bot_ref : float, default 20.76
+        Bottom-cell reference short-circuit current density [mA/cm²] at
+        ``G_ref`` and ``T_ref``.
+    alpha_isc_top : float, default 5e-4
+        Top-cell temperature coefficient of Jsc [1/K].
+    alpha_isc_bot : float, default 5e-4
+        Bottom-cell temperature coefficient of Jsc [1/K].
+    G_ref : float, default 1000.0
+        Reference irradiance [W/m²].
+    T_ref : float, default 25.0
+        Reference cell temperature [°C].
+    poa : pd.Series or pd.DataFrame, optional
+        Plane-of-array irradiance [W/m²]. If omitted, computed with
+        :func:`pvdeg.spectral.poa_irradiance`.
+    temp_cell : pd.Series, optional
+        Pre-computed cell temperature [°C]. If omitted, computed with
+        :func:`pvdeg.temperature.module`.
+    temp_model : str, default ``"sapm"``
+        pvlib temperature model used when ``temp_cell`` is not provided.
+    conf : str, default ``"open_rack_glass_polymer"``
+        Module mounting configuration used when ``temp_cell`` is not provided.
+    wind_factor : float, default 0.33
+        Wind-speed correction exponent used when ``temp_cell`` is not provided.
+
+    Returns
+    -------
+    dict
+        Dictionary with keys:
+
+        - ``"PR_Agg"``: cumulative aggregated power ratio [pd.Series]
+        - ``"T90_Agg_hours"``: first hour where ``PR_Agg < 0.90`` [float|None]
+        - ``"power_degraded"``: degraded tandem hourly MPP power [pd.Series]
+        - ``"power_reference"``: reference tandem hourly MPP power [pd.Series]
+    """
+    if weather_df is None:
+        raise ValueError("weather_df is required")
+    if ce_factor is None:
+        raise ValueError("ce_factor is required")
+    if tandem_template is None:
+        raise ValueError("tandem_template is required")
+
+    # Backward-compatible aliases for older notebooks/scripts.
+    if jsc_top_ref_ma is not None:
+        warnings.warn(
+            "'jsc_top_ref_ma' is deprecated; use 'jsc_top_ref' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        jsc_top_ref = jsc_top_ref_ma
+    if jsc_bot_ref_ma is not None:
+        warnings.warn(
+            "'jsc_bot_ref_ma' is deprecated; use 'jsc_bot_ref' instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        jsc_bot_ref = jsc_bot_ref_ma
+
+    # Import here so non-tandem workflows do not require pvcircuit.
+    try:
+        import pvcircuit as pvc  # noqa: F401
+    except ImportError as exc:
+        raise ImportError(
+            "degraded_power_ratio_tandem requires pvcircuit. "
+            "Install pvcircuit to use tandem energy-yield modeling."
+        ) from exc
+
+    if not ce_factor.index.equals(weather_df.index):
+        ce_factor = ce_factor.reindex(weather_df.index)
+        if ce_factor.isna().any():
+            raise ValueError(
+                "ce_factor is missing values for some timestamps in weather_df.index."
+                "Ensure ce_factor covers the full time range of weather_df."
+            )
+
+    # POA irradiance
+    if poa is None:
+        poa_df = spectral.poa_irradiance(weather_df, meta)
+    elif isinstance(poa, pd.Series):
+        poa_df = pd.DataFrame({"poa_global": poa}, index=poa.index)
+    else:
+        poa_df = poa
+    G = poa_df["poa_global"].clip(lower=0.0)
+
+    # Module / cell temperature [°C]
+    if temp_cell is not None:
+        if not temp_cell.index.equals(weather_df.index):
+            temp_cell = temp_cell.reindex(weather_df.index)
+            if temp_cell.isna().any():
+                raise ValueError(
+                    "temp_cell is missing values for some timestamps in"
+                    " weather_df.index. Ensure temp_cell covers the full time range of"
+                    " weather_df."
+                )
+        T_cell_C = temp_cell
+    else:
+        T_mod = temperature.module(
+            weather_df,
+            meta,
+            poa=poa_df,
+            temp_model=temp_model,
+            conf=conf,
+            wind_factor=wind_factor,
+        )
+        T_cell_C = T_mod
+
+    # Use independent copies so degraded and reference states do not interfere.
+    try:
+        dev_ref = tandem_template.copy()
+        dev_deg = tandem_template.copy()
+    except AttributeError:
+        dev_ref = copy.deepcopy(tandem_template)
+        dev_deg = copy.deepcopy(tandem_template)
+
+    p_ref = np.zeros(len(weather_df), dtype=float)
+    p_deg = np.zeros(len(weather_df), dtype=float)
+
+    for i, ts in enumerate(weather_df.index):
+        g_scale = max(float(G.iloc[i]) / G_ref, 0.0)
+        t_top = 1.0 + alpha_isc_top * (float(T_cell_C.iloc[i]) - T_ref)
+        t_bot = 1.0 + alpha_isc_bot * (float(T_cell_C.iloc[i]) - T_ref)
+
+        # mA/cm² -> A/cm² conversion for PVCircuit Junction.Jext
+        j_top_ref_acm2 = max(jsc_top_ref * g_scale * t_top, 0.0) / 1000.0
+        j_bot_ref_acm2 = max(jsc_bot_ref * g_scale * t_bot, 0.0) / 1000.0
+        j_top_deg_acm2 = max(j_top_ref_acm2 * float(ce_factor.loc[ts]), 0.0)
+
+        # Reference tandem (no CE degradation)
+        dev_ref.j[0].set(Jext=j_top_ref_acm2, TC=float(T_cell_C.iloc[i]))
+        dev_ref.j[1].set(Jext=j_bot_ref_acm2, TC=float(T_cell_C.iloc[i]))
+        p_ref[i] = float(dev_ref.MPP()["Pmp"])
+
+        # Degraded tandem (top-cell CE degradation only)
+        dev_deg.j[0].set(Jext=j_top_deg_acm2, TC=float(T_cell_C.iloc[i]))
+        dev_deg.j[1].set(Jext=j_bot_ref_acm2, TC=float(T_cell_C.iloc[i]))
+        p_deg[i] = float(dev_deg.MPP()["Pmp"])
+
+    P_ref = pd.Series(p_ref, index=weather_df.index, name="power_reference")
+    P_deg = pd.Series(p_deg, index=weather_df.index, name="power_degraded")
+
+    # Cumulative aggregated power ratio
+    cum_ref = P_ref.cumsum()
+    cum_deg = P_deg.cumsum()
+    PR_Agg = cum_deg / cum_ref.where(cum_ref > 0)
+    PR_Agg.name = "PR_Agg"
+
+    # T90,Agg: first timestep where PR_Agg < 0.90
+    below_90 = PR_Agg.index[PR_Agg < 0.90]
+    if len(below_90) > 0:
+        try:
+            T90_Agg_hours = (below_90[0] - PR_Agg.index[0]).total_seconds() / 3600.0
+        except AttributeError:
+            T90_Agg_hours = float(PR_Agg.index.get_loc(below_90[0]))
+    else:
+        T90_Agg_hours = None
+
+    return {
+        "PR_Agg": PR_Agg,
+        "T90_Agg_hours": T90_Agg_hours,
+        "power_degraded": P_deg,
+        "power_reference": P_ref,
+    }
+
+
+def acetic_acid_generation(
+    temp_module: pd.Series,
+    Ro: float = 0.00331,
+    Ea_gen: float = 90.0,
+    T_ref: float = 27.0,
+    encapsulant: str = "AA002",
+) -> pd.Series:
+    """Calculate the acetic acid generation rate in EVA encapsulant.
+
+    Uses an Arrhenius model for the hydrolysis source term of ethylene-vinyl
+    acetate (EVA). The rate at reference temperature ``T_ref`` is scaled via:
+
+    .. math::
+
+        R(T) = R_0 \\cdot \\exp\\!\\left[
+            \\frac{-E_a}{R}\\left(\\frac{1}{T} - \\frac{1}{T_{ref}}\\right)
+        \\right]
+
+    The baseline ``Ro`` is calibrated from Kempe et al. (2007) under damp-heat
+    conditions (85°C/85% RH), so this implementation assumes that humidity basis
+    implicitly and models temperature dependence directly.
+
+    Validation: Gnocchi et al. (2018) [2]_.
+
+    Parameters
+    ----------
+    temp_module : pd.Series
+        Time-indexed module temperature [°C].
+    Ro : float, default 0.00331
+        Acetic acid source term at ``T_ref`` under the 85% RH calibration
+        basis [ng/min/g].
+    Ea_gen : float, default 90.0
+        Activation energy for HAc generation [kJ/mol].
+    T_ref : float, default 27.0
+        Reference temperature for ``Ro`` [°C].
+    encapsulant : str, default ``"AA002"``
+        Key in ``AApermeation.json`` from which to load default parameters.
+        Set to ``None`` to use explicitly provided values only.
+
+    Returns
+    -------
+    generation_rate : pd.Series
+        Time-indexed acetic acid generation rate [ng/min/g].
+
+    References
+    ----------
+    .. [1] Kempe, M. D., et al. (2007). "Acetic acid production and glass
+       transition concerns with ethylene-vinyl acetate used in photovoltaic
+       devices." *Solar Energy Materials and Solar Cells* 91.4: 315-329.
+    .. [2] Gnocchi, L., et al. (2018). "Measuring and modelling the generation
+       of acetic acid in aged ethylene-vinyl acetate-based encapsulants used
+       in solar modules." EU PVSEC.
+    """
+
+    if encapsulant is not None:
+        params = utilities.read_material(
+            pvdeg_file="AApermeation",
+            key=encapsulant,
+            parameters=["Ro", "Ea_gen"],
+        )
+        Ro = params.get("Ro", Ro)
+        Ea_gen = params.get("Ea_gen", Ea_gen)
+
+        full_params = utilities.read_material(
+            pvdeg_file="AApermeation",
+            key=encapsulant,
+            parameters=["Ro"],
+            values_only=False,
+        )
+        ro_entry = full_params.get("Ro", {})
+        if isinstance(ro_entry, dict) and "ref_temp_C" in ro_entry:
+            T_ref = ro_entry["ref_temp_C"]
+
+    T_K = temp_module + 273.15
+    T_ref_K = T_ref + 273.15
+
+    generation_rate = Ro * np.exp((-Ea_gen / R_GAS) * (1.0 / T_K - 1.0 / T_ref_K))
+
+    return pd.Series(generation_rate, index=temp_module.index, name="HAc_rate_ng_min_g")
+
+
+def acetic_acid_cumulative(
+    temp_module: pd.Series,
+    Ro: float = 0.00331,
+    Ea_gen: float = 90.0,
+    T_ref: float = 27.0,
+    encapsulant: str = "AA002",
+) -> pd.Series:
+    """Calculate the cumulative acetic acid produced in EVA over time.
+
+    Integrates the hourly Arrhenius generation rate (assuming 1-hour time steps)
+    to produce cumulative HAc concentration in [mg/g], matching the units and
+    magnitude of experimental measurements from Gnocchi et al. (2018).
+
+    Parameters
+    ----------
+    temp_module : pd.Series
+        Time-indexed module temperature [°C].
+    Ro : float, default 0.00331
+        Acetic acid source term at ``T_ref`` [ng/min/g], calibrated at 85% RH.
+    Ea_gen : float, default 90.0
+        Activation energy for HAc generation [kJ/mol].
+    T_ref : float, default 27.0
+        Reference temperature for ``Ro`` [°C].
+    encapsulant : str, default ``"AA002"``
+        Key in ``AApermeation.json``.  Set to ``None`` to use explicit values.
+
+    Returns
+    -------
+    cumulative_HAc : pd.Series
+        Time-indexed cumulative acetic acid concentration [mg/g].
+    """
+    rate = acetic_acid_generation(
+        temp_module, Ro=Ro, Ea_gen=Ea_gen, T_ref=T_ref, encapsulant=encapsulant
+    )
+
+    # rate is in [ng/min/g]; integrate over 60 min/h, convert ng → mg
+    hourly_production_mg = rate * 60.0 / 1e6  # [mg/g per hour]
+    cumulative_HAc = hourly_production_mg.cumsum()
+    cumulative_HAc.name = "HAc_cumulative_mg_g"
+    return cumulative_HAc

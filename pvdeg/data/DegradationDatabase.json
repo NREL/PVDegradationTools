@@ -308,15 +308,15 @@
         "Degradation": "Optical Transmittance In-Situ measurement",
         "Comments": "LED Light at 550nm",
         "EquationType": "Perovskite_1",
-        "Equation": "R_D=R_{0,WPO}\\cdot e^{ \\left( \\frac{-E_{a,WPO}}{R\\cdot T_K } \\right) } \\cdot \\left< \\frac{P_{O_2}\\cdot P_{H_2 O}\\cdot G_{550}^{0.7} }{ \\left[ 1+K_{2W}\\cdot P_{O_2} \\left(1+K_{3W}\\cdot G_{550}^{0.7} \\right) \\right]^2}  \\right> +R_{0,DPO}\\cdot e^ {\\left( \\frac{-E_{a,DPO}}{R\\cdot T_K} \\right) } \\cdot \\frac{P_{O_2} \\cdot G_{550}^{0.7} }{1+K_{2D}\\cdot P_{O_2} \\cdot \\left( 1+K_3D\\cdot G_{550}^{0.7}  \\right)} +R_{0,hum}\\cdot e^ { \\left( \\frac {-E_a^{hum}}{R\\cdot T_K } \\right) } \\cdot P_{H_2 O}\\cdot G_{550}^{0.7}+R_{0,therm}\\cdot e^{ \\left( \\frac{-E_a^{therm}}{R\\cdot T_K } \\right) }",
+        "Equation": "R_D=k_{0,WPO}\\cdot e^{ \\left( \\frac{-E_{A,WPO}}{R\\cdot T_K } \\right) } \\cdot \\frac{P_{O_2}\\cdot P_{H_2 O}\\cdot I_{in}^{0.7} }{ \\left[ 1+K_{2W}\\cdot P_{O_2} \\left(1+K_{3W}\\cdot I_{in}^{0.7} \\right) \\right]^2} +k_{0,DPO}\\cdot e^ {\\left( \\frac{-E_{A,DPO}}{R\\cdot T_K} \\right) } \\cdot \\frac{P_{O_2} \\cdot I_{in}^{0.7} }{1+K_{2D}\\cdot P_{O_2} \\cdot \\left( 1+K_{3D}\\cdot I_{in}^{0.7} \\right)} +k_{0,hum}\\cdot e^ { \\left( \\frac {-E_{A}^{hum}}{R\\cdot T_K } \\right) } \\cdot P_{H_2 O}\\cdot I_{in}^{0.7}+k_{0,therm}\\cdot e^{ \\left( \\frac{-E_{A}^{therm}}{R\\cdot T_K } \\right) }",
         "R_D": {
             "units": "mol/(m^2·s)"
         },
-        "R_0,WPO": {
+        "k_0,WPO": {
             "value": 3.16E-25,
             "units": "mol/(m^2·s·kpa^2 )·(photons/(m^2·s))^(-0.7)"
         },
-        "E_a,WPO": {
+        "E_A,WPO": {
             "value": -8.6827,
             "units": "kJ/mol"
         },
@@ -328,11 +328,11 @@
             "value": 4.32E-15,
             "units": "(photons/(m^2·s))^(-0.7)"
         },
-        "R_0,DPO": {
+        "k_0,DPO": {
             "value": 5.45E-15,
             "units": "mol/(m^2·s·kpa )·(photons/(m^2·s))^(-0.7)"
         },
-        "E_a,DPO": {
+        "E_A,DPO": {
             "value": 59.82,
             "units": "kJ/mol"
         },
@@ -344,19 +344,19 @@
             "value": 6.97E-15,
             "units": "(photons/(m^2·s))^(-0.7)"
         },
-        "R_0,hum": {
+        "k_0,hum": {
             "value": 9.2E-22,
             "units": "mol/(m^2·s·kpa)·(photons/(m^2·s))^(-0.7)"
         },
-        "E_a^hum": {
+        "E_A^hum": {
             "value": 19.3,
             "units": "kJ/mol"
         },
-        "E_a^therm": {
+        "E_A^therm": {
             "value": 43.42,
             "units": "kJ/mol"
         },
-        "R_0,therm": {
+        "k_0,therm": {
             "value": 0.00041,
             "units": "mol/(m^2·s)"
         }
@@ -1178,5 +1178,25 @@
         "srv_ab": {"value": 0, "units": ""},
         "srv_bc": {"value": 0, "units": ""},
         "comments": "Lit BO-LID + fit to Qcells destab"
+    },
+    "D046": {
+        "DataEntryPerson": "Rajiv (Dax) Daxini",
+        "DateEntered": "5/8/2026",
+        "doi": "10.1126/science.abn5679",
+        "SourceTitle": "Accelerated aging of all-inorganic, interface-stabilized perovskite solar cells",
+        "Authors": "Xiaoming Zhao, Tianran Liu, Quinn C. Burlingame, Tianjun Liu, Rudolph Holley III, Guangming Cheng, Nan Yao, Feng Gao, Yueh-Lin Loo",
+        "Reference": "Science 377, 307-310 (2022)",
+        "Material": "Halide Perovskite (CsPbI3, uncapped device)",
+        "EquationType": "Perovskite_biexponential",
+        "Comments": "Parameters for the uncapped CsPbI3 device from Zhao et al. 2022. Ea values read directly from the Arrhenius plot (Fig. 3C, uncapped fast/slow dashed lines). k0 values are calibrated to reproduce T90,Agg ~ 1440 h under ISOS-L2 (85 C, 1200 W/m^2; ISOS-L-3 in Zhao) as reported by Orooji et al. 2026 (doi:10.1039/d6el00021e) using the same Zhao parameters. A1, A2, B are estimated from the biexponential decay shape in Fig. 3A (uncapped). NOTE: Zhao does not tabulate A1/A2/B/k_fast/k_slow anywhere in the paper or SI. These values appear only as fitted curves in Fig. 3A/3C, so these are derived from AI-digitization of the plots.",
+        "Ea_fast": {"value": 0.248, "units": "eV"},
+        "Ea_slow": {"value": 0.243, "units": "eV"},
+        "k0_fast": {"value": 0.56, "units": "h^-1 (pre-exponential at reference irradiance I_ref)"},
+        "k0_slow": {"value": 0.48, "units": "h^-1 (pre-exponential at reference irradiance I_ref)"},
+        "A1": {"value": 0.25, "units": "dimensionless (fast-process amplitude, A1+A2+B=1)"},
+        "A2": {"value": 0.70, "units": "dimensionless (slow-process amplitude)"},
+        "B": {"value": 0.05, "units": "dimensionless (residual stable fraction)"},
+        "gamma": {"value": 1.0, "units": "dimensionless (light-intensity exponent)"},
+        "I_ref": {"value": 1200.0, "units": "W/m^2 (reference irradiance used in Zhao experiments)"}
     }
 }

@@ -10,5 +10,19 @@
 	"comment": "Extracted from Figure 10 of Weber et al. The activation energy does not exactly match that in the published work (35.0 kJ/mol). I did this because I wanted to include the prefactor.",
       "Ead": { "name": "Diffusivity Activation Energy", "units": "kJ/mol", "value": 39.1970399216688 },
       "Do": { "name": "Diffusivity Prefactor", "units": "cm²/s", "value": 0.190570685252167 }
+    },
+
+    "AA002": {
+	"name": "EVA-source-term",
+      "alias": "EVA-AA-generation",
+	"contributor": "Luca Gnocchi / Michael Kempe",
+	"source_generation": "Kempe, Michael D., et al. Acetic acid production and glass transition concerns with ethylene-vinyl acetate used in photovoltaic devices. Solar Energy Materials and Solar Cells 91.4 (2007): 315-329.",
+	"source_diffusion": "Kim, Namsu, and Changwoon Han. Experimental characterization and simulation of water vapor diffusion through various encapsulants used in PV modules. Solar Energy Materials and Solar Cells 116 (2013): 68-75.",
+	"source_validation": "Gnocchi, Luca, et al. Measuring and modelling the generation of acetic acid in aged ethylene-vinyl acetate-based encapsulants used in solar modules. EU PVSEC 2018.",
+	"comment": "Acetic acid (AA) generation source term and diffusion coefficient for FEM-type acetic acid production modeling in EVA. Source term at 27°C from Kempe 2007; diffusion coefficient at 50°C from Kim & Han 2013. Used in Gnocchi et al. Table I. Defines how fast AA is genearted inside the EVA encapsulant in PV modules. These parameters allow AA production calculation as a function of temperature, using an Arrhenius equation.",
+      "Ro": { "name": "Source Term Prefactor", "units": "ng/min/g", "value": 0.00331, "ref_temp_C": 27 },
+      "Ea_gen": { "name": "Generation Activation Energy", "units": "kJ/mol", "value": 90.0 },
+      "D_ref": { "name": "Diffusion Coefficient at Reference Temperature", "units": "m²/s", "value": 1e-11, "ref_temp_C": 50 },
+      "Ea_diff": { "name": "Diffusion Activation Energy", "units": "kJ/mol", "value": 35.0 }
     }
 }

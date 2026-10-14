@@ -77,7 +77,7 @@ simple_scenario.addJob(func=pvdeg.standards.standoff)
 # %%
 kwargs = {"wind_factor": 0.33}
 
-simple_scenario.addJob(func=pvdeg.fatigue.solder_fatigue, func_kwarg=kwargs)
+simple_scenario.addJob(func=(pvdeg.fatigue.solder_fatigue, kwargs))
 
 # %% [markdown]
 # # Adding a job with weather and metadata from outside of the class
@@ -93,7 +93,7 @@ weather, meta = pvdeg.weather.read(PSM_FILE, "psm")
 
 kwargs = {"weather_df": weather, "meta": meta}
 
-simple_scenario.addJob(func=pvdeg.standards.standoff, func_kwarg=kwargs)
+simple_scenario.addJob(func=(pvdeg.standards.standoff, kwargs))
 
 # FIX THIS CASE IN SCENARIO CLASS
 # (simple_scenario.pipeline[1]['job'])(**simple_scenario.pipeline[1]['params'])

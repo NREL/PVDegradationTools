@@ -59,6 +59,7 @@ dependencies = [
     "xarray",
     "sympy",
     "zarr",
+    "plotly"
 ]
 dynamic = ["version"]
 
@@ -85,6 +86,9 @@ books = [
 ]
 sam = [
     "NREL-PySAM",
+]
+pvcircuit = [
+    "pvcircuit @ git+https://github.com/NatLabRockies/PVcircuit@master"
 ]
 dev = [
     "pre-commit",
