@@ -2,7 +2,7 @@
 # Learn more at https://jupyterbook.org/customize/config.html
 
 title: PVDEG Tutorials
-author: Martin Springer, Matthew Brown, Silvana Ovaitt, Tobin Ford, Joseph Karas, Michael Kempe
+author: Martin Springer, Silvana Ovaitt, Rajiv Daxini, Tobin Ford, Matthew Brown, Joseph Karas, Derek Holsapple, Michael Kempe
 logo: ../docs/source/_static/logo-vectors/PVdeg-Logo-Horiz-Color.svg
 
 # Auto-exclude files not in the toc

@@ -13,7 +13,7 @@
 <tr>
   <td>Publications</td>
   <td>
-     <a href="https://zenodo.org/records/8088578/latest"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.8088578.svg" alt="DOI"></a>
+     <a href="https://doi.org/10.5281/zenodo.8088382"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.8088382.svg" alt="DOI"></a>
   </td>
 </tr>
 <tr>
@@ -195,15 +195,29 @@ If you use PVDeg in a published work, please cite both the software and the pape
 
 **Software Citation:**
 
-Click the **"Cite this repository"** button in the right sidebar to get a formatted citation, or visit Zenodo for the DOI corresponding to your specific version:
+	Springer, M., Ovaitt, S., Daxini, R., Ford, T., Brown, M., Karas, J., Holsapple, D., & Kempe, M. (2026). PVDeg: a Python package for modeling degradation of solar photovoltaic systems [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8088382
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088578.svg)](https://zenodo.org/records/8088578/latest)
+```bibtex
+@software{pvdeg,
+  author    = {Springer, Martin and Ovaitt, Silvana and Daxini, Rajiv and
+               Ford, Tobin and Brown, Matthew and Karas, Joseph and
+               Holsapple, Derek and Kempe, Michael},
+  title     = {{PVDeg: a Python package for modeling degradation of solar
+               photovoltaic systems}},
+  publisher = {Zenodo},
+  year      = {2026},
+  doi       = {10.5281/zenodo.8088382},
+  url       = {https://doi.org/10.5281/zenodo.8088382}
+}
+```
 
-On the Zenodo page, use the "Cite as" section in the right sidebar to copy the citation in your preferred format (BibTeX, APA, etc.).
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8088382.svg)](https://doi.org/10.5281/zenodo.8088382)
+
+The DOI above always resolves to the latest release. To cite the exact version you used, pick it from the version list on the Zenodo page, or use the **"Cite this repository"** button in the right sidebar.
 
 **JOSS Paper (In Review):**
 
-	Daxini, R., Ovaitt, S., Springer, M., Ford, T., & Kempe, M. (2025). PVDeg: a Python package for modeling degradation of solar photovoltaic systems. Journal of Open Source Software (In Review).
+	Daxini, R., Ovaitt, S., Springer, M., Ford, T., & Kempe, M. (2026). PVDeg: a Python package for modeling degradation of solar photovoltaic systems. Journal of Open Source Software (In Review).
 
 
 Acknowledgements

@@ -3,10 +3,12 @@ project:
   title: PVDEG Tutorials
   authors:
     - name: Martin Springer
-    - name: Matthew Brown
     - name: Silvana Ovaitt
+    - name: Rajiv Daxini
     - name: Tobin Ford
+    - name: Matthew Brown
     - name: Joseph Karas
+    - name: Derek Holsapple
     - name: Michael Kempe
   exclude:
     - _build

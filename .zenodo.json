@@ -1,5 +1,5 @@
 {
-  "title": "PVDeg: Photovoltaic Degradation Tools",
+  "title": "PVDeg: a Python package for modeling degradation of solar photovoltaic systems",
   "description": "PVDeg is an open-source Python package for modeling photovoltaic (PV) degradation, developed at the National Laboratory of the Rockies (NLR) and supported by the Durable Module Materials (DuraMAT) consortium. It provides modular functions, materials databases, and calculation workflows for simulating degradation mechanisms (e.g., LeTID, hydrolysis, UV exposure) using weather data from the National Solar Radiation Database (NSRDB) and the Photovoltaic Geographical Information System (PVGIS). By integrating Monte Carlo uncertainty propagation and geospatial processing, PVDeg enables field-relevant predictions and uncertainty quantification of module reliability and lifetime.",
   "creators": [
     {
@@ -8,14 +8,14 @@
       "orcid": "0000-0001-6803-108X"
     },
     {
-      "name": "Brown, Matthew",
-      "affiliation": "National Laboratory of the Rockies",
-      "orcid": "0000-0002-0988-3431"
-    },
-    {
       "name": "Ovaitt, Silvana",
       "affiliation": "National Laboratory of the Rockies",
       "orcid": "0000-0003-0180-728X"
+    },
+    {
+      "name": "Daxini, Rajiv",
+      "affiliation": "National Laboratory of the Rockies",
+      "orcid": "0000-0003-1993-9408"
     },
     {
       "name": "Ford, Tobin",
@@ -23,9 +23,13 @@
       "orcid": "0009-0000-7428-5625"
     },
     {
-      "name": "Daxini, Rajiv",
+      "name": "Brown, Matthew",
       "affiliation": "National Laboratory of the Rockies",
-      "orcid": "0000-0003-1993-9408"
+      "orcid": "0000-0002-0988-3431"
+    },
+    {
+      "name": "Karas, Joseph",
+      "affiliation": "Electric Power Research Institute"
     },
     {
       "name": "Holsapple, Derek",
@@ -40,18 +44,27 @@
   "contributors": [
     {
       "name": "Campanelli, Mark",
-      "affiliation": "Intelligent Measurement Systems LLC",
       "type": "Other"
     },
     {
       "name": "Wells, Trenton",
-      "affiliation": "National Laboratory of the Rockies",
       "type": "Other"
     },
     {
       "name": "Anderson, Kevin",
-      "affiliation": "Sandia National Laboratories",
       "orcid": "0000-0002-1166-7957",
+      "type": "Other"
+    },
+    {
+      "name": "Prilliman, Matthew",
+      "type": "Other"
+    },
+    {
+      "name": "Wesley, Aidan",
+      "type": "Other"
+    },
+    {
+      "name": "Millstein, Maxx",
       "type": "Other"
     }
   ],

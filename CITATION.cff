@@ -1,28 +1,31 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite both the software and the paper from preferred-citation."
-title: "PVDeg: Photovoltaic Degradation Tools"
+title: "PVDeg: a Python package for modeling degradation of solar photovoltaic systems"
 abstract: "PVDeg is an open-source Python package for modeling photovoltaic (PV) degradation, developed at the National Laboratory of the Rockies (NLR) and supported by the Durable Module Materials (DuraMAT) consortium. It provides modular functions, materials databases, and calculation workflows for simulating degradation mechanisms (e.g., LeTID, hydrolysis, UV exposure) using weather data from the National Solar Radiation Database (NSRDB) and the Photovoltaic Geographical Information System (PVGIS). By integrating Monte Carlo uncertainty propagation and geospatial processing, PVDeg enables field-relevant predictions and uncertainty quantification of module reliability and lifetime."
 authors:
   - family-names: Springer
     given-names: Martin
     affiliation: National Laboratory of the Rockies
     orcid: "https://orcid.org/0000-0001-6803-108X"
-  - family-names: Brown
-    given-names: Matthew
-    affiliation: National Laboratory of the Rockies
-    orcid: "https://orcid.org/0000-0002-0988-3431"
   - family-names: Ovaitt
     given-names: Silvana
     affiliation: National Laboratory of the Rockies
     orcid: "https://orcid.org/0000-0003-0180-728X"
-  - family-names: Ford
-    given-names: Tobin
-    affiliation: National Laboratory of the Rockies
-    orcid: "https://orcid.org/0009-0000-7428-5625"
   - family-names: Daxini
     given-names: Rajiv
     affiliation: National Laboratory of the Rockies
     orcid: "https://orcid.org/0000-0003-1993-9408"
+  - family-names: Ford
+    given-names: Tobin
+    affiliation: National Laboratory of the Rockies
+    orcid: "https://orcid.org/0009-0000-7428-5625"
+  - family-names: Brown
+    given-names: Matthew
+    affiliation: National Laboratory of the Rockies
+    orcid: "https://orcid.org/0000-0002-0988-3431"
+  - family-names: Karas
+    given-names: Joseph
+    affiliation: Electric Power Research Institute
   - family-names: Holsapple
     given-names: Derek
     affiliation: National Laboratory of the Rockies
@@ -43,8 +46,9 @@ keywords:
   - PVGIS
   - DuraMAT
 license: BSD-3-Clause
+doi: 10.5281/zenodo.8088382
 repository-code: "https://github.com/NatLabRockies/PVDegradationTools"
 url: "https://pvdegradationtools.readthedocs.io"
 type: software
-version: 0.7.3
-date-released: 2026-09-28
+version: 0.7.4
+date-released: 2026-10-03
