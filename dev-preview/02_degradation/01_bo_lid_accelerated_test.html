@@ -1,0 +1,1366 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>B-O LID Accelerated Test &#8212; PVDEG Tutorials</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '02_degradation/01_bo_lid_accelerated_test';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="LETID Accelerated Test" href="02_letid_accelerated_test.html" />
+    <link rel="prev" title="Weather Database Access" href="../01_basics/04_weather_database_access.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/PVdeg-Logo-Horiz-Color.svg" class="logo__image only-light" alt="PVDEG Tutorials - Home"/>
+    <img src="../_static/PVdeg-Logo-Horiz-Color.svg" class="logo__image only-dark pst-js-only" alt="PVDEG Tutorials - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 - Basics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/01_basics_humidity_design.html">Humidity Design Basics</a></li>
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/02_degradation.html">Degradation Overview</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/03_spectral_degradation.html">Spectral Degradation</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/04_weather_database_access.html">Weather Database Access</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 - Degradation Mechanisms</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">B-O LID Accelerated Test</a></li>
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="02_letid_accelerated_test.html">LETID Accelerated Test</a></li>
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="03_letid_outdoor.html">LETID Outdoor</a></li>
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="04_letid_outdoor_scenario.html">LETID Outdoor Scenario</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="05_letid_passivated_wafer.html">LETID Passivated Wafer</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="06_vant_hoff_degradation_model.html">Van’t Hoff Degradation Model</a></li>
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 - Monte Carlo Simulations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_monte_carlo/01_arrhenius.html">Arrhenius Monte Carlo</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../03_monte_carlo/02_standoff.html">Standoff Monte Carlo</a></li>
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 - Scenarios</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_scenario/01_scenario_temperature.html">Temperature Scenario</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../04_scenario/02_scenario_single_location.html">Single Location</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../04_scenario/03_scenario_mountain_downselect.html">Mountain Downselect</a></li>
+
+
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">05 - Geospatial Analysis</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/01_geospatial_templates.html">Geospatial Templates (HPC)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/02_geospatial_world_map.html">Geospatial World Map (HPC)</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/03_letid_outdoor_geospatial_demo.html">LETID Outdoor Geospatial Demo (HPC)</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/04_scenario_geographical_features.html">Geographical Features (HPC)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/05_scenario_geospatial.html">Scenario Geospatial (HPC)</a></li>
+
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">06 - Advanced Topics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../06_advanced/01_custom_functions_nopython.html">Custom Functions with Numba</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../06_advanced/02_pysam_single_location.html">PySAM for a Single Location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_advanced/03_pysam_api.html">PySAM: Single Location &amp; Geospatial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../06_advanced/04_nsrdb_distributed_api.html">NSRDB Distributed (API Key Required)</a></li>
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../06_advanced/05_pvgis_distributed.html">PVGIS Distributed</a></li>
+
+
+
+
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">06 - Workshop Demos</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../10_workshop_demos/01_astm_live_demo.html">ASTM Live Demo</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../10_workshop_demos/02_duramat_live_demo.html">DuraMAT Live Demo (HPC)</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tools/Tools%20-%20Edge%20Seal%20Oxygen%20Ingress.html">Edge Seal Oxygen Ingress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/Tools%20-%20Degradation.html">Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html">Module Standoff for IEC TS 63126 (HPC)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/02_degradation/01_bo_lid_accelerated_test.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>B-O LID Accelerated Test</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">B-O LID Accelerated Test</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-boron-oxygen-light-induced-degradation-b-o-lid-progression-in-accelerated-tests">Example: Boron-oxygen light-induced degradation (B-O LID) progression in accelerated tests</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#device-parameters">Device parameters</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#degradation-parameters">Degradation parameters</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-timeseries">Set up timeseries</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#finish-calculating-degraded-device-parameters">Finish calculating degraded device parameters.</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-results">Plot the results</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="b-o-lid-accelerated-test">
+<h1>B-O LID Accelerated Test<a class="headerlink" href="#b-o-lid-accelerated-test" title="Link to this heading">#</a></h1>
+<section id="example-boron-oxygen-light-induced-degradation-b-o-lid-progression-in-accelerated-tests">
+<h2>Example: Boron-oxygen light-induced degradation (B-O LID) progression in accelerated tests<a class="headerlink" href="#example-boron-oxygen-light-induced-degradation-b-o-lid-progression-in-accelerated-tests" title="Link to this heading">#</a></h2>
+<p>This library can also be used to model B-O LID, as the defect states and transitions can be modeled in the same way as LETID. See kinetic_parameters.json for B-O LID kinetic parameters used in this example.</p>
+<p>In this example, we will model B-O LID progression in a test similar to <a class="reference external" href="https://webstore.iec.ch/publication/61215">IEC 61215 MQT 19.1</a> IEC 61215 MQT 19.1, which prescribes <span class="math notranslate nohighlight">\(\ge \)</span> 10 <span class="math notranslate nohighlight">\(kWh/m^2\)</span> of 1-sun illumination with maximum power point tracking at  <span class="math notranslate nohighlight">\(50\degree C\)</span>.</p>
+<p><strong>Objectives:</strong></p>
+<ol class="arabic simple">
+<li><p>Define necessary solar cell device parameters</p></li>
+<li><p>Define necessary degradation parameters: degraded lifetime and defect states, this time using B-O LID kinetics</p></li>
+<li><p>Create timeseries of temperature and current injection</p></li>
+<li><p>Run through timeseries, calculating defect states</p></li>
+<li><p>Calculate device degradation and plot</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># if running on google colab, uncomment the next line and execute this cell to install the dependencies and prevent "ModuleNotFoundError" in later cells:</span>
+<span class="c1"># !pip install pvdeg</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pvdeg</span><span class="w"> </span><span class="kn">import</span> <span class="n">letid</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">utilities</span><span class="p">,</span> <span class="n">DATA_DIR</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pvlib</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># This information helps with debugging and getting support :)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pvdeg</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Working on a "</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Python version "</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Pandas version "</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"pvlib version "</span><span class="p">,</span> <span class="n">pvlib</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"pvdeg version "</span><span class="p">,</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Working on a  Linux 6.17.0-1022-azure
+Python version  3.11.17 (main, Oct  1 2026, 14:32:31) [GCC 13.3.0]
+Pandas version  3.0.6
+pvlib version  0.16.1
+pvdeg version  0.1.dev1+g1a9e9e277
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="device-parameters">
+<h1>Device parameters<a class="headerlink" href="#device-parameters" title="Link to this heading">#</a></h1>
+<p>To define a device, we need to define several important quantities about the device: wafer thickness (in <span class="math notranslate nohighlight">\(\mu m\)</span>), rear surface recombination velocity (in cm/s), and cell area (in cm<sup>2</sup>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wafer_thickness</span> <span class="o">=</span> <span class="mi">180</span>  <span class="c1"># um</span>
+<span class="n">s_rear</span> <span class="o">=</span> <span class="mi">46</span>  <span class="c1"># cm/s</span>
+<span class="n">cell_area</span> <span class="o">=</span> <span class="mi">243</span>  <span class="c1"># cm^2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><b> Other device parameters </b></p>
+<p>Other required parameters are base diffusivity (in <span class="math notranslate nohighlight">\(cm^2/s\)</span>), and optical generation profile, which allow us to estimate current collection in the device.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">generation_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s2">"PVL_GenProfile.xlsx"</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>  <span class="c1"># this is an optical generation profile generated by PVLighthouse's OPAL2 default model for 1-sun, normal incident AM1.5 sunlight on a 180-um thick SiNx-coated, pyramid-textured wafer.</span>
+<span class="n">generation</span> <span class="o">=</span> <span class="n">generation_df</span><span class="p">[</span><span class="s2">"Generation (cm-3s-1)"</span><span class="p">]</span>
+<span class="n">depth</span> <span class="o">=</span> <span class="n">generation_df</span><span class="p">[</span><span class="s2">"Depth (um)"</span><span class="p">]</span>
+
+<span class="n">d_base</span> <span class="o">=</span> <span class="mi">27</span>  <span class="c1"># cm^2/s electron diffusivity. See https://www2.pvlighthouse.com.au/calculators/mobility%20calculator/mobility%20calculator.aspx for details</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="degradation-parameters">
+<h1>Degradation parameters<a class="headerlink" href="#degradation-parameters" title="Link to this heading">#</a></h1>
+<p>To model the device’s degradation, we need to define several more important quantities about the degradation the device will experience. These include undegraded and degraded lifetime (in <span class="math notranslate nohighlight">\(\mu s\)</span>).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tau_0</span> <span class="o">=</span> <span class="mi">115</span>  <span class="c1"># us, carrier lifetime in non-degraded states, e.g. LETID/LID states A or C</span>
+<span class="n">tau_deg</span> <span class="o">=</span> <span class="mi">55</span>  <span class="c1"># us, carrier lifetime in fully-degraded state, e.g. LETID/LID state B</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Let’s see how much maximum power degradation these parameters will result in:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">letid</span><span class="o">.</span><span class="n">calc_pmp_loss_from_tau_loss</span><span class="p">(</span>
+    <span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">cell_area</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">s_rear</span>
+<span class="p">)</span>  <span class="c1"># returns % power loss, pmp_0, pmp_deg</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(np.float64(0.03495240755084543),
+ np.float64(5.663466529792824),
+ np.float64(5.465514739492933))
+</pre></div>
+</div>
+</div>
+</div>
+<p><b>Remaining degradation parameters:</b></p>
+<p>The rest of the quantities to define are: the initial percentage of defects in each state (A, B, and C), and the dictionary of mechanism parameters.</p>
+<p>In this example, we’ll assume the device starts in the fully-undegraded state (100% state A), and we’ll use the parameters for B-O LID</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># starting defect state percentages</span>
+<span class="n">nA_0</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">nB_0</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">nC_0</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here's a list of the possible sets of kinetic parameters from kinetic_parameters.json:</span>
+<span class="n">utilities</span><span class="o">.</span><span class="n">get_kinetics</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>('Choose a set of kinetic parameters:',
+ ['D001',
+  'D002',
+  'D003',
+  'D004',
+  'D005',
+  'D006',
+  'D007',
+  'D008',
+  'D009',
+  'D010',
+  'D011',
+  'D012',
+  'D013',
+  'D014',
+  'D015',
+  'D016',
+  'D017',
+  'D018',
+  'D019',
+  'D020',
+  'D021',
+  'D022',
+  'D024',
+  'D025',
+  'D026',
+  'D027',
+  'D028',
+  'D029',
+  'D030',
+  'D031',
+  'D032',
+  'D033',
+  'D034',
+  'D035',
+  'D036',
+  'D037',
+  'D038',
+  'D039',
+  'D040',
+  'D041',
+  'D042',
+  'D043',
+  'D044',
+  'D045'])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mechanism_params</span> <span class="o">=</span> <span class="n">utilities</span><span class="o">.</span><span class="n">get_kinetics</span><span class="p">(</span><span class="s2">"D045"</span><span class="p">)</span>
+
+<span class="c1"># Flatten the nested dictionary to get only the "value" for each parameter</span>
+<span class="n">mechanism_params</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="p">[</span><span class="s2">"value"</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"value"</span> <span class="ow">in</span> <span class="n">v</span> <span class="k">else</span> <span class="n">v</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">mechanism_params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="set-up-timeseries">
+<h1>Set up timeseries<a class="headerlink" href="#set-up-timeseries" title="Link to this heading">#</a></h1>
+<p>In this example, we are going to model test with constant temperature and injection. IEC 61215 MQT 19.1 prescribes 10 <span class="math notranslate nohighlight">\(kWh/m^2\)</span> of 1-sun illumination (i.e., 10 hours of 1-sun) with maximum power point tracking at <span class="math notranslate nohighlight">\(50\degree C\)</span>. For most typical c-Si modules, MPP injection is roughly <span class="math notranslate nohighlight">\(I_{sc}-I_{mp}\)</span>, or roughly equal to  <span class="math notranslate nohighlight">\(0.05\times I_{sc}\)</span>. So we will set injection equal to 0.05 “suns” of injection.</p>
+<p>We will create a pandas datetime series and calculate the changes in defect states for each timestep. As B-O LID can initially proceed quickly, we will create a timeseries with 1-second intervals for the first 10 minutes, then proceed with 1-minute intervals</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">temperature</span> <span class="o">=</span> <span class="mi">50</span>  <span class="c1"># degrees celsius</span>
+<span class="n">suns</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c1"># "suns" of injection, e.g 1-sun illumination at open circuit would be 1; dark current injection is given as a fraction of Isc, e.g., injecting Isc would be 1. For this example we assume injection is 0.05*Isc.</span>
+
+<span class="n">timesteps_initial</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01 00:00:00"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-01-01 00:10:00"</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"s"</span>
+<span class="p">)</span>  <span class="c1"># 10 minutes of 1-second interval timesteps. In general, we should select small timesteps unless we are sure defect reactions are proceeding very slowly</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span>
+    <span class="n">start</span><span class="o">=</span><span class="s2">"2022-01-01 00:10:00"</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">"2022-01-01 10:00:00"</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s2">"min"</span>
+<span class="p">)</span>  <span class="c1"># a total of 10 hours of exposure</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Datetime"</span><span class="p">])</span>
+<span class="n">timesteps_initial</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">timesteps_initial</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"Datetime"</span><span class="p">])</span>
+
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">timesteps_initial</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">])</span>  <span class="c1"># concatenate the two time series</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">"Datetime"</span><span class="p">)</span>
+<span class="n">timesteps</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">temperature</span><span class="p">)</span>
+<span class="n">injection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">timesteps</span><span class="p">),</span> <span class="n">suns</span><span class="p">)</span>
+
+<span class="n">timesteps</span><span class="p">[</span><span class="s2">"Temperature"</span><span class="p">]</span> <span class="o">=</span> <span class="n">temps</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s2">"Injection"</span><span class="p">]</span> <span class="o">=</span> <span class="n">injection</span>
+
+<span class="n">timesteps</span><span class="p">[[</span><span class="s2">"NA"</span><span class="p">,</span> <span class="s2">"NB"</span><span class="p">,</span> <span class="s2">"NC"</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+<span class="p">)</span>  <span class="c1"># create columns for defect state percentages and lifetime, fill with NaNs for now, to fill iteratively below</span>
+
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="s2">"NA"</span><span class="p">,</span> <span class="s2">"NB"</span><span class="p">,</span> <span class="s2">"NC"</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">nA_0</span><span class="p">,</span>
+    <span class="n">nB_0</span><span class="p">,</span>
+    <span class="n">nC_0</span><span class="p">,</span>
+<span class="p">)</span>  <span class="c1"># assign first timestep defect state percentages</span>
+<span class="n">timesteps</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span>
+    <span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">nB_0</span>
+<span class="p">)</span>  <span class="c1"># calculate tau for the first timestep</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="c1"># first row tau has already been assigned</span>
+    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># loop through rows, new tau calculated based on previous NB. Reaction proceeds based on new tau.</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_A</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"NA"</span><span class="p">]</span>
+        <span class="n">n_B</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"NB"</span><span class="p">]</span>
+        <span class="n">n_C</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"NC"</span><span class="p">]</span>
+
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="n">jsc</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">calculate_jsc_from_tau_cp</span><span class="p">(</span>
+            <span class="n">tau</span><span class="p">,</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">d_base</span><span class="p">,</span> <span class="n">s_rear</span><span class="p">,</span> <span class="n">generation</span><span class="p">,</span> <span class="n">depth</span>
+        <span class="p">)</span>
+
+        <span class="n">temperature</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"Temperature"</span><span class="p">]</span>
+        <span class="n">injection</span> <span class="o">=</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"Injection"</span><span class="p">]</span>
+
+        <span class="c1"># calculate defect reaction kinetics: reaction constant and carrier concentration factor.</span>
+        <span class="n">k_AB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span>
+            <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"v_ab"</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"ea_ab"</span><span class="p">],</span> <span class="n">temperature</span>
+        <span class="p">)</span>
+        <span class="n">k_BA</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span>
+            <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"v_ba"</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"ea_ba"</span><span class="p">],</span> <span class="n">temperature</span>
+        <span class="p">)</span>
+        <span class="n">k_BC</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span>
+            <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"v_bc"</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"ea_bc"</span><span class="p">],</span> <span class="n">temperature</span>
+        <span class="p">)</span>
+        <span class="n">k_CB</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">k_ij</span><span class="p">(</span>
+            <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"v_cb"</span><span class="p">],</span> <span class="n">mechanism_params</span><span class="p">[</span><span class="s2">"ea_cb"</span><span class="p">],</span> <span class="n">temperature</span>
+        <span class="p">)</span>
+
+        <span class="n">x_ab</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor</span><span class="p">(</span>
+            <span class="n">tau</span><span class="p">,</span>
+            <span class="s2">"ab"</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="p">,</span>
+            <span class="n">injection</span><span class="p">,</span>
+            <span class="n">jsc</span><span class="p">,</span>
+            <span class="n">wafer_thickness</span><span class="p">,</span>
+            <span class="n">s_rear</span><span class="p">,</span>
+            <span class="n">mechanism_params</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">x_ba</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor</span><span class="p">(</span>
+            <span class="n">tau</span><span class="p">,</span>
+            <span class="s2">"ba"</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="p">,</span>
+            <span class="n">injection</span><span class="p">,</span>
+            <span class="n">jsc</span><span class="p">,</span>
+            <span class="n">wafer_thickness</span><span class="p">,</span>
+            <span class="n">s_rear</span><span class="p">,</span>
+            <span class="n">mechanism_params</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">x_bc</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">carrier_factor</span><span class="p">(</span>
+            <span class="n">tau</span><span class="p">,</span>
+            <span class="s2">"bc"</span><span class="p">,</span>
+            <span class="n">temperature</span><span class="p">,</span>
+            <span class="n">injection</span><span class="p">,</span>
+            <span class="n">jsc</span><span class="p">,</span>
+            <span class="n">wafer_thickness</span><span class="p">,</span>
+            <span class="n">s_rear</span><span class="p">,</span>
+            <span class="n">mechanism_params</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># calculate the instantaneous change in NA, NB, and NC</span>
+        <span class="n">dN_Adt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_ba</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span>
+        <span class="n">dN_Bdt</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">k_AB</span> <span class="o">*</span> <span class="n">n_A</span> <span class="o">*</span> <span class="n">x_ab</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">k_BA</span> <span class="o">*</span> <span class="n">x_ba</span> <span class="o">+</span> <span class="n">k_BC</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_B</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">dN_Cdt</span> <span class="o">=</span> <span class="p">(</span><span class="n">k_BC</span> <span class="o">*</span> <span class="n">n_B</span> <span class="o">*</span> <span class="n">x_bc</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">k_CB</span> <span class="o">*</span> <span class="n">n_C</span><span class="p">)</span>
+
+        <span class="n">t_step</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"Datetime"</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"Datetime"</span><span class="p">]</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+        <span class="c1"># assign new defect state percentages</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"NA"</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_A</span> <span class="o">+</span> <span class="n">dN_Adt</span> <span class="o">*</span> <span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"NB"</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_B</span> <span class="o">+</span> <span class="n">dN_Bdt</span> <span class="o">*</span> <span class="n">t_step</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"NC"</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_C</span> <span class="o">+</span> <span class="n">dN_Cdt</span> <span class="o">*</span> <span class="n">t_step</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="finish-calculating-degraded-device-parameters">
+<h1>Finish calculating degraded device parameters.<a class="headerlink" href="#finish-calculating-degraded-device-parameters" title="Link to this heading">#</a></h1>
+<p>Now that we have calculated defect states, we can calculate all the quantities that depend on defect states.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">timesteps</span><span class="p">[</span><span class="s2">"tau"</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">tau_now</span><span class="p">(</span><span class="n">tau_0</span><span class="p">,</span> <span class="n">tau_deg</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">[</span><span class="s2">"NB"</span><span class="p">])</span>
+
+<span class="c1"># calculate device Jsc for every timestep. Unfortunately this requires an integration so I think we have to run through a loop. Device Jsc allows calculation of device Voc.</span>
+<span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">timestep</span> <span class="ow">in</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">jsc_now</span> <span class="o">=</span> <span class="n">collection</span><span class="o">.</span><span class="n">calculate_jsc_from_tau_cp</span><span class="p">(</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">],</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">d_base</span><span class="p">,</span> <span class="n">s_rear</span><span class="p">,</span> <span class="n">generation</span><span class="p">,</span> <span class="n">depth</span>
+    <span class="p">)</span>
+    <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"Jsc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">jsc_now</span>
+    <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"Voc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">calc_voc_from_tau</span><span class="p">(</span>
+        <span class="n">timesteps</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">],</span> <span class="n">wafer_thickness</span><span class="p">,</span> <span class="n">s_rear</span><span class="p">,</span> <span class="n">jsc_now</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mi">25</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># this function quickly calculates the rest of the device parameters: Isc, FF, max power, and normalized max power</span>
+<span class="n">timesteps</span> <span class="o">=</span> <span class="n">letid</span><span class="o">.</span><span class="n">calc_device_params</span><span class="p">(</span><span class="n">timesteps</span><span class="p">,</span> <span class="n">cell_area</span><span class="o">=</span><span class="mi">243</span><span class="p">)</span>
+<span class="n">timesteps</span><span class="p">[</span><span class="s2">"time (days)"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">timesteps</span><span class="p">[</span><span class="s2">"Datetime"</span><span class="p">]</span> <span class="o">-</span> <span class="n">timesteps</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">"Datetime"</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">86400</span>  <span class="c1"># create a column for days elapsed</span>
+
+<span class="n">timesteps</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Datetime</th>
+      <th>Temperature</th>
+      <th>Injection</th>
+      <th>NA</th>
+      <th>NB</th>
+      <th>NC</th>
+      <th>tau</th>
+      <th>Jsc</th>
+      <th>Voc</th>
+      <th>Isc</th>
+      <th>FF</th>
+      <th>Pmp</th>
+      <th>Pmp_norm</th>
+      <th>time (days)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2022-01-01 00:00:00</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>100.000000</td>
+      <td>0.000000</td>
+      <td>0.000000e+00</td>
+      <td>115.000000</td>
+      <td>41.590997</td>
+      <td>0.666327</td>
+      <td>10.106612</td>
+      <td>0.840987</td>
+      <td>5.663467</td>
+      <td>1.000000</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>2022-01-01 00:00:01</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>99.984366</td>
+      <td>0.015634</td>
+      <td>0.000000e+00</td>
+      <td>114.980390</td>
+      <td>41.590936</td>
+      <td>0.666324</td>
+      <td>10.106597</td>
+      <td>0.840986</td>
+      <td>5.663426</td>
+      <td>0.999993</td>
+      <td>0.000012</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>2022-01-01 00:00:02</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>99.968735</td>
+      <td>0.031265</td>
+      <td>1.016487e-07</td>
+      <td>114.960790</td>
+      <td>41.590875</td>
+      <td>0.666321</td>
+      <td>10.106583</td>
+      <td>0.840986</td>
+      <td>5.663386</td>
+      <td>0.999986</td>
+      <td>0.000023</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>2022-01-01 00:00:03</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>99.953106</td>
+      <td>0.046893</td>
+      <td>3.049294e-07</td>
+      <td>114.941200</td>
+      <td>41.590814</td>
+      <td>0.666317</td>
+      <td>10.106568</td>
+      <td>0.840985</td>
+      <td>5.663345</td>
+      <td>0.999979</td>
+      <td>0.000035</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2022-01-01 00:00:04</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>99.937480</td>
+      <td>0.062520</td>
+      <td>6.098257e-07</td>
+      <td>114.921620</td>
+      <td>41.590753</td>
+      <td>0.666314</td>
+      <td>10.106553</td>
+      <td>0.840984</td>
+      <td>5.663305</td>
+      <td>0.999971</td>
+      <td>0.000046</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1187</th>
+      <td>2022-01-01 09:56:00</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>0.364232</td>
+      <td>82.313333</td>
+      <td>1.732243e+01</td>
+      <td>60.591256</td>
+      <td>41.280511</td>
+      <td>0.653103</td>
+      <td>10.031164</td>
+      <td>0.838627</td>
+      <td>5.494163</td>
+      <td>0.970106</td>
+      <td>0.413889</td>
+    </tr>
+    <tr>
+      <th>1188</th>
+      <td>2022-01-01 09:57:00</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>0.360820</td>
+      <td>82.284648</td>
+      <td>1.735453e+01</td>
+      <td>60.601248</td>
+      <td>41.280615</td>
+      <td>0.653106</td>
+      <td>10.031190</td>
+      <td>0.838627</td>
+      <td>5.494211</td>
+      <td>0.970115</td>
+      <td>0.414583</td>
+    </tr>
+    <tr>
+      <th>1189</th>
+      <td>2022-01-01 09:58:00</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>0.357440</td>
+      <td>82.255941</td>
+      <td>1.738662e+01</td>
+      <td>60.611250</td>
+      <td>41.280720</td>
+      <td>0.653110</td>
+      <td>10.031215</td>
+      <td>0.838628</td>
+      <td>5.494259</td>
+      <td>0.970123</td>
+      <td>0.415278</td>
+    </tr>
+    <tr>
+      <th>1190</th>
+      <td>2022-01-01 09:59:00</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>0.354092</td>
+      <td>82.227214</td>
+      <td>1.741869e+01</td>
+      <td>60.621263</td>
+      <td>41.280825</td>
+      <td>0.653113</td>
+      <td>10.031240</td>
+      <td>0.838629</td>
+      <td>5.494308</td>
+      <td>0.970132</td>
+      <td>0.415972</td>
+    </tr>
+    <tr>
+      <th>1191</th>
+      <td>2022-01-01 10:00:00</td>
+      <td>50</td>
+      <td>0.05</td>
+      <td>0.350776</td>
+      <td>82.198467</td>
+      <td>1.745076e+01</td>
+      <td>60.631286</td>
+      <td>41.280930</td>
+      <td>0.653117</td>
+      <td>10.031266</td>
+      <td>0.838629</td>
+      <td>5.494356</td>
+      <td>0.970140</td>
+      <td>0.416667</td>
+    </tr>
+  </tbody>
+</table>
+<p>1192 rows × 14 columns</p>
+</div></div></div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="plot-the-results">
+<h1>Plot the results<a class="headerlink" href="#plot-the-results" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">cycler</span><span class="w"> </span><span class="kn">import</span> <span class="n">cycler</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"default"</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_prop_cycle</span><span class="p">(</span>
+    <span class="n">cycler</span><span class="p">(</span><span class="s2">"color"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"tab:blue"</span><span class="p">,</span> <span class="s2">"tab:orange"</span><span class="p">,</span> <span class="s2">"tab:green"</span><span class="p">])</span>
+    <span class="o">+</span> <span class="n">cycler</span><span class="p">(</span><span class="s2">"linestyle"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">"--"</span><span class="p">,</span> <span class="s2">"-."</span><span class="p">])</span>
+<span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">timesteps</span><span class="p">[</span><span class="s2">"time (days)"</span><span class="p">],</span> <span class="n">timesteps</span><span class="p">[[</span><span class="s2">"NA"</span><span class="p">,</span> <span class="s2">"NB"</span><span class="p">,</span> <span class="s2">"NC"</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">"$N_A$"</span><span class="p">,</span> <span class="s2">"$N_B$"</span><span class="p">,</span> <span class="s2">"$N_C$"</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="s2">"upper left"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Defect state percentages [%]"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">"Time [days]"</span><span class="p">)</span>
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">timesteps</span><span class="p">[</span><span class="s2">"time (days)"</span><span class="p">],</span>
+    <span class="n">timesteps</span><span class="p">[</span><span class="s2">"Pmp_norm"</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="s2">"black"</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">"Normalized $P_</span><span class="si">{MP}</span><span class="s2">$"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s2">"upper right"</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">"Normalized $P_</span><span class="si">{MP}</span><span class="s2">$"</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
+    <span class="s2">"Accelerated B-O LID Test</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="sa">rf</span><span class="s2">"</span><span class="si">{</span><span class="n">temperature</span><span class="si">}</span><span class="s2">$\degree$C, </span><span class="si">{</span><span class="n">suns</span><span class="si">}</span><span class="s2">$\times I_</span><span class="se">{{</span><span class="s2">SC</span><span class="se">}}</span><span class="s2">$ injection"</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7547b45114bc21d1723442d7f29bec2722fe92a15ab870505da8953bf9de5984.png" src="../_images/7547b45114bc21d1723442d7f29bec2722fe92a15ab870505da8953bf9de5984.png" />
+</div>
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./02_degradation"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../01_basics/04_weather_database_access.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Weather Database Access</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_letid_accelerated_test.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">LETID Accelerated Test</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">B-O LID Accelerated Test</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#example-boron-oxygen-light-induced-degradation-b-o-lid-progression-in-accelerated-tests">Example: Boron-oxygen light-induced degradation (B-O LID) progression in accelerated tests</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#device-parameters">Device parameters</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#degradation-parameters">Degradation parameters</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-timeseries">Set up timeseries</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#finish-calculating-degraded-device-parameters">Finish calculating degraded device parameters.</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-the-results">Plot the results</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Martin Springer, Silvana Ovaitt, Rajiv Daxini, Tobin Ford, Matthew Brown, Joseph Karas, Derek Holsapple, Michael Kempe
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1061 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PVGIS Distributed &#8212; PVDEG Tutorials</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '06_advanced/05_pvgis_distributed';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ASTM Live Demo" href="../10_workshop_demos/01_astm_live_demo.html" />
+    <link rel="prev" title="NSRDB Distributed (API Key Required)" href="04_nsrdb_distributed_api.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/PVdeg-Logo-Horiz-Color.svg" class="logo__image only-light" alt="PVDEG Tutorials - Home"/>
+    <img src="../_static/PVdeg-Logo-Horiz-Color.svg" class="logo__image only-dark pst-js-only" alt="PVDEG Tutorials - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">01 - Basics</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/01_basics_humidity_design.html">Humidity Design Basics</a></li>
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/02_degradation.html">Degradation Overview</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/03_spectral_degradation.html">Spectral Degradation</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../01_basics/04_weather_database_access.html">Weather Database Access</a></li>
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">02 - Degradation Mechanisms</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../02_degradation/01_bo_lid_accelerated_test.html">B-O LID Accelerated Test</a></li>
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../02_degradation/02_letid_accelerated_test.html">LETID Accelerated Test</a></li>
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../02_degradation/03_letid_outdoor.html">LETID Outdoor</a></li>
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../02_degradation/04_letid_outdoor_scenario.html">LETID Outdoor Scenario</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../02_degradation/05_letid_passivated_wafer.html">LETID Passivated Wafer</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../02_degradation/06_vant_hoff_degradation_model.html">Van’t Hoff Degradation Model</a></li>
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">03 - Monte Carlo Simulations</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../03_monte_carlo/01_arrhenius.html">Arrhenius Monte Carlo</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../03_monte_carlo/02_standoff.html">Standoff Monte Carlo</a></li>
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">04 - Scenarios</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../04_scenario/01_scenario_temperature.html">Temperature Scenario</a></li>
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../04_scenario/02_scenario_single_location.html">Single Location</a></li>
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../04_scenario/03_scenario_mountain_downselect.html">Mountain Downselect</a></li>
+
+
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">05 - Geospatial Analysis</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/01_geospatial_templates.html">Geospatial Templates (HPC)</a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/02_geospatial_world_map.html">Geospatial World Map (HPC)</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/03_letid_outdoor_geospatial_demo.html">LETID Outdoor Geospatial Demo (HPC)</a></li>
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/04_scenario_geographical_features.html">Geographical Features (HPC)</a></li>
+
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../05_geospatial/05_scenario_geospatial.html">Scenario Geospatial (HPC)</a></li>
+
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">06 - Advanced Topics</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="01_custom_functions_nopython.html">Custom Functions with Numba</a></li>
+
+
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="02_pysam_single_location.html">PySAM for a Single Location</a></li>
+<li class="toctree-l1"><a class="reference internal" href="03_pysam_api.html">PySAM: Single Location &amp; Geospatial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="04_nsrdb_distributed_api.html">NSRDB Distributed (API Key Required)</a></li>
+
+
+
+
+
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">PVGIS Distributed</a></li>
+
+
+
+
+
+
+
+
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">06 - Workshop Demos</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../10_workshop_demos/01_astm_live_demo.html">ASTM Live Demo</a></li>
+
+
+
+
+
+
+<li class="toctree-l1"><a class="reference internal" href="../10_workshop_demos/02_duramat_live_demo.html">DuraMAT Live Demo (HPC)</a></li>
+
+
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Tools</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../tools/Tools%20-%20Edge%20Seal%20Oxygen%20Ingress.html">Edge Seal Oxygen Ingress</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/Tools%20-%20Degradation.html">Degradation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/Tools%20-%20Module%20Standoff%20for%20IEC%20TS%2063126.html">Module Standoff for IEC TS 63126 (HPC)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/06_advanced/05_pvgis_distributed.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>PVGIS Distributed</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">PVGIS Distributed</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-coordinates-list">Creating Coordinates List</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dask">Dask</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#requesting-weather">Requesting Weather</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-result">Viewing Result</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-geospatial-data-locally">Saving Geospatial Data Locally</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#store">Store</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#load">Load</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#load-pvgis-1hr-data">Load PVGIS-1hr Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inspecting-the-results">Inspecting the Results</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#geospatial-calculations-from-locally-stored-data">Geospatial Calculations from Locally Stored Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#growing-our-living-store">Growing Our Living Store</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="pvgis-distributed">
+<h1>PVGIS Distributed<a class="headerlink" href="#pvgis-distributed" title="Link to this heading">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pvdeg</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">global_land_mask</span><span class="w"> </span><span class="kn">import</span> <span class="n">globe</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dask.distributed</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalCluster</span><span class="p">,</span> <span class="n">Client</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="creating-coordinates-list">
+<h1>Creating Coordinates List<a class="headerlink" href="#creating-coordinates-list" title="Link to this heading">#</a></h1>
+<p>Lets Generate a Grid of Latitude and Longitude Coordinates over the UK.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># decrease the arange step size for more fine resolution</span>
+<span class="c1"># increase the arange step size for increased granularity</span>
+<span class="n">lon_UK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">1.76</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">lat_UK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">49.95</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">lon_grid_UK</span><span class="p">,</span> <span class="n">lat_grid_UK</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lon_UK</span><span class="p">,</span> <span class="n">lat_UK</span><span class="p">)</span>
+<span class="n">land_UK</span> <span class="o">=</span> <span class="n">globe</span><span class="o">.</span><span class="n">is_land</span><span class="p">(</span><span class="n">lat_grid_UK</span><span class="p">,</span> <span class="n">lon_grid_UK</span><span class="p">)</span>
+
+<span class="n">lon_land_UK</span> <span class="o">=</span> <span class="n">lon_grid_UK</span><span class="p">[</span><span class="n">land_UK</span><span class="p">]</span>
+<span class="n">lat_land_UK</span> <span class="o">=</span> <span class="n">lat_grid_UK</span><span class="p">[</span><span class="n">land_UK</span><span class="p">]</span>
+
+<span class="n">lon_Scan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">31.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">lat_Scan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mf">71.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">lon_grid_Scan</span><span class="p">,</span> <span class="n">lat_grid_Scan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lon_Scan</span><span class="p">,</span> <span class="n">lat_Scan</span><span class="p">)</span>
+<span class="n">land_Scan</span> <span class="o">=</span> <span class="n">globe</span><span class="o">.</span><span class="n">is_land</span><span class="p">(</span><span class="n">lat_grid_Scan</span><span class="p">,</span> <span class="n">lon_grid_Scan</span><span class="p">)</span>
+
+<span class="n">lon_land_Scan</span> <span class="o">=</span> <span class="n">lon_grid_Scan</span><span class="p">[</span><span class="n">land_Scan</span><span class="p">]</span>
+<span class="n">lat_land_Scan</span> <span class="o">=</span> <span class="n">lat_grid_Scan</span><span class="p">[</span><span class="n">land_Scan</span><span class="p">]</span>
+
+<span class="n">coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+    <span class="nb">zip</span><span class="p">(</span><span class="n">lat_land_UK</span><span class="p">,</span> <span class="n">lon_land_UK</span><span class="p">)</span>
+<span class="p">)</span>  <span class="c1"># easiest way to make a list of the right shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="dask">
+<h1>Dask<a class="headerlink" href="#dask" title="Link to this heading">#</a></h1>
+<p>We are using dask to parallelize the weather API calls. We need to start a dask client as shown below. This can also be done with <code class="docutils literal notranslate"><span class="pre">pvdeg.geospatial.start_dask</span></code>.</p>
+<p>Click on the link to open a localhost dashboard for the dask client. This will allow us to see what happens when we run functions using dask.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">workers</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">cluster</span> <span class="o">=</span> <span class="n">LocalCluster</span><span class="p">(</span>
+    <span class="n">n_workers</span><span class="o">=</span><span class="n">workers</span><span class="p">,</span>
+    <span class="n">processes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">dashboard_link</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="requesting-weather">
+<h1>Requesting Weather<a class="headerlink" href="#requesting-weather" title="Link to this heading">#</a></h1>
+<p>Now that we have our coordinates, and dask client initialized we can make our parallel api calls using <code class="docutils literal notranslate"><span class="pre">pvdeg.weather.weather_distributed</span></code>.</p>
+<p>We want data from PVGIS so we will use that as the database. For more information about the databases look at the <code class="docutils literal notranslate"><span class="pre">pvdeg.weather.get</span></code> docstring. We will pass in the coordinates list which is a list of tuple pairs for the latitude and longiutudes to request weather at.</p>
+<p><code class="docutils literal notranslate"><span class="pre">weather_ds</span></code> is the collected weather dataset from the API calls to PVGIS.
+<code class="docutils literal notranslate"><span class="pre">meta_df</span></code> is the collected meta dataframe from the API calls to PVGIS.
+<code class="docutils literal notranslate"><span class="pre">failed_gids</span></code> will be a list of the failed indexes from the input coordinates list that we could not get weather from using PVGIS. These may have failed randomly so it is worth trying again.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">weather_ds</span><span class="p">,</span> <span class="n">meta_df</span><span class="p">,</span> <span class="n">failed_gids</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">weather_distributed</span><span class="p">(</span>
+    <span class="n">database</span><span class="o">=</span><span class="s2">"PVGIS"</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="viewing-result">
+<h1>Viewing Result<a class="headerlink" href="#viewing-result" title="Link to this heading">#</a></h1>
+<p>The result is stored in an xarray dataset with a dask array backend. This allows us to parallelize the computation/api requests but makes it a little harder to view the data. We can inspect the dataset using the following but we will not be able to inspect any values.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">weather_ds</span>
+</pre></div>
+</div>
+<p>To load the values from the dask arrays we need to use <code class="docutils literal notranslate"><span class="pre">.compute()</span></code> as follows.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">weather_ds</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="saving-geospatial-data-locally">
+<h1>Saving Geospatial Data Locally<a class="headerlink" href="#saving-geospatial-data-locally" title="Link to this heading">#</a></h1>
+<p>The goal of <code class="docutils literal notranslate"><span class="pre">pvdeg.store</span></code> is to create a living local database of meteoroligical data that grows overtime as your geospatial data needs grow. To do this <code class="docutils literal notranslate"><span class="pre">PVDeg</span></code> will save to a folder called <code class="docutils literal notranslate"><span class="pre">PVDeg-Meteorological</span></code> in your user home directory, i.e. <code class="docutils literal notranslate"><span class="pre">Path.home()</span> <span class="pre">/</span> <span class="pre">&quot;PVDeg-Meteorological&quot;</span></code> (exposed as <code class="docutils literal notranslate"><span class="pre">pvdeg.METOROLOGICAL_DOWNLOAD_PATH</span></code>). This directory will contain a <code class="docutils literal notranslate"><span class="pre">zarr</span></code> store, this is a popular format for storing multi-dimensional array data, not dissimilar to <code class="docutils literal notranslate"><span class="pre">h5</span></code> files. It was chosen over <code class="docutils literal notranslate"><span class="pre">h5</span></code> because <code class="docutils literal notranslate"><span class="pre">zarr</span></code> stores arrays in chunked compressed files that make access very easy without opening an entire file like <code class="docutils literal notranslate"><span class="pre">h5</span></code>. This is an oversimplification of the design process but we felt <code class="docutils literal notranslate"><span class="pre">zarr</span></code> was a better fit.</p>
+<section id="store">
+<h2>Store<a class="headerlink" href="#store" title="Link to this heading">#</a></h2>
+<p>We can use <code class="docutils literal notranslate"><span class="pre">pvdeg.store.store</span></code> to save geospatial data to our living dataset in the common form provided by <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code>. The data is stored in various groups and subfolders but they will be arranged based on the <em>source</em> and <em>periodicity</em>.</p>
+<p>For example:
+- Hourly PVGIS data will be saved to a group called “PVGIS-1hr”
+- 30 minute PVGIS to a group called “PVGIS-30min”
+- 15 minute PVGIS will be saved to a group called “PVGIS-15min”</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pvdeg</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">weather_ds</span><span class="p">,</span> <span class="n">meta_df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="load">
+<h1>Load<a class="headerlink" href="#load" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">PVDeg</span></code> makes use of <code class="docutils literal notranslate"><span class="pre">dask</span></code> to handle larger than memory datasets. Trandionally, this was only useful in our HPC environment but as your local database grows overtime, it will eventually surpass the limits of your computer’s volatile memory. Additionally, <code class="docutils literal notranslate"><span class="pre">dask</span></code> allows us to parallelize geospatial calculations via <code class="docutils literal notranslate"><span class="pre">pvdeg.geospatial.analysis</span></code>. This ability can be utilized on local machines or HPC clusters alike.</p>
+<p><code class="docutils literal notranslate"><span class="pre">PVDeg</span></code> implements the ability to access your local living database via <code class="docutils literal notranslate"><span class="pre">pvdeg.store.get</span></code>. This method takes a string called <code class="docutils literal notranslate"><span class="pre">group</span></code>. Groups are created automatically in your store when you save data using <code class="docutils literal notranslate"><span class="pre">pvdeg.store.store</span></code>. As described in the <code class="docutils literal notranslate"><span class="pre">pvdeg.store.store</span></code> docstring and the <em>Store</em> section above, NSRDB will follow a similar scheme but it not implemented yet.
+- Hourly PVGIS data will be saved to a group called “PVGIS-1hr”
+- 30 minute PVGIS to a group called “PVGIS-30min”
+- 15 minute PVGIS will be saved to a group called “PVGIS-15min”</p>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="load-pvgis-1hr-data">
+<h1>Load PVGIS-1hr Data<a class="headerlink" href="#load-pvgis-1hr-data" title="Link to this heading">#</a></h1>
+<p>The example below shows us loading the hourly tmy data from PVGIS that we gathered and saved to our zarr store in the above cells. This gets us the form of a weather xarray.Dataset (<code class="docutils literal notranslate"><span class="pre">geo_weather</span></code> in this example) and a metadata dataframe (<code class="docutils literal notranslate"><span class="pre">geo_meta</span></code> in this example).</p>
+<p>These can be treated like any other geospatial data shown in the <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code> tutorials and tools or documentation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geo_weather</span><span class="p">,</span> <span class="n">geo_meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"PVGIS-1hr"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="inspecting-the-results">
+<h1>Inspecting the Results<a class="headerlink" href="#inspecting-the-results" title="Link to this heading">#</a></h1>
+<p>explain <em>.compute() and dask here</em></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">geo_weather</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">gid</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">dni</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geo_meta</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="geospatial-calculations-from-locally-stored-data">
+<h1>Geospatial Calculations from Locally Stored Data<a class="headerlink" href="#geospatial-calculations-from-locally-stored-data" title="Link to this heading">#</a></h1>
+<p>As shown above we can load from our <code class="docutils literal notranslate"><span class="pre">zarr</span></code> store and treat it like any other geospatial data in <code class="docutils literal notranslate"><span class="pre">pvdeg</span></code>.</p>
+<p>For demonstration we can run the analysis below to estimate effective standoff height and operating temperatures for the provided data. It may look like the <code class="docutils literal notranslate"><span class="pre">geo_res</span></code> contains empty results but that is because we did not have input data for all of the points in the input grid (think of this as a 2D plane formed between the latitude and longitude axes). Clicking on the stack of three circles in the bottom cell will expand the datavariable (like an attribute of the multidimensional array structure) and show the results.</p>
+<p>Additionally, we can interpolate and plot the results.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">func</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span>
+
+<span class="n">template</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">geospatial</span><span class="o">.</span><span class="n">auto_template</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">ds_gids</span><span class="o">=</span><span class="n">geo_weather</span><span class="p">)</span>
+
+<span class="n">geo_res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">geospatial</span><span class="o">.</span><span class="n">analysis</span><span class="p">(</span>
+    <span class="n">weather_ds</span><span class="o">=</span><span class="n">geo_weather</span><span class="p">,</span> <span class="n">meta_df</span><span class="o">=</span><span class="n">geo_meta</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geo_res</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This plot lacks information on the area and does not include some political boundary lines. For more information on plotting look at the <code class="docutils literal notranslate"><span class="pre">Scenario</span> <span class="pre">-</span> <span class="pre">Non-uniform</span> <span class="pre">Mountain</span> <span class="pre">Downselect.ipynb</span></code> tutorial in the tutorials and tools folder.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pvdeg</span><span class="o">.</span><span class="n">geospatial</span><span class="o">.</span><span class="n">plot_sparse_analysis_land</span><span class="p">(</span>
+    <span class="n">geo_res</span><span class="p">,</span> <span class="n">data_var</span><span class="o">=</span><span class="s2">"T98_0"</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">"nearest"</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="n">j</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section class="tex2jax_ignore mathjax_ignore" id="growing-our-living-store">
+<h1>Growing Our Living Store<a class="headerlink" href="#growing-our-living-store" title="Link to this heading">#</a></h1>
+<p>What if we want to download more points from Europe? We can keep our old download in the store and shelve it to look at northern Europe.</p>
+<p>We will start by generating a range of points that cover Europe.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lon_EU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">25.0</span><span class="p">,</span> <span class="mf">51.0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># Adjusted for EU longitudes</span>
+<span class="n">lat_EU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">34.0</span><span class="p">,</span> <span class="mf">73.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># Adjusted for EU latitudes</span>
+
+<span class="c1"># Create meshgrid for EU</span>
+<span class="n">lon_grid_EU</span><span class="p">,</span> <span class="n">lat_grid_EU</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lon_EU</span><span class="p">,</span> <span class="n">lat_EU</span><span class="p">)</span>
+
+<span class="c1"># Check land coverage in the EU</span>
+<span class="n">land_EU</span> <span class="o">=</span> <span class="n">globe</span><span class="o">.</span><span class="n">is_land</span><span class="p">(</span><span class="n">lat_grid_EU</span><span class="p">,</span> <span class="n">lon_grid_EU</span><span class="p">)</span>
+
+<span class="c1"># Extract land coordinates in the EU</span>
+<span class="n">lon_land_EU</span> <span class="o">=</span> <span class="n">lon_grid_EU</span><span class="p">[</span><span class="n">land_EU</span><span class="p">]</span>
+<span class="n">lat_land_EU</span> <span class="o">=</span> <span class="n">lat_grid_EU</span><span class="p">[</span><span class="n">land_EU</span><span class="p">]</span>
+
+<span class="c1"># Define the Scan grid ranges</span>
+<span class="n">lon_Scan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">10.5</span><span class="p">,</span> <span class="mf">31.6</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">lat_Scan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mf">71.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">lon_grid_Scan</span><span class="p">,</span> <span class="n">lat_grid_Scan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lon_Scan</span><span class="p">,</span> <span class="n">lat_Scan</span><span class="p">)</span>
+<span class="n">land_Scan</span> <span class="o">=</span> <span class="n">globe</span><span class="o">.</span><span class="n">is_land</span><span class="p">(</span><span class="n">lat_grid_Scan</span><span class="p">,</span> <span class="n">lon_grid_Scan</span><span class="p">)</span>
+
+<span class="n">lon_land_Scan</span> <span class="o">=</span> <span class="n">lon_grid_Scan</span><span class="p">[</span><span class="n">land_Scan</span><span class="p">]</span>
+<span class="n">lat_land_Scan</span> <span class="o">=</span> <span class="n">lat_grid_Scan</span><span class="p">[</span><span class="n">land_Scan</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">lon_land_EU</span><span class="p">,</span> <span class="n">lat_land_EU</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">failed_gids</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">weather</span><span class="o">.</span><span class="n">weather_distributed</span><span class="p">(</span>
+    <span class="n">database</span><span class="o">=</span><span class="s2">"PVGIS"</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="p">[(</span><span class="n">lat_land_EU</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">lon_land_EU</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pvdeg</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">weather_ds</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">meta_df</span><span class="o">=</span><span class="n">m</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_weather</span><span class="p">,</span> <span class="n">loaded_meta</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group</span><span class="o">=</span><span class="s2">"PVGIS-1hr"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_meta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_weather</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_weather</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">gid</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">loaded_weather</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">gid</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">dhi</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wet</span><span class="p">,</span> <span class="n">met</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">store</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PVGIS-1hr"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wet</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">loaded_meta</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">func</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">standards</span><span class="o">.</span><span class="n">standoff</span>
+
+<span class="n">template</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">geospatial</span><span class="o">.</span><span class="n">auto_template</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">ds_gids</span><span class="o">=</span><span class="n">loaded_weather</span><span class="p">)</span>
+
+<span class="n">loaded_geo_res</span> <span class="o">=</span> <span class="n">pvdeg</span><span class="o">.</span><span class="n">geospatial</span><span class="o">.</span><span class="n">analysis</span><span class="p">(</span>
+    <span class="n">weather_ds</span><span class="o">=</span><span class="n">loaded_weather</span><span class="p">,</span> <span class="n">meta_df</span><span class="o">=</span><span class="n">loaded_meta</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pvdeg</span><span class="o">.</span><span class="n">geospatial</span><span class="o">.</span><span class="n">plot_sparse_analysis_land</span><span class="p">(</span><span class="n">loaded_geo_res</span><span class="p">,</span> <span class="n">data_var</span><span class="o">=</span><span class="s2">"T98_inf"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./06_advanced"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="04_nsrdb_distributed_api.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">NSRDB Distributed (API Key Required)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../10_workshop_demos/01_astm_live_demo.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ASTM Live Demo</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">PVGIS Distributed</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-coordinates-list">Creating Coordinates List</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#dask">Dask</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#requesting-weather">Requesting Weather</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-result">Viewing Result</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-geospatial-data-locally">Saving Geospatial Data Locally</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#store">Store</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#load">Load</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#load-pvgis-1hr-data">Load PVGIS-1hr Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inspecting-the-results">Inspecting the Results</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#geospatial-calculations-from-locally-stored-data">Geospatial Calculations from Locally Stored Data</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#growing-our-living-store">Growing Our Living Store</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Martin Springer, Silvana Ovaitt, Rajiv Daxini, Tobin Ford, Matthew Brown, Joseph Karas, Derek Holsapple, Michael Kempe
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
