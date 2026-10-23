@@ -20,6 +20,56 @@ import pprint
 from IPython.display import display, HTML
 
 
+def _resolve_material_params(material_params, material_layer):
+    """Resolve which material parameters to inject for a given job.
+
+    Parameters:
+    -----------
+    material_params : dict
+        The module's material parameters. Either a flat dict of scalar
+        values (single-material, from ``addModule(materials="OX003")``)
+        or a nested dict of dicts (multi-layer, from
+        ``addModule(materials={"encapsulant": {...}, ...})``).
+    material_layer : str or None
+        The layer name bound to the job via ``addJob``. If ``None``,
+        no material parameters are injected.
+
+    Returns:
+    --------
+    dict
+        Flat dict of material parameters to inject into the function, or
+        an empty dict if no injection is needed.
+    """
+    if material_layer is None:
+        return {}
+
+    # Detect nested (multi-layer) vs flat (single-material) structure.
+    # Nested: all values are dicts, e.g. {"encapsulant": {"Ead": ...}}
+    # Flat:   values are scalars,   e.g. {"Ead": 29.4, "Do": 0.13, ...}
+    is_nested = material_params and all(
+        isinstance(v, dict) for v in material_params.values()
+    )
+
+    if is_nested:
+        if material_layer not in material_params:
+            warnings.warn(
+                f"Layer '{material_layer}' is missing from material_params. "
+                "No material parameters will be injected for this job. "
+                f"Available layers: {list(material_params.keys())}"
+            )
+            return {}
+        return material_params[material_layer]
+    else:
+        # material_params is flat (single material) but a layer name was
+        # requested — layer selection requires a nested material dict.
+        warnings.warn(
+            f"Layer '{material_layer}' was specified but material_params is not "
+            "structured as named layers. No material parameters will be injected. "
+            "Use a dict-of-dicts when calling addModule to enable layer selection."
+        )
+        return {}
+
+
 class Scenario:
     """Scenario object, contains all parameters and criteria for a given scenario.
 
@@ -33,7 +83,7 @@ class Scenario:
         path: Optional[str] = None,
         gids: Optional[Union[int, List[int], np.ndarray[int]]] = None,
         modules: Optional[list] = None,
-        pipeline=OrderedDict(),
+        pipeline: Optional[OrderedDict] = None,
         file: Optional[str] = None,
         results=None,
         weather_data: Optional[pd.DataFrame] = None,  # df
@@ -70,7 +120,7 @@ class Scenario:
         self.path = path
         self.modules = modules if modules is not None else []
         self.gids = gids
-        self.pipeline = pipeline
+        self.pipeline = pipeline if pipeline is not None else OrderedDict()
         self.results = results
         self.weather_data = weather_data
         self.meta_data = meta_data
@@ -85,18 +135,18 @@ class Scenario:
         self.name = name
 
         if path is None:
-            self.path = os.path.join(os.getcwd(), f"pvd_job_{self.name}")
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
+            from pvdeg import config as _cfg
+
+            _base = (
+                os.environ.get("PVDEG_JOB_PATH")
+                or _cfg.SCENARIO_OUTPUT_PATH
+                or os.getcwd()
+            )
+            self.path = os.path.join(_base, f"pvd_job_{self.name}")
         else:
             self.path = path
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
 
-        # Only change directory if we're not in a test environment
-        # or if the scenario actually needs to work with files
-        if not os.environ.get("PYTEST_CURRENT_TEST"):
-            os.chdir(self.path)
+        os.makedirs(self.path, exist_ok=True)
 
         if file:
             self.load_json(file_path=file, email=email, api_key=api_key)
@@ -152,7 +202,6 @@ class Scenario:
         to remove all pvd_job_* directories and children from a directory
         """
         if self.path:
-            os.chdir(os.pardir)
             rmtree(path=self.path)  # error when file is not found
         else:
             raise ValueError(f"{self.name} does not have a path attribute")
@@ -540,27 +589,171 @@ class Scenario:
 
     def addJob(
         self,
-        func=None,
-        func_kwarg={},
+        func,
+        name: Optional[str] = None,
+        depends_on: Optional[dict] = None,
     ):
-        """Add a pvdeg function to the scenario pipeline.
+        """Add pvdeg function(s) to the scenario pipeline.
+
+        A material layer is optional. When specified, ``run()`` will inject
+        the matching layer's material parameters into the function automatically.
+        Functions that do not require material parameters (e.g. ``standoff``,
+        ``solder_fatigue``) can be added as a bare callable or a
+        ``(function, kwargs)`` 2-tuple without a layer name.
 
         Parameters:
         -----------
-        func : function
-            pvdeg function to use for single point calculation.
-            All regular pvdeg functions will work at a single point when
-            ``Scenario.geospatial == False``
-        func_params : dict
-            job specific keyword argument dictionary to provide to the function
-        """
-        if func is None or not callable(func):
-            raise ValueError(f'FAILED: Requested function "{func}" not found')
+        func : callable, tuple, or list
+            Specify job(s) to add. Each job must be one of:
 
+            - A bare ``callable`` — add a function with no material layer
+              binding (no material parameters are injected).
+            - A 2-tuple ``(function, layer_name)`` — bind a function to a
+              material layer. Material parameter values are injected
+              automatically by ``run()``.
+            - A 2-tuple ``(function, extra_kwargs)`` — add a function with
+              extra kwargs but no material layer binding (backward compatible
+              for functions that do not use material parameters).
+            - A 3-tuple ``(function, extra_kwargs, layer_name)`` — as above
+              but also supply extra non-material arguments (e.g. experimental
+              conditions such as ``I_chamber``) *and* bind to a material layer.
+            - A list of any of the above for adding multiple jobs at once.
+
+            ``layer_name`` (str) must match a key in the module's
+            ``material_params`` dict (e.g. ``"encapsulant"``,
+            ``"backsheet"``).
+
+        name : str or None
+            Optional unique name for this job. Used for sequential analysis in the
+            Scenario pipeline. Pass this name to a later job's ``depends_on`` variable
+            to forward the output of this job as an input to the later job at run time.
+        depends_on : dict or None
+            ``{kwarg_name: source_job_name}`` mapping. The job from which to take the
+            output as an input for this job. At run time, ``run()`` resolves each source
+            (depends on) job's result and passes it as the named kwarg to this function.
+            The source job must already exist in the pipeline (i.e. have been added with
+            a matching ``name``).
+        """
+        # name/depends_on cannot be used with list form
+        if isinstance(func, list) and (name is not None or depends_on is not None):
+            raise ValueError(
+                "'name' and 'depends_on' cannot be used with list-form addJob. "
+                "Call addJob separately for each job you want to name."
+            )
+
+        # Normalize input to list of jobs
+        if isinstance(func, list):
+            jobs_to_add = func
+        else:
+            jobs_to_add = [func]
+
+        # Process each job
+        if len(jobs_to_add) == 1:
+            return self._add_single_job(jobs_to_add[0], name, depends_on)
+        else:
+            return [self._add_single_job(job) for job in jobs_to_add]
+
+    def _add_single_job(
+        self,
+        job_spec,
+        name: Optional[str] = None,
+        depends_on: Optional[dict] = None,
+    ):
+        """Parse a job spec and add a single job to the pipeline.
+
+        Parameters:
+        -----------
+        job_spec : callable or tuple
+            One of:
+            - A bare callable — no material layer, no extra kwargs.
+            - ``(func, layer_name)`` — bind to a material layer.
+            - ``(func, extra_kwargs)`` — extra kwargs, no layer (backward compat).
+            - ``(func, extra_kwargs, layer_name)`` — extra kwargs + layer binding.
+        name : str or None
+            Optional unique name for this job. Used with ``depends_on`` to
+            reference this job's output from a later job.
+        depends_on : dict or None
+            Mapping of ``{kwarg_name: source_job_name}`` declaring that the
+            result of a previously-named job should be forwarded as a keyword
+            argument to this job at run time.
+        """
+        # Parse the spec into (func, func_kwarg, material_layer)
+        if callable(job_spec):
+            func, func_kwarg, material_layer = job_spec, {}, None
+        elif isinstance(job_spec, tuple):
+            if len(job_spec) == 2:
+                job_func, second = job_spec
+                if not callable(job_func):
+                    raise ValueError(
+                        "First element of job tuple must be callable, "
+                        f"got {type(job_func)}"
+                    )
+                if isinstance(second, str):
+                    func, func_kwarg, material_layer = job_func, {}, second
+                elif isinstance(second, dict):
+                    func, func_kwarg, material_layer = job_func, second, None
+                else:
+                    raise ValueError(
+                        "Second element of a 2-tuple must be a layer name "
+                        f"(str) or extra kwargs (dict), got {type(second)}"
+                    )
+            elif len(job_spec) == 3:
+                job_func, job_kwargs, layer_name = job_spec
+                if not callable(job_func):
+                    raise ValueError(
+                        "First element of job tuple must be callable, "
+                        f"got {type(job_func)}"
+                    )
+                if not isinstance(job_kwargs, dict):
+                    raise ValueError(
+                        "Second element of a 3-tuple must be a dict of "
+                        f"extra kwargs, got {type(job_kwargs)}"
+                    )
+                if not isinstance(layer_name, str):
+                    raise ValueError(
+                        "Third element of a 3-tuple must be a layer name "
+                        f"(str), got {type(layer_name)}"
+                    )
+                func, func_kwarg, material_layer = job_func, job_kwargs, layer_name
+            else:
+                raise ValueError(
+                    "Job tuple must have 2 or 3 elements, " f"got {len(job_spec)}"
+                )
+        else:
+            raise ValueError(
+                "Each job must be a callable, a 2-tuple, or a 3-tuple, "
+                f"got {type(job_spec)}"
+            )
+
+        # Validate and insert into pipeline
         try:
+            if name is not None:
+                existing_names = {
+                    j.get("name") for j in self.pipeline.values() if j.get("name")
+                }
+                if name in existing_names:
+                    raise ValueError(
+                        f"A job named '{name}' already exists in the pipeline."
+                    )
+            if depends_on:
+                existing_names = {
+                    j.get("name") for j in self.pipeline.values() if j.get("name")
+                }
+                for kwarg, source in depends_on.items():
+                    if source not in existing_names:
+                        raise ValueError(
+                            f"depends_on references unknown job '{source}'. "
+                            "Add the source job before the dependent job."
+                        )
             job_id = utilities.new_id(self.pipeline)
-            job_dict = {"job": func, "params": func_kwarg}
-            self.pipeline[job_id] = job_dict
+            self.pipeline[job_id] = {
+                "job": func,
+                "params": func_kwarg,
+                "material_layer": material_layer,
+                "name": name,
+                "depends_on": depends_on or {},
+            }
+            return job_id
         except Exception as e:
             warnings.warn(f"Failed to add job: {e}")
 
@@ -568,8 +761,13 @@ class Scenario:
         """
         Run all jobs in pipeline on scenario object for each module in the scenario.
 
-        Note: if a pipeline job contains a function not adhering to package
-        wide pv parameter naming scheme, the job will raise a fatal error.
+        For jobs bound to a material layer (via ``addJob``), only the
+        parameters for that layer are injected. For jobs with no layer
+        binding, no material parameters are injected.
+
+        Note: if a pipeline job contains a function not adhering to the
+        package-wide pv parameter naming scheme, the job will raise a
+        fatal error.
 
         Parameters:
         -----------
@@ -585,63 +783,94 @@ class Scenario:
         if self.modules:
             for module in self.modules:
                 module_result = {}
+                completed: dict = {}
+
+                weather_dict = {
+                    "weather_df": self.weather_data,
+                    "meta": self.meta_data,
+                }
+
+                temperature_args = {
+                    "temp_model": module["temp_model"],
+                    "model_kwarg": module["model_kwarg"],
+                    "irradiance_kwarg": module["irradiance_kwarg"],
+                    "conf": module["racking"],
+                    **module["irradiance_kwarg"],
+                }
 
                 for id, job in self.pipeline.items():
-                    func, params = job["job"], job["params"]
+                    func = job["job"]
+                    params = job["params"]
+                    material_layer = job.get("material_layer", None)
+                    job_name = job.get("name")
+                    job_depends_on = job.get("depends_on", {})
 
-                    weather_dict = {
-                        "weather_df": self.weather_data,
-                        "meta": self.meta_data,
-                    }
+                    # Resolve upstream job outputs into kwargs
+                    upstream_kwargs = {}
+                    for kwarg, source_name in job_depends_on.items():
+                        if source_name in completed:
+                            upstream_kwargs[kwarg] = completed[source_name]
 
-                    temperature_args = {
-                        "temp_model": module["temp_model"],
-                        "model_kwarg": module["model_kwarg"],
-                        "irradiance_kwarg": module["irradiance_kwarg"],
-                        "conf": module["racking"],
-                        **module["irradiance_kwarg"],
-                    }
+                    # Resolve material params for this specific job's layer
+                    job_material_params = _resolve_material_params(
+                        module["material_params"], material_layer
+                    )
 
                     combined = (
-                        weather_dict | temperature_args | module["material_params"]
+                        weather_dict
+                        | temperature_args
+                        | job_material_params
+                        | upstream_kwargs
                     )
 
                     func_params = signature(func).parameters
-                    func_args = {
-                        k: v for k, v in combined.items() if k in func_params.keys()
-                    }
+                    func_args = {k: v for k, v in combined.items() if k in func_params}
 
                     res = func(**params, **func_args)
-
-                    if id not in module_result.keys():
-                        module_result[id] = res
+                    module_result[id] = res
+                    if job_name:
+                        completed[job_name] = res
+                        module_result[job_name] = res
 
                 results_dict[module["module_name"]] = module_result
 
             self.results = results_dict
 
             for module, pipeline_result in self.results.items():
-                module_dir = f"./pipeline_results/{module}_pipeline_results"
+                module_dir = os.path.join(
+                    self.path, "pipeline_results", f"{module}_pipeline_results"
+                )
                 os.makedirs(module_dir, exist_ok=True)
                 for function, result in pipeline_result.items():
                     if isinstance(result, (pd.Series, pd.DataFrame)):
-                        result.to_csv(f"{module_dir}/{function}.csv")
+                        result.to_csv(os.path.join(module_dir, f"{function}.csv"))
                     elif isinstance(result, (int, float)):
-                        with open(f"{module_dir}/{function}.csv", "w") as file:
+                        out_file = os.path.join(module_dir, f"{function}.csv")
+                        with open(out_file, "w") as file:
                             file.write(f"{result}\n")
 
         elif not self.modules:
             pipeline_results = {}
+            completed: dict = {}
 
             for id, job in self.pipeline.items():
                 func, params = job["job"], job["params"]
+                job_name = job.get("name")
+                job_depends_on = job.get("depends_on", {})
+
+                # Resolve upstream job outputs into kwargs
+                upstream_kwargs = {}
+                for kwarg, source_name in job_depends_on.items():
+                    if source_name in completed:
+                        upstream_kwargs[kwarg] = completed[source_name]
 
                 # Arguments to pass to the function
                 func_args = {
                     "weather_df": self.weather_data,
                     "meta": self.meta_data,
                 }
-                # Merge user-defined parameters, which can override weather/meta
+                # Merge upstream results, then user-defined parameters
+                func_args.update(upstream_kwargs)
                 if params:
                     func_args.update(params)
 
@@ -652,16 +881,24 @@ class Scenario:
                 result = func(**final_args)
 
                 results_dict[id] = result
+                if job_name:
+                    results_dict[job_name] = result
+                    completed[job_name] = result
                 pipeline_results = results_dict
 
             for key in pipeline_results.keys():
                 if isinstance(results_dict[key], pd.DataFrame):
+                    results_series[key] = results_dict[key]
+                elif isinstance(results_dict[key], pd.Series):
                     results_series[key] = results_dict[key]
                 elif isinstance(results_dict[key], (float, int)):
                     results_series[key] = pd.DataFrame(
                         [results_dict[key]],
                         columns=[key],
                     )
+                else:
+                    # Preserve any other return type (e.g. a dict of series/scalars)
+                    results_series[key] = results_dict[key]
 
             self.results = results_series
 
@@ -1066,7 +1303,7 @@ class Scenario:
             <p><strong>self.api_key:</strong> {self.api_key}</p>
             <div>
                 <h3>self.results</h3>
-                {self.format_results() if self.results else None}
+                {self.format_results() if self.results is not None else None}
             </div>
             <div>
                 <h3>self.pipeline</h3>

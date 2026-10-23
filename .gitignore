@@ -123,3 +123,10 @@ tests/TEMP_test_addModule_materials.py
 pvd_job_*/
 /tutorials_and_tools/tutorials_and_tools/pvd_job_temperature and degradation/pipeline_results
 /tutorials/04_scenario/pvd_job_temperature and degradation/pipeline_results
+/tutorials/04_scenario/pvd_job_temperature and degradation
+/pipeline_results
+/tutorials/04_scenario/pvd_job_two-material-demo/pipeline_results
+/tutorials/04_scenario/pvd_job_two-material-demo
+/tutorials/04_scenario/pvd_job_stack
+/tutorials/04_scenario/pvd_job_perov-module-stack
+/perovskite_papers

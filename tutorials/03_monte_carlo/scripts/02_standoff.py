@@ -100,6 +100,7 @@ print(samples)
 # When using the pvdeg.montecarlo.simulate() function on a target function all of the target function's required arguments must still be given. Our non-changing arguments will be stored in a dictionary. The randomized monte carlo input data will also be passed to the target function via the simulate function. All required target function arguments should be contained between the column names of the randomized input data and fixed argument dictionary,
 
 # %%
+# NBVAL-IGNORE-OUTPUT
 # defining arguments to pass to the target function, standoff() in this case
 function_kwargs = {
     "weather_df": WEATHER,

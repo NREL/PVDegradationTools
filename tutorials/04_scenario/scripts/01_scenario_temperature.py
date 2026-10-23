@@ -82,18 +82,15 @@ scene_temp.addModule(
 )
 
 scene_temp.addJob(
-    func=pvdeg.temperature.temperature,
-    func_kwarg={"cell_or_mod": "cell"},
+    func=(pvdeg.temperature.temperature, {"cell_or_mod": "cell"}),
 )
 
 scene_temp.addJob(
-    func=pvdeg.degradation.vantHoff_deg,
-    func_kwarg={"I_chamber": 1000, "temp_chamber": 25},
+    func=(pvdeg.degradation.vantHoff_deg, {"I_chamber": 1000, "temp_chamber": 25}),
 )
 
 scene_temp.addJob(
-    func=pvdeg.degradation.vantHoff_deg,
-    func_kwarg={"I_chamber": 1000, "temp_chamber": 30},
+    func=(pvdeg.degradation.vantHoff_deg, {"I_chamber": 1000, "temp_chamber": 30}),
 )
 
 scene_temp.addJob(

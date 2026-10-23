@@ -12,6 +12,8 @@ TEST_DATA_DIR = PVDEG_DIR.parent / "tests" / "data"
 # downloader target directory
 METOROLOGICAL_DOWNLOAD_PATH = Path.home() / "PVDeg-Meteorological"
 
+SCENARIO_OUTPUT_PATH = None
+
 # DATA_LIBRARY = PVDEG_DIR.parent / "DataLibrary"
 # if not os.path.isdir(DATA_LIBRARY):
 #     DATA_LIBRARY = os.path.join(sys.prefix, "DataLibrary")
